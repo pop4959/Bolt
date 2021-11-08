@@ -1,10 +1,13 @@
 repositories {
     mavenCentral()
+    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://papermc.io/repo/repository/maven-public")
 }
 
 dependencies {
     compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.17.1-R0.1-SNAPSHOT")
+    compileOnly(group = "org.xerial", name = "sqlite-jdbc", version = "3.34.0")
+    compileOnly(group = "mysql", name = "mysql-connector-java", version = "8.0.23")
     implementation(group = "io.papermc", name = "paperlib", version = "1.0.6")
     implementation(group = "org.bstats", name = "bstats-bukkit", version = "2.2.1")
     implementation(project(":bolt-common"))

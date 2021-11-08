@@ -1,4 +1,0 @@
-name: Bolt
-version: @version@
-main: org.popcraft.bolt.Bolt
-api-version: 1.17

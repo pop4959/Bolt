@@ -1,0 +1,6 @@
+name: ${name}
+version: ${version}
+main: ${group}.bolt.Bolt
+api-version: 1.13
+authors: [${author}]
+description: ${description}
