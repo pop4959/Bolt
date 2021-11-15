@@ -1,4 +1,4 @@
-package org.popcraft.bolt.data;
+package org.popcraft.bolt.data.defaults;
 
 public class DefaultSource {
     public static final String PLAYER = "player";

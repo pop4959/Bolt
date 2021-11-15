@@ -1,6 +1,6 @@
 package org.popcraft.bolt.migration.lwc;
 
-import org.popcraft.bolt.data.protection.DefaultProtectionType;
+import org.popcraft.bolt.data.defaults.DefaultProtectionType;
 
 public enum LWCSourceType {
     PUBLIC(DefaultProtectionType.PUBLIC),

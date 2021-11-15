@@ -1,4 +1,7 @@
-package org.popcraft.bolt.data;
+package org.popcraft.bolt.data.defaults;
+
+import org.popcraft.bolt.data.Access;
+import org.popcraft.bolt.data.Permission;
 
 import java.util.List;
 

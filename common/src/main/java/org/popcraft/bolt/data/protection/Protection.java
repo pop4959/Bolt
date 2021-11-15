@@ -7,15 +7,21 @@ import java.util.UUID;
 
 public abstract class Protection {
     private final UUID id;
-    private final Map<Source, String> access;
+    private final Map<Source, String> accessList;
     private String owner;
     private String type;
 
-    public Protection(UUID id, String owner, String type, Map<Source, String> access) {
+    protected Protection(UUID id, String owner, String type, Map<Source, String> accessList) {
         this.id = id;
         this.owner = owner;
         this.type = type;
-        this.access = access;
+        this.accessList = accessList;
+    }
+
+    public boolean canAccess(final UUID player) {
+        // TODO: Check permissions
+        // TODO: Think about how to handle protection type access and access list
+        return player.toString().equals(owner);
     }
 
     public UUID getId() {
@@ -38,7 +44,7 @@ public abstract class Protection {
         this.type = type;
     }
 
-    public Map<Source, String> getAccess() {
-        return access;
+    public Map<Source, String> getAccessList() {
+        return accessList;
     }
 }

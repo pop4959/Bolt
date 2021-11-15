@@ -1,4 +1,4 @@
-package org.popcraft.bolt.data.protection;
+package org.popcraft.bolt.data.defaults;
 
 import org.popcraft.bolt.data.Access;
 import org.popcraft.bolt.data.Permission;

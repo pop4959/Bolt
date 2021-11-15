@@ -1,11 +1,12 @@
 package org.popcraft.bolt.migration.lwc;
 
 import com.google.gson.Gson;
-import org.popcraft.bolt.data.DefaultAccess;
-import org.popcraft.bolt.data.protection.DefaultProtectionType;
-import org.popcraft.bolt.data.DefaultSource;
+import org.popcraft.bolt.data.Access;
+import org.popcraft.bolt.data.defaults.DefaultAccess;
+import org.popcraft.bolt.data.defaults.DefaultProtectionType;
+import org.popcraft.bolt.data.defaults.DefaultSource;
 import org.popcraft.bolt.data.Source;
-import org.popcraft.bolt.data.protection.ProtectedBlock;
+import org.popcraft.bolt.data.protection.BlockProtection;
 import org.popcraft.bolt.data.store.MemoryStore;
 import org.popcraft.bolt.migration.Migration;
 import org.popcraft.bolt.migration.lwc.data.Block;
@@ -94,6 +95,10 @@ public class LWCMigration implements Migration {
                 e.printStackTrace();
             }
         }
+        for (final DefaultAccess defaultAccess : DefaultAccess.values()) {
+            final Access access = new Access(defaultAccess.type(), defaultAccess.permissions());
+            store.saveAccess(access);
+        }
         final Gson gson = new Gson();
         for (final Protection protection : protections) {
             final String protectionType;
@@ -132,7 +137,7 @@ public class LWCMigration implements Migration {
             if (protection.password() != null && !protection.password().isEmpty()) {
                 access.put(new Source(DefaultSource.PASSWORD, protection.password()), DefaultAccess.BASIC.type());
             }
-            store.saveProtection(new ProtectedBlock(
+            store.saveBlockProtection(new BlockProtection(
                     UUID.randomUUID(),
                     protection.owner(),
                     protectionType,

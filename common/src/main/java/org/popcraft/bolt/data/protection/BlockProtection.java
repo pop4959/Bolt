@@ -5,15 +5,15 @@ import org.popcraft.bolt.data.Source;
 import java.util.Map;
 import java.util.UUID;
 
-public class ProtectedBlock extends Protection {
+public class BlockProtection extends Protection {
     private final String block;
     private String world;
     private int x;
     private int y;
     private int z;
 
-    public ProtectedBlock(UUID id, String owner, String type, Map<Source, String> access, String block, String world, int x, int y, int z) {
-        super(id, owner, type, access);
+    public BlockProtection(UUID id, String owner, String type, Map<Source, String> accessList, String block, String world, int x, int y, int z) {
+        super(id, owner, type, accessList);
         this.block = block;
         this.world = world;
         this.x = x;

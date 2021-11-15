@@ -1,7 +1,8 @@
 package org.popcraft.bolt.data.store;
 
 import org.popcraft.bolt.data.Access;
-import org.popcraft.bolt.data.protection.Protection;
+import org.popcraft.bolt.data.protection.BlockProtection;
+import org.popcraft.bolt.data.util.BlockLocation;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +12,13 @@ import java.util.UUID;
 
 public class MemoryStore implements Store {
     private final Map<String, Access> accessMap = new HashMap<>();
-    private final Map<UUID, Protection> protectionMap = new HashMap<>();
+    private final Map<UUID, BlockProtection> uuidProtectionMap = new HashMap<>();
+    private final Map<BlockLocation, BlockProtection> locationProtectionMap = new HashMap<>();
+
+    @Override
+    public Optional<Access> loadAccess(final String type) {
+        return Optional.ofNullable(accessMap.get(type));
+    }
 
     @Override
     public List<Access> loadAccess() {
@@ -24,17 +31,24 @@ public class MemoryStore implements Store {
     }
 
     @Override
-    public Optional<Protection> loadProtection(UUID id) {
-        return Optional.ofNullable(protectionMap.get(id));
+    public Optional<BlockProtection> loadBlockProtection(final UUID id) {
+        return Optional.ofNullable(uuidProtectionMap.get(id));
     }
 
     @Override
-    public List<Protection> loadProtections() {
-        return List.copyOf(protectionMap.values());
+    public Optional<BlockProtection> loadBlockProtection(final BlockLocation location) {
+        return Optional.ofNullable(locationProtectionMap.get(location));
     }
 
     @Override
-    public void saveProtection(Protection protection) {
-        protectionMap.put(protection.getId(), protection);
+    public List<BlockProtection> loadBlockProtections() {
+        return List.copyOf(uuidProtectionMap.values());
+    }
+
+    @Override
+    public void saveBlockProtection(final BlockProtection protection) {
+        uuidProtectionMap.put(protection.getId(), protection);
+        final BlockLocation blockLocation = new BlockLocation(protection.getWorld(), protection.getX(), protection.getY(), protection.getZ());
+        locationProtectionMap.put(blockLocation, protection);
     }
 }
