@@ -1,6 +1,6 @@
 package org.popcraft.bolt.data.defaults;
 
-public class DefaultSource {
+public class DefaultSourceType {
     public static final String PLAYER = "player";
     public static final String GROUP = "group";
     public static final String PERMISSION = "permission";
@@ -8,6 +8,6 @@ public class DefaultSource {
     public static final String REDSTONE = "redstone";
     public static final String HOPPER = "hopper";
 
-    private DefaultSource() {
+    private DefaultSourceType() {
     }
 }

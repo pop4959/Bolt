@@ -8,18 +8,23 @@ import org.popcraft.bolt.event.AccessEvents;
 import org.popcraft.bolt.event.EnvironmentEvents;
 import org.popcraft.bolt.event.RegistrationEvents;
 import org.popcraft.bolt.migration.lwc.LWCMigration;
+import org.popcraft.bolt.registry.AccessRegistry;
 
 import java.util.List;
 
 public final class Bolt extends JavaPlugin {
     private final Store store = new LWCMigration().migrate();
+    private final AccessRegistry accessRegistry = new AccessRegistry();
+    private AccessManager accessManager;
 
     @Override
     public void onEnable() {
+        store.loadAccess().forEach(access -> accessRegistry.register(access.type(), access));
+        this.accessManager = new AccessManager(this);
         getServer().getPluginManager().registerEvents(new AccessEvents(this), this);
         getServer().getPluginManager().registerEvents(new EnvironmentEvents(this), this);
         getServer().getPluginManager().registerEvents(new RegistrationEvents(), this);
-        final List<BlockProtection> protectedBlocks = store.loadBlockProtections().stream().filter(BlockProtection.class::isInstance).map(BlockProtection.class::cast).toList();
+        final List<BlockProtection> protectedBlocks = store.loadBlockProtections();
         getLogger().info(() -> String.valueOf(protectedBlocks.size()));
     }
 
@@ -30,5 +35,13 @@ public final class Bolt extends JavaPlugin {
 
     public Store getStore() {
         return store;
+    }
+
+    public AccessRegistry getAccessRegistry() {
+        return accessRegistry;
+    }
+
+    public AccessManager getAccessManager() {
+        return accessManager;
     }
 }

@@ -18,12 +18,6 @@ public abstract class Protection {
         this.accessList = accessList;
     }
 
-    public boolean canAccess(final UUID player) {
-        // TODO: Check permissions
-        // TODO: Think about how to handle protection type access and access list
-        return player.toString().equals(owner);
-    }
-
     public UUID getId() {
         return id;
     }

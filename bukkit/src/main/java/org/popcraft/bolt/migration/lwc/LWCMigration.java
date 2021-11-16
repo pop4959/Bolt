@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import org.popcraft.bolt.data.Access;
 import org.popcraft.bolt.data.defaults.DefaultAccess;
 import org.popcraft.bolt.data.defaults.DefaultProtectionType;
-import org.popcraft.bolt.data.defaults.DefaultSource;
+import org.popcraft.bolt.data.defaults.DefaultSourceType;
 import org.popcraft.bolt.data.Source;
 import org.popcraft.bolt.data.protection.BlockProtection;
 import org.popcraft.bolt.data.store.MemoryStore;
@@ -95,6 +95,10 @@ public class LWCMigration implements Migration {
                 e.printStackTrace();
             }
         }
+        for (final DefaultProtectionType defaultProtectionType : DefaultProtectionType.values()) {
+            final Access access = new Access(defaultProtectionType.type(), defaultProtectionType.permissions());
+            store.saveAccess(access);
+        }
         for (final DefaultAccess defaultAccess : DefaultAccess.values()) {
             final Access access = new Access(defaultAccess.type(), defaultAccess.permissions());
             store.saveAccess(access);
@@ -116,17 +120,17 @@ public class LWCMigration implements Migration {
             if (data != null) {
                 for (DataFlag flag : data.getFlags()) {
                     if (flag.getId() == FLAG_TYPE_REDSTONE) {
-                        access.put(new Source(DefaultSource.REDSTONE, DefaultSource.REDSTONE), DefaultAccess.ADMIN.type());
+                        access.put(new Source(DefaultSourceType.REDSTONE, DefaultSourceType.REDSTONE), DefaultAccess.ADMIN.type());
                     } else if (flag.getId() == FLAG_TYPE_HOPPER) {
-                        access.put(new Source(DefaultSource.HOPPER, DefaultSource.HOPPER), DefaultAccess.ADMIN.type());
+                        access.put(new Source(DefaultSourceType.HOPPER, DefaultSourceType.HOPPER), DefaultAccess.ADMIN.type());
                     }
                 }
                 for (DataRights rights : data.getRights()) {
                     final String accessType = rights.getRights() == RIGHTS_TYPE_ADMIN ? DefaultAccess.ADMIN.type() : DefaultAccess.BASIC.type();
                     if (rights.getType() == ACCESS_TYPE_GROUP) {
-                        access.put(new Source(DefaultSource.PERMISSION, rights.getName()), accessType);
+                        access.put(new Source(DefaultSourceType.PERMISSION, rights.getName()), accessType);
                     } else if (rights.getType() == ACCESS_TYPE_PLAYER) {
-                        access.put(new Source(DefaultSource.PLAYER, rights.getName()), accessType);
+                        access.put(new Source(DefaultSourceType.PLAYER, rights.getName()), accessType);
                     } else if (rights.getType() == ACCESS_TYPE_TOWN) {
                         access.put(new Source(LWC_SOURCE_TOWN, rights.getName()), accessType);
                     } else if (rights.getType() == ACCESS_TYPE_REGION) {
@@ -135,7 +139,7 @@ public class LWCMigration implements Migration {
                 }
             }
             if (protection.password() != null && !protection.password().isEmpty()) {
-                access.put(new Source(DefaultSource.PASSWORD, protection.password()), DefaultAccess.BASIC.type());
+                access.put(new Source(DefaultSourceType.PASSWORD, protection.password()), DefaultAccess.BASIC.type());
             }
             store.saveBlockProtection(new BlockProtection(
                     UUID.randomUUID(),

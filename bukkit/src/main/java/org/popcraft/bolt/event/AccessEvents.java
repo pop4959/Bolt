@@ -5,6 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.popcraft.bolt.Bolt;
+import org.popcraft.bolt.data.Permission;
 import org.popcraft.bolt.data.protection.BlockProtection;
 import org.popcraft.bolt.data.util.BlockLocation;
 
@@ -24,7 +25,7 @@ public class AccessEvents implements Listener {
         final Optional<BlockProtection> protection = bolt.getStore().loadBlockProtection(location);
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
-            if (!blockProtection.canAccess(e.getPlayer().getUniqueId())) {
+            if (!bolt.getAccessManager().hasAccess(e.getPlayer(), blockProtection, Permission.BREAK)) {
                 e.setCancelled(true);
             }
         }
