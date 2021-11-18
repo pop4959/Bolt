@@ -2,6 +2,7 @@ package org.popcraft.bolt.data.store;
 
 import org.popcraft.bolt.data.Access;
 import org.popcraft.bolt.data.protection.BlockProtection;
+import org.popcraft.bolt.data.protection.EntityProtection;
 import org.popcraft.bolt.data.util.BlockLocation;
 
 import java.util.HashMap;
@@ -12,8 +13,9 @@ import java.util.UUID;
 
 public class MemoryStore implements Store {
     private final Map<String, Access> accessMap = new HashMap<>();
-    private final Map<UUID, BlockProtection> uuidProtectionMap = new HashMap<>();
-    private final Map<BlockLocation, BlockProtection> locationProtectionMap = new HashMap<>();
+    private final Map<UUID, BlockProtection> blockProtectionMap = new HashMap<>();
+    private final Map<BlockLocation, BlockProtection> blockLocationProtectionMap = new HashMap<>();
+    private final Map<UUID, EntityProtection> entityProtectionMap = new HashMap<>();
 
     @Override
     public Optional<Access> loadAccess(final String type) {
@@ -32,23 +34,38 @@ public class MemoryStore implements Store {
 
     @Override
     public Optional<BlockProtection> loadBlockProtection(final UUID id) {
-        return Optional.ofNullable(uuidProtectionMap.get(id));
+        return Optional.ofNullable(blockProtectionMap.get(id));
     }
 
     @Override
     public Optional<BlockProtection> loadBlockProtection(final BlockLocation location) {
-        return Optional.ofNullable(locationProtectionMap.get(location));
+        return Optional.ofNullable(blockLocationProtectionMap.get(location));
     }
 
     @Override
     public List<BlockProtection> loadBlockProtections() {
-        return List.copyOf(uuidProtectionMap.values());
+        return List.copyOf(blockProtectionMap.values());
     }
 
     @Override
     public void saveBlockProtection(final BlockProtection protection) {
-        uuidProtectionMap.put(protection.getId(), protection);
+        blockProtectionMap.put(protection.getId(), protection);
         final BlockLocation blockLocation = new BlockLocation(protection.getWorld(), protection.getX(), protection.getY(), protection.getZ());
-        locationProtectionMap.put(blockLocation, protection);
+        blockLocationProtectionMap.put(blockLocation, protection);
+    }
+
+    @Override
+    public Optional<EntityProtection> loadEntityProtection(UUID id) {
+        return Optional.ofNullable(entityProtectionMap.get(id));
+    }
+
+    @Override
+    public List<EntityProtection> loadEntityProtections() {
+        return List.copyOf(entityProtectionMap.values());
+    }
+
+    @Override
+    public void saveEntityProtection(EntityProtection protection) {
+        entityProtectionMap.put(protection.getId(), protection);
     }
 }

@@ -2,6 +2,7 @@ package org.popcraft.bolt.data.store;
 
 import org.popcraft.bolt.data.Access;
 import org.popcraft.bolt.data.protection.BlockProtection;
+import org.popcraft.bolt.data.protection.EntityProtection;
 import org.popcraft.bolt.data.util.BlockLocation;
 
 import java.util.List;
@@ -22,4 +23,10 @@ public interface Store {
     List<BlockProtection> loadBlockProtections();
 
     void saveBlockProtection(BlockProtection protection);
+
+    Optional<EntityProtection> loadEntityProtection(UUID id);
+
+    List<EntityProtection> loadEntityProtections();
+
+    void saveEntityProtection(EntityProtection protection);
 }
