@@ -1,6 +1,9 @@
 name: ${name}
 version: ${version}
-main: ${group}.bolt.Bolt
+main: ${group}.bolt.BoltPlugin
 api-version: 1.13
 authors: [${author}]
 description: ${description}
+commands:
+  bolt:
+    description: Main bolt command

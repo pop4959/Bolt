@@ -19,29 +19,31 @@ import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.InventoryHolder;
-import org.popcraft.bolt.Bolt;
+import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.data.Permission;
 import org.popcraft.bolt.data.protection.BlockProtection;
 import org.popcraft.bolt.data.protection.EntityProtection;
 import org.popcraft.bolt.data.util.BlockLocation;
+import org.popcraft.bolt.util.BoltPlayer;
 
 import java.util.Optional;
 
 public class AccessEvents implements Listener {
-    private final Bolt bolt;
+    private final BoltPlugin plugin;
 
-    public AccessEvents(final Bolt bolt) {
-        this.bolt = bolt;
+    public AccessEvents(final BoltPlugin plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler
     public void onBlockBreak(final BlockBreakEvent e) {
         final Block block = e.getBlock();
         final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-        final Optional<BlockProtection> protection = bolt.getStore().loadBlockProtection(location);
+        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(location);
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
-            if (!bolt.getAccessManager().hasAccess(e.getPlayer(), blockProtection, Permission.BREAK)) {
+            final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(e.getPlayer().getUniqueId());
+            if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, blockProtection, Permission.BREAK)) {
                 e.setCancelled(true);
             }
         }
@@ -54,10 +56,11 @@ public class AccessEvents implements Listener {
             return;
         }
         final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-        final Optional<BlockProtection> protection = bolt.getStore().loadBlockProtection(location);
+        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(location);
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
-            if (!bolt.getAccessManager().hasAccess(e.getPlayer(), blockProtection, Permission.INTERACT)) {
+            final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(e.getPlayer().getUniqueId());
+            if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, blockProtection, Permission.INTERACT)) {
                 e.setCancelled(true);
             }
         }
@@ -67,10 +70,11 @@ public class AccessEvents implements Listener {
     public void onSignChange(final SignChangeEvent e) {
         final Block block = e.getBlock();
         final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-        final Optional<BlockProtection> protection = bolt.getStore().loadBlockProtection(location);
+        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(location);
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
-            if (!bolt.getAccessManager().hasAccess(e.getPlayer(), blockProtection, Permission.INTERACT)) {
+            final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(e.getPlayer().getUniqueId());
+            if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, blockProtection, Permission.INTERACT)) {
                 e.setCancelled(true);
             }
         }
@@ -79,10 +83,10 @@ public class AccessEvents implements Listener {
     @EventHandler
     public void onHangingBreakByEntity(final HangingBreakByEntityEvent e) {
         final Entity entity = e.getEntity();
-        final Optional<EntityProtection> protection = bolt.getStore().loadEntityProtection(entity.getUniqueId());
+        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getRemover() instanceof final Player player) || !bolt.getAccessManager().hasAccess(player, entityProtection, Permission.KILL)) {
+            if (!(e.getRemover() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getBoltPlayer(player.getUniqueId()), entityProtection, Permission.KILL)) {
                 e.setCancelled(true);
             }
         }
@@ -91,10 +95,10 @@ public class AccessEvents implements Listener {
     @EventHandler
     public void onVehicleDestroy(final VehicleDestroyEvent e) {
         final Entity entity = e.getVehicle();
-        final Optional<EntityProtection> protection = bolt.getStore().loadEntityProtection(entity.getUniqueId());
+        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getAttacker() instanceof final Player player) || !bolt.getAccessManager().hasAccess(player, entityProtection, Permission.KILL)) {
+            if (!(e.getAttacker() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getBoltPlayer(player.getUniqueId()), entityProtection, Permission.KILL)) {
                 e.setCancelled(true);
             }
         }
@@ -103,10 +107,11 @@ public class AccessEvents implements Listener {
     @EventHandler
     public void onPlayerArmorStandManipulate(final PlayerArmorStandManipulateEvent e) {
         final Entity entity = e.getRightClicked();
-        final Optional<EntityProtection> protection = bolt.getStore().loadEntityProtection(entity.getUniqueId());
+        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!bolt.getAccessManager().hasAccess(e.getPlayer(), entityProtection, Permission.INTERACT)) {
+            final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(e.getPlayer().getUniqueId());
+            if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, entityProtection, Permission.INTERACT)) {
                 e.setCancelled(true);
             }
         }
@@ -115,10 +120,10 @@ public class AccessEvents implements Listener {
     @EventHandler
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
         final Entity entity = e.getEntity();
-        final Optional<EntityProtection> protection = bolt.getStore().loadEntityProtection(entity.getUniqueId());
+        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getDamager() instanceof final Player player) || !bolt.getAccessManager().hasAccess(player, entityProtection, Permission.KILL)) {
+            if (!(e.getDamager() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getBoltPlayer(player.getUniqueId()), entityProtection, Permission.KILL)) {
                 e.setCancelled(true);
             }
         }
@@ -127,10 +132,11 @@ public class AccessEvents implements Listener {
     @EventHandler
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent e) {
         final Entity entity = e.getRightClicked();
-        final Optional<EntityProtection> protection = bolt.getStore().loadEntityProtection(entity.getUniqueId());
+        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!bolt.getAccessManager().hasAccess(e.getPlayer(), entityProtection, Permission.INTERACT)) {
+            final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(e.getPlayer().getUniqueId());
+            if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, entityProtection, Permission.INTERACT)) {
                 e.setCancelled(true);
             }
         }
@@ -142,22 +148,23 @@ public class AccessEvents implements Listener {
         if (!(e.getPlayer() instanceof Player player)) {
             return;
         }
+        final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(e.getPlayer().getUniqueId());
         final InventoryHolder inventoryHolder = e.getInventory().getHolder();
         if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
             final Block block = blockInventoryHolder.getBlock();
             final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-            final Optional<BlockProtection> protection = bolt.getStore().loadBlockProtection(location);
+            final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(location);
             if (protection.isPresent()) {
                 final BlockProtection blockProtection = protection.get();
-                if (!bolt.getAccessManager().hasAccess(player, blockProtection, Permission.CONTAINER_ACCESS)) {
+                if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, blockProtection, Permission.CONTAINER_ACCESS)) {
                     e.setCancelled(true);
                 }
             }
         } else if (inventoryHolder instanceof final Entity entity) {
-            final Optional<EntityProtection> protection = bolt.getStore().loadEntityProtection(entity.getUniqueId());
+            final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
             if (protection.isPresent()) {
                 final EntityProtection entityProtection = protection.get();
-                if (!bolt.getAccessManager().hasAccess(player, entityProtection, Permission.CONTAINER_ACCESS)) {
+                if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, entityProtection, Permission.CONTAINER_ACCESS)) {
                     e.setCancelled(true);
                 }
             }
@@ -178,10 +185,11 @@ public class AccessEvents implements Listener {
     public void onPlayerTakeLecternBook(final PlayerTakeLecternBookEvent e) {
         final Block block = e.getLectern().getBlock();
         final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-        final Optional<BlockProtection> protection = bolt.getStore().loadBlockProtection(location);
+        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(location);
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
-            if (!bolt.getAccessManager().hasAccess(e.getPlayer(), blockProtection, Permission.CONTAINER_REMOVE)) {
+            final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(e.getPlayer().getUniqueId());
+            if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, blockProtection, Permission.CONTAINER_REMOVE)) {
                 e.setCancelled(true);
             }
         }

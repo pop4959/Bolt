@@ -19,21 +19,21 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
-import org.popcraft.bolt.Bolt;
+import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.data.util.BlockLocation;
 
 public class EnvironmentEvents implements Listener {
-    private final Bolt bolt;
+    private final BoltPlugin plugin;
 
-    public EnvironmentEvents(final Bolt bolt) {
-        this.bolt = bolt;
+    public EnvironmentEvents(final BoltPlugin plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler
     public void onStructureGrow(final StructureGrowEvent e) {
         for (final BlockState blockState : e.getBlocks()) {
             final BlockLocation location = new BlockLocation(blockState.getWorld().getName(), blockState.getX(), blockState.getY(), blockState.getZ());
-            if (bolt.getStore().loadBlockProtection(location).isPresent()) {
+            if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
                 e.setCancelled(true);
                 return;
             }
@@ -44,7 +44,7 @@ public class EnvironmentEvents implements Listener {
     public void onEntityChangeBlock(final EntityChangeBlockEvent e) {
         final Block block = e.getBlock();
         final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-        if (bolt.getStore().loadBlockProtection(location).isPresent()) {
+        if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
             e.setCancelled(true);
         }
     }
@@ -53,7 +53,7 @@ public class EnvironmentEvents implements Listener {
     public void onBlockMultiPlace(final BlockMultiPlaceEvent e) {
         for (final BlockState blockState : e.getReplacedBlockStates()) {
             final BlockLocation location = new BlockLocation(blockState.getWorld().getName(), blockState.getX(), blockState.getY(), blockState.getZ());
-            if (bolt.getStore().loadBlockProtection(location).isPresent()) {
+            if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
                 e.setCancelled(true);
                 return;
             }
@@ -64,7 +64,7 @@ public class EnvironmentEvents implements Listener {
     public void onBlockFromTo(final BlockFromToEvent e) {
         final Block block = e.getToBlock();
         final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-        if (bolt.getStore().loadBlockProtection(location).isPresent()) {
+        if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
             e.setCancelled(true);
         }
     }
@@ -73,7 +73,7 @@ public class EnvironmentEvents implements Listener {
     public void onBlockExplode(final BlockExplodeEvent e) {
         for (final Block block : e.blockList()) {
             final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-            if (bolt.getStore().loadBlockProtection(location).isPresent()) {
+            if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
                 e.setCancelled(true);
             }
         }

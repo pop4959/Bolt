@@ -5,10 +5,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.17.1-R0.1-SNAPSHOT")
-    compileOnly(group = "org.xerial", name = "sqlite-jdbc", version = "3.34.0")
-    compileOnly(group = "mysql", name = "mysql-connector-java", version = "8.0.23")
-    implementation(group = "io.papermc", name = "paperlib", version = "1.0.6")
+    compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.18.1-R0.1-SNAPSHOT")
+    compileOnly(group = "org.xerial", name = "sqlite-jdbc", version = "3.36.0.3")
+    compileOnly(group = "mysql", name = "mysql-connector-java", version = "8.0.27")
+    implementation(group = "net.kyori", name = "adventure-api", version = "4.9.3")
+    implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.1.0-SNAPSHOT")
+    implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.0.0")
     implementation(group = "org.bstats", name = "bstats-bukkit", version = "2.2.1")
     implementation(project(":bolt-common"))
 }
@@ -29,7 +31,7 @@ tasks {
         minimize {
             exclude(project(":bolt-common"))
         }
-        relocate("io.papermc.lib", "${project.group}.${rootProject.name}.lib.paperlib")
+        relocate("net.kyori", "${project.group}.${rootProject.name}.lib.kyori")
         relocate("org.bstats", "${project.group}.${rootProject.name}.lib.bstats")
     }
 }

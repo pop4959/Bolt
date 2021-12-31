@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.LogManager;
 
 public class LWCMigration implements Migration {
     private static final int PROTECTION_TYPE_PUBLIC = 0;
@@ -141,6 +142,17 @@ public class LWCMigration implements Migration {
             if (protection.password() != null && !protection.password().isEmpty()) {
                 access.put(new Source(DefaultSourceType.PASSWORD, protection.password()), DefaultAccess.BASIC.type());
             }
+            LogManager.getLogManager().getLogger("").info(() -> new ProtectionData(
+                    UUID.randomUUID(),
+                    protection.owner(),
+                    protectionType,
+                    access,
+                    blocks.getOrDefault(protection.blockId(), BLOCK_AIR).name(),
+                    protection.world(),
+                    protection.x(),
+                    protection.y(),
+                    protection.z()
+            ).toString());
             store.saveBlockProtection(new BlockProtection(
                     UUID.randomUUID(),
                     protection.owner(),
@@ -154,5 +166,8 @@ public class LWCMigration implements Migration {
             ));
         }
         return store;
+    }
+
+    private record ProtectionData(UUID id, String owner, String type, Map<Source, String> accessList, String block, String world, int x, int y, int z) {
     }
 }
