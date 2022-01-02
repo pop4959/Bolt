@@ -24,7 +24,11 @@ import org.popcraft.bolt.data.Permission;
 import org.popcraft.bolt.data.protection.BlockProtection;
 import org.popcraft.bolt.data.protection.EntityProtection;
 import org.popcraft.bolt.data.util.BlockLocation;
+import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.lang.Strings;
+import org.popcraft.bolt.util.lang.Translation;
 
 import java.util.Optional;
 
@@ -38,11 +42,11 @@ public class AccessEvents implements Listener {
     @EventHandler
     public void onBlockBreak(final BlockBreakEvent e) {
         final Block block = e.getBlock();
-        final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(location);
+        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
+        final Player player = e.getPlayer();
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
-            final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(e.getPlayer().getUniqueId());
+            final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(player.getUniqueId());
             if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, blockProtection, Permission.BREAK)) {
                 e.setCancelled(true);
             }
@@ -55,12 +59,13 @@ public class AccessEvents implements Listener {
         if (block == null) {
             return;
         }
-        final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(location);
+        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
+        final Player player = e.getPlayer();
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
-            final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(e.getPlayer().getUniqueId());
+            final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(player.getUniqueId());
             if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, blockProtection, Permission.INTERACT)) {
+                BoltComponents.sendMessage(player, Translation.LOCKED, Strings.toTitleCase(block.getType()));
                 e.setCancelled(true);
             }
         }

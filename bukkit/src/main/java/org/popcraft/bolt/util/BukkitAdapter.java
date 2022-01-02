@@ -1,6 +1,5 @@
 package org.popcraft.bolt.util;
 
-import net.kyori.adventure.identity.Identified;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -26,11 +25,11 @@ public final class BukkitAdapter {
     }
 
     public static BlockLocation blockLocation(final Block block) {
-        return new BlockLocation(block.getWorld().toString(), block.getX(), block.getY(), block.getZ());
+        return new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
     }
 
     public static BlockLocation blockLocation(final Location location) {
         Objects.requireNonNull(location.getWorld());
-        return new BlockLocation(location.getWorld().toString(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return new BlockLocation(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 }

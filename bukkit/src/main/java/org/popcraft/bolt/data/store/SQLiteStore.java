@@ -55,6 +55,20 @@ public class SQLiteStore implements Store {
 
     @Override
     public Optional<BlockProtection> loadBlockProtection(BlockLocation location) {
+        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+            try (final PreparedStatement selectBlock = connection.prepareStatement("SELECT * FROM blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;")) {
+                selectBlock.setString(1, location.world());
+                selectBlock.setInt(2, location.x());
+                selectBlock.setInt(3, location.y());
+                selectBlock.setInt(4, location.z());
+                final ResultSet blockResultSet = selectBlock.executeQuery();
+                if (blockResultSet.next()) {
+                    return Optional.of(blockProtectionFromResultSet(blockResultSet));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return Optional.empty();
     }
 
@@ -65,28 +79,7 @@ public class SQLiteStore implements Store {
                 final ResultSet blocksResultSet = selectBlocks.executeQuery();
                 final List<BlockProtection> protections = new ArrayList<>();
                 while (blocksResultSet.next()) {
-                    final String id = blocksResultSet.getString(1);
-                    final String owner = blocksResultSet.getString(2);
-                    final String type = blocksResultSet.getString(3);
-                    final String block = blocksResultSet.getString(5);
-                    final String world = blocksResultSet.getString(6);
-                    final int x = blocksResultSet.getInt(7);
-                    final int y = blocksResultSet.getInt(8);
-                    final int z = blocksResultSet.getInt(9);
-                    final String accessListString = blocksResultSet.getString(4);
-                    final Map<Source, String> accessList = new HashMap<>();
-                    if (!accessListString.isEmpty()) {
-                        String[] accessListSplit = accessListString.split(",");
-                        for (String accessListEntry : accessListSplit) {
-                            String[] keyValue = accessListEntry.split(":");
-                            String[] sourceTypeIdentifier = keyValue[0].split(";");
-                            String sourceType = sourceTypeIdentifier[0];
-                            String sourceIdentifier = sourceTypeIdentifier[1];
-                            String access = keyValue[1];
-                            accessList.put(new Source(sourceType, sourceIdentifier), access);
-                        }
-                    }
-                    protections.add(new BlockProtection(UUID.fromString(id), owner, type, accessList, block, world, x, y, z));
+                    protections.add(blockProtectionFromResultSet(blocksResultSet));
                 }
                 return protections;
             }
@@ -94,6 +87,31 @@ public class SQLiteStore implements Store {
             e.printStackTrace();
         }
         return Collections.emptyList();
+    }
+
+    private BlockProtection blockProtectionFromResultSet(final ResultSet resultSet) throws SQLException {
+        final String id = resultSet.getString(1);
+        final String owner = resultSet.getString(2);
+        final String type = resultSet.getString(3);
+        final String block = resultSet.getString(5);
+        final String world = resultSet.getString(6);
+        final int x = resultSet.getInt(7);
+        final int y = resultSet.getInt(8);
+        final int z = resultSet.getInt(9);
+        final String accessListString = resultSet.getString(4);
+        final Map<Source, String> accessList = new HashMap<>();
+        if (!accessListString.isEmpty()) {
+            String[] accessListSplit = accessListString.split(",");
+            for (String accessListEntry : accessListSplit) {
+                String[] keyValue = accessListEntry.split(":");
+                String[] sourceTypeIdentifier = keyValue[0].split(";");
+                String sourceType = sourceTypeIdentifier[0];
+                String sourceIdentifier = sourceTypeIdentifier[1];
+                String access = keyValue[1];
+                accessList.put(new Source(sourceType, sourceIdentifier), access);
+            }
+        }
+        return new BlockProtection(UUID.fromString(id), owner, type, accessList, block, world, x, y, z);
     }
 
     @Override
