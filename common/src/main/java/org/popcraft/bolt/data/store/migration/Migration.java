@@ -1,7 +1,7 @@
-package org.popcraft.bolt.migration;
+package org.popcraft.bolt.data.store.migration;
 
 import org.popcraft.bolt.data.store.MemoryStore;
 
 public interface Migration {
-    MemoryStore migrate();
+    MemoryStore convert();
 }

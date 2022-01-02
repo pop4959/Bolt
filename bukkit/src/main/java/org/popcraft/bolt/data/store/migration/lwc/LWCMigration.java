@@ -1,19 +1,14 @@
-package org.popcraft.bolt.migration.lwc;
+package org.popcraft.bolt.data.store.migration.lwc;
 
 import com.google.gson.Gson;
 import org.popcraft.bolt.data.Access;
+import org.popcraft.bolt.data.Source;
 import org.popcraft.bolt.data.defaults.DefaultAccess;
 import org.popcraft.bolt.data.defaults.DefaultProtectionType;
 import org.popcraft.bolt.data.defaults.DefaultSourceType;
-import org.popcraft.bolt.data.Source;
 import org.popcraft.bolt.data.protection.BlockProtection;
 import org.popcraft.bolt.data.store.MemoryStore;
-import org.popcraft.bolt.migration.Migration;
-import org.popcraft.bolt.migration.lwc.data.Block;
-import org.popcraft.bolt.migration.lwc.data.Data;
-import org.popcraft.bolt.migration.lwc.data.DataFlag;
-import org.popcraft.bolt.migration.lwc.data.DataRights;
-import org.popcraft.bolt.migration.lwc.data.Protection;
+import org.popcraft.bolt.data.store.migration.Migration;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -43,7 +38,7 @@ public class LWCMigration implements Migration {
     private static final Block BLOCK_AIR = new Block(-1, "AIR");
 
     @Override
-    public MemoryStore migrate() {
+    public MemoryStore convert() {
         final MemoryStore store = new MemoryStore();
         final Map<Integer, Block> blocks = new HashMap<>();
         final List<Protection> protections = new ArrayList<>();
@@ -168,6 +163,7 @@ public class LWCMigration implements Migration {
         return store;
     }
 
-    private record ProtectionData(UUID id, String owner, String type, Map<Source, String> accessList, String block, String world, int x, int y, int z) {
+    private record ProtectionData(UUID id, String owner, String type, Map<Source, String> accessList, String block,
+                                  String world, int x, int y, int z) {
     }
 }

@@ -1,4 +1,4 @@
-package org.popcraft.bolt.migration.lwc.data;
+package org.popcraft.bolt.data.store.migration.lwc;
 
 import java.util.List;
 

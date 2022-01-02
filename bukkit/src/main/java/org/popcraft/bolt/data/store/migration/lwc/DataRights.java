@@ -1,4 +1,4 @@
-package org.popcraft.bolt.migration.lwc.data;
+package org.popcraft.bolt.data.store.migration.lwc;
 
 public class DataRights {
     private int rights;

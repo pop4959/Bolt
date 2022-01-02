@@ -14,6 +14,11 @@ public final class Bolt {
     private final AccessManager accessManager;
     private Store store;
 
+    public Bolt(final Store store) {
+        this();
+        this.store = store;
+    }
+
     public Bolt() {
         this.accessManager = new AccessManager(this);
     }

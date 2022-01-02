@@ -4,7 +4,8 @@ public enum Action {
     LOCK_BLOCK,
     LOCK_ENTITY,
     UNLOCK_BLOCK,
-    UNLOCK_ENTITY;
+    UNLOCK_ENTITY,
+    DEBUG;
 
     private final long timestamp;
 
