@@ -1,5 +1,6 @@
 package org.popcraft.bolt.data.store;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.popcraft.bolt.data.Access;
 import org.popcraft.bolt.data.Source;
 import org.popcraft.bolt.data.protection.BlockProtection;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.LogManager;
 import java.util.stream.Collectors;
 
 public class SQLiteStore implements Store {
@@ -55,6 +57,8 @@ public class SQLiteStore implements Store {
 
     @Override
     public Optional<BlockProtection> loadBlockProtection(BlockLocation location) {
+        final StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
             try (final PreparedStatement selectBlock = connection.prepareStatement("SELECT * FROM blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;")) {
                 selectBlock.setString(1, location.world());
@@ -63,6 +67,7 @@ public class SQLiteStore implements Store {
                 selectBlock.setInt(4, location.z());
                 final ResultSet blockResultSet = selectBlock.executeQuery();
                 if (blockResultSet.next()) {
+                    LogManager.getLogManager().getLogger("").info(() -> "Loading block protection took %d ms".formatted(stopWatch.getTime()));
                     return Optional.of(blockProtectionFromResultSet(blockResultSet));
                 }
             }

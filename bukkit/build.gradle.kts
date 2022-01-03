@@ -10,7 +10,7 @@ dependencies {
     compileOnly(group = "mysql", name = "mysql-connector-java", version = "8.0.27")
     implementation(group = "net.kyori", name = "adventure-api", version = "4.9.3")
     implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.1.0-SNAPSHOT")
-    implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.0.0")
+    implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.0.1")
     implementation(group = "org.bstats", name = "bstats-bukkit", version = "2.2.1")
     implementation(project(":bolt-common"))
 }
