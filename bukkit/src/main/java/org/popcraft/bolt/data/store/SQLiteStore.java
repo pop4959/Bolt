@@ -140,6 +140,21 @@ public class SQLiteStore implements Store {
     }
 
     @Override
+    public void removeBlockProtection(BlockProtection protection) {
+        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+            try (final PreparedStatement deleteBlock = connection.prepareStatement("DELETE FROM blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;")) {
+                deleteBlock.setString(1, protection.getWorld());
+                deleteBlock.setInt(2, protection.getX());
+                deleteBlock.setInt(3, protection.getY());
+                deleteBlock.setInt(4, protection.getZ());
+                deleteBlock.execute();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public Optional<EntityProtection> loadEntityProtection(UUID id) {
         return Optional.empty();
     }

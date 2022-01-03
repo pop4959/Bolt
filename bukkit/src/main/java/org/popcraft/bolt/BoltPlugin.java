@@ -9,6 +9,7 @@ import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.command.implementation.DebugCommand;
 import org.popcraft.bolt.command.implementation.LockCommand;
+import org.popcraft.bolt.command.implementation.UnlockCommand;
 import org.popcraft.bolt.data.Source;
 import org.popcraft.bolt.data.protection.BlockProtection;
 import org.popcraft.bolt.data.store.SQLiteStore;
@@ -48,6 +49,7 @@ public class BoltPlugin extends JavaPlugin {
     private void registerCommands() {
         commands.put("debug", new DebugCommand(this));
         commands.put("lock", new LockCommand(this));
+        commands.put("unlock", new UnlockCommand(this));
     }
 
     @Override

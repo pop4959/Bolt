@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.popcraft.bolt.Bolt;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.data.protection.BlockProtection;
 import org.popcraft.bolt.data.store.Store;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
@@ -14,6 +15,8 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
+
+import java.util.Optional;
 
 public class RegistrationEvents implements Listener {
     private final BoltPlugin plugin;
@@ -30,7 +33,6 @@ public class RegistrationEvents implements Listener {
         if (boltPlayer.hasAction(Action.LOCK_BLOCK)) {
             final Block clicked = e.getClickedBlock();
             if (clicked == null) {
-                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_BLOCK);
                 return;
             }
             final Store store = bolt.getStore();
@@ -41,6 +43,20 @@ public class RegistrationEvents implements Listener {
                 BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_LOCKED, Strings.toTitleCase(clicked.getType()));
             }
             boltPlayer.removeAction(Action.LOCK_BLOCK);
+        } else if (boltPlayer.hasAction(Action.UNLOCK_BLOCK)) {
+            final Block clicked = e.getClickedBlock();
+            if (clicked == null) {
+                return;
+            }
+            final Store store = bolt.getStore();
+            final Optional<BlockProtection> protection = store.loadBlockProtection(BukkitAdapter.blockLocation(clicked));
+            if (protection.isPresent()) {
+                store.removeBlockProtection(protection.get());
+                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_UNLOCKED, Strings.toTitleCase(clicked.getType()));
+            } else {
+                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED);
+            }
+            boltPlayer.removeAction(Action.UNLOCK_BLOCK);
         }
     }
 }

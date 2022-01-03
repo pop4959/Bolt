@@ -55,6 +55,13 @@ public class MemoryStore implements Store {
     }
 
     @Override
+    public void removeBlockProtection(BlockProtection protection) {
+        blockProtectionMap.remove(protection.getId());
+        final BlockLocation blockLocation = new BlockLocation(protection.getWorld(), protection.getX(), protection.getY(), protection.getZ());
+        blockLocationProtectionMap.remove(blockLocation);
+    }
+
+    @Override
     public Optional<EntityProtection> loadEntityProtection(UUID id) {
         return Optional.ofNullable(entityProtectionMap.get(id));
     }

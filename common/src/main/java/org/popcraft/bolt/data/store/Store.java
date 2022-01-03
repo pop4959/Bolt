@@ -24,6 +24,8 @@ public interface Store {
 
     void saveBlockProtection(BlockProtection protection);
 
+    void removeBlockProtection(BlockProtection protection);
+
     Optional<EntityProtection> loadEntityProtection(UUID id);
 
     List<EntityProtection> loadEntityProtections();

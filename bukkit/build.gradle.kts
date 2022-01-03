@@ -6,8 +6,6 @@ repositories {
 
 dependencies {
     compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.18.1-R0.1-SNAPSHOT")
-    compileOnly(group = "org.xerial", name = "sqlite-jdbc", version = "3.36.0.3")
-    compileOnly(group = "mysql", name = "mysql-connector-java", version = "8.0.27")
     implementation(group = "net.kyori", name = "adventure-api", version = "4.9.3")
     implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.1.0-SNAPSHOT")
     implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.0.1")
