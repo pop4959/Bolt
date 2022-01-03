@@ -1,5 +1,6 @@
 package org.popcraft.bolt.event;
 
+import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -23,7 +24,6 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.data.Permission;
 import org.popcraft.bolt.data.protection.BlockProtection;
 import org.popcraft.bolt.data.protection.EntityProtection;
-import org.popcraft.bolt.data.util.BlockLocation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
@@ -65,7 +65,7 @@ public class AccessEvents implements Listener {
             final BlockProtection blockProtection = protection.get();
             final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(player.getUniqueId());
             if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, blockProtection, Permission.INTERACT)) {
-                BoltComponents.sendMessage(player, Translation.LOCKED, Strings.toTitleCase(block.getType()));
+                BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("block", Strings.toTitleCase(block.getType())));
                 e.setCancelled(true);
             }
         }
@@ -74,8 +74,7 @@ public class AccessEvents implements Listener {
     @EventHandler
     public void onSignChange(final SignChangeEvent e) {
         final Block block = e.getBlock();
-        final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(location);
+        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
             final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(e.getPlayer().getUniqueId());
@@ -157,8 +156,7 @@ public class AccessEvents implements Listener {
         final InventoryHolder inventoryHolder = e.getInventory().getHolder();
         if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
             final Block block = blockInventoryHolder.getBlock();
-            final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-            final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(location);
+            final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
             if (protection.isPresent()) {
                 final BlockProtection blockProtection = protection.get();
                 if (!plugin.getBolt().getAccessManager().hasAccess(boltPlayer, blockProtection, Permission.CONTAINER_ACCESS)) {
@@ -189,8 +187,7 @@ public class AccessEvents implements Listener {
     @EventHandler
     public void onPlayerTakeLecternBook(final PlayerTakeLecternBookEvent e) {
         final Block block = e.getLectern().getBlock();
-        final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(location);
+        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
             final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(e.getPlayer().getUniqueId());

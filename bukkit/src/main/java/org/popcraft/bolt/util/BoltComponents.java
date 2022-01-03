@@ -2,6 +2,7 @@ package org.popcraft.bolt.util;
 
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
@@ -29,7 +30,7 @@ public final class BoltComponents {
         }
     }
 
-    public static void sendMessage(final CommandSender sender, String key, Object... args) {
-        adventure.sender(sender).sendMessage(miniMessage.parse(translate(key, args)));
+    public static void sendMessage(final CommandSender sender, String key, Template... placeholders) {
+        adventure.sender(sender).sendMessage(miniMessage.parse(translate(key), placeholders));
     }
 }

@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class EntityProtection extends Protection {
-    public EntityProtection(UUID id, String owner, String type, Map<Source, String> accessList) {
+    public EntityProtection(UUID id, UUID owner, String type, Map<Source, String> accessList) {
         super(id, owner, type, accessList);
     }
 }

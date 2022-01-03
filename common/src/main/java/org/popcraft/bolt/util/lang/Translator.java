@@ -12,8 +12,8 @@ public final class Translator {
     private Translator() {
     }
 
-    public static String translate(final String key, Object... args) {
-        return Objects.requireNonNullElse(translations.getProperty(key), Objects.requireNonNullElse(fallback.getProperty(key), key)).formatted(args);
+    public static String translate(final String key) {
+        return Objects.requireNonNullElse(translations.getProperty(key), Objects.requireNonNullElse(fallback.getProperty(key), key));
     }
 
     private static void setTranslation(final String language) {

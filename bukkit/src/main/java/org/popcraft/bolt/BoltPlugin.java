@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.command.implementation.DebugCommand;
+import org.popcraft.bolt.command.implementation.InfoCommand;
 import org.popcraft.bolt.command.implementation.LockCommand;
 import org.popcraft.bolt.command.implementation.UnlockCommand;
 import org.popcraft.bolt.data.Source;
@@ -48,6 +49,7 @@ public class BoltPlugin extends JavaPlugin {
 
     private void registerCommands() {
         commands.put("debug", new DebugCommand(this));
+        commands.put("info", new InfoCommand(this));
         commands.put("lock", new LockCommand(this));
         commands.put("unlock", new UnlockCommand(this));
     }
@@ -92,7 +94,7 @@ public class BoltPlugin extends JavaPlugin {
         ).toString()));
     }
 
-    private record ProtectionData(UUID id, String owner, String type, Map<Source, String> accessList, String block,
+    private record ProtectionData(UUID id, UUID owner, String type, Map<Source, String> accessList, String block,
                                   String world, int x, int y, int z) {
     }
 }

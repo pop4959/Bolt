@@ -9,6 +9,7 @@ import org.popcraft.bolt.data.defaults.DefaultSourceType;
 import org.popcraft.bolt.data.protection.BlockProtection;
 import org.popcraft.bolt.data.store.MemoryStore;
 import org.popcraft.bolt.data.store.migration.Migration;
+import org.popcraft.bolt.util.BukkitAdapter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.LogManager;
 
 public class LWCMigration implements Migration {
     private static final int PROTECTION_TYPE_PUBLIC = 0;
@@ -137,20 +137,15 @@ public class LWCMigration implements Migration {
             if (protection.password() != null && !protection.password().isEmpty()) {
                 access.put(new Source(DefaultSourceType.PASSWORD, protection.password()), DefaultAccess.BASIC.type());
             }
-            LogManager.getLogManager().getLogger("").info(() -> new ProtectionData(
-                    UUID.randomUUID(),
-                    protection.owner(),
-                    protectionType,
-                    access,
-                    blocks.getOrDefault(protection.blockId(), BLOCK_AIR).name(),
-                    protection.world(),
-                    protection.x(),
-                    protection.y(),
-                    protection.z()
-            ).toString());
+            UUID ownerUUID;
+            try {
+                ownerUUID = UUID.fromString(protection.owner());
+            } catch (IllegalArgumentException e) {
+                ownerUUID = BukkitAdapter.playerUUID(protection.owner());
+            }
             store.saveBlockProtection(new BlockProtection(
                     UUID.randomUUID(),
-                    protection.owner(),
+                    ownerUUID,
                     protectionType,
                     access,
                     blocks.getOrDefault(protection.blockId(), BLOCK_AIR).name(),
@@ -161,9 +156,5 @@ public class LWCMigration implements Migration {
             ));
         }
         return store;
-    }
-
-    private record ProtectionData(UUID id, String owner, String type, Map<Source, String> accessList, String block,
-                                  String world, int x, int y, int z) {
     }
 }

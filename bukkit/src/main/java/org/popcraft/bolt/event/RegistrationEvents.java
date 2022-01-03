@@ -1,5 +1,6 @@
 package org.popcraft.bolt.event;
 
+import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,6 +19,8 @@ import org.popcraft.bolt.util.lang.Translation;
 
 import java.util.Optional;
 
+import static org.popcraft.bolt.util.lang.Translator.translate;
+
 public class RegistrationEvents implements Listener {
     private final BoltPlugin plugin;
 
@@ -30,33 +33,36 @@ public class RegistrationEvents implements Listener {
         final Player player = e.getPlayer();
         final Bolt bolt = plugin.getBolt();
         final BoltPlayer boltPlayer = bolt.getBoltPlayer(player.getUniqueId());
+        final Block clicked = e.getClickedBlock();
+        if (clicked == null) {
+            return;
+        }
+        final Store store = bolt.getStore();
         if (boltPlayer.hasAction(Action.LOCK_BLOCK)) {
-            final Block clicked = e.getClickedBlock();
-            if (clicked == null) {
-                return;
-            }
-            final Store store = bolt.getStore();
             if (store.loadBlockProtection(BukkitAdapter.blockLocation(clicked)).isPresent()) {
                 BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_LOCKED_ALREADY);
             } else {
                 store.saveBlockProtection(BukkitAdapter.createPrivateBlockProtection(clicked, player));
-                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_LOCKED, Strings.toTitleCase(clicked.getType()));
+                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_LOCKED, Template.of("block", Strings.toTitleCase(clicked.getType())));
             }
             boltPlayer.removeAction(Action.LOCK_BLOCK);
         } else if (boltPlayer.hasAction(Action.UNLOCK_BLOCK)) {
-            final Block clicked = e.getClickedBlock();
-            if (clicked == null) {
-                return;
-            }
-            final Store store = bolt.getStore();
             final Optional<BlockProtection> protection = store.loadBlockProtection(BukkitAdapter.blockLocation(clicked));
             if (protection.isPresent()) {
                 store.removeBlockProtection(protection.get());
-                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_UNLOCKED, Strings.toTitleCase(clicked.getType()));
+                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_UNLOCKED, Template.of("block", Strings.toTitleCase(clicked.getType())));
             } else {
                 BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED);
             }
             boltPlayer.removeAction(Action.UNLOCK_BLOCK);
+        } else if (boltPlayer.hasAction(Action.INFO)) {
+            store.loadBlockProtection(BukkitAdapter.blockLocation(clicked)).ifPresentOrElse(protection -> {
+                BoltComponents.sendMessage(player, Translation.INFO,
+                        Template.of("type", Strings.toTitleCase(protection.getType())),
+                        Template.of("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
+                );
+            }, () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
+            boltPlayer.removeAction(Action.INFO);
         }
     }
 }

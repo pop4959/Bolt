@@ -116,7 +116,7 @@ public class SQLiteStore implements Store {
                 accessList.put(new Source(sourceType, sourceIdentifier), access);
             }
         }
-        return new BlockProtection(UUID.fromString(id), owner, type, accessList, block, world, x, y, z);
+        return new BlockProtection(UUID.fromString(id), UUID.fromString(owner), type, accessList, block, world, x, y, z);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class SQLiteStore implements Store {
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
             try (final PreparedStatement insertBlock = connection.prepareStatement("INSERT INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING;")) {
                 insertBlock.setString(1, protection.getId().toString());
-                insertBlock.setString(2, protection.getOwner());
+                insertBlock.setString(2, protection.getOwner().toString());
                 insertBlock.setString(3, protection.getType());
                 insertBlock.setString(4, protection.getAccessList().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
                 insertBlock.setString(5, protection.getBlock());
