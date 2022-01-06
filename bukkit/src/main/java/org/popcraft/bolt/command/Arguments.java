@@ -5,13 +5,13 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Arguments {
-    private final Queue<String> arguments = new LinkedList<>();
+    private final Queue<String> remaining = new LinkedList<>();
 
     public Arguments(String... args) {
-        arguments.addAll(Arrays.asList(args));
+        remaining.addAll(Arrays.asList(args));
     }
 
     public String next() {
-        return arguments.poll();
+        return remaining.poll();
     }
 }
