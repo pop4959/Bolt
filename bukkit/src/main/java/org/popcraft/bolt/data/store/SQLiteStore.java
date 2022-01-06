@@ -27,9 +27,15 @@ public class SQLiteStore implements Store {
 
     public SQLiteStore() {
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
-            connection.prepareStatement("CREATE TABLE IF NOT EXISTS blocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), accesslist text, block varchar(128), world varchar(128), x integer, y integer, z integer);").execute();
-            connection.prepareStatement("CREATE INDEX IF NOT EXISTS block_owner ON blocks(owner);").execute();
-            connection.prepareStatement("CREATE UNIQUE INDEX IF NOT EXISTS block_location ON blocks(world, x, y, z);").execute();
+            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS blocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), accesslist text, block varchar(128), world varchar(128), x integer, y integer, z integer);")) {
+                statement.execute();
+            }
+            try (final PreparedStatement statement = connection.prepareStatement("CREATE INDEX IF NOT EXISTS block_owner ON blocks(owner);")) {
+                statement.execute();
+            }
+            try (final PreparedStatement statement = connection.prepareStatement("CREATE UNIQUE INDEX IF NOT EXISTS block_location ON blocks(world, x, y, z);")) {
+                statement.execute();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -42,12 +48,12 @@ public class SQLiteStore implements Store {
 
     @Override
     public List<Access> loadAccess() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void saveAccess(Access access) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -161,11 +167,11 @@ public class SQLiteStore implements Store {
 
     @Override
     public List<EntityProtection> loadEntityProtections() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void saveEntityProtection(EntityProtection protection) {
-
+        throw new UnsupportedOperationException();
     }
 }

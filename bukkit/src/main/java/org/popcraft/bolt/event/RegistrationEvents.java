@@ -56,12 +56,10 @@ public class RegistrationEvents implements Listener {
             }
             boltPlayer.removeAction(Action.UNLOCK_BLOCK);
         } else if (boltPlayer.hasAction(Action.INFO)) {
-            store.loadBlockProtection(BukkitAdapter.blockLocation(clicked)).ifPresentOrElse(protection -> {
-                BoltComponents.sendMessage(player, Translation.INFO,
-                        Template.of("type", Strings.toTitleCase(protection.getType())),
-                        Template.of("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
-                );
-            }, () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
+            store.loadBlockProtection(BukkitAdapter.blockLocation(clicked)).ifPresentOrElse(protection -> BoltComponents.sendMessage(player, Translation.INFO,
+                    Template.of("type", Strings.toTitleCase(protection.getType())),
+                    Template.of("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
+            ), () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
             boltPlayer.removeAction(Action.INFO);
         }
     }

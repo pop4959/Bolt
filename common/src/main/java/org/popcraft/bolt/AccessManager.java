@@ -14,7 +14,7 @@ public class AccessManager {
     }
 
     public boolean hasAccess(final BoltPlayer player, final Protection protection, String permission) {
-        if (player.getUuid().toString().equals(protection.getOwner())) {
+        if (player.getUuid().equals(protection.getOwner())) {
             return true;
         }
         final AccessRegistry accessRegistry = bolt.getAccessRegistry();
