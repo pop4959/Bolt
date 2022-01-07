@@ -1,6 +1,7 @@
 package org.popcraft.bolt.util.lang;
 
 public class Translation {
+    public static final String COMMAND_NO_PERMISSION = "command_no_permission";
     public static final String CLICK_BLOCK_LOCK = "click_block_lock";
     public static final String CLICK_BLOCK_UNLOCK = "click_block_unlock";
     public static final String CLICK_BLOCK_INFO = "click_block_info";

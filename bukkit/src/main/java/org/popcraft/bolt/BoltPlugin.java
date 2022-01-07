@@ -20,7 +20,9 @@ import org.popcraft.bolt.event.DebugEvents;
 import org.popcraft.bolt.event.EnvironmentEvents;
 import org.popcraft.bolt.event.RegistrationEvents;
 import org.popcraft.bolt.util.BoltComponents;
+import org.popcraft.bolt.util.lang.Translation;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class BoltPlugin extends JavaPlugin {
+    private static final String COMMAND_PERMISSION_KEY = "bolt.command.";
     private final Bolt bolt = new Bolt(new SQLiteStore());
     private final Map<String, BoltCommand> commands = new HashMap<>();
 
@@ -64,15 +67,29 @@ public class BoltPlugin extends JavaPlugin {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (args.length > 0 && commands.containsKey(args[0].toLowerCase())) {
-            commands.get(args[0].toLowerCase()).execute(sender, new Arguments(Arrays.copyOfRange(args, 1, args.length)));
-            return true;
+            if (sender.hasPermission(COMMAND_PERMISSION_KEY + args[0].toLowerCase())) {
+                commands.get(args[0].toLowerCase()).execute(sender, new Arguments(Arrays.copyOfRange(args, 1, args.length)));
+            } else {
+                BoltComponents.sendMessage(sender, Translation.COMMAND_NO_PERMISSION);
+            }
         }
-        return false;
+        return true;
     }
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
-        return Collections.emptyList();
+        if (args.length < 1) {
+            return Collections.emptyList();
+        }
+        final List<String> suggestions = new ArrayList<>();
+        if (args.length == 1) {
+            commands.keySet().stream().filter(name -> sender.hasPermission(COMMAND_PERMISSION_KEY + name)).forEach(suggestions::add);
+        } else if (commands.containsKey(args[0].toLowerCase()) && sender.hasPermission(COMMAND_PERMISSION_KEY + args[0].toLowerCase())) {
+            suggestions.addAll(commands.get(args[0].toLowerCase()).suggestions());
+        }
+        return suggestions.stream()
+                .filter(s -> s.toLowerCase().contains(args[args.length - 1].toLowerCase()))
+                .toList();
     }
 
     public Bolt getBolt() {

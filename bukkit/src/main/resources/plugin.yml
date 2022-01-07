@@ -7,3 +7,7 @@ description: ${description}
 commands:
   bolt:
     description: Main bolt command
+    permission: bolt.command
+permissions:
+  bolt.command:
+    default: op
