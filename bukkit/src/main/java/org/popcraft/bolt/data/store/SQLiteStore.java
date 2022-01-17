@@ -128,17 +128,17 @@ public class SQLiteStore implements Store {
     @Override
     public void saveBlockProtection(BlockProtection protection) {
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
-            try (final PreparedStatement insertBlock = connection.prepareStatement("INSERT INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING;")) {
-                insertBlock.setString(1, protection.getId().toString());
-                insertBlock.setString(2, protection.getOwner().toString());
-                insertBlock.setString(3, protection.getType());
-                insertBlock.setString(4, protection.getAccessList().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
-                insertBlock.setString(5, protection.getBlock());
-                insertBlock.setString(6, protection.getWorld());
-                insertBlock.setInt(7, protection.getX());
-                insertBlock.setInt(8, protection.getY());
-                insertBlock.setInt(9, protection.getZ());
-                insertBlock.execute();
+            try (final PreparedStatement replaceBlock = connection.prepareStatement("REPLACE INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);")) {
+                replaceBlock.setString(1, protection.getId().toString());
+                replaceBlock.setString(2, protection.getOwner().toString());
+                replaceBlock.setString(3, protection.getType());
+                replaceBlock.setString(4, protection.getAccessList().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
+                replaceBlock.setString(5, protection.getBlock());
+                replaceBlock.setString(6, protection.getWorld());
+                replaceBlock.setInt(7, protection.getX());
+                replaceBlock.setInt(8, protection.getY());
+                replaceBlock.setInt(9, protection.getZ());
+                replaceBlock.execute();
             }
         } catch (SQLException e) {
             e.printStackTrace();
