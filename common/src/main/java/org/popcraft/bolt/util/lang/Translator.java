@@ -16,6 +16,7 @@ public final class Translator {
         return Objects.requireNonNullElse(translations.getProperty(key), Objects.requireNonNullElse(fallback.getProperty(key), key));
     }
 
+    @SuppressWarnings("unused")
     private static void setTranslation(final String language) {
         translations = loadTranslation(language);
     }

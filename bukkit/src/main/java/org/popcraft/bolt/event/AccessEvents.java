@@ -155,7 +155,7 @@ public class AccessEvents implements Listener {
         if (!(e.getPlayer() instanceof Player player)) {
             return;
         }
-        final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(e.getPlayer().getUniqueId());
+        final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
         final InventoryHolder inventoryHolder = e.getInventory().getHolder();
         if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
             final Block block = blockInventoryHolder.getBlock();
