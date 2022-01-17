@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.BukkitAdapter;
 
 public class DebugEvents implements Listener {
@@ -21,13 +21,13 @@ public class DebugEvents implements Listener {
     @EventHandler
     public void onPlayerInteract(final PlayerInteractEvent e) {
         final Player player = e.getPlayer();
-        final BoltPlayer boltPlayer = plugin.getBolt().getBoltPlayer(player.getUniqueId());
-        if (boltPlayer.hasAction(Action.DEBUG)) {
+        final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
+        if (playerMeta.hasAction(Action.DEBUG)) {
             final Block clicked = e.getClickedBlock();
             if (clicked != null) {
                 plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(clicked)).ifPresentOrElse(blockProtection -> BoltComponents.sendMessage(player, "A block is protected here"), () -> BoltComponents.sendMessage(player, "A block isn't protected here"));
             }
-            boltPlayer.removeAction(Action.DEBUG);
+            playerMeta.removeAction(Action.DEBUG);
         }
     }
 }

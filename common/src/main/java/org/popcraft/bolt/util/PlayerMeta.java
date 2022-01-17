@@ -4,11 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class BoltPlayer {
+public class PlayerMeta {
     private final UUID uuid;
     private final Set<Action> actions = new HashSet<>();
 
-    public BoltPlayer(UUID uuid) {
+    public PlayerMeta(UUID uuid) {
         this.uuid = uuid;
     }
 

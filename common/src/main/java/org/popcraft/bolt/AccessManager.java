@@ -4,7 +4,7 @@ import org.popcraft.bolt.data.Source;
 import org.popcraft.bolt.data.defaults.DefaultSourceType;
 import org.popcraft.bolt.data.protection.Protection;
 import org.popcraft.bolt.registry.AccessRegistry;
-import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.PlayerMeta;
 
 public class AccessManager {
     private final Bolt bolt;
@@ -13,7 +13,7 @@ public class AccessManager {
         this.bolt = bolt;
     }
 
-    public boolean hasAccess(final BoltPlayer player, final Protection protection, String permission) {
+    public boolean hasAccess(final PlayerMeta player, final Protection protection, String permission) {
         if (player.getUuid().equals(protection.getOwner())) {
             return true;
         }

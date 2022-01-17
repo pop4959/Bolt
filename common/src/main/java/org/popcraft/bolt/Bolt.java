@@ -2,7 +2,7 @@ package org.popcraft.bolt;
 
 import org.popcraft.bolt.data.store.Store;
 import org.popcraft.bolt.registry.AccessRegistry;
-import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.PlayerMeta;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public final class Bolt {
     private final AccessRegistry accessRegistry = new AccessRegistry();
-    private final Map<UUID, BoltPlayer> players = new HashMap<>();
+    private final Map<UUID, PlayerMeta> players = new HashMap<>();
     private final AccessManager accessManager;
     private Store store;
 
@@ -39,7 +39,7 @@ public final class Bolt {
         return accessManager;
     }
 
-    public BoltPlayer getBoltPlayer(UUID uuid) {
-        return players.computeIfAbsent(uuid, x -> new BoltPlayer(uuid));
+    public PlayerMeta getPlayerMeta(UUID uuid) {
+        return players.computeIfAbsent(uuid, x -> new PlayerMeta(uuid));
     }
 }

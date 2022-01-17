@@ -19,7 +19,7 @@ public class DebugCommand extends BoltCommand {
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
         if (sender instanceof final Player player) {
-            plugin.getBolt().getBoltPlayer(player.getUniqueId()).addAction(Action.DEBUG);
+            plugin.getBolt().getPlayerMeta(player.getUniqueId()).addAction(Action.DEBUG);
             BoltComponents.sendMessage(player, "Click to debug object");
         }
     }
