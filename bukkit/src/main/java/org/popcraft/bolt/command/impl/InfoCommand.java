@@ -1,4 +1,4 @@
-package org.popcraft.bolt.command.implementation;
+package org.popcraft.bolt.command.impl;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
