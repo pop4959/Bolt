@@ -61,6 +61,20 @@ public class RegistrationEvents implements Listener {
                     Template.of("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
             ), () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
             playerMeta.removeAction(Action.INFO);
+        } else if (playerMeta.hasAction(Action.MODIFY)) {
+            store.loadBlockProtection(BukkitAdapter.blockLocation(clicked)).ifPresentOrElse(protection -> {
+                playerMeta.getModifications().forEach((source, access) -> {
+                    if (access == null || bolt.getAccessRegistry().getAccess(access).isEmpty()) {
+                        protection.getAccessList().remove(source);
+                    } else {
+                        protection.getAccessList().put(source, access);
+                    }
+                });
+                bolt.getStore().saveBlockProtection(protection);
+                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_MODIFIED);
+            }, () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
+            playerMeta.getModifications().clear();
+            playerMeta.removeAction(Action.MODIFY);
         }
     }
 }

@@ -15,6 +15,10 @@ public enum DefaultAccess {
         this.access = access;
     }
 
+    public Access access() {
+        return access;
+    }
+
     public String type() {
         return access.type();
     }

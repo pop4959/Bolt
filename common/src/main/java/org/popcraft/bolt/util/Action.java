@@ -6,7 +6,8 @@ public enum Action {
     UNLOCK_BLOCK,
     UNLOCK_ENTITY,
     INFO,
-    DEBUG;
+    DEBUG,
+    MODIFY;
 
     private final long timestamp;
 

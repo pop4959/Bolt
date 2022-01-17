@@ -14,4 +14,8 @@ public class Arguments {
     public String next() {
         return remaining.poll();
     }
+
+    public int remaining() {
+        return remaining.size();
+    }
 }
