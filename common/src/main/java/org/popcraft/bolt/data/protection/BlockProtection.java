@@ -56,4 +56,19 @@ public class BlockProtection extends Protection {
     public void setZ(int z) {
         this.z = z;
     }
+
+    @Override
+    public String toString() {
+        return "BlockProtection{" +
+                "id=" + id +
+                ", accessList=" + accessList +
+                ", owner=" + owner +
+                ", type='" + type + '\'' +
+                ", block='" + block + '\'' +
+                ", world='" + world + '\'' +
+                ", x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
+    }
 }

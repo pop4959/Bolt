@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.UUID;
 
 public abstract class Protection {
-    private final UUID id;
-    private final Map<Source, String> accessList;
-    private UUID owner;
-    private String type;
+    protected final UUID id;
+    protected final Map<Source, String> accessList;
+    protected UUID owner;
+    protected String type;
 
     protected Protection(UUID id, UUID owner, String type, Map<Source, String> accessList) {
         this.id = id;
@@ -40,5 +40,15 @@ public abstract class Protection {
 
     public Map<Source, String> getAccessList() {
         return accessList;
+    }
+
+    @Override
+    public String toString() {
+        return "Protection{" +
+                "id=" + id +
+                ", accessList=" + accessList +
+                ", owner=" + owner +
+                ", type='" + type + '\'' +
+                '}';
     }
 }
