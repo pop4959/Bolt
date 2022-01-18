@@ -7,9 +7,9 @@ import java.util.Set;
 
 public enum DefaultProtectionType {
     PRIVATE(new Access("private", Collections.emptySet())),
+    DISPLAY(new Access("display", Set.of(DefaultPermission.CONTAINER_ACCESS.getKey()))),
     DEPOSIT(new Access("deposit", Set.of(DefaultPermission.CONTAINER_ACCESS.getKey(), DefaultPermission.CONTAINER_ADD.getKey()))),
     WITHDRAWAL(new Access("withdrawal", Set.of(DefaultPermission.CONTAINER_ACCESS.getKey(), DefaultPermission.CONTAINER_REMOVE.getKey()))),
-    DISPLAY(new Access("display", Set.of(DefaultPermission.CONTAINER_ACCESS.getKey()))),
     PUBLIC(new Access("public", Set.of(DefaultPermission.PLACE.getKey(), DefaultPermission.CONTAINER_ACCESS.getKey(), DefaultPermission.CONTAINER_ADD.getKey(), DefaultPermission.CONTAINER_REMOVE.getKey(), DefaultPermission.INTERACT.getKey())));
 
     private final Access access;

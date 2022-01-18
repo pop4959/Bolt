@@ -5,12 +5,13 @@ import org.popcraft.bolt.util.Access;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class AccessRegistry {
     private final Map<String, Access> accessMap = new HashMap<>();
 
-    public void register(final String type, final Access access) {
-        accessMap.put(type, access);
+    public void register(final String type, final Set<String> permissions) {
+        accessMap.put(type, new Access(type, permissions));
     }
 
     public void unregister(final String type) {

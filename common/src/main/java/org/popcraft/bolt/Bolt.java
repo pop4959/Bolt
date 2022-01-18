@@ -1,6 +1,5 @@
 package org.popcraft.bolt;
 
-import org.popcraft.bolt.util.defaults.DefaultAccess;
 import org.popcraft.bolt.store.Store;
 import org.popcraft.bolt.util.PlayerMeta;
 
@@ -15,15 +14,8 @@ public final class Bolt {
     private Store store;
 
     public Bolt(final Store store) {
-        this();
-        this.store = store;
-        // TODO: replace this with proper registry
-        this.accessRegistry.register(DefaultAccess.BASIC.type(), DefaultAccess.BASIC.access());
-        this.accessRegistry.register(DefaultAccess.ADMIN.type(), DefaultAccess.ADMIN.access());
-    }
-
-    public Bolt() {
         this.accessManager = new AccessManager(this);
+        this.store = store;
     }
 
     public Store getStore() {

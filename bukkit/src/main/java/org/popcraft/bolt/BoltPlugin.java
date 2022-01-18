@@ -21,26 +21,79 @@ import org.popcraft.bolt.event.DebugEvents;
 import org.popcraft.bolt.event.EnvironmentEvents;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.lang.Translation;
+import org.spongepowered.configurate.ConfigurateException;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class BoltPlugin extends JavaPlugin {
     private static final String COMMAND_PERMISSION_KEY = "bolt.command.";
     private final Bolt bolt = new Bolt(new SQLiteStore());
     private final Map<String, BoltCommand> commands = new HashMap<>();
+    private YamlConfigurationLoader configurationLoader;
+    private ConfigurationNode configurationRootNode;
 
     @Override
     public void onEnable() {
+        loadConfiguration();
+        registerAccessTypes();
         BoltComponents.enable(this);
         registerEvents();
         registerCommands();
         listAllBlockProtections(bolt.getStore());
+    }
+
+    private void loadConfiguration() {
+        configurationLoader = YamlConfigurationLoader.builder()
+                .path(getDataFolder().toPath().resolve("config.yml"))
+                .build();
+        try {
+            configurationRootNode = configurationLoader.load();
+            if (!configurationRootNode.hasChild("version")) {
+                final YamlConfigurationLoader defaultLoader = YamlConfigurationLoader.builder()
+                        .url(getClassLoader().getResource("config.yml"))
+                        .build();
+                final ConfigurationNode configurationDefaultRootNode = defaultLoader.load();
+                configurationRootNode.mergeFrom(configurationDefaultRootNode);
+                configurationLoader.save(configurationRootNode);
+            }
+        } catch (ConfigurateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveConfiguration() {
+        try {
+            configurationLoader.save(configurationRootNode);
+        } catch (ConfigurateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void registerAccessTypes() {
+        final ConfigurationNode accessTypesMapNode = configurationRootNode.node("access-types");
+        if (accessTypesMapNode.isMap()) {
+            accessTypesMapNode.childrenMap().forEach((key, permissionsNode) -> {
+                try {
+                    final List<String> permissions = permissionsNode.getList(String.class);
+                    if (key instanceof String type && permissions != null) {
+                        bolt.getAccessRegistry().register(type, new HashSet<>(permissions));
+                    }
+                } catch (SerializationException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     private void registerEvents() {
@@ -62,6 +115,7 @@ public class BoltPlugin extends JavaPlugin {
         BoltComponents.disable();
         HandlerList.unregisterAll(this);
         commands.clear();
+        saveConfiguration();
     }
 
     @Override
@@ -94,6 +148,10 @@ public class BoltPlugin extends JavaPlugin {
 
     public Bolt getBolt() {
         return bolt;
+    }
+
+    public ConfigurationNode getConfiguration() {
+        return configurationRootNode;
     }
 
     private void listAllBlockProtections(final Store store) {
