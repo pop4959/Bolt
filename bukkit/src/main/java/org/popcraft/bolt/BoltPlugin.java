@@ -19,7 +19,6 @@ import org.popcraft.bolt.store.Store;
 import org.popcraft.bolt.event.AccessEvents;
 import org.popcraft.bolt.event.DebugEvents;
 import org.popcraft.bolt.event.EnvironmentEvents;
-import org.popcraft.bolt.event.RegistrationEvents;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.lang.Translation;
 
@@ -48,7 +47,6 @@ public class BoltPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new AccessEvents(this), this);
         getServer().getPluginManager().registerEvents(new DebugEvents(this), this);
         getServer().getPluginManager().registerEvents(new EnvironmentEvents(this), this);
-        getServer().getPluginManager().registerEvents(new RegistrationEvents(this), this);
     }
 
     private void registerCommands() {

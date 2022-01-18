@@ -10,6 +10,7 @@ public class Translation {
     public static final String CLICK_BLOCK_NOT_BLOCK = "click_block_not_block";
     public static final String CLICK_BLOCK_LOCKED_ALREADY = "click_block_locked_already";
     public static final String CLICK_BLOCK_LOCKED = "click_block_locked";
+    public static final String PROTECTION_NOTIFY = "protection_notify";
     public static final String LOCKED = "locked";
     public static final String COMMAND_PLAYER_ONLY = "command_player_only";
     public static final String CLICK_BLOCK_UNLOCKED = "click_block_unlocked";
@@ -17,6 +18,7 @@ public class Translation {
     public static final String INFO = "info";
     public static final String UNKNOWN = "unknown";
     public static final String EMPTY = "empty";
+    public static final String YOU = "you";
 
     private Translation() {
     }

@@ -11,3 +11,5 @@ commands:
 permissions:
   bolt.command:
     default: op
+  bolt.protection.notify:
+    default: false

@@ -21,7 +21,10 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
+import org.popcraft.bolt.Bolt;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.store.Store;
+import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.defaults.DefaultPermission;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
@@ -33,11 +36,79 @@ import org.popcraft.bolt.util.lang.Translation;
 
 import java.util.Optional;
 
+import static org.popcraft.bolt.util.lang.Translator.translate;
+
 public class AccessEvents implements Listener {
     private final BoltPlugin plugin;
 
     public AccessEvents(final BoltPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onPlayerInteract(final PlayerInteractEvent e) {
+        final Block clicked = e.getClickedBlock();
+        if (clicked == null) {
+            return;
+        }
+        final Player player = e.getPlayer();
+        final Bolt bolt = plugin.getBolt();
+        final PlayerMeta playerMeta = bolt.getPlayerMeta(player.getUniqueId());
+        final Store store = bolt.getStore();
+        final Optional<BlockProtection> optionalProtection = store.loadBlockProtection(BukkitAdapter.blockLocation(clicked));
+        if (playerMeta.triggerAction(Action.LOCK_BLOCK)) {
+            if (optionalProtection.isPresent()) {
+                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_LOCKED_ALREADY);
+            } else {
+                store.saveBlockProtection(BukkitAdapter.createPrivateBlockProtection(clicked, player));
+                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_LOCKED,
+                        Template.of("block", Strings.toTitleCase(clicked.getType()))
+                );
+            }
+        } else if (playerMeta.triggerAction(Action.UNLOCK_BLOCK)) {
+            if (optionalProtection.isPresent()) {
+                store.removeBlockProtection(optionalProtection.get());
+                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_UNLOCKED,
+                        Template.of("block", Strings.toTitleCase(clicked.getType()))
+                );
+            } else {
+                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED);
+            }
+        } else if (playerMeta.triggerAction(Action.INFO)) {
+            optionalProtection.ifPresentOrElse(protection -> BoltComponents.sendMessage(player, Translation.INFO,
+                    Template.of("type", Strings.toTitleCase(protection.getType())),
+                    Template.of("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
+            ), () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
+        } else if (playerMeta.triggerAction(Action.MODIFY)) {
+            optionalProtection.ifPresentOrElse(protection -> {
+                playerMeta.getModifications().forEach((source, access) -> {
+                    if (access == null || bolt.getAccessRegistry().getAccess(access).isEmpty()) {
+                        protection.getAccessList().remove(source);
+                    } else {
+                        protection.getAccessList().put(source, access);
+                    }
+                });
+                bolt.getStore().saveBlockProtection(protection);
+                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_MODIFIED);
+            }, () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
+            playerMeta.getModifications().clear();
+        } else if (optionalProtection.isPresent()) {
+            final boolean shouldSendMessage = EquipmentSlot.HAND.equals(e.getHand());
+            final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
+            final BlockProtection protection = optionalProtection.get();
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, DefaultPermission.INTERACT.getKey())) {
+                e.setCancelled(true);
+                if (shouldSendMessage && !hasNotifyPermission) {
+                    BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("block", Strings.toTitleCase(clicked.getType())));
+                }
+            }
+            if (shouldSendMessage && hasNotifyPermission) {
+                BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY,
+                        Template.of("block", Strings.toTitleCase(clicked.getType())),
+                        Template.of("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
+                );
+            }
+        }
     }
 
     @EventHandler
@@ -50,26 +121,6 @@ public class AccessEvents implements Listener {
             final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
             if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.BREAK.getKey())) {
                 e.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onPlayerInteract(final PlayerInteractEvent e) {
-        final Block block = e.getClickedBlock();
-        if (block == null) {
-            return;
-        }
-        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
-        final Player player = e.getPlayer();
-        if (protection.isPresent()) {
-            final BlockProtection blockProtection = protection.get();
-            final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.INTERACT.getKey())) {
-                e.setCancelled(true);
-                if (EquipmentSlot.HAND.equals(e.getHand())) {
-                    BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("block", Strings.toTitleCase(block.getType())));
-                }
             }
         }
     }

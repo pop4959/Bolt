@@ -7,6 +7,7 @@ import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
+import org.popcraft.bolt.util.lang.Translation;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +22,8 @@ public class DebugCommand extends BoltCommand {
         if (sender instanceof final Player player) {
             plugin.getBolt().getPlayerMeta(player.getUniqueId()).addAction(Action.DEBUG);
             BoltComponents.sendMessage(player, "Click to debug object");
+        } else {
+            BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
         }
     }
 
