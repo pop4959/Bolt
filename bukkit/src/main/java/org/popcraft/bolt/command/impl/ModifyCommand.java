@@ -5,14 +5,17 @@ import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.PlayerMeta;
+import org.popcraft.bolt.util.defaults.DefaultSource;
 import org.popcraft.bolt.util.lang.Translation;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class ModifyCommand extends BoltCommand {
     public ModifyCommand(BoltPlugin plugin) {
@@ -25,7 +28,19 @@ public class ModifyCommand extends BoltCommand {
             final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
             playerMeta.addAction(Action.MODIFY);
             final String sourceType = arguments.next();
-            final String sourceIdentifier = arguments.next();
+            final String inputIdentifier = arguments.next();
+            String sourceIdentifier;
+            if (DefaultSource.PLAYER.getType().equals(sourceType)) {
+                UUID uuid;
+                try {
+                    uuid = UUID.fromString(inputIdentifier);
+                } catch (IllegalArgumentException ignored) {
+                    uuid = null;
+                }
+                sourceIdentifier = (uuid == null ? BukkitAdapter.playerUUID(inputIdentifier) : uuid).toString();
+            } else {
+                sourceIdentifier = inputIdentifier;
+            }
             final String access = arguments.next();
             playerMeta.getModifications().put(new Source(sourceType, sourceIdentifier), access);
             BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_MODIFY);
