@@ -1,8 +1,7 @@
 package org.popcraft.bolt;
 
-import org.popcraft.bolt.data.defaults.DefaultAccess;
-import org.popcraft.bolt.data.store.Store;
-import org.popcraft.bolt.registry.AccessRegistry;
+import org.popcraft.bolt.util.defaults.DefaultAccess;
+import org.popcraft.bolt.store.Store;
 import org.popcraft.bolt.util.PlayerMeta;
 
 import java.util.HashMap;

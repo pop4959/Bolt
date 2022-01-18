@@ -20,7 +20,7 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.popcraft.bolt.BoltPlugin;
-import org.popcraft.bolt.data.util.BlockLocation;
+import org.popcraft.bolt.util.BlockLocation;
 
 public class EnvironmentEvents implements Listener {
     private final BoltPlugin plugin;

@@ -1,6 +1,6 @@
 package org.popcraft.bolt.util.lang;
 
-import org.popcraft.bolt.data.Source;
+import org.popcraft.bolt.util.Source;
 
 import java.util.ArrayList;
 import java.util.List;

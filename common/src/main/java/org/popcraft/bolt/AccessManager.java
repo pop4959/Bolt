@@ -1,9 +1,8 @@
 package org.popcraft.bolt;
 
-import org.popcraft.bolt.data.Source;
-import org.popcraft.bolt.data.defaults.DefaultSourceType;
-import org.popcraft.bolt.data.protection.Protection;
-import org.popcraft.bolt.registry.AccessRegistry;
+import org.popcraft.bolt.util.Source;
+import org.popcraft.bolt.util.defaults.DefaultSource;
+import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.PlayerMeta;
 
 public class AccessManager {
@@ -21,7 +20,7 @@ public class AccessManager {
         if (accessRegistry.getAccess(protection.getType()).map(access -> access.permissions().contains(permission)).orElse(false)) {
             return true;
         }
-        final Source playerSource = new Source(DefaultSourceType.PLAYER, player.getUuid().toString());
+        final Source playerSource = new Source(DefaultSource.PLAYER.getType(), player.getUuid().toString());
         if (protection.getAccessList().containsKey(playerSource)) {
             final String accessType = protection.getAccessList().get(playerSource);
             return accessRegistry.getAccess(accessType).map(access -> access.permissions().contains(permission)).orElse(false);

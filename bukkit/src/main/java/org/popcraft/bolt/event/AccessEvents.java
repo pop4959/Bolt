@@ -22,9 +22,9 @@ import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.popcraft.bolt.BoltPlugin;
-import org.popcraft.bolt.data.Permission;
-import org.popcraft.bolt.data.protection.BlockProtection;
-import org.popcraft.bolt.data.protection.EntityProtection;
+import org.popcraft.bolt.util.defaults.DefaultPermission;
+import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.BukkitAdapter;
@@ -48,7 +48,7 @@ public class AccessEvents implements Listener {
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
             final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.BREAK.getKey())) {
                 e.setCancelled(true);
             }
         }
@@ -65,7 +65,7 @@ public class AccessEvents implements Listener {
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
             final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.INTERACT)) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.INTERACT.getKey())) {
                 e.setCancelled(true);
                 if (EquipmentSlot.HAND.equals(e.getHand())) {
                     BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("block", Strings.toTitleCase(block.getType())));
@@ -81,7 +81,7 @@ public class AccessEvents implements Listener {
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
             final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(e.getPlayer().getUniqueId());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.INTERACT)) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.INTERACT.getKey())) {
                 e.setCancelled(true);
             }
         }
@@ -93,7 +93,7 @@ public class AccessEvents implements Listener {
         final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getRemover() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getPlayerMeta(player.getUniqueId()), entityProtection, Permission.KILL)) {
+            if (!(e.getRemover() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getPlayerMeta(player.getUniqueId()), entityProtection, DefaultPermission.KILL.getKey())) {
                 e.setCancelled(true);
             }
         }
@@ -105,7 +105,7 @@ public class AccessEvents implements Listener {
         final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getAttacker() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getPlayerMeta(player.getUniqueId()), entityProtection, Permission.KILL)) {
+            if (!(e.getAttacker() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getPlayerMeta(player.getUniqueId()), entityProtection, DefaultPermission.KILL.getKey())) {
                 e.setCancelled(true);
             }
         }
@@ -118,7 +118,7 @@ public class AccessEvents implements Listener {
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
             final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(e.getPlayer().getUniqueId());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, DefaultPermission.INTERACT.getKey())) {
                 e.setCancelled(true);
             }
         }
@@ -130,7 +130,7 @@ public class AccessEvents implements Listener {
         final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getDamager() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getPlayerMeta(player.getUniqueId()), entityProtection, Permission.KILL)) {
+            if (!(e.getDamager() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getPlayerMeta(player.getUniqueId()), entityProtection, DefaultPermission.KILL.getKey())) {
                 e.setCancelled(true);
             }
         }
@@ -143,7 +143,7 @@ public class AccessEvents implements Listener {
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
             final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(e.getPlayer().getUniqueId());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, DefaultPermission.INTERACT.getKey())) {
                 e.setCancelled(true);
             }
         }
@@ -162,7 +162,7 @@ public class AccessEvents implements Listener {
             final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
             if (protection.isPresent()) {
                 final BlockProtection blockProtection = protection.get();
-                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.CONTAINER_ACCESS)) {
+                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.CONTAINER_ACCESS.getKey())) {
                     e.setCancelled(true);
                 }
             }
@@ -170,7 +170,7 @@ public class AccessEvents implements Listener {
             final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
             if (protection.isPresent()) {
                 final EntityProtection entityProtection = protection.get();
-                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.CONTAINER_ACCESS)) {
+                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, DefaultPermission.CONTAINER_ACCESS.getKey())) {
                     e.setCancelled(true);
                 }
             }
@@ -194,7 +194,7 @@ public class AccessEvents implements Listener {
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
             final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(e.getPlayer().getUniqueId());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.CONTAINER_REMOVE)) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.CONTAINER_REMOVE.getKey())) {
                 e.setCancelled(true);
             }
         }

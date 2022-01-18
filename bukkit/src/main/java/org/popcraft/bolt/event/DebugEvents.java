@@ -22,15 +22,9 @@ public class DebugEvents implements Listener {
     public void onPlayerInteract(final PlayerInteractEvent e) {
         final Player player = e.getPlayer();
         final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
-        if (playerMeta.hasAction(Action.DEBUG)) {
+        if (playerMeta.triggerAction(Action.DEBUG)) {
             final Block clicked = e.getClickedBlock();
-            if (clicked != null) {
-                plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(clicked)).ifPresentOrElse(blockProtection -> {
-                    BoltComponents.sendMessage(player, "A block is protected here");
-                    BoltComponents.sendMessage(player, blockProtection.toString());
-                }, () -> BoltComponents.sendMessage(player, "A block isn't protected here"));
-            }
-            playerMeta.removeAction(Action.DEBUG);
+            BoltComponents.sendMessage(player, clicked == null ? "null" : plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(clicked)).toString());
         }
     }
 }

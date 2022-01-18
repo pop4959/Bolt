@@ -1,7 +1,5 @@
 package org.popcraft.bolt.util;
 
-import org.popcraft.bolt.data.Source;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,8 +27,8 @@ public class PlayerMeta {
         actions.add(action);
     }
 
-    public void removeAction(Action action) {
-        actions.remove(action);
+    public boolean triggerAction(Action action) {
+        return actions.remove(action);
     }
 
     public Map<Source, String> getModifications() {

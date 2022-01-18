@@ -8,8 +8,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.popcraft.bolt.Bolt;
 import org.popcraft.bolt.BoltPlugin;
-import org.popcraft.bolt.data.protection.BlockProtection;
-import org.popcraft.bolt.data.store.Store;
+import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.store.Store;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.PlayerMeta;
@@ -38,15 +38,14 @@ public class RegistrationEvents implements Listener {
             return;
         }
         final Store store = bolt.getStore();
-        if (playerMeta.hasAction(Action.LOCK_BLOCK)) {
+        if (playerMeta.triggerAction(Action.LOCK_BLOCK)) {
             if (store.loadBlockProtection(BukkitAdapter.blockLocation(clicked)).isPresent()) {
                 BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_LOCKED_ALREADY);
             } else {
                 store.saveBlockProtection(BukkitAdapter.createPrivateBlockProtection(clicked, player));
                 BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_LOCKED, Template.of("block", Strings.toTitleCase(clicked.getType())));
             }
-            playerMeta.removeAction(Action.LOCK_BLOCK);
-        } else if (playerMeta.hasAction(Action.UNLOCK_BLOCK)) {
+        } else if (playerMeta.triggerAction(Action.UNLOCK_BLOCK)) {
             final Optional<BlockProtection> protection = store.loadBlockProtection(BukkitAdapter.blockLocation(clicked));
             if (protection.isPresent()) {
                 store.removeBlockProtection(protection.get());
@@ -54,14 +53,12 @@ public class RegistrationEvents implements Listener {
             } else {
                 BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED);
             }
-            playerMeta.removeAction(Action.UNLOCK_BLOCK);
-        } else if (playerMeta.hasAction(Action.INFO)) {
+        } else if (playerMeta.triggerAction(Action.INFO)) {
             store.loadBlockProtection(BukkitAdapter.blockLocation(clicked)).ifPresentOrElse(protection -> BoltComponents.sendMessage(player, Translation.INFO,
                     Template.of("type", Strings.toTitleCase(protection.getType())),
                     Template.of("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
             ), () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
-            playerMeta.removeAction(Action.INFO);
-        } else if (playerMeta.hasAction(Action.MODIFY)) {
+        } else if (playerMeta.triggerAction(Action.MODIFY)) {
             store.loadBlockProtection(BukkitAdapter.blockLocation(clicked)).ifPresentOrElse(protection -> {
                 playerMeta.getModifications().forEach((source, access) -> {
                     if (access == null || bolt.getAccessRegistry().getAccess(access).isEmpty()) {
@@ -74,7 +71,6 @@ public class RegistrationEvents implements Listener {
                 BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_MODIFIED);
             }, () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
             playerMeta.getModifications().clear();
-            playerMeta.removeAction(Action.MODIFY);
         }
     }
 }
