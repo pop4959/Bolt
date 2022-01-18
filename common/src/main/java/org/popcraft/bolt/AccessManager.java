@@ -5,6 +5,8 @@ import org.popcraft.bolt.util.defaults.DefaultSource;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.PlayerMeta;
 
+import java.util.Map;
+
 public class AccessManager {
     private final Bolt bolt;
 
@@ -17,14 +19,13 @@ public class AccessManager {
             return true;
         }
         final AccessRegistry accessRegistry = bolt.getAccessRegistry();
-        if (accessRegistry.getAccess(protection.getType()).map(access -> access.permissions().contains(permission)).orElse(false)) {
+        if (accessRegistry.get(protection.getType()).map(access -> access.permissions().contains(permission)).orElse(false)) {
             return true;
         }
         final Source playerSource = new Source(DefaultSource.PLAYER.getType(), player.getUuid().toString());
-        if (protection.getAccessList().containsKey(playerSource)) {
-            final String accessType = protection.getAccessList().get(playerSource);
-            return accessRegistry.getAccess(accessType).map(access -> access.permissions().contains(permission)).orElse(false);
-        }
-        return false;
+        final Map<Source, String> accessList = protection.getAccessList();
+        return accessList.containsKey(playerSource) && accessRegistry.get(accessList.get(playerSource))
+                .map(access -> access.permissions().contains(permission))
+                .orElse(false);
     }
 }

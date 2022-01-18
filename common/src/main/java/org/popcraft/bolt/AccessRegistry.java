@@ -18,7 +18,7 @@ public class AccessRegistry {
         accessMap.remove(type);
     }
 
-    public Optional<Access> getAccess(String type) {
+    public Optional<Access> get(String type) {
         return Optional.ofNullable(accessMap.get(type));
     }
 }

@@ -81,11 +81,11 @@ public class AccessEvents implements Listener {
             ), () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
         } else if (playerMeta.triggerAction(Action.MODIFY)) {
             optionalProtection.ifPresentOrElse(protection -> {
-                playerMeta.getModifications().forEach((source, access) -> {
-                    if (access == null || bolt.getAccessRegistry().getAccess(access).isEmpty()) {
+                playerMeta.getModifications().forEach((source, type) -> {
+                    if (type == null || bolt.getAccessRegistry().get(type).isEmpty()) {
                         protection.getAccessList().remove(source);
                     } else {
-                        protection.getAccessList().put(source, access);
+                        protection.getAccessList().put(source, type);
                     }
                 });
                 bolt.getStore().saveBlockProtection(protection);
