@@ -1,6 +1,7 @@
 package org.popcraft.bolt.event;
 
 import net.kyori.adventure.text.minimessage.Template;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -10,9 +11,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -20,20 +23,23 @@ import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.popcraft.bolt.Bolt;
 import org.popcraft.bolt.BoltPlugin;
-import org.popcraft.bolt.store.Store;
-import org.popcraft.bolt.util.Action;
-import org.popcraft.bolt.util.defaults.DefaultPermission;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.store.Store;
+import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.PlayerMeta;
+import org.popcraft.bolt.util.defaults.DefaultPermission;
 import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
 
+import java.util.EnumSet;
 import java.util.Optional;
 
 import static org.popcraft.bolt.util.lang.Translator.translate;
@@ -53,7 +59,7 @@ public class AccessEvents implements Listener {
         }
         final Player player = e.getPlayer();
         final Bolt bolt = plugin.getBolt();
-        final PlayerMeta playerMeta = bolt.getPlayerMeta(player.getUniqueId());
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
         final Store store = bolt.getStore();
         final Optional<BlockProtection> optionalProtection = store.loadBlockProtection(BukkitAdapter.blockLocation(clicked));
         if (playerMeta.triggerAction(Action.LOCK_BLOCK)) {
@@ -118,7 +124,7 @@ public class AccessEvents implements Listener {
         final Player player = e.getPlayer();
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
-            final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
+            final PlayerMeta playerMeta = plugin.playerMeta(player);
             if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.BREAK.getKey())) {
                 e.setCancelled(true);
             }
@@ -131,7 +137,7 @@ public class AccessEvents implements Listener {
         final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
-            final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(e.getPlayer().getUniqueId());
+            final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
             if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.INTERACT.getKey())) {
                 e.setCancelled(true);
             }
@@ -144,7 +150,7 @@ public class AccessEvents implements Listener {
         final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getRemover() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getPlayerMeta(player.getUniqueId()), entityProtection, DefaultPermission.KILL.getKey())) {
+            if (!(e.getRemover() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, DefaultPermission.KILL.getKey())) {
                 e.setCancelled(true);
             }
         }
@@ -156,7 +162,7 @@ public class AccessEvents implements Listener {
         final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getAttacker() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getPlayerMeta(player.getUniqueId()), entityProtection, DefaultPermission.KILL.getKey())) {
+            if (!(e.getAttacker() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, DefaultPermission.KILL.getKey())) {
                 e.setCancelled(true);
             }
         }
@@ -168,7 +174,7 @@ public class AccessEvents implements Listener {
         final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(e.getPlayer().getUniqueId());
+            final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
             if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, DefaultPermission.INTERACT.getKey())) {
                 e.setCancelled(true);
             }
@@ -181,7 +187,7 @@ public class AccessEvents implements Listener {
         final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getDamager() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.getBolt().getPlayerMeta(player.getUniqueId()), entityProtection, DefaultPermission.KILL.getKey())) {
+            if (!(e.getDamager() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, DefaultPermission.KILL.getKey())) {
                 e.setCancelled(true);
             }
         }
@@ -193,7 +199,7 @@ public class AccessEvents implements Listener {
         final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(e.getPlayer().getUniqueId());
+            final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
             if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, DefaultPermission.INTERACT.getKey())) {
                 e.setCancelled(true);
             }
@@ -206,7 +212,7 @@ public class AccessEvents implements Listener {
         if (!(e.getPlayer() instanceof Player player)) {
             return;
         }
-        final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
         final InventoryHolder inventoryHolder = e.getInventory().getHolder();
         if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
             final Block block = blockInventoryHolder.getBlock();
@@ -230,24 +236,83 @@ public class AccessEvents implements Listener {
 
     @EventHandler
     public void onInventoryClick(final InventoryClickEvent e) {
-        // TODO: Do this when the other inventory event is handled better (and this one will be pretty similar)
+        if (!(e.getWhoClicked() instanceof final Player player)) {
+            return;
+        }
+        final Inventory inventory = e.getInventory();
+        if (InventoryType.PLAYER.equals(inventory.getType())) {
+            plugin.getLogger().info("Player inventory");
+            return;
+        }
+        if (!InventoryType.SlotType.CONTAINER.equals(e.getSlotType())) {
+            plugin.getLogger().info("Not a container");
+            return;
+        }
+        final Location location = inventory.getLocation();
+        if (location == null) {
+            plugin.getLogger().info("No location");
+            return;
+        }
+        final InventoryAction action = e.getAction();
+        plugin.getLogger().info(action::name);
+        final EnumSet<InventoryAction> adding = EnumSet.of(
+                InventoryAction.PLACE_ALL,
+                InventoryAction.PLACE_ONE,
+                InventoryAction.PLACE_SOME,
+                InventoryAction.SWAP_WITH_CURSOR
+        );
+        final EnumSet<InventoryAction> removing = EnumSet.of(
+                InventoryAction.COLLECT_TO_CURSOR,
+                InventoryAction.MOVE_TO_OTHER_INVENTORY,
+                InventoryAction.PICKUP_ALL,
+                InventoryAction.PICKUP_HALF,
+                InventoryAction.PICKUP_ONE,
+                InventoryAction.PICKUP_SOME,
+                InventoryAction.SWAP_WITH_CURSOR
+        );
+        final boolean isAdding = adding.contains(action);
+        final boolean isRemoving = removing.contains(action);
+        if (!isAdding && !isRemoving) {
+            return;
+        }
+        plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
+            if (isAdding && !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey())
+                    || isRemoving && !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_REMOVE.getKey())) {
+                e.setCancelled(true);
+            }
+        });
     }
 
     @EventHandler
     public void onInventoryDrag(final InventoryDragEvent e) {
-        // TODO: Do this when the other inventory event is handled better (and this one will be pretty similar)
+        if (!(e.getWhoClicked() instanceof final Player player)) {
+            return;
+        }
+        final Inventory inventory = e.getInventory();
+        if (InventoryType.PLAYER.equals(inventory.getType())) {
+            plugin.getLogger().info("Player inventory");
+            return;
+        }
+        final Location location = inventory.getLocation();
+        if (location == null) {
+            plugin.getLogger().info("No location");
+            return;
+        }
+        plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
+            if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey())) {
+                e.setCancelled(true);
+            }
+        });
     }
 
     @EventHandler
     public void onPlayerTakeLecternBook(final PlayerTakeLecternBookEvent e) {
         final Block block = e.getLectern().getBlock();
-        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
-        if (protection.isPresent()) {
-            final BlockProtection blockProtection = protection.get();
-            final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(e.getPlayer().getUniqueId());
+        plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block)).ifPresent(blockProtection -> {
+            final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
             if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.CONTAINER_REMOVE.getKey())) {
                 e.setCancelled(true);
             }
-        }
+        });
     }
 }

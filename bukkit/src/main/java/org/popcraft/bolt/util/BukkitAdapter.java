@@ -3,6 +3,7 @@ package org.popcraft.bolt.util;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.popcraft.bolt.util.defaults.DefaultProtectionType;
 import org.popcraft.bolt.protection.BlockProtection;
@@ -27,6 +28,10 @@ public final class BukkitAdapter {
 
     public static BlockLocation blockLocation(final Block block) {
         return new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+    }
+
+    public static BlockLocation blockLocation(final BlockState blockState) {
+        return new BlockLocation(blockState.getWorld().getName(), blockState.getX(), blockState.getY(), blockState.getZ());
     }
 
     public static BlockLocation blockLocation(final Location location) {

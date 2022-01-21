@@ -21,7 +21,7 @@ public class DebugEvents implements Listener {
     @EventHandler
     public void onPlayerInteract(final PlayerInteractEvent e) {
         final Player player = e.getPlayer();
-        final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
         if (playerMeta.triggerAction(Action.DEBUG)) {
             final Block clicked = e.getClickedBlock();
             BoltComponents.sendMessage(player, clicked == null ? "null" : plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(clicked)).toString());

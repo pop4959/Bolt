@@ -20,7 +20,7 @@ public class InfoCommand extends BoltCommand {
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
         if (sender instanceof final Player player) {
-            plugin.getBolt().getPlayerMeta(player.getUniqueId()).addAction(Action.INFO);
+            plugin.playerMeta(player).addAction(Action.INFO);
             BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_INFO);
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);

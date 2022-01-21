@@ -20,7 +20,7 @@ public class UnlockCommand extends BoltCommand {
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
         if (sender instanceof final Player player) {
-            plugin.getBolt().getPlayerMeta(player.getUniqueId()).addAction(Action.UNLOCK_BLOCK);
+            plugin.playerMeta(player).addAction(Action.UNLOCK_BLOCK);
             BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_UNLOCK);
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);

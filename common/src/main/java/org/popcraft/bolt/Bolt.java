@@ -34,7 +34,7 @@ public final class Bolt {
         return accessManager;
     }
 
-    public PlayerMeta getPlayerMeta(UUID uuid) {
+    public PlayerMeta getPlayerMeta(final UUID uuid) {
         return players.computeIfAbsent(uuid, x -> new PlayerMeta(uuid));
     }
 }

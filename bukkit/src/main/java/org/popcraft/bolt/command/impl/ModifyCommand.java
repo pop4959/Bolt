@@ -25,7 +25,7 @@ public class ModifyCommand extends BoltCommand {
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
         if (sender instanceof final Player player && arguments.remaining() >= 3) {
-            final PlayerMeta playerMeta = plugin.getBolt().getPlayerMeta(player.getUniqueId());
+            final PlayerMeta playerMeta = plugin.playerMeta(player);
             playerMeta.addAction(Action.MODIFY);
             final String sourceType = arguments.next();
             final String inputIdentifier = arguments.next();

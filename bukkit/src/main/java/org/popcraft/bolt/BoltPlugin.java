@@ -2,6 +2,7 @@ package org.popcraft.bolt;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,8 @@ import org.popcraft.bolt.command.impl.InfoCommand;
 import org.popcraft.bolt.command.impl.LockCommand;
 import org.popcraft.bolt.command.impl.ModifyCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
+import org.popcraft.bolt.util.BlockLocation;
+import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.store.SQLiteStore;
@@ -152,6 +155,10 @@ public class BoltPlugin extends JavaPlugin {
 
     public ConfigurationNode getConfiguration() {
         return configurationRootNode;
+    }
+
+    public PlayerMeta playerMeta(final Player player) {
+        return bolt.getPlayerMeta(player.getUniqueId());
     }
 
     private void listAllBlockProtections(final Store store) {
