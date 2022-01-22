@@ -323,6 +323,7 @@ public class AccessEvents implements Listener {
             plugin.getLogger().info("No location");
             return;
         }
+        // TODO: Make sure to handle the case where dragging only occurs in the player inventory
         plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
             if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey())) {
                 e.setCancelled(true);
