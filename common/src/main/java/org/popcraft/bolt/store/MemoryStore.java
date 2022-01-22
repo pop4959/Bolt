@@ -1,8 +1,8 @@
 package org.popcraft.bolt.store;
 
-import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.BlockLocation;
 
 import java.util.HashMap;

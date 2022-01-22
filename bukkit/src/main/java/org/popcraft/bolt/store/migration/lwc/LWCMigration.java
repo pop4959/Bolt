@@ -1,15 +1,15 @@
 package org.popcraft.bolt.store.migration.lwc;
 
 import com.google.gson.Gson;
+import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.store.MemoryStore;
+import org.popcraft.bolt.store.migration.Migration;
 import org.popcraft.bolt.util.Access;
+import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.defaults.DefaultAccess;
 import org.popcraft.bolt.util.defaults.DefaultProtectionType;
 import org.popcraft.bolt.util.defaults.DefaultSource;
-import org.popcraft.bolt.protection.BlockProtection;
-import org.popcraft.bolt.store.MemoryStore;
-import org.popcraft.bolt.store.migration.Migration;
-import org.popcraft.bolt.util.BukkitAdapter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -116,13 +116,13 @@ public class LWCMigration implements Migration {
             if (data != null) {
                 for (DataFlag flag : data.getFlags()) {
                     if (flag.getId() == FLAG_TYPE_REDSTONE) {
-                        access.put(new Source(DefaultSource.REDSTONE.getType(), DefaultSource.REDSTONE.getType()), DefaultAccess.ADMIN.type());
+                        access.put(new Source(DefaultSource.REDSTONE.getType(), DefaultSource.REDSTONE.getType()), DefaultAccess.FULL.type());
                     } else if (flag.getId() == FLAG_TYPE_HOPPER) {
-                        access.put(new Source(DefaultSource.HOPPER.getType(), DefaultSource.HOPPER.getType()), DefaultAccess.ADMIN.type());
+                        access.put(new Source(DefaultSource.HOPPER.getType(), DefaultSource.HOPPER.getType()), DefaultAccess.FULL.type());
                     }
                 }
                 for (DataRights rights : data.getRights()) {
-                    final String accessType = rights.getRights() == RIGHTS_TYPE_ADMIN ? DefaultAccess.ADMIN.type() : DefaultAccess.BASIC.type();
+                    final String accessType = rights.getRights() == RIGHTS_TYPE_ADMIN ? DefaultAccess.FULL.type() : DefaultAccess.BASIC.type();
                     if (rights.getType() == ACCESS_TYPE_GROUP) {
                         access.put(new Source(DefaultSource.PERMISSION.getType(), rights.getName()), accessType);
                     } else if (rights.getType() == ACCESS_TYPE_PLAYER) {

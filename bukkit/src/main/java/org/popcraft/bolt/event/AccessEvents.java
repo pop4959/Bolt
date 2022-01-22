@@ -34,8 +34,8 @@ import org.popcraft.bolt.store.Store;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.PlayerMeta;
-import org.popcraft.bolt.util.defaults.DefaultPermission;
 import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
 
@@ -101,7 +101,7 @@ public class AccessEvents implements Listener {
             final boolean shouldSendMessage = EquipmentSlot.HAND.equals(e.getHand());
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
             final BlockProtection protection = optionalProtection.get();
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, DefaultPermission.INTERACT.getKey())) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.INTERACT)) {
                 e.setCancelled(true);
                 if (shouldSendMessage && !hasNotifyPermission) {
                     BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("block", Strings.toTitleCase(clicked.getType())));
@@ -124,7 +124,7 @@ public class AccessEvents implements Listener {
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
             final PlayerMeta playerMeta = plugin.playerMeta(player);
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.BREAK.getKey())) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
                 e.setCancelled(true);
             }
         }
@@ -137,7 +137,7 @@ public class AccessEvents implements Listener {
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
             final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.INTERACT.getKey())) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.INTERACT)) {
                 e.setCancelled(true);
             }
         }
@@ -149,7 +149,7 @@ public class AccessEvents implements Listener {
         final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getRemover() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, DefaultPermission.KILL.getKey())) {
+            if (!(e.getRemover() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, Permission.KILL)) {
                 e.setCancelled(true);
             }
         }
@@ -161,7 +161,7 @@ public class AccessEvents implements Listener {
         final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getAttacker() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, DefaultPermission.KILL.getKey())) {
+            if (!(e.getAttacker() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, Permission.KILL)) {
                 e.setCancelled(true);
             }
         }
@@ -174,7 +174,7 @@ public class AccessEvents implements Listener {
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
             final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, DefaultPermission.INTERACT.getKey())) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
                 e.setCancelled(true);
             }
         }
@@ -186,7 +186,7 @@ public class AccessEvents implements Listener {
         final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
-            if (!(e.getDamager() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, DefaultPermission.KILL.getKey())) {
+            if (!(e.getDamager() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, Permission.KILL)) {
                 e.setCancelled(true);
             }
         }
@@ -199,7 +199,7 @@ public class AccessEvents implements Listener {
         if (protection.isPresent()) {
             final EntityProtection entityProtection = protection.get();
             final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, DefaultPermission.INTERACT.getKey())) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
                 e.setCancelled(true);
             }
         }
@@ -217,7 +217,7 @@ public class AccessEvents implements Listener {
             final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
             if (protection.isPresent()) {
                 final BlockProtection blockProtection = protection.get();
-                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.CONTAINER_ACCESS.getKey())) {
+                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.OPEN)) {
                     e.setCancelled(true);
                 }
             }
@@ -249,19 +249,19 @@ public class AccessEvents implements Listener {
         switch (action) {
             // Add
             case PLACE_ALL, PLACE_ONE, PLACE_SOME -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey())) {
+                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT)) {
                     e.setCancelled(true);
                 }
             });
             // Remove
             case COLLECT_TO_CURSOR, DROP_ALL_SLOT, DROP_ONE_SLOT, PICKUP_ALL, PICKUP_HALF, PICKUP_ONE, PICKUP_SOME -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_REMOVE.getKey())) {
+                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.WITHDRAW)) {
                     e.setCancelled(true);
                 }
             });
             // Add and remove
             case HOTBAR_MOVE_AND_READD, SWAP_WITH_CURSOR, UNKNOWN -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey(), DefaultPermission.CONTAINER_REMOVE.getKey())) {
+                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT, Permission.WITHDRAW)) {
                     e.setCancelled(true);
                 }
             });
@@ -269,24 +269,24 @@ public class AccessEvents implements Listener {
             case HOTBAR_SWAP -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
                 final ItemStack clickedItem = e.getCurrentItem();
                 if (clickedItem == null) {
-                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey(), DefaultPermission.CONTAINER_REMOVE.getKey())) {
+                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT, Permission.WITHDRAW)) {
                         e.setCancelled(true);
                     }
                 } else if (clickedItem.getType().isAir()) {
-                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey())) {
+                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT)) {
                         e.setCancelled(true);
                     }
-                } else if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_REMOVE.getKey())) {
+                } else if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.WITHDRAW)) {
                     e.setCancelled(true);
                 }
             });
             case MOVE_TO_OTHER_INVENTORY -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
                 if (InventoryType.PLAYER.equals(clickedInventoryType)) {
-                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey())) {
+                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT)) {
                         e.setCancelled(true);
                     }
                 } else {
-                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_REMOVE.getKey())) {
+                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.WITHDRAW)) {
                         e.setCancelled(true);
                     }
                 }
@@ -316,7 +316,7 @@ public class AccessEvents implements Listener {
         }
         // TODO: Make sure to handle the case where dragging only occurs in the player inventory
         plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-            if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey())) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT)) {
                 e.setCancelled(true);
             }
         });
@@ -327,7 +327,7 @@ public class AccessEvents implements Listener {
         final Block block = e.getLectern().getBlock();
         plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block)).ifPresent(blockProtection -> {
             final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, DefaultPermission.CONTAINER_REMOVE.getKey())) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.WITHDRAW)) {
                 e.setCancelled(true);
             }
         });

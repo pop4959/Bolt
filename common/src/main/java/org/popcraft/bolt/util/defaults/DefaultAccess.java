@@ -1,12 +1,13 @@
 package org.popcraft.bolt.util.defaults;
 
 import org.popcraft.bolt.util.Access;
+import org.popcraft.bolt.util.Permission;
 
 import java.util.Set;
 
 public enum DefaultAccess {
-    BASIC(new Access("basic", Set.of(DefaultPermission.CONTAINER_ACCESS.getKey(), DefaultPermission.CONTAINER_ADD.getKey(), DefaultPermission.CONTAINER_REMOVE.getKey(), DefaultPermission.INTERACT.getKey()))),
-    ADMIN(new Access("admin", Set.of(DefaultPermission.BREAK.getKey(), DefaultPermission.PLACE.getKey(), DefaultPermission.CONTAINER_ACCESS.getKey(), DefaultPermission.CONTAINER_ADD.getKey(), DefaultPermission.CONTAINER_REMOVE.getKey(), DefaultPermission.INTERACT.getKey())));
+    BASIC(new Access("basic", Set.of(Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT, Permission.WITHDRAW))),
+    FULL(new Access("full", Set.of(Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT, Permission.WITHDRAW, Permission.PLACE, Permission.BREAK)));
 
     private final Access access;
 

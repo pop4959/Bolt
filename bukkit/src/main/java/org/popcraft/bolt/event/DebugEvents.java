@@ -8,8 +8,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.PlayerMeta;
 
 public class DebugEvents implements Listener {
     private final BoltPlugin plugin;

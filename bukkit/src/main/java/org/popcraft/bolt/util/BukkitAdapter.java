@@ -5,8 +5,8 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
-import org.popcraft.bolt.util.defaults.DefaultProtectionType;
 import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.util.defaults.DefaultProtectionType;
 
 import java.util.HashMap;
 import java.util.Objects;
