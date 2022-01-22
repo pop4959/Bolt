@@ -1,10 +1,10 @@
 version: 0
-protection-types: [ "private", "deposit", "withdrawal", "display", "public" ]
+protection-types: [ "private", "display", "deposit", "withdrawal", "public" ]
 access-types:
   private: [ ]
-  display: [ "container_access" ]
-  deposit: [ "container_access", "container_add" ]
-  withdrawal: [ "container_access", "container_remove" ]
+  display: [ "container_access", "interact" ]
+  deposit: [ "container_access", "container_add", "interact" ]
+  withdrawal: [ "container_access", "container_remove", "interact" ]
   public: [ "container_access", "container_add", "container_remove", "interact", "place" ]
   basic: [ "container_access", "container_add", "container_remove", "interact" ]
   admin: [ "container_access", "container_add", "container_remove", "interact", "break", "place" ]

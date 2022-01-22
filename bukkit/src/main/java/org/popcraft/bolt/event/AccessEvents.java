@@ -239,48 +239,73 @@ public class AccessEvents implements Listener {
         if (!(e.getWhoClicked() instanceof final Player player)) {
             return;
         }
-        final Inventory inventory = e.getInventory();
-        if (InventoryType.PLAYER.equals(inventory.getType())) {
-            plugin.getLogger().info("Player inventory");
-            return;
-        }
-        if (!InventoryType.SlotType.CONTAINER.equals(e.getSlotType())) {
-            plugin.getLogger().info("Not a container");
-            return;
-        }
-        final Location location = inventory.getLocation();
-        if (location == null) {
-            plugin.getLogger().info("No location");
-            return;
-        }
         final InventoryAction action = e.getAction();
-        plugin.getLogger().info(action::name);
-        final EnumSet<InventoryAction> adding = EnumSet.of(
-                InventoryAction.PLACE_ALL,
-                InventoryAction.PLACE_ONE,
-                InventoryAction.PLACE_SOME,
-                InventoryAction.SWAP_WITH_CURSOR
-        );
-        final EnumSet<InventoryAction> removing = EnumSet.of(
-                InventoryAction.COLLECT_TO_CURSOR,
-                InventoryAction.MOVE_TO_OTHER_INVENTORY,
-                InventoryAction.PICKUP_ALL,
-                InventoryAction.PICKUP_HALF,
-                InventoryAction.PICKUP_ONE,
-                InventoryAction.PICKUP_SOME,
-                InventoryAction.SWAP_WITH_CURSOR
-        );
-        final boolean isAdding = adding.contains(action);
-        final boolean isRemoving = removing.contains(action);
-        if (!isAdding && !isRemoving) {
+        final Inventory clickedInventory = e.getClickedInventory();
+        // Didn't click on an inventory
+        if (clickedInventory == null) {
             return;
         }
-        plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-            if (isAdding && !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey())
-                    || isRemoving && !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_REMOVE.getKey())) {
-                e.setCancelled(true);
+        final InventoryType clickedInventoryType = e.getClickedInventory().getType();
+        // We don't care about the player's inventory, unless the action can pull from other inventories
+        if (InventoryType.PLAYER.equals(clickedInventoryType) && !InventoryAction.COLLECT_TO_CURSOR.equals(action) && !InventoryAction.MOVE_TO_OTHER_INVENTORY.equals(action)) {
+            return;
+        }
+        final Location location = e.getInventory().getLocation();
+        // Not a physical inventory that can be protected
+        if (location == null) {
+            return;
+        }
+        switch (action) {
+            // Add
+            case PLACE_ALL, PLACE_ONE, PLACE_SOME -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
+                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey())) {
+                    e.setCancelled(true);
+                }
+            });
+            // Remove
+            case COLLECT_TO_CURSOR, DROP_ALL_SLOT, DROP_ONE_SLOT, PICKUP_ALL, PICKUP_HALF, PICKUP_ONE, PICKUP_SOME -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
+                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_REMOVE.getKey())) {
+                    e.setCancelled(true);
+                }
+            });
+            // Add and remove
+            case HOTBAR_MOVE_AND_READD, SWAP_WITH_CURSOR, UNKNOWN -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
+                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey(), DefaultPermission.CONTAINER_REMOVE.getKey())) {
+                    e.setCancelled(true);
+                }
+            });
+            // Add or remove
+            case HOTBAR_SWAP -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
+                final ItemStack clickedItem = e.getCurrentItem();
+                if (clickedItem == null) {
+                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey(), DefaultPermission.CONTAINER_REMOVE.getKey())) {
+                        e.setCancelled(true);
+                    }
+                } else if (clickedItem.getType().isAir()) {
+                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey())) {
+                        e.setCancelled(true);
+                    }
+                } else if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_REMOVE.getKey())) {
+                    e.setCancelled(true);
+                }
+            });
+            case MOVE_TO_OTHER_INVENTORY -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
+                if (InventoryType.PLAYER.equals(clickedInventoryType)) {
+                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_ADD.getKey())) {
+                        e.setCancelled(true);
+                    }
+                } else {
+                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, DefaultPermission.CONTAINER_REMOVE.getKey())) {
+                        e.setCancelled(true);
+                    }
+                }
+            });
+            case CLONE_STACK, DROP_ALL_CURSOR, DROP_ONE_CURSOR, NOTHING -> {
+                // No permission needed
             }
-        });
+            // Unknown, cancel
+            default -> e.setCancelled(true);
+        }
     }
 
     @EventHandler
