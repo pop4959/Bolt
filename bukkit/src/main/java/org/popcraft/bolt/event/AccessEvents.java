@@ -39,7 +39,6 @@ import org.popcraft.bolt.util.defaults.DefaultPermission;
 import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
 
-import java.util.EnumSet;
 import java.util.Optional;
 
 import static org.popcraft.bolt.util.lang.Translator.translate;
