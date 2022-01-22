@@ -1,4 +1,5 @@
 version: 0
+listener-priority: "low"
 protection-types: [ "private", "display", "deposit", "withdrawal", "public" ]
 access-types:
   private: [ ]

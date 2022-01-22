@@ -207,7 +207,6 @@ public class AccessEvents implements Listener {
 
     @EventHandler
     public void onInventoryOpen(final InventoryOpenEvent e) {
-        // TODO: Do this better
         if (!(e.getPlayer() instanceof Player player)) {
             return;
         }
@@ -222,15 +221,8 @@ public class AccessEvents implements Listener {
                     e.setCancelled(true);
                 }
             }
-        } else if (inventoryHolder instanceof final Entity entity) {
-            final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
-            if (protection.isPresent()) {
-                final EntityProtection entityProtection = protection.get();
-                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, DefaultPermission.CONTAINER_ACCESS.getKey())) {
-                    e.setCancelled(true);
-                }
-            }
         }
+        // TODO: Handle entities
     }
 
     @EventHandler
