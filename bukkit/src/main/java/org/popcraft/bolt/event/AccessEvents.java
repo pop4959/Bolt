@@ -304,22 +304,20 @@ public class AccessEvents implements Listener {
         if (!(e.getWhoClicked() instanceof final Player player)) {
             return;
         }
-        final Inventory inventory = e.getInventory();
-        if (InventoryType.PLAYER.equals(inventory.getType())) {
-            plugin.getLogger().info("Player inventory");
-            return;
-        }
-        final Location location = inventory.getLocation();
+        final Location location = e.getInventory().getLocation();
         if (location == null) {
-            plugin.getLogger().info("No location");
             return;
         }
-        // TODO: Make sure to handle the case where dragging only occurs in the player inventory
-        plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-            if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT)) {
-                e.setCancelled(true);
+        for (int rawSlot : e.getRawSlots()) {
+            final Inventory slotInventory = e.getView().getInventory(rawSlot);
+            if (slotInventory != null && !InventoryType.PLAYER.equals(slotInventory.getType())) {
+                plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
+                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT)) {
+                        e.setCancelled(true);
+                    }
+                });
             }
-        });
+        }
     }
 
     @EventHandler
