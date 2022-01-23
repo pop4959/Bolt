@@ -12,6 +12,7 @@ dependencies {
     implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.0.1")
     implementation(group = "org.bstats", name = "bstats-bukkit", version = "2.2.1")
     implementation(project(":bolt-common"))
+    implementation(project(":bolt-paper"))
 }
 
 tasks {
@@ -30,7 +31,10 @@ tasks {
         minimize {
             exclude(project(":bolt-common"))
         }
-        relocate("net.kyori", "${project.group}.${rootProject.name}.lib.kyori")
-        relocate("org.bstats", "${project.group}.${rootProject.name}.lib.bstats")
+        relocate("org.spongepowered", "${project.group}.${rootProject.name}.lib.org.spongepowered")
+        relocate("org.yaml", "${project.group}.${rootProject.name}.lib.org.yaml")
+        relocate("io.leangen", "${project.group}.${rootProject.name}.lib.io.leangen")
+        relocate("net.kyori", "${project.group}.${rootProject.name}.lib.net.kyori")
+        relocate("org.bstats", "${project.group}.${rootProject.name}.lib.org.bstats")
     }
 }

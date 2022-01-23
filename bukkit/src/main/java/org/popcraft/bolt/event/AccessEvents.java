@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,6 +20,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
@@ -331,6 +333,23 @@ public class AccessEvents implements Listener {
         plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block)).ifPresent(blockProtection -> {
             if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(e.getPlayer()), blockProtection, Permission.WITHDRAW)) {
                 e.setCancelled(true);
+            }
+        });
+    }
+
+    public void onPlayerRecipeBookClick(final PlayerEvent e) {
+        if (!(e instanceof Cancellable cancellable)) {
+            return;
+        }
+        final Player player = e.getPlayer();
+        final Inventory inventory = player.getOpenInventory().getTopInventory();
+        final Location location = inventory.getLocation();
+        if (location == null) {
+            return;
+        }
+        plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
+            if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(e.getPlayer()), blockProtection, Permission.DEPOSIT, Permission.WITHDRAW)) {
+                cancellable.setCancelled(true);
             }
         });
     }

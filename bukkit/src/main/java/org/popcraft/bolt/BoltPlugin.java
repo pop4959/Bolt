@@ -16,6 +16,7 @@ import org.popcraft.bolt.command.impl.UnlockCommand;
 import org.popcraft.bolt.event.AccessEvents;
 import org.popcraft.bolt.event.DebugEvents;
 import org.popcraft.bolt.event.EnvironmentEvents;
+import org.popcraft.bolt.event.adapter.PlayerRecipeBookClickListener;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.store.SQLiteStore;
 import org.popcraft.bolt.store.Store;
@@ -98,9 +99,11 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     private void registerEvents() {
-        getServer().getPluginManager().registerEvents(new AccessEvents(this), this);
-        getServer().getPluginManager().registerEvents(new DebugEvents(this), this);
+        final AccessEvents accessEvents = new AccessEvents(this);
+        getServer().getPluginManager().registerEvents(accessEvents, this);
+        getServer().getPluginManager().registerEvents(new PlayerRecipeBookClickListener(accessEvents::onPlayerRecipeBookClick), this);
         getServer().getPluginManager().registerEvents(new EnvironmentEvents(this), this);
+        getServer().getPluginManager().registerEvents(new DebugEvents(this), this);
     }
 
     private void registerCommands() {
