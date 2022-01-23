@@ -68,22 +68,6 @@ public class EnvironmentEvents implements Listener {
     }
 
     @EventHandler
-    public void onEntityExplode(final EntityExplodeEvent e) {
-        e.blockList().removeIf(block -> {
-            final BlockLocation location = BukkitAdapter.blockLocation(block);
-            return plugin.getBolt().getStore().loadBlockProtection(location).isPresent();
-        });
-    }
-
-    @EventHandler
-    public void onBlockExplode(final BlockExplodeEvent e) {
-        e.blockList().removeIf(block -> {
-            final BlockLocation location = BukkitAdapter.blockLocation(block);
-            return plugin.getBolt().getStore().loadBlockProtection(location).isPresent();
-        });
-    }
-
-    @EventHandler
     public void onEntityBreakDoor(final EntityBreakDoorEvent e) {
         final Block block = e.getBlock();
         final BlockLocation location = BukkitAdapter.blockLocation(block);
@@ -110,6 +94,22 @@ public class EnvironmentEvents implements Listener {
                 e.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler
+    public void onBlockExplode(final BlockExplodeEvent e) {
+        e.blockList().removeIf(block -> {
+            final BlockLocation location = BukkitAdapter.blockLocation(block);
+            return plugin.getBolt().getStore().loadBlockProtection(location).isPresent();
+        });
+    }
+
+    @EventHandler
+    public void onEntityExplode(final EntityExplodeEvent e) {
+        e.blockList().removeIf(block -> {
+            final BlockLocation location = BukkitAdapter.blockLocation(block);
+            return plugin.getBolt().getStore().loadBlockProtection(location).isPresent();
+        });
     }
 
     @EventHandler
