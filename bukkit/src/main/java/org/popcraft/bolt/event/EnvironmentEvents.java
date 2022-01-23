@@ -32,13 +32,10 @@ public class EnvironmentEvents implements Listener {
 
     @EventHandler
     public void onStructureGrow(final StructureGrowEvent e) {
-        for (final BlockState blockState : e.getBlocks()) {
+        e.getBlocks().removeIf(blockState -> {
             final BlockLocation location = BukkitAdapter.blockLocation(blockState);
-            if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
-                e.setCancelled(true);
-                return;
-            }
-        }
+            return plugin.getBolt().getStore().loadBlockProtection(location).isPresent();
+        });
     }
 
     @EventHandler
@@ -71,13 +68,19 @@ public class EnvironmentEvents implements Listener {
     }
 
     @EventHandler
-    public void onBlockExplode(final BlockExplodeEvent e) {
-        for (final Block block : e.blockList()) {
+    public void onEntityExplode(final EntityExplodeEvent e) {
+        e.blockList().removeIf(block -> {
             final BlockLocation location = BukkitAdapter.blockLocation(block);
-            if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
-                e.setCancelled(true);
-            }
-        }
+            return plugin.getBolt().getStore().loadBlockProtection(location).isPresent();
+        });
+    }
+
+    @EventHandler
+    public void onBlockExplode(final BlockExplodeEvent e) {
+        e.blockList().removeIf(block -> {
+            final BlockLocation location = BukkitAdapter.blockLocation(block);
+            return plugin.getBolt().getStore().loadBlockProtection(location).isPresent();
+        });
     }
 
     @EventHandler
@@ -116,11 +119,6 @@ public class EnvironmentEvents implements Listener {
 
     @EventHandler
     public void onEntityDamage(final EntityDamageEvent e) {
-        // TODO: Entity event
-    }
-
-    @EventHandler
-    public void onEntityExplode(final EntityExplodeEvent e) {
         // TODO: Entity event
     }
 
