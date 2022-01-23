@@ -117,7 +117,7 @@ public class AccessEvents implements Listener {
                         Template.of("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
                 );
             }
-            if (Material.LECTERN.equals(clicked.getType()) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.DEPOSIT)) {
+            if (Material.LECTERN.equals(clicked.getType()) && e.getItem() != null && (Material.WRITABLE_BOOK.equals(e.getItem().getType()) || Material.WRITTEN_BOOK.equals(e.getItem().getType())) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.DEPOSIT)) {
                 e.setUseItemInHand(Event.Result.DENY);
             }
         }
