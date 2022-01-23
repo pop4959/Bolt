@@ -2,9 +2,11 @@ package org.popcraft.bolt.event;
 
 import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -112,6 +114,9 @@ public class AccessEvents implements Listener {
                         Template.of("block", Strings.toTitleCase(clicked.getType())),
                         Template.of("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
                 );
+            }
+            if (Material.LECTERN.equals(clicked.getType()) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.DEPOSIT)) {
+                e.setUseItemInHand(Event.Result.DENY);
             }
         }
     }
@@ -324,8 +329,7 @@ public class AccessEvents implements Listener {
     public void onPlayerTakeLecternBook(final PlayerTakeLecternBookEvent e) {
         final Block block = e.getLectern().getBlock();
         plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block)).ifPresent(blockProtection -> {
-            final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.WITHDRAW)) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(e.getPlayer()), blockProtection, Permission.WITHDRAW)) {
                 e.setCancelled(true);
             }
         });
