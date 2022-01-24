@@ -210,7 +210,7 @@ public class AccessEvents implements Listener {
         if (protection.isPresent()) {
             final BlockProtection blockProtection = protection.get();
             final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.INTERACT)) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.MODIFY)) {
                 e.setCancelled(true);
             }
         }
