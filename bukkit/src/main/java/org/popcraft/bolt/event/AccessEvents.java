@@ -24,6 +24,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
@@ -226,6 +227,13 @@ public class AccessEvents implements Listener {
 
     @EventHandler
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent e) {
+        if (handlePlayerEntityInteraction(e.getPlayer(), e.getRightClicked(), false, EquipmentSlot.HAND.equals(e.getHand()))) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteractAtEntity(final PlayerInteractAtEntityEvent e) {
         if (handlePlayerEntityInteraction(e.getPlayer(), e.getRightClicked(), false, EquipmentSlot.HAND.equals(e.getHand()))) {
             e.setCancelled(true);
         }
