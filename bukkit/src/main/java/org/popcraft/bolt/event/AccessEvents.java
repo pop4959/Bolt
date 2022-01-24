@@ -122,9 +122,11 @@ public class AccessEvents implements Listener {
             }
             if (e.getItem() != null) {
                 final Material itemType = e.getItem().getType();
-                if ((Material.LECTERN.equals(clicked.getType()) && (Material.WRITABLE_BOOK.equals(itemType) || Material.WRITTEN_BOOK.equals(itemType)) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.DEPOSIT))
-                || (Tag.SIGNS.isTagged(clicked.getType()) && (DYES.contains(itemType) || Material.GLOW_INK_SAC.equals(itemType)) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.MODIFY))) {
+                if (Material.LECTERN.equals(clicked.getType()) && (Material.WRITABLE_BOOK.equals(itemType) || Material.WRITTEN_BOOK.equals(itemType)) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.DEPOSIT)) {
                     e.setUseItemInHand(Event.Result.DENY);
+                } else if ((Tag.SIGNS.isTagged(clicked.getType()) && (DYES.contains(itemType) || Material.GLOW_INK_SAC.equals(itemType)) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.MODIFY))) {
+                    e.setUseItemInHand(Event.Result.DENY);
+                    e.setUseInteractedBlock(Event.Result.DENY);
                 }
             }
         }
