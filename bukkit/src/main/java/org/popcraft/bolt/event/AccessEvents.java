@@ -84,6 +84,7 @@ public class AccessEvents implements Listener {
                         Template.of("type", Strings.toTitleCase(clicked.getType()))
                 );
             }
+            e.setCancelled(true);
         } else if (playerMeta.triggerAction(Action.UNLOCK)) {
             if (optionalProtection.isPresent()) {
                 store.removeBlockProtection(optionalProtection.get());
@@ -95,11 +96,13 @@ public class AccessEvents implements Listener {
                         Template.of("type", Strings.toTitleCase(clicked.getType()))
                 );
             }
+            e.setCancelled(true);
         } else if (playerMeta.triggerAction(Action.INFO)) {
             optionalProtection.ifPresentOrElse(protection -> BoltComponents.sendMessage(player, Translation.INFO,
                     Template.of("access", Strings.toTitleCase(protection.getType())),
                     Template.of("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
             ), () -> BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(clicked.getType()))));
+            e.setCancelled(true);
         } else if (playerMeta.triggerAction(Action.MODIFY)) {
             optionalProtection.ifPresentOrElse(protection -> {
                 playerMeta.getModifications().forEach((source, type) -> {
@@ -113,6 +116,7 @@ public class AccessEvents implements Listener {
                 BoltComponents.sendMessage(player, Translation.CLICK_MODIFIED);
             }, () -> BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(clicked.getType()))));
             playerMeta.getModifications().clear();
+            e.setCancelled(true);
         } else if (optionalProtection.isPresent()) {
             final boolean shouldSendMessage = EquipmentSlot.HAND.equals(e.getHand());
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
@@ -218,7 +222,7 @@ public class AccessEvents implements Listener {
 
     @EventHandler
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent e) {
-        if (!handlePlayerEntityInteraction(e.getPlayer(), e.getRightClicked(), false, EquipmentSlot.HAND.equals(e.getHand()))) {
+        if (handlePlayerEntityInteraction(e.getPlayer(), e.getRightClicked(), false, EquipmentSlot.HAND.equals(e.getHand()))) {
             e.setCancelled(true);
         }
     }
@@ -249,9 +253,7 @@ public class AccessEvents implements Listener {
                         Template.of("type", Strings.toTitleCase(entity.getType()))
                 );
             }
-            if (damage) {
-                shouldCancel = true;
-            }
+            shouldCancel = true;
         } else if (playerMeta.triggerAction(Action.UNLOCK)) {
             if (optionalProtection.isPresent()) {
                 store.removeEntityProtection(optionalProtection.get());
@@ -263,17 +265,13 @@ public class AccessEvents implements Listener {
                         Template.of("type", Strings.toTitleCase(entity.getType()))
                 );
             }
-            if (damage) {
-                shouldCancel = true;
-            }
+            shouldCancel = true;
         } else if (playerMeta.triggerAction(Action.INFO)) {
             optionalProtection.ifPresentOrElse(protection -> BoltComponents.sendMessage(player, Translation.INFO,
                     Template.of("access", Strings.toTitleCase(protection.getType())),
                     Template.of("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
             ), () -> BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(entity.getType()))));
-            if (damage) {
-                shouldCancel = true;
-            }
+            shouldCancel = true;
         } else if (playerMeta.triggerAction(Action.MODIFY)) {
             optionalProtection.ifPresentOrElse(protection -> {
                 playerMeta.getModifications().forEach((source, type) -> {
@@ -287,9 +285,7 @@ public class AccessEvents implements Listener {
                 BoltComponents.sendMessage(player, Translation.CLICK_MODIFIED);
             }, () -> BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(entity.getType()))));
             playerMeta.getModifications().clear();
-            if (damage) {
-                shouldCancel = true;
-            }
+            shouldCancel = true;
         } else if (optionalProtection.isPresent()) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
             final EntityProtection protection = optionalProtection.get();
