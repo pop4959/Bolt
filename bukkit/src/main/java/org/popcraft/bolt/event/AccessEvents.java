@@ -133,6 +133,9 @@ public class AccessEvents implements Listener {
             final PlayerMeta playerMeta = plugin.playerMeta(player);
             if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
                 e.setCancelled(true);
+            } else {
+                plugin.getBolt().getStore().removeBlockProtection(blockProtection);
+                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_UNLOCKED, Template.of("block", Strings.toTitleCase(block.getType())));
             }
         }
     }
