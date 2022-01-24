@@ -5,6 +5,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
@@ -61,6 +62,15 @@ public class EnvironmentEvents implements Listener {
     @EventHandler
     public void onBlockFromTo(final BlockFromToEvent e) {
         final Block block = e.getToBlock();
+        final BlockLocation location = BukkitAdapter.blockLocation(block);
+        if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockFade(final BlockFadeEvent e) {
+        final Block block = e.getBlock();
         final BlockLocation location = BukkitAdapter.blockLocation(block);
         if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
             e.setCancelled(true);
