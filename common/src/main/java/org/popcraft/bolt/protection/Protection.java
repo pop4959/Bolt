@@ -46,9 +46,9 @@ public abstract class Protection {
     public String toString() {
         return "Protection{" +
                 "id=" + id +
-                ", accessList=" + accessList +
                 ", owner=" + owner +
                 ", type='" + type + '\'' +
+                ", accessList=" + accessList +
                 '}';
     }
 }
