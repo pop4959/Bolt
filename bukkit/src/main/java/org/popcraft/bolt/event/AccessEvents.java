@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -51,6 +52,8 @@ import static org.popcraft.bolt.util.lang.Translator.translate;
 
 public class AccessEvents implements Listener {
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
+    // TODO: These uprooted types should be structures
+    private static final EnumSet<Material> UPROOT = EnumSet.of(Material.BAMBOO, Material.CACTUS, Material.SUGAR_CANE);
     private final BoltPlugin plugin;
 
     public AccessEvents(final BoltPlugin plugin) {
@@ -135,16 +138,29 @@ public class AccessEvents implements Listener {
     @EventHandler
     public void onBlockBreak(final BlockBreakEvent e) {
         final Block block = e.getBlock();
-        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
+        final Material blockType = block.getType();
+        final Optional<BlockProtection> optionalProtection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
         final Player player = e.getPlayer();
-        if (protection.isPresent()) {
-            final BlockProtection blockProtection = protection.get();
-            final PlayerMeta playerMeta = plugin.playerMeta(player);
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
+        if (optionalProtection.isPresent()) {
+            final BlockProtection blockProtection = optionalProtection.get();
             if (plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
                 plugin.getBolt().getStore().removeBlockProtection(blockProtection);
                 BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_UNLOCKED, Template.of("block", Strings.toTitleCase(block.getType())));
             } else {
                 e.setCancelled(true);
+            }
+        } else if (UPROOT.contains(blockType)) {
+            for (Block above = block.getRelative(BlockFace.UP); UPROOT.contains(above.getType()); above = above.getRelative(BlockFace.UP)) {
+                final Optional<BlockProtection> optionalAboveProtection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(above));
+                if (optionalAboveProtection.isPresent()) {
+                    final BlockProtection aboveProtection = optionalAboveProtection.get();
+                    if (plugin.getBolt().getAccessManager().hasAccess(playerMeta, aboveProtection, Permission.BREAK)) {
+                        plugin.getBolt().getStore().removeBlockProtection(aboveProtection);
+                    } else {
+                        e.setCancelled(true);
+                    }
+                }
             }
         }
     }
