@@ -37,6 +37,7 @@ import org.popcraft.bolt.Bolt;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.store.Store;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
@@ -116,6 +117,9 @@ public class AccessEvents implements Listener {
                 BoltComponents.sendMessage(player, Translation.CLICK_MODIFIED);
             }, () -> BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(clicked.getType()))));
             playerMeta.getModifications().clear();
+            e.setCancelled(true);
+        } else if (playerMeta.triggerAction(Action.DEBUG)) {
+            BoltComponents.sendMessage(player, optionalProtection.map(Protection::toString).toString());
             e.setCancelled(true);
         } else if (optionalProtection.isPresent()) {
             final boolean shouldSendMessage = EquipmentSlot.HAND.equals(e.getHand());
@@ -231,7 +235,7 @@ public class AccessEvents implements Listener {
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
         final Entity damager = e.getDamager();
         final Entity entity = e.getEntity();
-        if ((damager instanceof final Player player && !handlePlayerEntityInteraction(player, entity, true, true)) || (!(damager instanceof Player) && plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent())) {
+        if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, true, true)) || (!(damager instanceof Player) && plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent())) {
             e.setCancelled(true);
         }
     }
@@ -285,6 +289,9 @@ public class AccessEvents implements Listener {
                 BoltComponents.sendMessage(player, Translation.CLICK_MODIFIED);
             }, () -> BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(entity.getType()))));
             playerMeta.getModifications().clear();
+            shouldCancel = true;
+        } else if (playerMeta.triggerAction(Action.DEBUG)) {
+            BoltComponents.sendMessage(player, optionalProtection.map(Protection::toString).toString());
             shouldCancel = true;
         } else if (optionalProtection.isPresent()) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
