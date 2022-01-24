@@ -42,7 +42,7 @@ public class SQLiteStore implements Store {
 
     @Override
     public Optional<BlockProtection> loadBlockProtection(UUID id) {
-        return Optional.empty();
+        throw new UnsupportedOperationException();
     }
 
     @Override
