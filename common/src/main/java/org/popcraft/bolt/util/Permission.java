@@ -7,9 +7,10 @@ public final class Permission {
     public static final String WITHDRAW = "withdraw";
     public static final String PLACE = "place";
     public static final String BREAK = "break";
-    public static final String CREATE = "create";
+    public static final String SPAWN = "spawn";
     public static final String KILL = "kill";
     public static final String MODIFY = "modify";
+    public static final String EDIT = "edit";
 
     private Permission() {
     }

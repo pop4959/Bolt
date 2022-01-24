@@ -7,7 +7,7 @@ import java.util.Set;
 
 public enum DefaultAccess {
     BASIC(new Access("basic", Set.of(Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT, Permission.WITHDRAW))),
-    FULL(new Access("full", Set.of(Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT, Permission.WITHDRAW, Permission.PLACE, Permission.BREAK)));
+    FULL(new Access("full", Set.of(Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT, Permission.WITHDRAW, Permission.PLACE, Permission.BREAK, Permission.SPAWN, Permission.KILL, Permission.MODIFY, Permission.EDIT)));
 
     private final Access access;
 

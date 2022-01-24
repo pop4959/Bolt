@@ -3,6 +3,7 @@ package org.popcraft.bolt.event;
 import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -43,11 +44,13 @@ import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
 
+import java.util.EnumSet;
 import java.util.Optional;
 
 import static org.popcraft.bolt.util.lang.Translator.translate;
 
 public class AccessEvents implements Listener {
+    private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     private final BoltPlugin plugin;
 
     public AccessEvents(final BoltPlugin plugin) {
@@ -117,8 +120,12 @@ public class AccessEvents implements Listener {
                         Template.of("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
                 );
             }
-            if (Material.LECTERN.equals(clicked.getType()) && e.getItem() != null && (Material.WRITABLE_BOOK.equals(e.getItem().getType()) || Material.WRITTEN_BOOK.equals(e.getItem().getType())) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.DEPOSIT)) {
-                e.setUseItemInHand(Event.Result.DENY);
+            if (e.getItem() != null) {
+                final Material itemType = e.getItem().getType();
+                if ((Material.LECTERN.equals(clicked.getType()) && (Material.WRITABLE_BOOK.equals(itemType) || Material.WRITTEN_BOOK.equals(itemType)) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.DEPOSIT))
+                || (Tag.SIGNS.isTagged(clicked.getType()) && (DYES.contains(itemType) || Material.GLOW_INK_SAC.equals(itemType)) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.MODIFY))) {
+                    e.setUseItemInHand(Event.Result.DENY);
+                }
             }
         }
     }
