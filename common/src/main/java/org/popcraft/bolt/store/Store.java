@@ -24,4 +24,6 @@ public interface Store {
     List<EntityProtection> loadEntityProtections();
 
     void saveEntityProtection(EntityProtection protection);
+
+    void removeEntityProtection(EntityProtection protection);
 }

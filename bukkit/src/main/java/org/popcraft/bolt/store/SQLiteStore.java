@@ -1,6 +1,5 @@
 package org.popcraft.bolt.store;
 
-import org.apache.commons.lang.time.StopWatch;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
@@ -29,6 +28,9 @@ public class SQLiteStore implements Store {
             try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS blocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), accesslist text, block varchar(128), world varchar(128), x integer, y integer, z integer);")) {
                 statement.execute();
             }
+            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS entities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), accesslist text, entity varchar(128));")) {
+                statement.execute();
+            }
             try (final PreparedStatement statement = connection.prepareStatement("CREATE INDEX IF NOT EXISTS block_owner ON blocks(owner);")) {
                 statement.execute();
             }
@@ -47,8 +49,7 @@ public class SQLiteStore implements Store {
 
     @Override
     public Optional<BlockProtection> loadBlockProtection(BlockLocation location) {
-        final StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+        final long startTimeNanos = System.nanoTime();
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
             try (final PreparedStatement selectBlock = connection.prepareStatement("SELECT * FROM blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;")) {
                 selectBlock.setString(1, location.world());
@@ -57,7 +58,8 @@ public class SQLiteStore implements Store {
                 selectBlock.setInt(4, location.z());
                 final ResultSet blockResultSet = selectBlock.executeQuery();
                 if (blockResultSet.next()) {
-                    LogManager.getLogManager().getLogger("").info(() -> "Loading block protection took %d ms".formatted(stopWatch.getTime()));
+                    final long timeNanos = System.nanoTime() - startTimeNanos;
+                    LogManager.getLogManager().getLogger("").info(() -> "Loading block protection took %d ns".formatted(timeNanos));
                     return Optional.of(blockProtectionFromResultSet(blockResultSet));
                 }
             }
@@ -146,16 +148,86 @@ public class SQLiteStore implements Store {
 
     @Override
     public Optional<EntityProtection> loadEntityProtection(UUID id) {
+        final long startTimeNanos = System.nanoTime();
+        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+            try (final PreparedStatement selectEntity = connection.prepareStatement("SELECT * FROM entities WHERE id = ?;")) {
+                selectEntity.setString(1, id.toString());
+                final ResultSet entityResultSet = selectEntity.executeQuery();
+                if (entityResultSet.next()) {
+                    final long timeNanos = System.nanoTime() - startTimeNanos;
+                    LogManager.getLogManager().getLogger("").info(() -> "Loading entity protection took %d ns".formatted(timeNanos));
+                    return Optional.of(entityProtectionFromResultSet(entityResultSet));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return Optional.empty();
     }
 
     @Override
     public List<EntityProtection> loadEntityProtections() {
-        throw new UnsupportedOperationException();
+        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+            try (final PreparedStatement selectEntities = connection.prepareStatement("SELECT * FROM entities;")) {
+                final ResultSet entitiesResultSet = selectEntities.executeQuery();
+                final List<EntityProtection> protections = new ArrayList<>();
+                while (entitiesResultSet.next()) {
+                    protections.add(entityProtectionFromResultSet(entitiesResultSet));
+                }
+                return protections;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
+    }
+
+    private EntityProtection entityProtectionFromResultSet(final ResultSet resultSet) throws SQLException {
+        final String id = resultSet.getString(1);
+        final String owner = resultSet.getString(2);
+        final String type = resultSet.getString(3);
+        final String entity = resultSet.getString(5);
+        final String accessListString = resultSet.getString(4);
+        final Map<Source, String> accessList = new HashMap<>();
+        if (!accessListString.isEmpty()) {
+            String[] accessListSplit = accessListString.split(",");
+            for (String accessListEntry : accessListSplit) {
+                String[] keyValue = accessListEntry.split(":");
+                String[] sourceTypeIdentifier = keyValue[0].split(";");
+                String sourceType = sourceTypeIdentifier[0];
+                String sourceIdentifier = sourceTypeIdentifier[1];
+                String access = keyValue[1];
+                accessList.put(new Source(sourceType, sourceIdentifier), access);
+            }
+        }
+        return new EntityProtection(UUID.fromString(id), UUID.fromString(owner), type, accessList, entity);
     }
 
     @Override
     public void saveEntityProtection(EntityProtection protection) {
-        throw new UnsupportedOperationException();
+        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+            try (final PreparedStatement replaceEntity = connection.prepareStatement("REPLACE INTO entities VALUES (?, ?, ?, ?, ?);")) {
+                replaceEntity.setString(1, protection.getId().toString());
+                replaceEntity.setString(2, protection.getOwner().toString());
+                replaceEntity.setString(3, protection.getType());
+                replaceEntity.setString(4, protection.getAccessList().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
+                replaceEntity.setString(5, protection.getEntity());
+                replaceEntity.execute();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void removeEntityProtection(EntityProtection protection) {
+        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+            try (final PreparedStatement deleteEntity = connection.prepareStatement("DELETE FROM entities WHERE id = ?;")) {
+                deleteEntity.setString(1, protection.getId().toString());
+                deleteEntity.execute();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

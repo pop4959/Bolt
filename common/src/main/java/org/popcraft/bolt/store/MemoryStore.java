@@ -58,4 +58,9 @@ public class MemoryStore implements Store {
     public void saveEntityProtection(EntityProtection protection) {
         entityProtectionMap.put(protection.getId(), protection);
     }
+
+    @Override
+    public void removeEntityProtection(EntityProtection protection) {
+        entityProtectionMap.remove(protection.getId());
+    }
 }
