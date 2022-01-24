@@ -13,6 +13,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
@@ -51,6 +52,7 @@ import java.util.Optional;
 import static org.popcraft.bolt.util.lang.Translator.translate;
 
 public class AccessEvents implements Listener {
+    private static final EnumSet<BlockFace> CARTESIAN_BLOCK_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN);
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     // TODO: These uprooted types should be structures
     private static final EnumSet<Material> UPROOT = EnumSet.of(Material.BAMBOO, Material.CACTUS, Material.SUGAR_CANE);
@@ -136,6 +138,38 @@ public class AccessEvents implements Listener {
     }
 
     @EventHandler
+    public void onBlockPlace(final BlockPlaceEvent e) {
+        final Block block = e.getBlock();
+        final Material blockType = block.getType();
+        final Player player = e.getPlayer();
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
+        if (Material.CARVED_PUMPKIN.equals(blockType) || Material.JACK_O_LANTERN.equals(blockType)) {
+            for (final BlockFace blockFace : CARTESIAN_BLOCK_FACES) {
+                final Block firstBlock = block.getRelative(blockFace);
+                final Block secondBlock = firstBlock.getRelative(blockFace);
+                if (Material.SNOW_BLOCK.equals(firstBlock.getType()) && Material.SNOW_BLOCK.equals(secondBlock.getType())) {
+                    final Optional<BlockProtection> firstProtection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(firstBlock));
+                    firstProtection.ifPresent(blockProtection -> {
+                        if (plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
+                            plugin.getBolt().getStore().removeBlockProtection(blockProtection);
+                        } else {
+                            e.setCancelled(true);
+                        }
+                    });
+                    final Optional<BlockProtection> secondProtection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(secondBlock));
+                    secondProtection.ifPresent(blockProtection -> {
+                        if (plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
+                            plugin.getBolt().getStore().removeBlockProtection(blockProtection);
+                        } else {
+                            e.setCancelled(true);
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+    @EventHandler
     public void onBlockBreak(final BlockBreakEvent e) {
         final Block block = e.getBlock();
         final Material blockType = block.getType();
@@ -154,9 +188,9 @@ public class AccessEvents implements Listener {
             for (Block above = block.getRelative(BlockFace.UP); UPROOT.contains(above.getType()); above = above.getRelative(BlockFace.UP)) {
                 final Optional<BlockProtection> optionalAboveProtection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(above));
                 if (optionalAboveProtection.isPresent()) {
-                    final BlockProtection aboveProtection = optionalAboveProtection.get();
-                    if (plugin.getBolt().getAccessManager().hasAccess(playerMeta, aboveProtection, Permission.BREAK)) {
-                        plugin.getBolt().getStore().removeBlockProtection(aboveProtection);
+                    final BlockProtection blockProtection = optionalAboveProtection.get();
+                    if (plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
+                        plugin.getBolt().getStore().removeBlockProtection(blockProtection);
                     } else {
                         e.setCancelled(true);
                     }
