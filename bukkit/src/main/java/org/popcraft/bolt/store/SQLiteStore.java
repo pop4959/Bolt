@@ -59,7 +59,8 @@ public class SQLiteStore implements Store {
                 final ResultSet blockResultSet = selectBlock.executeQuery();
                 if (blockResultSet.next()) {
                     final long timeNanos = System.nanoTime() - startTimeNanos;
-                    LogManager.getLogManager().getLogger("").info(() -> "Loading block protection took %d ns".formatted(timeNanos));
+                    final double timeMillis = timeNanos / 1e6d;
+                    LogManager.getLogManager().getLogger("").info(() -> "Loading block protection took %.3f ms".formatted(timeMillis));
                     return Optional.of(blockProtectionFromResultSet(blockResultSet));
                 }
             }
@@ -155,7 +156,8 @@ public class SQLiteStore implements Store {
                 final ResultSet entityResultSet = selectEntity.executeQuery();
                 if (entityResultSet.next()) {
                     final long timeNanos = System.nanoTime() - startTimeNanos;
-                    LogManager.getLogManager().getLogger("").info(() -> "Loading entity protection took %d ns".formatted(timeNanos));
+                    final double timeMillis = timeNanos / 1e6d;
+                    LogManager.getLogManager().getLogger("").info(() -> "Loading entity protection took %.3f ms".formatted(timeMillis));
                     return Optional.of(entityProtectionFromResultSet(entityResultSet));
                 }
             }
