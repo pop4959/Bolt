@@ -3,7 +3,6 @@ package org.popcraft.bolt.store;
 import org.apache.commons.lang.time.StopWatch;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
-import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.Source;
 
@@ -39,21 +38,6 @@ public class SQLiteStore implements Store {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public Optional<Access> loadAccess(String type) {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Access> loadAccess() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void saveAccess(Access access) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

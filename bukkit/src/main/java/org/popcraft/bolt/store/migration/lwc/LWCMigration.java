@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.store.MemoryStore;
 import org.popcraft.bolt.store.migration.Migration;
-import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.defaults.DefaultAccess;
@@ -90,14 +89,6 @@ public class LWCMigration implements Migration {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }
-        for (final DefaultProtectionType defaultProtectionType : DefaultProtectionType.values()) {
-            final Access access = new Access(defaultProtectionType.type(), defaultProtectionType.permissions());
-            store.saveAccess(access);
-        }
-        for (final DefaultAccess defaultAccess : DefaultAccess.values()) {
-            final Access access = new Access(defaultAccess.type(), defaultAccess.permissions());
-            store.saveAccess(access);
         }
         final Gson gson = new Gson();
         for (final Protection protection : protections) {

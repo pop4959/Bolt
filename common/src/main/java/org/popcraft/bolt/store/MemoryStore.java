@@ -2,7 +2,6 @@ package org.popcraft.bolt.store;
 
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
-import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.BlockLocation;
 
 import java.util.HashMap;
@@ -12,25 +11,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class MemoryStore implements Store {
-    private final Map<String, Access> accessMap = new HashMap<>();
     private final Map<UUID, BlockProtection> blockProtectionMap = new HashMap<>();
     private final Map<BlockLocation, BlockProtection> blockLocationProtectionMap = new HashMap<>();
     private final Map<UUID, EntityProtection> entityProtectionMap = new HashMap<>();
-
-    @Override
-    public Optional<Access> loadAccess(final String type) {
-        return Optional.ofNullable(accessMap.get(type));
-    }
-
-    @Override
-    public List<Access> loadAccess() {
-        return List.copyOf(accessMap.values());
-    }
-
-    @Override
-    public void saveAccess(Access access) {
-        accessMap.put(access.type(), access);
-    }
 
     @Override
     public Optional<BlockProtection> loadBlockProtection(final UUID id) {
