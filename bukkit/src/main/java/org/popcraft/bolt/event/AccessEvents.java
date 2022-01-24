@@ -75,27 +75,31 @@ public class AccessEvents implements Listener {
         final Optional<BlockProtection> optionalProtection = store.loadBlockProtection(BukkitAdapter.blockLocation(clicked));
         if (playerMeta.triggerAction(Action.LOCK_BLOCK)) {
             if (optionalProtection.isPresent()) {
-                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_LOCKED_ALREADY);
+                BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY,
+                        Template.of("type", Strings.toTitleCase(clicked.getType()))
+                );
             } else {
                 store.saveBlockProtection(BukkitAdapter.createPrivateBlockProtection(clicked, player));
-                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_LOCKED,
-                        Template.of("block", Strings.toTitleCase(clicked.getType()))
+                BoltComponents.sendMessage(player, Translation.CLICK_LOCKED,
+                        Template.of("type", Strings.toTitleCase(clicked.getType()))
                 );
             }
         } else if (playerMeta.triggerAction(Action.UNLOCK_BLOCK)) {
             if (optionalProtection.isPresent()) {
                 store.removeBlockProtection(optionalProtection.get());
-                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_UNLOCKED,
-                        Template.of("block", Strings.toTitleCase(clicked.getType()))
+                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED,
+                        Template.of("type", Strings.toTitleCase(clicked.getType()))
                 );
             } else {
-                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED);
+                BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED,
+                        Template.of("type", Strings.toTitleCase(clicked.getType()))
+                );
             }
         } else if (playerMeta.triggerAction(Action.INFO)) {
             optionalProtection.ifPresentOrElse(protection -> BoltComponents.sendMessage(player, Translation.INFO,
-                    Template.of("type", Strings.toTitleCase(protection.getType())),
+                    Template.of("access", Strings.toTitleCase(protection.getType())),
                     Template.of("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
-            ), () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
+            ), () -> BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(clicked.getType()))));
         } else if (playerMeta.triggerAction(Action.MODIFY)) {
             optionalProtection.ifPresentOrElse(protection -> {
                 playerMeta.getModifications().forEach((source, type) -> {
@@ -106,8 +110,8 @@ public class AccessEvents implements Listener {
                     }
                 });
                 bolt.getStore().saveBlockProtection(protection);
-                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_MODIFIED);
-            }, () -> BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_NOT_LOCKED));
+                BoltComponents.sendMessage(player, Translation.CLICK_MODIFIED);
+            }, () -> BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(clicked.getType()))));
             playerMeta.getModifications().clear();
         } else if (optionalProtection.isPresent()) {
             final boolean shouldSendMessage = EquipmentSlot.HAND.equals(e.getHand());
@@ -116,12 +120,12 @@ public class AccessEvents implements Listener {
             if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.INTERACT)) {
                 e.setCancelled(true);
                 if (shouldSendMessage && !hasNotifyPermission) {
-                    BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("block", Strings.toTitleCase(clicked.getType())));
+                    BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("type", Strings.toTitleCase(clicked.getType())));
                 }
             }
             if (shouldSendMessage && hasNotifyPermission) {
                 BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY,
-                        Template.of("block", Strings.toTitleCase(clicked.getType())),
+                        Template.of("type", Strings.toTitleCase(clicked.getType())),
                         Template.of("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
                 );
             }
@@ -180,7 +184,7 @@ public class AccessEvents implements Listener {
             final BlockProtection blockProtection = optionalProtection.get();
             if (plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
                 plugin.getBolt().getStore().removeBlockProtection(blockProtection);
-                BoltComponents.sendMessage(player, Translation.CLICK_BLOCK_UNLOCKED, Template.of("block", Strings.toTitleCase(block.getType())));
+                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Strings.toTitleCase(block.getType())));
             } else {
                 e.setCancelled(true);
             }
