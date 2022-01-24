@@ -217,55 +217,6 @@ public class AccessEvents implements Listener {
     }
 
     @EventHandler
-    public void onHangingBreakByEntity(final HangingBreakByEntityEvent e) {
-        final Entity entity = e.getEntity();
-        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
-        if (protection.isPresent()) {
-            final EntityProtection entityProtection = protection.get();
-            if (!(e.getRemover() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, Permission.KILL)) {
-                e.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onVehicleDestroy(final VehicleDestroyEvent e) {
-        final Entity entity = e.getVehicle();
-        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
-        if (protection.isPresent()) {
-            final EntityProtection entityProtection = protection.get();
-            if (!(e.getAttacker() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, Permission.KILL)) {
-                e.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onPlayerArmorStandManipulate(final PlayerArmorStandManipulateEvent e) {
-        final Entity entity = e.getRightClicked();
-        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
-        if (protection.isPresent()) {
-            final EntityProtection entityProtection = protection.get();
-            final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
-                e.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
-        final Entity entity = e.getEntity();
-        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
-        if (protection.isPresent()) {
-            final EntityProtection entityProtection = protection.get();
-            if (!(e.getDamager() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, Permission.KILL)) {
-                e.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent e) {
         final Entity entity = e.getRightClicked();
         final Player player = e.getPlayer();
@@ -328,6 +279,55 @@ public class AccessEvents implements Listener {
                         Template.of("type", Strings.toTitleCase(entity.getType())),
                         Template.of("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN)))
                 );
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
+        final Entity entity = e.getEntity();
+        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
+        if (protection.isPresent()) {
+            final EntityProtection entityProtection = protection.get();
+            if (!(e.getDamager() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, Permission.KILL)) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onVehicleDestroy(final VehicleDestroyEvent e) {
+        final Entity entity = e.getVehicle();
+        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
+        if (protection.isPresent()) {
+            final EntityProtection entityProtection = protection.get();
+            if (!(e.getAttacker() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, Permission.KILL)) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onHangingBreakByEntity(final HangingBreakByEntityEvent e) {
+        final Entity entity = e.getEntity();
+        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
+        if (protection.isPresent()) {
+            final EntityProtection entityProtection = protection.get();
+            if (!(e.getRemover() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, Permission.KILL)) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerArmorStandManipulate(final PlayerArmorStandManipulateEvent e) {
+        final Entity entity = e.getRightClicked();
+        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
+        if (protection.isPresent()) {
+            final EntityProtection entityProtection = protection.get();
+            final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
+                e.setCancelled(true);
             }
         }
     }
