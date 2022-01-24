@@ -6,6 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.defaults.DefaultProtectionType;
 
 import java.util.HashMap;
@@ -37,6 +38,14 @@ public final class BukkitAdapter {
     public static BlockLocation blockLocation(final Location location) {
         Objects.requireNonNull(location.getWorld());
         return new BlockLocation(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
+
+    public static EntityProtection createPrivateEntityProtection(final Entity entity, final Entity owner) {
+        return createEntityProtection(entity, owner, DefaultProtectionType.PRIVATE.type());
+    }
+
+    public static EntityProtection createEntityProtection(final Entity entity, final Entity owner, final String type) {
+        return new EntityProtection(entity.getUniqueId(), owner.getUniqueId(), type, new HashMap<>(), entity.getType().toString());
     }
 
     @SuppressWarnings("deprecation")

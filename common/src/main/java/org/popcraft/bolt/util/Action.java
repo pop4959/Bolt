@@ -1,10 +1,8 @@
 package org.popcraft.bolt.util;
 
 public enum Action {
-    LOCK_BLOCK,
-    LOCK_ENTITY,
-    UNLOCK_BLOCK,
-    UNLOCK_ENTITY,
+    LOCK,
+    UNLOCK,
     INFO,
     DEBUG,
     MODIFY;

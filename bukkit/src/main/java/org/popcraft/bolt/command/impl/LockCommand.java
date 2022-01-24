@@ -22,7 +22,7 @@ public class LockCommand extends BoltCommand {
 
     public void execute(CommandSender sender, Arguments arguments) {
         if (sender instanceof final Player player) {
-            plugin.playerMeta(player).addAction(Action.LOCK_BLOCK);
+            plugin.playerMeta(player).addAction(Action.LOCK);
             BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Template.of("action", translate(Translation.LOCK)));
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
