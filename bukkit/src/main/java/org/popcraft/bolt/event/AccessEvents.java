@@ -226,13 +226,6 @@ public class AccessEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerInteractEntity(final PlayerInteractEntityEvent e) {
-        if (handlePlayerEntityInteraction(e.getPlayer(), e.getRightClicked(), false, EquipmentSlot.HAND.equals(e.getHand()))) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
     public void onPlayerInteractAtEntity(final PlayerInteractAtEntityEvent e) {
         if (handlePlayerEntityInteraction(e.getPlayer(), e.getRightClicked(), false, EquipmentSlot.HAND.equals(e.getHand()))) {
             e.setCancelled(true);
