@@ -366,7 +366,15 @@ public class AccessEvents implements Listener {
                 }
             }
         }
-        // TODO: Handle entities
+        if (inventoryHolder instanceof final Entity entity) {
+            final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
+            if (protection.isPresent()) {
+                final EntityProtection entityProtection = protection.get();
+                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.OPEN)) {
+                    e.setCancelled(true);
+                }
+            }
+        }
     }
 
     @EventHandler
