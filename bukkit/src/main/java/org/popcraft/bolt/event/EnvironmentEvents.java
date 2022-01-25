@@ -11,18 +11,21 @@ import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
+import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.entity.PiglinBarterEvent;
+import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.player.PlayerUnleashEntityEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.spigotmc.event.entity.EntityMountEvent;
 
 public class EnvironmentEvents implements Listener {
     private final BoltPlugin plugin;
@@ -133,17 +136,32 @@ public class EnvironmentEvents implements Listener {
     }
 
     @EventHandler
-    public void onHangingBreakByEntity(final HangingBreakByEntityEvent e) {
+    public void onVehicleDamage(final VehicleDamageEvent e) {
         // TODO: Entity event
     }
 
     @EventHandler
-    public void onVehicleDestroy(final VehicleDestroyEvent e) {
+    public void onEntityMount(final EntityMountEvent e) {
         // TODO: Entity event
     }
 
     @EventHandler
-    public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
+    public void onEntityBreed(final EntityBreedEvent e) {
+        // TODO: Entity event
+    }
+
+    @EventHandler
+    public void onPlayerUnleashEntity(final PlayerUnleashEntityEvent e) {
+        // TODO: Entity event
+    }
+
+    @EventHandler
+    public void onPiglinBarter(final PiglinBarterEvent e) {
+        // TODO: Entity event
+    }
+
+    @EventHandler
+    public void onSheepDyeWool(final SheepDyeWoolEvent e) {
         // TODO: Entity event
     }
 
