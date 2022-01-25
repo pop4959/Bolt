@@ -440,22 +440,35 @@ public class AccessEvents implements Listener {
     }
 
     @EventHandler
+    @SuppressWarnings("java:S2583")
     public void onInventoryDrag(final InventoryDragEvent e) {
         if (!(e.getWhoClicked() instanceof final Player player)) {
             return;
         }
-        final Location location = e.getInventory().getLocation();
-        if (location == null) {
-            return;
-        }
+        final Store store = plugin.getBolt().getStore();
+        final AccessManager accessManager = plugin.getBolt().getAccessManager();
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
         for (int rawSlot : e.getRawSlots()) {
             final Inventory slotInventory = e.getView().getInventory(rawSlot);
             if (slotInventory != null && !InventoryType.PLAYER.equals(slotInventory.getType())) {
-                plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT)) {
-                        e.setCancelled(true);
-                    }
-                });
+                final Protection protection;
+                final InventoryHolder inventoryHolder = slotInventory.getHolder();
+                if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
+                    final BlockLocation location = BukkitAdapter.blockLocation(blockInventoryHolder.getBlock());
+                    protection = store.loadBlockProtection(location).orElse(null);
+                } else if (inventoryHolder instanceof final Entity entity) {
+                    protection = store.loadEntityProtection(entity.getUniqueId()).orElse(null);
+                } else {
+                    continue;
+                }
+                // There isn't a protection
+                if (protection == null) {
+                    continue;
+                }
+                if (!accessManager.hasAccess(playerMeta, protection, Permission.DEPOSIT)) {
+                    e.setCancelled(true);
+                    return;
+                }
             }
         }
     }
