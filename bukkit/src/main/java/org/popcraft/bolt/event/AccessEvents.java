@@ -33,6 +33,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.popcraft.bolt.AccessManager;
 import org.popcraft.bolt.Bolt;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.BlockProtection;
@@ -40,6 +41,7 @@ import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.store.Store;
 import org.popcraft.bolt.util.Action;
+import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permission;
@@ -350,6 +352,7 @@ public class AccessEvents implements Listener {
     }
 
     @EventHandler
+    @SuppressWarnings("java:S2583")
     public void onInventoryOpen(final InventoryOpenEvent e) {
         if (!(e.getPlayer() instanceof Player player)) {
             return;
@@ -365,8 +368,7 @@ public class AccessEvents implements Listener {
                     e.setCancelled(true);
                 }
             }
-        }
-        if (inventoryHolder instanceof final Entity entity) {
+        } else if (inventoryHolder instanceof final Entity entity) {
             final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
             if (protection.isPresent()) {
                 final EntityProtection entityProtection = protection.get();
@@ -378,14 +380,19 @@ public class AccessEvents implements Listener {
     }
 
     @EventHandler
+    @SuppressWarnings("java:S2583")
     public void onInventoryClick(final InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof final Player player)) {
             return;
         }
-        final InventoryAction action = e.getAction();
         final Inventory clickedInventory = e.getClickedInventory();
         // Didn't click on an inventory
         if (clickedInventory == null) {
+            return;
+        }
+        final InventoryAction action = e.getAction();
+        // No permission needed for these actions
+        if (InventoryAction.CLONE_STACK.equals(action) || InventoryAction.DROP_ALL_CURSOR.equals(action) || InventoryAction.DROP_ONE_CURSOR.equals(action) || InventoryAction.NOTHING.equals(action)) {
             return;
         }
         final InventoryType clickedInventoryType = e.getClickedInventory().getType();
@@ -393,61 +400,42 @@ public class AccessEvents implements Listener {
         if (InventoryType.PLAYER.equals(clickedInventoryType) && !InventoryAction.COLLECT_TO_CURSOR.equals(action) && !InventoryAction.MOVE_TO_OTHER_INVENTORY.equals(action)) {
             return;
         }
-        final Location location = e.getInventory().getLocation();
-        // Not a physical inventory that can be protected
-        if (location == null) {
+        final Protection protection;
+        final InventoryHolder inventoryHolder = e.getInventory().getHolder();
+        final Store store = plugin.getBolt().getStore();
+        if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
+            final BlockLocation location = BukkitAdapter.blockLocation(blockInventoryHolder.getBlock());
+            protection = store.loadBlockProtection(location).orElse(null);
+        } else if (inventoryHolder instanceof final Entity entity) {
+            protection = store.loadEntityProtection(entity.getUniqueId()).orElse(null);
+        } else {
             return;
         }
-        switch (action) {
-            // Add
-            case PLACE_ALL, PLACE_ONE, PLACE_SOME -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT)) {
-                    e.setCancelled(true);
-                }
-            });
-            // Remove
-            case COLLECT_TO_CURSOR, DROP_ALL_SLOT, DROP_ONE_SLOT, PICKUP_ALL, PICKUP_HALF, PICKUP_ONE, PICKUP_SOME -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.WITHDRAW)) {
-                    e.setCancelled(true);
-                }
-            });
-            // Add and remove
-            case HOTBAR_MOVE_AND_READD, SWAP_WITH_CURSOR, UNKNOWN -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-                if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT, Permission.WITHDRAW)) {
-                    e.setCancelled(true);
-                }
-            });
-            // Add or remove
-            case HOTBAR_SWAP -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
+        // There isn't a protection
+        if (protection == null) {
+            return;
+        }
+        final AccessManager accessManager = plugin.getBolt().getAccessManager();
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
+        final boolean shouldCancel = switch (action) {
+            case PLACE_ALL, PLACE_ONE, PLACE_SOME -> !accessManager.hasAccess(playerMeta, protection, Permission.DEPOSIT);
+            case COLLECT_TO_CURSOR, DROP_ALL_SLOT, DROP_ONE_SLOT, PICKUP_ALL, PICKUP_HALF, PICKUP_ONE, PICKUP_SOME -> !accessManager.hasAccess(playerMeta, protection, Permission.WITHDRAW);
+            case HOTBAR_MOVE_AND_READD, SWAP_WITH_CURSOR, UNKNOWN -> !accessManager.hasAccess(playerMeta, protection, Permission.DEPOSIT, Permission.WITHDRAW);
+            case MOVE_TO_OTHER_INVENTORY -> !accessManager.hasAccess(playerMeta, protection, InventoryType.PLAYER.equals(clickedInventoryType) ? Permission.DEPOSIT : Permission.WITHDRAW);
+            case HOTBAR_SWAP -> {
                 final ItemStack clickedItem = e.getCurrentItem();
                 if (clickedItem == null) {
-                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT, Permission.WITHDRAW)) {
-                        e.setCancelled(true);
-                    }
+                    yield !accessManager.hasAccess(playerMeta, protection, Permission.DEPOSIT, Permission.WITHDRAW);
                 } else if (clickedItem.getType().isAir()) {
-                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT)) {
-                        e.setCancelled(true);
-                    }
-                } else if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.WITHDRAW)) {
-                    e.setCancelled(true);
-                }
-            });
-            case MOVE_TO_OTHER_INVENTORY -> plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-                if (InventoryType.PLAYER.equals(clickedInventoryType)) {
-                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.DEPOSIT)) {
-                        e.setCancelled(true);
-                    }
+                    yield !accessManager.hasAccess(playerMeta, protection, Permission.DEPOSIT);
                 } else {
-                    if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), blockProtection, Permission.WITHDRAW)) {
-                        e.setCancelled(true);
-                    }
+                    yield !accessManager.hasAccess(playerMeta, protection, Permission.WITHDRAW);
                 }
-            });
-            case CLONE_STACK, DROP_ALL_CURSOR, DROP_ONE_CURSOR, NOTHING -> {
-                // No permission needed
             }
-            // Unknown, cancel
-            default -> e.setCancelled(true);
+            default -> true;
+        };
+        if (shouldCancel) {
+            e.setCancelled(true);
         }
     }
 
