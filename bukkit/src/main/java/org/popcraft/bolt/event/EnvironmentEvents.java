@@ -2,6 +2,8 @@ package org.popcraft.bolt.event;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -25,6 +27,8 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Permission;
+import org.popcraft.bolt.util.PlayerMeta;
 import org.spigotmc.event.entity.EntityMountEvent;
 
 public class EnvironmentEvents implements Listener {
@@ -142,7 +146,15 @@ public class EnvironmentEvents implements Listener {
 
     @EventHandler
     public void onEntityMount(final EntityMountEvent e) {
-        // TODO: Entity event
+        if (e.getEntity() instanceof final Player player) {
+            final PlayerMeta playerMeta = plugin.playerMeta(player);
+            final Entity mount = e.getMount();
+            plugin.getBolt().getStore().loadEntityProtection(mount.getUniqueId()).ifPresent(entityProtection -> {
+                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.MOUNT)) {
+                    e.setCancelled(true);
+                }
+            });
+        }
     }
 
     @EventHandler
