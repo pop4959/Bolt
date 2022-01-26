@@ -159,7 +159,11 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     public PlayerMeta playerMeta(final Player player) {
-        return bolt.getPlayerMeta(player.getUniqueId());
+        return playerMeta(player.getUniqueId());
+    }
+
+    public PlayerMeta playerMeta(final UUID uuid) {
+        return bolt.getPlayerMeta(uuid);
     }
 
     private void listAllBlockProtections(final Store store) {

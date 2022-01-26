@@ -20,6 +20,7 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -480,6 +481,41 @@ public class AccessEvents implements Listener {
                     return;
                 }
             }
+        }
+    }
+
+    @EventHandler
+    @SuppressWarnings("java:S2583")
+    public void onInventoryMoveItem(final InventoryMoveItemEvent e) {
+        final Store store = plugin.getBolt().getStore();
+        Protection sourceProtection = null;
+        final InventoryHolder sourceHolder = e.getSource().getHolder();
+        if (sourceHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
+            final BlockLocation location = BukkitAdapter.blockLocation(blockInventoryHolder.getBlock());
+            sourceProtection = store.loadBlockProtection(location).orElse(null);
+        } else if (sourceHolder instanceof final Entity entity) {
+            sourceProtection = store.loadEntityProtection(entity.getUniqueId()).orElse(null);
+        }
+        Protection destinationProtection = null;
+        final InventoryHolder destinationHolder = e.getDestination().getHolder();
+        if (destinationHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
+            final BlockLocation location = BukkitAdapter.blockLocation(blockInventoryHolder.getBlock());
+            destinationProtection = store.loadBlockProtection(location).orElse(null);
+        } else if (destinationHolder instanceof final Entity entity) {
+            destinationProtection = store.loadEntityProtection(entity.getUniqueId()).orElse(null);
+        }
+        if (sourceProtection == null && destinationProtection == null) {
+            return;
+        }
+        final AccessManager accessManager = plugin.getBolt().getAccessManager();
+        if (sourceProtection != null && destinationProtection != null) {
+            final PlayerMeta sourceMeta = plugin.playerMeta(sourceProtection.getOwner());
+            final PlayerMeta destinationMeta = plugin.playerMeta(destinationProtection.getOwner());
+            if (!accessManager.hasAccess(sourceMeta, destinationProtection, Permission.DEPOSIT) || !accessManager.hasAccess(destinationMeta, sourceProtection, Permission.WITHDRAW)) {
+                e.setCancelled(true);
+            }
+        } else if (sourceProtection != null) {
+            e.setCancelled(true);
         }
     }
 
