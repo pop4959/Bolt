@@ -18,18 +18,23 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PiglinBarterEvent;
+import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.spigotmc.event.entity.EntityMountEvent;
+
+import java.util.Optional;
 
 public class EnvironmentEvents implements Listener {
     private final BoltPlugin plugin;
@@ -131,50 +136,85 @@ public class EnvironmentEvents implements Listener {
 
     @EventHandler
     public void onHangingBreak(final HangingBreakEvent e) {
-        // TODO: Entity event
-    }
-
-    @EventHandler
-    public void onEntityDamage(final EntityDamageEvent e) {
-        // TODO: Entity event
-    }
-
-    @EventHandler
-    public void onVehicleDamage(final VehicleDamageEvent e) {
-        // TODO: Entity event
-    }
-
-    @EventHandler
-    public void onEntityMount(final EntityMountEvent e) {
-        if (e.getEntity() instanceof final Player player) {
-            final PlayerMeta playerMeta = plugin.playerMeta(player);
-            final Entity mount = e.getMount();
-            plugin.getBolt().getStore().loadEntityProtection(mount.getUniqueId()).ifPresent(entityProtection -> {
-                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.MOUNT)) {
-                    e.setCancelled(true);
-                }
-            });
+        if (HangingBreakEvent.RemoveCause.ENTITY.equals(e.getCause())) {
+            return;
+        }
+        final Entity entity = e.getEntity();
+        if (plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent()) {
+            e.setCancelled(true);
         }
     }
 
     @EventHandler
+    public void onHangingBreakByEntity(final HangingBreakByEntityEvent e) {
+        if (!(e.getRemover() instanceof final Player player)) {
+            return;
+        }
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
+        final Entity entity = e.getEntity();
+        plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.BREAK)) {
+                e.setCancelled(true);
+            }
+        });
+    }
+
+    @EventHandler
+    public void onEntityDamage(final EntityDamageEvent e) {
+        final Entity entity = e.getEntity();
+        if (plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent()) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityMount(final EntityMountEvent e) {
+        if (!(e.getEntity() instanceof final Player player)) {
+            return;
+        }
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
+        final Entity mount = e.getMount();
+        plugin.getBolt().getStore().loadEntityProtection(mount.getUniqueId()).ifPresent(entityProtection -> {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.MOUNT)) {
+                e.setCancelled(true);
+            }
+        });
+    }
+
+    @EventHandler
     public void onEntityBreed(final EntityBreedEvent e) {
-        // TODO: Entity event
-    }
-
-    @EventHandler
-    public void onPlayerUnleashEntity(final PlayerUnleashEntityEvent e) {
-        // TODO: Entity event
-    }
-
-    @EventHandler
-    public void onPiglinBarter(final PiglinBarterEvent e) {
-        // TODO: Entity event
+        if (!(e.getBreeder() instanceof final Player player)) {
+            return;
+        }
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
+        final Entity mother = e.getMother();
+        final Optional<EntityProtection> optionalMotherProtection = plugin.getBolt().getStore().loadEntityProtection(mother.getUniqueId());
+        if (optionalMotherProtection.isPresent() && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, optionalMotherProtection.get(), Permission.SPAWN)) {
+            e.setCancelled(true);
+            return;
+        }
+        final Entity father = e.getFather();
+        final Optional<EntityProtection> optionalFatherProtection = plugin.getBolt().getStore().loadEntityProtection(father.getUniqueId());
+        if (optionalFatherProtection.isPresent() && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, optionalFatherProtection.get(), Permission.SPAWN)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onSheepDyeWool(final SheepDyeWoolEvent e) {
-        // TODO: Entity event
+        final Entity entity = e.getEntity();
+        final Optional<EntityProtection> optionalEntityProtection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
+        final Player player = e.getPlayer();
+        if (player == null && optionalEntityProtection.isPresent()) {
+            e.setCancelled(true);
+        } else {
+            final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
+            optionalEntityProtection.ifPresent(entityProtection -> {
+                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
+                    e.setCancelled(true);
+                }
+            });
+        }
     }
 
     @EventHandler

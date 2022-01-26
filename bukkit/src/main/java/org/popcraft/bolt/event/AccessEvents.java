@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.EquipmentSlot;
@@ -238,6 +239,15 @@ public class AccessEvents implements Listener {
         final Entity damager = e.getDamager();
         final Entity entity = e.getEntity();
         if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, true, true)) || (!(damager instanceof Player) && plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onVehicleDamage(final VehicleDamageEvent e) {
+        final Entity attacker = e.getAttacker();
+        final Entity vehicle = e.getVehicle();
+        if (attacker instanceof final Player player && handlePlayerEntityInteraction(player, vehicle, false, true)) {
             e.setCancelled(true);
         }
     }

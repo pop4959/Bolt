@@ -19,6 +19,10 @@ public class PlayerMeta {
         return uuid;
     }
 
+    public boolean hasActions() {
+        return !actions.isEmpty();
+    }
+
     public boolean hasAction(Action action) {
         return actions.contains(action);
     }
