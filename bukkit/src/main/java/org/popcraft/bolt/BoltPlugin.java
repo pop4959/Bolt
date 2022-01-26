@@ -12,6 +12,7 @@ import org.popcraft.bolt.command.impl.DebugCommand;
 import org.popcraft.bolt.command.impl.InfoCommand;
 import org.popcraft.bolt.command.impl.LockCommand;
 import org.popcraft.bolt.command.impl.ModifyCommand;
+import org.popcraft.bolt.command.impl.ReportCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
 import org.popcraft.bolt.event.AccessEvents;
 import org.popcraft.bolt.event.EnvironmentEvents;
@@ -109,6 +110,7 @@ public class BoltPlugin extends JavaPlugin {
         commands.put("info", new InfoCommand(this));
         commands.put("lock", new LockCommand(this));
         commands.put("modify", new ModifyCommand(this));
+        commands.put("report", new ReportCommand(this));
         commands.put("unlock", new UnlockCommand(this));
     }
 

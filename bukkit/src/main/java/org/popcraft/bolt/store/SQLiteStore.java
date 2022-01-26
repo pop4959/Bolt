@@ -3,6 +3,7 @@ package org.popcraft.bolt.store;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
+import org.popcraft.bolt.util.Metrics;
 import org.popcraft.bolt.util.Source;
 
 import java.sql.Connection;
@@ -61,12 +62,14 @@ public class SQLiteStore implements Store {
                     final long timeNanos = System.nanoTime() - startTimeNanos;
                     final double timeMillis = timeNanos / 1e6d;
                     LogManager.getLogManager().getLogger("").info(() -> "Loading block protection took %.3f ms".formatted(timeMillis));
+                    Metrics.recordProtectionAccess(true);
                     return Optional.of(blockProtectionFromResultSet(blockResultSet));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        Metrics.recordProtectionAccess(false);
         return Optional.empty();
     }
 
@@ -158,12 +161,14 @@ public class SQLiteStore implements Store {
                     final long timeNanos = System.nanoTime() - startTimeNanos;
                     final double timeMillis = timeNanos / 1e6d;
                     LogManager.getLogManager().getLogger("").info(() -> "Loading entity protection took %.3f ms".formatted(timeMillis));
+                    Metrics.recordProtectionAccess(true);
                     return Optional.of(entityProtectionFromResultSet(entityResultSet));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        Metrics.recordProtectionAccess(false);
         return Optional.empty();
     }
 
