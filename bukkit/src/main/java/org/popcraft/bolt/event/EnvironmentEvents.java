@@ -18,7 +18,6 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
-import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.popcraft.bolt.BoltPlugin;
@@ -138,20 +137,6 @@ public class EnvironmentEvents implements Listener {
         if (plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent()) {
             e.setCancelled(true);
         }
-    }
-
-    @EventHandler
-    public void onHangingBreakByEntity(final HangingBreakByEntityEvent e) {
-        if (!(e.getRemover() instanceof final Player player)) {
-            return;
-        }
-        final PlayerMeta playerMeta = plugin.playerMeta(player);
-        final Entity entity = e.getEntity();
-        plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.BREAK)) {
-                e.setCancelled(true);
-            }
-        });
     }
 
     @EventHandler

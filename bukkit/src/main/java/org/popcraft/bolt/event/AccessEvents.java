@@ -7,6 +7,7 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -26,6 +27,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
@@ -230,7 +232,7 @@ public class AccessEvents implements Listener {
 
     @EventHandler
     public void onPlayerInteractAtEntity(final PlayerInteractAtEntityEvent e) {
-        if (handlePlayerEntityInteraction(e.getPlayer(), e.getRightClicked(), false, EquipmentSlot.HAND.equals(e.getHand()))) {
+        if (handlePlayerEntityInteraction(e.getPlayer(), e.getRightClicked(), Permission.INTERACT, EquipmentSlot.HAND.equals(e.getHand()))) {
             e.setCancelled(true);
         }
     }
@@ -239,7 +241,7 @@ public class AccessEvents implements Listener {
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
         final Entity damager = e.getDamager();
         final Entity entity = e.getEntity();
-        if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, true, true)) || (!(damager instanceof Player) && plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent())) {
+        if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, Permission.KILL, true)) || (!(damager instanceof Player) && plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent())) {
             e.setCancelled(true);
         }
     }
@@ -248,12 +250,19 @@ public class AccessEvents implements Listener {
     public void onVehicleDamage(final VehicleDamageEvent e) {
         final Entity attacker = e.getAttacker();
         final Entity vehicle = e.getVehicle();
-        if (attacker instanceof final Player player && handlePlayerEntityInteraction(player, vehicle, false, true)) {
+        if (attacker instanceof final Player player && handlePlayerEntityInteraction(player, vehicle, Permission.INTERACT, true)) {
             e.setCancelled(true);
         }
     }
 
-    private boolean handlePlayerEntityInteraction(final Player player, final Entity entity, final boolean damage, final boolean shouldSendMessage) {
+    @EventHandler
+    public void onHangingBreakByEntity(final HangingBreakByEntityEvent e) {
+        if (e.getRemover() instanceof final Player player && handlePlayerEntityInteraction(player, e.getEntity(), Permission.BREAK, true)) {
+            e.setCancelled(true);
+        }
+    }
+
+    private boolean handlePlayerEntityInteraction(final Player player, final Entity entity, final String permission, final boolean shouldSendMessage) {
         boolean shouldCancel = false;
         final PlayerMeta playerMeta = plugin.playerMeta(player);
         final Bolt bolt = plugin.getBolt();
@@ -309,7 +318,7 @@ public class AccessEvents implements Listener {
         } else if (optionalProtection.isPresent()) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
             final EntityProtection protection = optionalProtection.get();
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, damage ? Permission.KILL : Permission.INTERACT)) {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, permission)) {
                 shouldCancel = true;
                 if (shouldSendMessage && !hasNotifyPermission) {
                     BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("type", Strings.toTitleCase(entity.getType())));
@@ -338,15 +347,20 @@ public class AccessEvents implements Listener {
     }
 
     @EventHandler
-    public void onHangingBreakByEntity(final HangingBreakByEntityEvent e) {
-        final Entity entity = e.getEntity();
-        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
-        if (protection.isPresent()) {
-            final EntityProtection entityProtection = protection.get();
-            if (!(e.getRemover() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, Permission.KILL)) {
+    public void onPlayerInteractEntity(final PlayerInteractEntityEvent e) {
+        if (!(e.getRightClicked() instanceof final ItemFrame itemFrame)) {
+            return;
+        }
+        if (itemFrame.getItem().getType().isAir()) {
+            return;
+        }
+        final Player player = e.getPlayer();
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
+        plugin.getBolt().getStore().loadEntityProtection(itemFrame.getUniqueId()).ifPresent(entityProtection -> {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
                 e.setCancelled(true);
             }
-        }
+        });
     }
 
     @EventHandler
