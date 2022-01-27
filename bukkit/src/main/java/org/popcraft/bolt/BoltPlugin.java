@@ -15,8 +15,9 @@ import org.popcraft.bolt.command.impl.ModifyCommand;
 import org.popcraft.bolt.command.impl.PersistCommand;
 import org.popcraft.bolt.command.impl.ReportCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
-import org.popcraft.bolt.event.AccessEvents;
-import org.popcraft.bolt.event.EnvironmentEvents;
+import org.popcraft.bolt.event.BlockListener;
+import org.popcraft.bolt.event.EntityListener;
+import org.popcraft.bolt.event.InventoryListener;
 import org.popcraft.bolt.event.adapter.PlayerRecipeBookClickListener;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.store.SQLiteStore;
@@ -100,10 +101,11 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     private void registerEvents() {
-        final AccessEvents accessEvents = new AccessEvents(this);
-        getServer().getPluginManager().registerEvents(accessEvents, this);
-        getServer().getPluginManager().registerEvents(new PlayerRecipeBookClickListener(accessEvents::onPlayerRecipeBookClick), this);
-        getServer().getPluginManager().registerEvents(new EnvironmentEvents(this), this);
+        final BlockListener blockListener = new BlockListener(this);
+        getServer().getPluginManager().registerEvents(blockListener, this);
+        getServer().getPluginManager().registerEvents(new PlayerRecipeBookClickListener(blockListener::onPlayerRecipeBookClick), this);
+        getServer().getPluginManager().registerEvents(new EntityListener(this), this);
+        getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
     }
 
     private void registerCommands() {
@@ -154,10 +156,6 @@ public class BoltPlugin extends JavaPlugin {
 
     public Bolt getBolt() {
         return bolt;
-    }
-
-    public ConfigurationNode getConfiguration() {
-        return configurationRootNode;
     }
 
     public PlayerMeta playerMeta(final Player player) {
