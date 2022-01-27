@@ -23,8 +23,11 @@ public final class BukkitAdapter {
     }
 
     public static BlockProtection createBlockProtection(final Block block, final Entity owner, final String type) {
-        final BlockLocation location = blockLocation(block);
-        return new BlockProtection(UUID.randomUUID(), owner.getUniqueId(), type, new HashMap<>(), block.getType().toString(), location.world(), location.x(), location.y(), location.z());
+        return new BlockProtection(UUID.randomUUID(), owner.getUniqueId(), null, type, new HashMap<>(), block.getType().toString(), block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+    }
+
+    public static BlockProtection createBlockProtection(final Block block, final BlockProtection parent) {
+        return new BlockProtection(UUID.randomUUID(), parent.getOwner(), parent.getId(), parent.getType(), new HashMap<>(), block.getType().toString(), block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
     }
 
     public static BlockLocation blockLocation(final Block block) {
@@ -45,7 +48,11 @@ public final class BukkitAdapter {
     }
 
     public static EntityProtection createEntityProtection(final Entity entity, final Entity owner, final String type) {
-        return new EntityProtection(entity.getUniqueId(), owner.getUniqueId(), type, new HashMap<>(), entity.getType().toString());
+        return new EntityProtection(entity.getUniqueId(), owner.getUniqueId(), null, type, new HashMap<>(), entity.getType().toString());
+    }
+
+    public static EntityProtection createEntityProtection(final Entity entity, final EntityProtection parent) {
+        return new EntityProtection(entity.getUniqueId(), parent.getOwner(), parent.getId(), parent.getType(), new HashMap<>(), entity.getType().toString());
     }
 
     @SuppressWarnings("deprecation")

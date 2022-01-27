@@ -12,8 +12,8 @@ public class BlockProtection extends Protection {
     private final int y;
     private final int z;
 
-    public BlockProtection(UUID id, UUID owner, String type, Map<Source, String> access, String block, String world, int x, int y, int z) {
-        super(id, owner, type, access);
+    public BlockProtection(UUID id, UUID owner, UUID parent, String type, Map<Source, String> access, String block, String world, int x, int y, int z) {
+        super(id, owner, parent, type, access);
         this.block = block;
         this.world = world;
         this.x = x;
@@ -46,6 +46,7 @@ public class BlockProtection extends Protection {
         return "BlockProtection{" +
                 "id=" + id +
                 ", owner=" + owner +
+                ", parent=" + parent +
                 ", type='" + type + '\'' +
                 ", access=" + access +
                 ", block='" + block + '\'' +

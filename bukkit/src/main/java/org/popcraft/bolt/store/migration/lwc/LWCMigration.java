@@ -137,6 +137,7 @@ public class LWCMigration implements Migration {
             store.saveBlockProtection(new BlockProtection(
                     UUID.randomUUID(),
                     ownerUUID,
+                    null,
                     protectionType,
                     access,
                     blocks.getOrDefault(protection.blockId(), BLOCK_AIR).name(),
