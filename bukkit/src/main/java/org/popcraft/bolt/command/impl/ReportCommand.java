@@ -30,16 +30,17 @@ public class ReportCommand extends BoltCommand {
         final long misses = Metrics.getProtectionMisses();
         final boolean hitsChanged = hits != previousHits;
         final boolean missesChanged = misses != previousMisses;
-        BoltComponents.sendMessage(sender, "Hits: <hits>", Template.of("hits", Component.text(hits).color(hitsChanged ? NamedTextColor.RED : NamedTextColor.WHITE)));
-        BoltComponents.sendMessage(sender, "Misses: <misses>", Template.of("misses", Component.text(misses).color(missesChanged ? NamedTextColor.RED : NamedTextColor.WHITE)));
+        BoltComponents.sendMessage(sender, "Hits: <hits>", Template.of("hits", Component.empty().append(Component.text(hitsChanged ? "%d -> ".formatted(previousHits) : "")).append(Component.text(hits).color(hitsChanged ? NamedTextColor.RED : NamedTextColor.WHITE))));
+        BoltComponents.sendMessage(sender, "Misses: <misses>", Template.of("misses", Component.empty().append(Component.text(missesChanged ? "%d -> ".formatted(previousMisses) : "")).append(Component.text(misses).color(missesChanged ? NamedTextColor.RED : NamedTextColor.WHITE))));
         final Map<Metrics.ProtectionAccess, Long> protectionAccessCounts = Metrics.getProtectionAccessCounts();
         final Map<String, List<Metrics.ProtectionAccess>> protectionAccessListByType = protectionAccessCounts.keySet().stream().collect(Collectors.groupingBy(Metrics.ProtectionAccess::type, Collectors.toList()));
         protectionAccessListByType.forEach((type, list) -> {
             BoltComponents.sendMessage(sender, "<type>", Template.of("type", type));
             list.forEach(protectionAccess -> {
                 final long count = protectionAccessCounts.get(protectionAccess);
-                final boolean countChanged = previousExecutionCounts != null && count != previousExecutionCounts.getOrDefault(protectionAccess, 0L);
-                BoltComponents.sendMessage(sender, "<consumer>: <count>", Template.of("consumer", protectionAccess.consumer()), Template.of("count", Component.text(count).color(countChanged ? NamedTextColor.RED : NamedTextColor.WHITE)));
+                final long previousCount = previousExecutionCounts.getOrDefault(protectionAccess, 0L);
+                final boolean countChanged = previousExecutionCounts != null && count != previousCount;
+                BoltComponents.sendMessage(sender, "<consumer>: <count>", Template.of("consumer", protectionAccess.consumer()), Template.of("count", Component.empty().append(Component.text(countChanged ? "%d -> ".formatted(previousCount) : "")).append(Component.text(count).color(countChanged ? NamedTextColor.RED : NamedTextColor.WHITE))));
             });
         });
         this.previousHits = hits;
