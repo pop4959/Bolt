@@ -26,10 +26,10 @@ public class SQLiteStore implements Store {
 
     public SQLiteStore() {
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS blocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), accesslist text, block varchar(128), world varchar(128), x integer, y integer, z integer);")) {
+            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS blocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), access text, block varchar(128), world varchar(128), x integer, y integer, z integer);")) {
                 statement.execute();
             }
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS entities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), accesslist text, entity varchar(128));")) {
+            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS entities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), access text, entity varchar(128));")) {
                 statement.execute();
             }
             try (final PreparedStatement statement = connection.prepareStatement("CREATE INDEX IF NOT EXISTS block_owner ON blocks(owner);")) {
@@ -99,20 +99,20 @@ public class SQLiteStore implements Store {
         final int x = resultSet.getInt(7);
         final int y = resultSet.getInt(8);
         final int z = resultSet.getInt(9);
-        final String accessListString = resultSet.getString(4);
-        final Map<Source, String> accessList = new HashMap<>();
-        if (!accessListString.isEmpty()) {
-            String[] accessListSplit = accessListString.split(",");
-            for (String accessListEntry : accessListSplit) {
-                String[] keyValue = accessListEntry.split(":");
+        final String accessString = resultSet.getString(4);
+        final Map<Source, String> accessMap = new HashMap<>();
+        if (!accessString.isEmpty()) {
+            String[] accessSplit = accessString.split(",");
+            for (String accessEntry : accessSplit) {
+                String[] keyValue = accessEntry.split(":");
                 String[] sourceTypeIdentifier = keyValue[0].split(";");
                 String sourceType = sourceTypeIdentifier[0];
                 String sourceIdentifier = sourceTypeIdentifier[1];
                 String access = keyValue[1];
-                accessList.put(new Source(sourceType, sourceIdentifier), access);
+                accessMap.put(new Source(sourceType, sourceIdentifier), access);
             }
         }
-        return new BlockProtection(UUID.fromString(id), UUID.fromString(owner), type, accessList, block, world, x, y, z);
+        return new BlockProtection(UUID.fromString(id), UUID.fromString(owner), type, accessMap, block, world, x, y, z);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class SQLiteStore implements Store {
                 replaceBlock.setString(1, protection.getId().toString());
                 replaceBlock.setString(2, protection.getOwner().toString());
                 replaceBlock.setString(3, protection.getType());
-                replaceBlock.setString(4, protection.getAccessList().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
+                replaceBlock.setString(4, protection.getAccess().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
                 replaceBlock.setString(5, protection.getBlock());
                 replaceBlock.setString(6, protection.getWorld());
                 replaceBlock.setInt(7, protection.getX());
@@ -194,20 +194,20 @@ public class SQLiteStore implements Store {
         final String owner = resultSet.getString(2);
         final String type = resultSet.getString(3);
         final String entity = resultSet.getString(5);
-        final String accessListString = resultSet.getString(4);
-        final Map<Source, String> accessList = new HashMap<>();
-        if (!accessListString.isEmpty()) {
-            String[] accessListSplit = accessListString.split(",");
-            for (String accessListEntry : accessListSplit) {
-                String[] keyValue = accessListEntry.split(":");
+        final String accessString = resultSet.getString(4);
+        final Map<Source, String> accessMap = new HashMap<>();
+        if (!accessString.isEmpty()) {
+            String[] accessSplit = accessString.split(",");
+            for (String accessEntry : accessSplit) {
+                String[] keyValue = accessEntry.split(":");
                 String[] sourceTypeIdentifier = keyValue[0].split(";");
                 String sourceType = sourceTypeIdentifier[0];
                 String sourceIdentifier = sourceTypeIdentifier[1];
                 String access = keyValue[1];
-                accessList.put(new Source(sourceType, sourceIdentifier), access);
+                accessMap.put(new Source(sourceType, sourceIdentifier), access);
             }
         }
-        return new EntityProtection(UUID.fromString(id), UUID.fromString(owner), type, accessList, entity);
+        return new EntityProtection(UUID.fromString(id), UUID.fromString(owner), type, accessMap, entity);
     }
 
     @Override
@@ -217,7 +217,7 @@ public class SQLiteStore implements Store {
                 replaceEntity.setString(1, protection.getId().toString());
                 replaceEntity.setString(2, protection.getOwner().toString());
                 replaceEntity.setString(3, protection.getType());
-                replaceEntity.setString(4, protection.getAccessList().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
+                replaceEntity.setString(4, protection.getAccess().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
                 replaceEntity.setString(5, protection.getEntity());
                 replaceEntity.execute();
             }

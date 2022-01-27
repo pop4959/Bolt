@@ -29,12 +29,12 @@ public class Strings {
         return builder.toString();
     }
 
-    public static String accessList(final Map<Source, String> accessList) {
-        if (accessList == null || accessList.isEmpty()) {
+    public static String access(final Map<Source, String> accessMap) {
+        if (accessMap == null || accessMap.isEmpty()) {
             return translate(Translation.EMPTY);
         }
         final List<String> access = new ArrayList<>();
-        for (final Source source : accessList.keySet()) {
+        for (final Source source : access.keySet()) {
             access.add("%s (%s)".formatted(source.identifier(), toTitleCase(source.type())));
         }
         return String.join(", ", access);

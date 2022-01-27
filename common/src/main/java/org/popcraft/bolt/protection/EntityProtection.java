@@ -8,8 +8,8 @@ import java.util.UUID;
 public class EntityProtection extends Protection {
     private final String entity;
 
-    public EntityProtection(UUID id, UUID owner, String type, Map<Source, String> accessList, String entity) {
-        super(id, owner, type, accessList);
+    public EntityProtection(UUID id, UUID owner, String type, Map<Source, String> access, String entity) {
+        super(id, owner, type, access);
         this.entity = entity;
     }
 
@@ -23,7 +23,7 @@ public class EntityProtection extends Protection {
                 "id=" + id +
                 ", owner=" + owner +
                 ", type='" + type + '\'' +
-                ", accessList=" + accessList +
+                ", access=" + access +
                 ", entity='" + entity + '\'' +
                 '}';
     }

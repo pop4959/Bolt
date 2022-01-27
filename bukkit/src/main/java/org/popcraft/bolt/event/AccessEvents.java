@@ -112,9 +112,9 @@ public class AccessEvents implements Listener {
             optionalProtection.ifPresentOrElse(protection -> {
                 playerMeta.getModifications().forEach((source, type) -> {
                     if (type == null || bolt.getAccessRegistry().get(type).isEmpty()) {
-                        protection.getAccessList().remove(source);
+                        protection.getAccess().remove(source);
                     } else {
-                        protection.getAccessList().put(source, type);
+                        protection.getAccess().put(source, type);
                     }
                 });
                 bolt.getStore().saveBlockProtection(protection);
@@ -293,9 +293,9 @@ public class AccessEvents implements Listener {
             optionalProtection.ifPresentOrElse(protection -> {
                 playerMeta.getModifications().forEach((source, type) -> {
                     if (type == null || bolt.getAccessRegistry().get(type).isEmpty()) {
-                        protection.getAccessList().remove(source);
+                        protection.getAccess().remove(source);
                     } else {
-                        protection.getAccessList().put(source, type);
+                        protection.getAccess().put(source, type);
                     }
                 });
                 bolt.getStore().saveEntityProtection(protection);

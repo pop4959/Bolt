@@ -172,7 +172,7 @@ public class BoltPlugin extends JavaPlugin {
                 UUID.randomUUID(),
                 protection.getOwner(),
                 protection.getType(),
-                protection.getAccessList(),
+                protection.getAccess(),
                 protection.getBlock(),
                 protection.getWorld(),
                 protection.getX(),
@@ -181,7 +181,7 @@ public class BoltPlugin extends JavaPlugin {
         ).toString()));
     }
 
-    private record ProtectionData(UUID id, UUID owner, String type, Map<Source, String> accessList, String block,
+    private record ProtectionData(UUID id, UUID owner, String type, Map<Source, String> access, String block,
                                   String world, int x, int y, int z) {
     }
 }
