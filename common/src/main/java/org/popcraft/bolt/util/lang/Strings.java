@@ -34,7 +34,7 @@ public class Strings {
             return translate(Translation.EMPTY);
         }
         final List<String> access = new ArrayList<>();
-        for (final Source source : access.keySet()) {
+        for (final Source source : accessMap.keySet()) {
             access.add("%s (%s)".formatted(source.identifier(), toTitleCase(source.type())));
         }
         return String.join(", ", access);
