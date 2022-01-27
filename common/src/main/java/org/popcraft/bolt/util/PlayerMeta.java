@@ -1,15 +1,14 @@
 package org.popcraft.bolt.util;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 public class PlayerMeta {
     private final UUID uuid;
-    private final Set<Action> actions = new HashSet<>();
     private final Map<Source, String> modifications = new HashMap<>();
+    private Action action;
+    private boolean persist;
 
     public PlayerMeta(UUID uuid) {
         this.uuid = uuid;
@@ -19,20 +18,35 @@ public class PlayerMeta {
         return uuid;
     }
 
-    public boolean hasActions() {
-        return !actions.isEmpty();
+    public boolean hasAction() {
+        return this.action != null;
     }
 
     public boolean hasAction(Action action) {
-        return actions.contains(action);
+        return action.equals(this.action);
     }
 
-    public void addAction(Action action) {
-        actions.add(action);
+    public void setAction(Action action) {
+        this.action = action;
     }
 
     public boolean triggerAction(Action action) {
-        return actions.remove(action);
+        final boolean triggered = hasAction(action);
+        if (!this.persist) {
+            this.action = null;
+        }
+        return triggered;
+    }
+
+    public boolean isPersist() {
+        return persist;
+    }
+
+    public void togglePersist() {
+        this.persist = !this.persist;
+        if (!this.persist) {
+            this.action = null;
+        }
     }
 
     public Map<Source, String> getModifications() {

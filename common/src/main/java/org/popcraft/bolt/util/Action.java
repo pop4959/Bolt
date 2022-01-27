@@ -6,14 +6,4 @@ public enum Action {
     INFO,
     DEBUG,
     MODIFY;
-
-    private final long timestamp;
-
-    Action() {
-        timestamp = System.currentTimeMillis();
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
 }

@@ -29,7 +29,7 @@ public class ModifyCommand extends BoltCommand {
     public void execute(CommandSender sender, Arguments arguments) {
         if (sender instanceof final Player player && arguments.remaining() >= 3) {
             final PlayerMeta playerMeta = plugin.playerMeta(player);
-            playerMeta.addAction(Action.MODIFY);
+            playerMeta.setAction(Action.MODIFY);
             final String sourceType = arguments.next();
             final String inputIdentifier = arguments.next();
             String sourceIdentifier;

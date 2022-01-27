@@ -3,6 +3,7 @@ package org.popcraft.bolt.util.lang;
 public class Translation {
     public static final String COMMAND_NO_PERMISSION = "command_no_permission";
     public static final String COMMAND_PLAYER_ONLY = "command_player_only";
+    public static final String COMMAND_PERSIST = "command_persist";
     public static final String CLICK_ACTION = "click_action";
     public static final String CLICK_MODIFIED = "click_modified";
     public static final String CLICK_INFO = "click_info";
@@ -11,6 +12,8 @@ public class Translation {
     public static final String CLICK_LOCKED = "click_locked";
     public static final String CLICK_UNLOCKED = "click_unlocked";
     public static final String CLICK_NOT_LOCKED = "click_not_locked";
+    public static final String DISABLED = "disabled";
+    public static final String ENABLED = "enabled";
     public static final String PROTECTION_NOTIFY = "protection_notify";
     public static final String LOCKED = "locked";
     public static final String INFO = "info";
