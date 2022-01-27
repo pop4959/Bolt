@@ -51,11 +51,6 @@ public class SQLiteStore implements Store {
     }
 
     @Override
-    public Optional<BlockProtection> loadBlockProtection(UUID id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Optional<BlockProtection> loadBlockProtection(BlockLocation location) {
         final long startTimeNanos = System.nanoTime();
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {

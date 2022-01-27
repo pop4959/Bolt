@@ -11,18 +11,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class MemoryStore implements Store {
-    private final Map<UUID, BlockProtection> blockProtectionMap = new HashMap<>();
-    private final Map<BlockLocation, BlockProtection> blockLocationProtectionMap = new HashMap<>();
+    private final Map<BlockLocation, BlockProtection> blockProtectionMap = new HashMap<>();
     private final Map<UUID, EntityProtection> entityProtectionMap = new HashMap<>();
 
     @Override
-    public Optional<BlockProtection> loadBlockProtection(final UUID id) {
-        return Optional.ofNullable(blockProtectionMap.get(id));
-    }
-
-    @Override
     public Optional<BlockProtection> loadBlockProtection(final BlockLocation location) {
-        return Optional.ofNullable(blockLocationProtectionMap.get(location));
+        return Optional.ofNullable(blockProtectionMap.get(location));
     }
 
     @Override
@@ -32,16 +26,14 @@ public class MemoryStore implements Store {
 
     @Override
     public void saveBlockProtection(final BlockProtection protection) {
-        blockProtectionMap.put(protection.getId(), protection);
         final BlockLocation blockLocation = new BlockLocation(protection.getWorld(), protection.getX(), protection.getY(), protection.getZ());
-        blockLocationProtectionMap.put(blockLocation, protection);
+        blockProtectionMap.put(blockLocation, protection);
     }
 
     @Override
     public void removeBlockProtection(BlockProtection protection) {
-        blockProtectionMap.remove(protection.getId());
         final BlockLocation blockLocation = new BlockLocation(protection.getWorld(), protection.getX(), protection.getY(), protection.getZ());
-        blockLocationProtectionMap.remove(blockLocation);
+        blockProtectionMap.remove(blockLocation);
     }
 
     @Override

@@ -9,8 +9,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface Store {
-    Optional<BlockProtection> loadBlockProtection(UUID id);
-
     Optional<BlockProtection> loadBlockProtection(BlockLocation location);
 
     List<BlockProtection> loadBlockProtections();
