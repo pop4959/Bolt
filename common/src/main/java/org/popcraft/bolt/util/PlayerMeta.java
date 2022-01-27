@@ -32,7 +32,7 @@ public class PlayerMeta {
 
     public boolean triggerAction(Action action) {
         final boolean triggered = hasAction(action);
-        if (!this.persist) {
+        if (triggered && !this.persist) {
             this.action = null;
         }
         return triggered;
