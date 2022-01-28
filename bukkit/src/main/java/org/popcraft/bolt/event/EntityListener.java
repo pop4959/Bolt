@@ -6,10 +6,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
@@ -22,9 +24,9 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.popcraft.bolt.Bolt;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
@@ -44,6 +46,14 @@ public class EntityListener implements Listener {
 
     public EntityListener(final BoltPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEntityDeath(final EntityDeathEvent e) {
+        final Entity entity = e.getEntity();
+        final Store store = plugin.getBolt().getStore();
+        // TODO: Figure out player in damage event to print unlock message
+        store.loadEntityProtection(entity.getUniqueId()).ifPresent(store::removeEntityProtection);
     }
 
     @EventHandler
@@ -230,8 +240,10 @@ public class EntityListener implements Listener {
 
     @EventHandler
     public void onEntityDamage(final EntityDamageEvent e) {
+        if (EntityDamageEvent.DamageCause.ENTITY_ATTACK.equals(e.getCause())) {
+            return;
+        }
         final Entity entity = e.getEntity();
-        // TODO: shouldn't listen to this when damaged by a player/entity
         if (plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent()) {
             e.setCancelled(true);
         }
