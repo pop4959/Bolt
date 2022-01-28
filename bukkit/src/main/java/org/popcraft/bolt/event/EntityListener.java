@@ -258,7 +258,7 @@ public class EntityListener implements Listener {
         final PlayerMeta playerMeta = plugin.playerMeta(player);
         final Entity mother = e.getMother();
         final Optional<EntityProtection> optionalMotherProtection = plugin.getBolt().getStore().loadEntityProtection(mother.getUniqueId());
-        if (optionalMotherProtection.isPresent() && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, optionalMotherProtection.get(), Permission.SPAWN)) {
+        if (optionalMotherProtection.isPresent() && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, optionalMotherProtection.get(), Permission.INTERACT)) {
             if (mother instanceof final Animals animal) {
                 animal.setLoveModeTicks(0);
             }
@@ -267,7 +267,7 @@ public class EntityListener implements Listener {
         }
         final Entity father = e.getFather();
         final Optional<EntityProtection> optionalFatherProtection = plugin.getBolt().getStore().loadEntityProtection(father.getUniqueId());
-        if (optionalFatherProtection.isPresent() && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, optionalFatherProtection.get(), Permission.SPAWN)) {
+        if (optionalFatherProtection.isPresent() && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, optionalFatherProtection.get(), Permission.INTERACT)) {
             if (father instanceof final Animals animal) {
                 animal.setLoveModeTicks(0);
             }

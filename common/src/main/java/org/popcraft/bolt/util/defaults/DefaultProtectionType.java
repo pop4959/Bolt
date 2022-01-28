@@ -11,7 +11,7 @@ public enum DefaultProtectionType {
     DISPLAY(new Access("display", Set.of(Permission.INTERACT, Permission.OPEN))),
     DEPOSIT(new Access("deposit", Set.of(Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT))),
     WITHDRAWAL(new Access("withdrawal", Set.of(Permission.INTERACT, Permission.OPEN, Permission.WITHDRAW))),
-    PUBLIC(new Access("public", Set.of(Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT, Permission.WITHDRAW, Permission.PLACE)));
+    PUBLIC(new Access("public", Set.of(Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT, Permission.WITHDRAW)));
 
     private final Access access;
 
