@@ -16,6 +16,7 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -282,13 +283,25 @@ public class EntityListener implements Listener {
         final Player player = e.getPlayer();
         if (player == null && optionalEntityProtection.isPresent()) {
             e.setCancelled(true);
-        } else {
-            final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
+        } else if (player != null) {
+            final PlayerMeta playerMeta = plugin.playerMeta(player);
             optionalEntityProtection.ifPresent(entityProtection -> {
                 if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
                     e.setCancelled(true);
                 }
             });
         }
+    }
+
+    @EventHandler
+    public void onPlayerShearEntity(final PlayerShearEntityEvent e) {
+        final Player player = e.getPlayer();
+        final Entity entity = e.getEntity();
+        plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
+            final PlayerMeta playerMeta = plugin.playerMeta(player);
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
+                e.setCancelled(true);
+            }
+        });
     }
 }
