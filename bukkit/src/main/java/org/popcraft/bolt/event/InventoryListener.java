@@ -11,16 +11,17 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.TradeSelectEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.popcraft.bolt.AccessManager;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permission;
@@ -191,5 +192,18 @@ public class InventoryListener implements Listener {
         } else if (sourceProtection != null) {
             e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onTradeSelect(final TradeSelectEvent e) {
+        if (!(e.getWhoClicked() instanceof final Player player) || !(e.getInventory().getHolder() instanceof final Entity entity)) {
+            return;
+        }
+        plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
+            final PlayerMeta playerMeta = plugin.playerMeta(player);
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.DEPOSIT)) {
+                e.setCancelled(true);
+            }
+        });
     }
 }
