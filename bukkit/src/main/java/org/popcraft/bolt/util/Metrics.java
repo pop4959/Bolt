@@ -5,7 +5,7 @@ import java.util.Map;
 
 public final class Metrics {
     private static final String REVERSE_DOMAIN = "org.popcraft";
-    private static final String STORE_PACKAGE = REVERSE_DOMAIN + ".bolt.store";
+    private static final String DATA_PACKAGE = REVERSE_DOMAIN + ".bolt.data";
     private static final Map<ProtectionAccess, Long> protectionAccessCounts = new HashMap<>();
     private static long protectionHits;
     private static long protectionMisses;
@@ -22,7 +22,7 @@ public final class Metrics {
         final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         for (int i = 0; i < stackTrace.length; ++i) {
             final StackTraceElement stackTraceElement = stackTrace[i];
-            if (stackTraceElement.getClassName().startsWith(STORE_PACKAGE)) {
+            if (stackTraceElement.getClassName().startsWith(DATA_PACKAGE)) {
                 final String type = stackTraceElement.getMethodName();
                 for (int j = i + 1; j < stackTrace.length - 1; ++j) {
                     final StackTraceElement nextStackTraceElement = stackTrace[j + 1];

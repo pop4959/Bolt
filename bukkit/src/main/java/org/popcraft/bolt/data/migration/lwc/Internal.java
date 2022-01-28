@@ -1,4 +1,4 @@
-package org.popcraft.bolt.store.migration.lwc;
+package org.popcraft.bolt.data.migration.lwc;
 
 public record Internal(String name, String value) {
 }

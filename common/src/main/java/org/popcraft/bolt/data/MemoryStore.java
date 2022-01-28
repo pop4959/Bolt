@@ -1,4 +1,4 @@
-package org.popcraft.bolt.store;
+package org.popcraft.bolt.data;
 
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;

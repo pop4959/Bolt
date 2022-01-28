@@ -20,7 +20,7 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.store.Store;
+import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permission;

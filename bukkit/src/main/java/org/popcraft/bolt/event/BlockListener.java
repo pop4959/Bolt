@@ -34,7 +34,7 @@ import org.popcraft.bolt.Bolt;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.store.Store;
+import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BoltComponents;

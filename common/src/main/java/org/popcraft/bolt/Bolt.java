@@ -1,6 +1,6 @@
 package org.popcraft.bolt;
 
-import org.popcraft.bolt.store.Store;
+import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.util.PlayerMeta;
 
 import java.util.HashMap;
