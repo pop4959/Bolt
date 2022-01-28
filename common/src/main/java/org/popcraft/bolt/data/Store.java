@@ -4,14 +4,14 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface Store {
     Optional<BlockProtection> loadBlockProtection(BlockLocation location);
 
-    List<BlockProtection> loadBlockProtections();
+    Collection<BlockProtection> loadBlockProtections();
 
     void saveBlockProtection(BlockProtection protection);
 
@@ -19,7 +19,7 @@ public interface Store {
 
     Optional<EntityProtection> loadEntityProtection(UUID id);
 
-    List<EntityProtection> loadEntityProtections();
+    Collection<EntityProtection> loadEntityProtections();
 
     void saveEntityProtection(EntityProtection protection);
 

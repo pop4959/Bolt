@@ -52,7 +52,6 @@ public class SQLiteStore implements Store {
 
     @Override
     public Optional<BlockProtection> loadBlockProtection(BlockLocation location) {
-        final long startTimeNanos = System.nanoTime();
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
             try (final PreparedStatement selectBlock = connection.prepareStatement("SELECT * FROM blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;")) {
                 selectBlock.setString(1, location.world());
@@ -61,10 +60,6 @@ public class SQLiteStore implements Store {
                 selectBlock.setInt(4, location.z());
                 final ResultSet blockResultSet = selectBlock.executeQuery();
                 if (blockResultSet.next()) {
-                    final long timeNanos = System.nanoTime() - startTimeNanos;
-                    final double timeMillis = timeNanos / 1e6d;
-                    LogManager.getLogManager().getLogger("").info(() -> "Loading block protection took %.3f ms".formatted(timeMillis));
-                    Metrics.recordProtectionAccess(true);
                     return Optional.of(blockProtectionFromResultSet(blockResultSet));
                 }
             }
@@ -77,6 +72,7 @@ public class SQLiteStore implements Store {
 
     @Override
     public List<BlockProtection> loadBlockProtections() {
+        final long startTimeNanos = System.nanoTime();
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
             try (final PreparedStatement selectBlocks = connection.prepareStatement("SELECT * FROM blocks;")) {
                 final ResultSet blocksResultSet = selectBlocks.executeQuery();
@@ -84,6 +80,9 @@ public class SQLiteStore implements Store {
                 while (blocksResultSet.next()) {
                     protections.add(blockProtectionFromResultSet(blocksResultSet));
                 }
+                final long timeNanos = System.nanoTime() - startTimeNanos;
+                final double timeMillis = timeNanos / 1e6d;
+                LogManager.getLogManager().getLogger("").info(() -> "Loading all block protections took %.3f ms".formatted(timeMillis));
                 return protections;
             }
         } catch (SQLException e) {
@@ -156,16 +155,11 @@ public class SQLiteStore implements Store {
 
     @Override
     public Optional<EntityProtection> loadEntityProtection(UUID id) {
-        final long startTimeNanos = System.nanoTime();
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
             try (final PreparedStatement selectEntity = connection.prepareStatement("SELECT * FROM entities WHERE id = ?;")) {
                 selectEntity.setString(1, id.toString());
                 final ResultSet entityResultSet = selectEntity.executeQuery();
                 if (entityResultSet.next()) {
-                    final long timeNanos = System.nanoTime() - startTimeNanos;
-                    final double timeMillis = timeNanos / 1e6d;
-                    LogManager.getLogManager().getLogger("").info(() -> "Loading entity protection took %.3f ms".formatted(timeMillis));
-                    Metrics.recordProtectionAccess(true);
                     return Optional.of(entityProtectionFromResultSet(entityResultSet));
                 }
             }
@@ -178,6 +172,7 @@ public class SQLiteStore implements Store {
 
     @Override
     public List<EntityProtection> loadEntityProtections() {
+        final long startTimeNanos = System.nanoTime();
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
             try (final PreparedStatement selectEntities = connection.prepareStatement("SELECT * FROM entities;")) {
                 final ResultSet entitiesResultSet = selectEntities.executeQuery();
@@ -185,6 +180,9 @@ public class SQLiteStore implements Store {
                 while (entitiesResultSet.next()) {
                     protections.add(entityProtectionFromResultSet(entitiesResultSet));
                 }
+                final long timeNanos = System.nanoTime() - startTimeNanos;
+                final double timeMillis = timeNanos / 1e6d;
+                LogManager.getLogManager().getLogger("").info(() -> "Loading all entity protections took %.3f ms".formatted(timeMillis));
                 return protections;
             }
         } catch (SQLException e) {

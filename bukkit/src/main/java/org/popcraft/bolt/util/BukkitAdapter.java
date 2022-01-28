@@ -43,6 +43,10 @@ public final class BukkitAdapter {
         return new BlockLocation(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
+    public static BlockLocation blockLocation(final BlockProtection blockProtection) {
+        return new BlockLocation(blockProtection.getWorld(), blockProtection.getX(), blockProtection.getY(), blockProtection.getZ());
+    }
+
     public static EntityProtection createPrivateEntityProtection(final Entity entity, final Entity owner) {
         return createEntityProtection(entity, owner, DefaultProtectionType.PRIVATE.type());
     }

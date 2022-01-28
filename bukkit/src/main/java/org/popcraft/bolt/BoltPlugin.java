@@ -15,16 +15,14 @@ import org.popcraft.bolt.command.impl.ModifyCommand;
 import org.popcraft.bolt.command.impl.PersistCommand;
 import org.popcraft.bolt.command.impl.ReportCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
+import org.popcraft.bolt.data.SQLiteStore;
+import org.popcraft.bolt.data.SimpleProtectionCache;
 import org.popcraft.bolt.event.BlockListener;
 import org.popcraft.bolt.event.EntityListener;
 import org.popcraft.bolt.event.InventoryListener;
 import org.popcraft.bolt.event.adapter.PlayerRecipeBookClickListener;
-import org.popcraft.bolt.protection.BlockProtection;
-import org.popcraft.bolt.data.SQLiteStore;
-import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.PlayerMeta;
-import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.lang.Translation;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -42,7 +40,7 @@ import java.util.UUID;
 
 public class BoltPlugin extends JavaPlugin {
     private static final String COMMAND_PERMISSION_KEY = "bolt.command.";
-    private final Bolt bolt = new Bolt(new SQLiteStore());
+    private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
     private YamlConfigurationLoader configurationLoader;
     private ConfigurationNode configurationRootNode;
@@ -54,7 +52,6 @@ public class BoltPlugin extends JavaPlugin {
         BoltComponents.enable(this);
         registerEvents();
         registerCommands();
-        listAllBlockProtections(bolt.getStore());
     }
 
     private void loadConfiguration() {
@@ -164,24 +161,5 @@ public class BoltPlugin extends JavaPlugin {
 
     public PlayerMeta playerMeta(final UUID uuid) {
         return bolt.getPlayerMeta(uuid);
-    }
-
-    private void listAllBlockProtections(final Store store) {
-        final List<BlockProtection> sqliteProtections = store.loadBlockProtections();
-        sqliteProtections.forEach(protection -> getLogger().info(() -> new ProtectionData(
-                UUID.randomUUID(),
-                protection.getOwner(),
-                protection.getType(),
-                protection.getAccess(),
-                protection.getBlock(),
-                protection.getWorld(),
-                protection.getX(),
-                protection.getY(),
-                protection.getZ()
-        ).toString()));
-    }
-
-    private record ProtectionData(UUID id, UUID owner, String type, Map<Source, String> access, String block,
-                                  String world, int x, int y, int z) {
     }
 }
