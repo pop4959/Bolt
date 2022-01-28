@@ -4,15 +4,15 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MemoryStore implements Store {
-    private final Map<BlockLocation, BlockProtection> blockProtectionMap = new HashMap<>();
-    private final Map<UUID, EntityProtection> entityProtectionMap = new HashMap<>();
+    private final Map<BlockLocation, BlockProtection> blockProtectionMap = new ConcurrentHashMap<>();
+    private final Map<UUID, EntityProtection> entityProtectionMap = new ConcurrentHashMap<>();
 
     @Override
     public Optional<BlockProtection> loadBlockProtection(final BlockLocation location) {

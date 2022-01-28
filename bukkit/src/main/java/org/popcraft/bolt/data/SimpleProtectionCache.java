@@ -10,18 +10,24 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.logging.LogManager;
 
 public class SimpleProtectionCache implements Store {
     private final Map<BlockLocation, BlockProtection> cachedBlocks = new ConcurrentHashMap<>();
     private final Map<UUID, EntityProtection> cachedEntities = new ConcurrentHashMap<>();
+    private final Executor executorThread = Executors.newSingleThreadExecutor();
     private final Store backingStore;
 
     public SimpleProtectionCache(final Store backingStore) {
         this.backingStore = backingStore;
-        backingStore.loadBlockProtections().forEach(blockProtection -> cachedBlocks.putIfAbsent(BukkitAdapter.blockLocation(blockProtection), blockProtection));
-        backingStore.loadEntityProtections().forEach(entityProtection -> cachedEntities.putIfAbsent(entityProtection.getId(), entityProtection));
+        CompletableFuture.runAsync(() -> {
+            backingStore.loadBlockProtections().forEach(blockProtection -> cachedBlocks.putIfAbsent(BukkitAdapter.blockLocation(blockProtection), blockProtection));
+            backingStore.loadEntityProtections().forEach(entityProtection -> cachedEntities.putIfAbsent(entityProtection.getId(), entityProtection));
+        }, executorThread);
     }
 
     @Override
@@ -51,7 +57,7 @@ public class SimpleProtectionCache implements Store {
         final long startTimeNanos = System.nanoTime();
 
         cachedBlocks.put(BukkitAdapter.blockLocation(protection), protection);
-        backingStore.saveBlockProtection(protection);
+        CompletableFuture.runAsync(() -> backingStore.saveBlockProtection(protection), executorThread);
 
         final long timeNanos = System.nanoTime() - startTimeNanos;
         final double timeMillis = timeNanos / 1e6d;
@@ -63,7 +69,7 @@ public class SimpleProtectionCache implements Store {
         final long startTimeNanos = System.nanoTime();
 
         cachedBlocks.remove(BukkitAdapter.blockLocation(protection));
-        backingStore.removeBlockProtection(protection);
+        CompletableFuture.runAsync(() -> backingStore.removeBlockProtection(protection), executorThread);
 
         final long timeNanos = System.nanoTime() - startTimeNanos;
         final double timeMillis = timeNanos / 1e6d;
@@ -97,7 +103,7 @@ public class SimpleProtectionCache implements Store {
         final long startTimeNanos = System.nanoTime();
 
         cachedEntities.put(protection.getId(), protection);
-        backingStore.saveEntityProtection(protection);
+        CompletableFuture.runAsync(() -> backingStore.saveEntityProtection(protection), executorThread);
 
         final long timeNanos = System.nanoTime() - startTimeNanos;
         final double timeMillis = timeNanos / 1e6d;
@@ -109,7 +115,7 @@ public class SimpleProtectionCache implements Store {
         final long startTimeNanos = System.nanoTime();
 
         cachedEntities.remove(protection.getId());
-        backingStore.removeEntityProtection(protection);
+        CompletableFuture.runAsync(() -> backingStore.removeEntityProtection(protection), executorThread);
 
         final long timeNanos = System.nanoTime() - startTimeNanos;
         final double timeMillis = timeNanos / 1e6d;
