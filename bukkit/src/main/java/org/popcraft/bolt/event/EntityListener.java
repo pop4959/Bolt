@@ -1,6 +1,7 @@
 package org.popcraft.bolt.event;
 
 import net.kyori.adventure.text.minimessage.Template;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -258,12 +259,18 @@ public class EntityListener implements Listener {
         final Entity mother = e.getMother();
         final Optional<EntityProtection> optionalMotherProtection = plugin.getBolt().getStore().loadEntityProtection(mother.getUniqueId());
         if (optionalMotherProtection.isPresent() && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, optionalMotherProtection.get(), Permission.SPAWN)) {
+            if (mother instanceof final Animals animal) {
+                animal.setLoveModeTicks(0);
+            }
             e.setCancelled(true);
             return;
         }
         final Entity father = e.getFather();
         final Optional<EntityProtection> optionalFatherProtection = plugin.getBolt().getStore().loadEntityProtection(father.getUniqueId());
         if (optionalFatherProtection.isPresent() && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, optionalFatherProtection.get(), Permission.SPAWN)) {
+            if (father instanceof final Animals animal) {
+                animal.setLoveModeTicks(0);
+            }
             e.setCancelled(true);
         }
     }
