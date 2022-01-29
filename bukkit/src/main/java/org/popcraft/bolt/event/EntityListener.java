@@ -8,10 +8,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityEnterLoveModeEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
@@ -264,28 +264,18 @@ public class EntityListener implements Listener {
     }
 
     @EventHandler
-    public void onEntityBreed(final EntityBreedEvent e) {
-        if (!(e.getBreeder() instanceof final Player player)) {
+    public void onEntityEnterLoveMode(final EntityEnterLoveModeEvent e) {
+        // TODO: Potentially look into a solution for items being lost when cancelling
+        if (!(e.getHumanEntity() instanceof final Player player)) {
             return;
         }
         final PlayerMeta playerMeta = plugin.playerMeta(player);
-        final Entity mother = e.getMother();
-        final Optional<EntityProtection> optionalMotherProtection = plugin.getBolt().getStore().loadEntityProtection(mother.getUniqueId());
-        if (optionalMotherProtection.isPresent() && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, optionalMotherProtection.get(), Permission.INTERACT)) {
-            if (mother instanceof final Animals animal) {
-                animal.setLoveModeTicks(0);
+        final Animals entity = e.getEntity();
+        plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
+                e.setCancelled(true);
             }
-            e.setCancelled(true);
-            return;
-        }
-        final Entity father = e.getFather();
-        final Optional<EntityProtection> optionalFatherProtection = plugin.getBolt().getStore().loadEntityProtection(father.getUniqueId());
-        if (optionalFatherProtection.isPresent() && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, optionalFatherProtection.get(), Permission.INTERACT)) {
-            if (father instanceof final Animals animal) {
-                animal.setLoveModeTicks(0);
-            }
-            e.setCancelled(true);
-        }
+        });
     }
 
     @EventHandler
