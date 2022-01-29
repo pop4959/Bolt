@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityEnterLoveModeEvent;
+import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
@@ -297,6 +298,18 @@ public class EntityListener implements Listener {
 
     @EventHandler
     public void onPlayerShearEntity(final PlayerShearEntityEvent e) {
+        final Player player = e.getPlayer();
+        final Entity entity = e.getEntity();
+        plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
+            final PlayerMeta playerMeta = plugin.playerMeta(player);
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
+                e.setCancelled(true);
+            }
+        });
+    }
+
+    @EventHandler
+    public void onPlayerLeashEntity(final PlayerLeashEntityEvent e) {
         final Player player = e.getPlayer();
         final Entity entity = e.getEntity();
         plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
