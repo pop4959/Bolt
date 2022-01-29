@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -310,6 +311,18 @@ public class EntityListener implements Listener {
 
     @EventHandler
     public void onPlayerLeashEntity(final PlayerLeashEntityEvent e) {
+        final Player player = e.getPlayer();
+        final Entity entity = e.getEntity();
+        plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
+            final PlayerMeta playerMeta = plugin.playerMeta(player);
+            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
+                e.setCancelled(true);
+            }
+        });
+    }
+
+    @EventHandler
+    public void onPlayerUnleashEntity(final PlayerUnleashEntityEvent e) {
         final Player player = e.getPlayer();
         final Entity entity = e.getEntity();
         plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
