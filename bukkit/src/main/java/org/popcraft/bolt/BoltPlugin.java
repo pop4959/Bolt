@@ -1,7 +1,9 @@
 package org.popcraft.bolt;
 
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,7 +23,11 @@ import org.popcraft.bolt.listeners.BlockListener;
 import org.popcraft.bolt.listeners.EntityListener;
 import org.popcraft.bolt.listeners.InventoryListener;
 import org.popcraft.bolt.listeners.adapter.PlayerRecipeBookClickListener;
+import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.BoltComponents;
+import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.lang.Translation;
 import org.spongepowered.configurate.ConfigurateException;
@@ -36,6 +42,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class BoltPlugin extends JavaPlugin {
@@ -161,5 +168,30 @@ public class BoltPlugin extends JavaPlugin {
 
     public PlayerMeta playerMeta(final UUID uuid) {
         return bolt.getPlayerMeta(uuid);
+    }
+
+    public Optional<BlockProtection> getBlockProtection(final Block block) {
+        return bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
+    }
+
+    public Optional<EntityProtection> getEntityProtection(final Entity entity) {
+        return bolt.getStore().loadEntityProtection(entity.getUniqueId());
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean canAccessProtection(final UUID uuid, final Protection protection, final String... permissions) {
+        return bolt.getAccessManager().hasAccess(playerMeta(uuid), protection, permissions);
+    }
+
+    public boolean canAccessProtection(final Player player, final Protection protection, final String... permissions) {
+        return bolt.getAccessManager().hasAccess(playerMeta(player), protection, permissions);
+    }
+
+    public boolean canAccessBlock(final Player player, final Block block, final String... permissions) {
+        return getBlockProtection(block).map(protection -> canAccessProtection(player, protection, permissions)).orElse(true);
+    }
+
+    public boolean canAccessEntity(final Player player, final Entity entity, final String... permissions) {
+        return getEntityProtection(entity).map(protection -> canAccessProtection(player, protection, permissions)).orElse(true);
     }
 }

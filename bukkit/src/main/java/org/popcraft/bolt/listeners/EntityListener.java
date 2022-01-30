@@ -1,7 +1,6 @@
 package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.minimessage.Template;
-import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -52,10 +51,8 @@ public class EntityListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityDeath(final EntityDeathEvent e) {
-        final Entity entity = e.getEntity();
-        final Store store = plugin.getBolt().getStore();
         // TODO: Figure out player in damage event to print unlock message
-        store.loadEntityProtection(entity.getUniqueId()).ifPresent(store::removeEntityProtection);
+        plugin.getEntityProtection(e.getEntity()).ifPresent(protection -> plugin.getBolt().getStore().removeEntityProtection(protection));
     }
 
     @EventHandler
@@ -69,7 +66,7 @@ public class EntityListener implements Listener {
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
         final Entity damager = e.getDamager();
         final Entity entity = e.getEntity();
-        if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, Permission.KILL, true)) || (!(damager instanceof Player) && plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent())) {
+        if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, Permission.KILL, true)) || (!(damager instanceof Player) && plugin.getEntityProtection(entity).isPresent())) {
             e.setCancelled(true);
         }
     }
@@ -95,7 +92,7 @@ public class EntityListener implements Listener {
         final PlayerMeta playerMeta = plugin.playerMeta(player);
         final Bolt bolt = plugin.getBolt();
         final Store store = bolt.getStore();
-        final Optional<EntityProtection> optionalProtection = store.loadEntityProtection(entity.getUniqueId());
+        final Optional<EntityProtection> optionalProtection = plugin.getEntityProtection(entity);
         if (playerMeta.triggerAction(Action.LOCK)) {
             if (optionalProtection.isPresent()) {
                 if (shouldSendMessage) {
@@ -171,7 +168,7 @@ public class EntityListener implements Listener {
         } else if (optionalProtection.isPresent()) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
             final EntityProtection protection = optionalProtection.get();
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, permission)) {
+            if (!plugin.canAccessProtection(player, protection, permission)) {
                 shouldCancel = true;
                 if (shouldSendMessage && !hasNotifyPermission) {
                     BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("type", Strings.toTitleCase(entity.getType())));
@@ -189,13 +186,9 @@ public class EntityListener implements Listener {
 
     @EventHandler
     public void onVehicleDestroy(final VehicleDestroyEvent e) {
-        final Entity entity = e.getVehicle();
-        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
-        if (protection.isPresent()) {
-            final EntityProtection entityProtection = protection.get();
-            if (!(e.getAttacker() instanceof final Player player) || !plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(player), entityProtection, Permission.KILL)) {
-                e.setCancelled(true);
-            }
+        final Optional<EntityProtection> protection = plugin.getEntityProtection(e.getVehicle());
+        if (protection.isPresent() && (!(e.getAttacker() instanceof final Player player) || !plugin.canAccessProtection(player, protection.get(), Permission.KILL))) {
+            e.setCancelled(true);
         }
     }
 
@@ -207,25 +200,15 @@ public class EntityListener implements Listener {
         if (itemFrame.getItem().getType().isAir()) {
             return;
         }
-        final Player player = e.getPlayer();
-        final PlayerMeta playerMeta = plugin.playerMeta(player);
-        plugin.getBolt().getStore().loadEntityProtection(itemFrame.getUniqueId()).ifPresent(entityProtection -> {
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
-                e.setCancelled(true);
-            }
-        });
+        if (!plugin.canAccessEntity(e.getPlayer(), itemFrame, Permission.INTERACT)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onPlayerArmorStandManipulate(final PlayerArmorStandManipulateEvent e) {
-        final Entity entity = e.getRightClicked();
-        final Optional<EntityProtection> protection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
-        if (protection.isPresent()) {
-            final EntityProtection entityProtection = protection.get();
-            final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.MODIFY)) {
-                e.setCancelled(true);
-            }
+        if (!plugin.canAccessEntity(e.getPlayer(), e.getRightClicked(), Permission.MODIFY)) {
+            e.setCancelled(true);
         }
     }
 
@@ -234,8 +217,7 @@ public class EntityListener implements Listener {
         if (HangingBreakEvent.RemoveCause.ENTITY.equals(e.getCause())) {
             return;
         }
-        final Entity entity = e.getEntity();
-        if (plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent()) {
+        if (plugin.getEntityProtection(e.getEntity()).isPresent()) {
             e.setCancelled(true);
         }
     }
@@ -245,8 +227,7 @@ public class EntityListener implements Listener {
         if (EntityDamageEvent.DamageCause.ENTITY_ATTACK.equals(e.getCause())) {
             return;
         }
-        final Entity entity = e.getEntity();
-        if (plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).isPresent()) {
+        if (plugin.getEntityProtection(e.getEntity()).isPresent()) {
             e.setCancelled(true);
         }
     }
@@ -256,13 +237,9 @@ public class EntityListener implements Listener {
         if (!(e.getEntity() instanceof final Player player)) {
             return;
         }
-        final PlayerMeta playerMeta = plugin.playerMeta(player);
-        final Entity mount = e.getMount();
-        plugin.getBolt().getStore().loadEntityProtection(mount.getUniqueId()).ifPresent(entityProtection -> {
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.MOUNT)) {
-                e.setCancelled(true);
-            }
-        });
+        if (!plugin.canAccessEntity(player, e.getMount(), Permission.MOUNT)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -271,65 +248,41 @@ public class EntityListener implements Listener {
         if (!(e.getHumanEntity() instanceof final Player player)) {
             return;
         }
-        final PlayerMeta playerMeta = plugin.playerMeta(player);
-        final Animals entity = e.getEntity();
-        plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
-                e.setCancelled(true);
-            }
-        });
+        if (!plugin.canAccessEntity(player, e.getEntity(), Permission.INTERACT)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onSheepDyeWool(final SheepDyeWoolEvent e) {
-        final Entity entity = e.getEntity();
-        final Optional<EntityProtection> optionalEntityProtection = plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId());
+        final Optional<EntityProtection> protection = plugin.getEntityProtection(e.getEntity());
+        if (protection.isEmpty()) {
+            return;
+        }
         final Player player = e.getPlayer();
-        if (player == null && optionalEntityProtection.isPresent()) {
+        if (player == null || !plugin.canAccessProtection(player, protection.get(), Permission.INTERACT)) {
             e.setCancelled(true);
-        } else if (player != null) {
-            final PlayerMeta playerMeta = plugin.playerMeta(player);
-            optionalEntityProtection.ifPresent(entityProtection -> {
-                if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
-                    e.setCancelled(true);
-                }
-            });
         }
     }
 
     @EventHandler
     public void onPlayerShearEntity(final PlayerShearEntityEvent e) {
-        final Player player = e.getPlayer();
-        final Entity entity = e.getEntity();
-        plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
-            final PlayerMeta playerMeta = plugin.playerMeta(player);
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
-                e.setCancelled(true);
-            }
-        });
+        if (!plugin.canAccessEntity(e.getPlayer(), e.getEntity(), Permission.INTERACT)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onPlayerLeashEntity(final PlayerLeashEntityEvent e) {
-        final Player player = e.getPlayer();
-        final Entity entity = e.getEntity();
-        plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
-            final PlayerMeta playerMeta = plugin.playerMeta(player);
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
-                e.setCancelled(true);
-            }
-        });
+        if (!plugin.canAccessEntity(e.getPlayer(), e.getEntity(), Permission.INTERACT)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onPlayerUnleashEntity(final PlayerUnleashEntityEvent e) {
-        final Player player = e.getPlayer();
-        final Entity entity = e.getEntity();
-        plugin.getBolt().getStore().loadEntityProtection(entity.getUniqueId()).ifPresent(entityProtection -> {
-            final PlayerMeta playerMeta = plugin.playerMeta(player);
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, entityProtection, Permission.INTERACT)) {
-                e.setCancelled(true);
-            }
-        });
+        if (!plugin.canAccessEntity(e.getPlayer(), e.getEntity(), Permission.INTERACT)) {
+            e.setCancelled(true);
+        }
     }
 }

@@ -29,14 +29,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.popcraft.bolt.Bolt;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.util.Action;
-import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permission;
@@ -72,7 +70,7 @@ public class BlockListener implements Listener {
         final Bolt bolt = plugin.getBolt();
         final Store store = bolt.getStore();
         final boolean shouldSendMessage = EquipmentSlot.HAND.equals(e.getHand());
-        final Optional<BlockProtection> optionalProtection = store.loadBlockProtection(BukkitAdapter.blockLocation(clicked));
+        final Optional<BlockProtection> optionalProtection = plugin.getBlockProtection(clicked);
         if (playerMeta.triggerAction(Action.LOCK)) {
             if (optionalProtection.isPresent()) {
                 if (shouldSendMessage) {
@@ -147,7 +145,7 @@ public class BlockListener implements Listener {
         } else if (optionalProtection.isPresent()) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
             final BlockProtection protection = optionalProtection.get();
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.INTERACT)) {
+            if (!plugin.canAccessProtection(player, protection, Permission.INTERACT)) {
                 e.setCancelled(true);
                 if (shouldSendMessage && !hasNotifyPermission) {
                     BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("type", Strings.toTitleCase(clicked.getType())));
@@ -161,9 +159,9 @@ public class BlockListener implements Listener {
             }
             if (e.getItem() != null) {
                 final Material itemType = e.getItem().getType();
-                if (Material.LECTERN.equals(clicked.getType()) && (Material.WRITABLE_BOOK.equals(itemType) || Material.WRITTEN_BOOK.equals(itemType)) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.DEPOSIT)) {
+                if (Material.LECTERN.equals(clicked.getType()) && (Material.WRITABLE_BOOK.equals(itemType) || Material.WRITTEN_BOOK.equals(itemType)) && !plugin.canAccessProtection(player, protection, Permission.DEPOSIT)) {
                     e.setUseItemInHand(Event.Result.DENY);
-                } else if ((Tag.SIGNS.isTagged(clicked.getType()) && (DYES.contains(itemType) || Material.GLOW_INK_SAC.equals(itemType)) && !plugin.getBolt().getAccessManager().hasAccess(playerMeta, protection, Permission.MODIFY))) {
+                } else if ((Tag.SIGNS.isTagged(clicked.getType()) && (DYES.contains(itemType) || Material.GLOW_INK_SAC.equals(itemType)) && !plugin.canAccessProtection(player, protection, Permission.MODIFY))) {
                     e.setUseItemInHand(Event.Result.DENY);
                     e.setUseInteractedBlock(Event.Result.DENY);
                 }
@@ -176,23 +174,23 @@ public class BlockListener implements Listener {
         final Block block = e.getBlock();
         final Material blockType = block.getType();
         final Player player = e.getPlayer();
-        final PlayerMeta playerMeta = plugin.playerMeta(player);
+        // TODO: move to matcher
         if (Material.CARVED_PUMPKIN.equals(blockType) || Material.JACK_O_LANTERN.equals(blockType)) {
             for (final BlockFace blockFace : CARTESIAN_BLOCK_FACES) {
                 final Block firstBlock = block.getRelative(blockFace);
                 final Block secondBlock = firstBlock.getRelative(blockFace);
                 if (Material.SNOW_BLOCK.equals(firstBlock.getType()) && Material.SNOW_BLOCK.equals(secondBlock.getType())) {
-                    final Optional<BlockProtection> firstProtection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(firstBlock));
+                    final Optional<BlockProtection> firstProtection = plugin.getBlockProtection(firstBlock);
                     firstProtection.ifPresent(blockProtection -> {
-                        if (plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
+                        if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
                             plugin.getBolt().getStore().removeBlockProtection(blockProtection);
                         } else {
                             e.setCancelled(true);
                         }
                     });
-                    final Optional<BlockProtection> secondProtection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(secondBlock));
+                    final Optional<BlockProtection> secondProtection = plugin.getBlockProtection(secondBlock);
                     secondProtection.ifPresent(blockProtection -> {
-                        if (plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
+                        if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
                             plugin.getBolt().getStore().removeBlockProtection(blockProtection);
                         } else {
                             e.setCancelled(true);
@@ -207,12 +205,11 @@ public class BlockListener implements Listener {
     public void onBlockBreak(final BlockBreakEvent e) {
         final Block block = e.getBlock();
         final Material blockType = block.getType();
-        final Optional<BlockProtection> optionalProtection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
+        final Optional<BlockProtection> optionalProtection = plugin.getBlockProtection(block);
         final Player player = e.getPlayer();
-        final PlayerMeta playerMeta = plugin.playerMeta(player);
         if (optionalProtection.isPresent()) {
             final BlockProtection blockProtection = optionalProtection.get();
-            if (plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
+            if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
                 plugin.getBolt().getStore().removeBlockProtection(blockProtection);
                 BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Strings.toTitleCase(block.getType())));
             } else {
@@ -220,10 +217,10 @@ public class BlockListener implements Listener {
             }
         } else if (UPROOT.contains(blockType)) {
             for (Block above = block.getRelative(BlockFace.UP); UPROOT.contains(above.getType()); above = above.getRelative(BlockFace.UP)) {
-                final Optional<BlockProtection> optionalAboveProtection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(above));
+                final Optional<BlockProtection> optionalAboveProtection = plugin.getBlockProtection(above);
                 if (optionalAboveProtection.isPresent()) {
                     final BlockProtection blockProtection = optionalAboveProtection.get();
-                    if (plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.BREAK)) {
+                    if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
                         plugin.getBolt().getStore().removeBlockProtection(blockProtection);
                     } else {
                         e.setCancelled(true);
@@ -235,30 +232,19 @@ public class BlockListener implements Listener {
 
     @EventHandler
     public void onSignChange(final SignChangeEvent e) {
-        final Block block = e.getBlock();
-        final Optional<BlockProtection> protection = plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
-        if (protection.isPresent()) {
-            final BlockProtection blockProtection = protection.get();
-            final PlayerMeta playerMeta = plugin.playerMeta(e.getPlayer());
-            if (!plugin.getBolt().getAccessManager().hasAccess(playerMeta, blockProtection, Permission.MODIFY)) {
-                e.setCancelled(true);
-            }
+        if (!plugin.canAccessBlock(e.getPlayer(), e.getBlock(), Permission.MODIFY)) {
+            e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onStructureGrow(final StructureGrowEvent e) {
-        e.getBlocks().removeIf(blockState -> {
-            final BlockLocation location = BukkitAdapter.blockLocation(blockState);
-            return plugin.getBolt().getStore().loadBlockProtection(location).isPresent();
-        });
+        e.getBlocks().removeIf(blockState -> plugin.getBlockProtection(blockState.getBlock()).isPresent());
     }
 
     @EventHandler
     public void onEntityChangeBlock(final EntityChangeBlockEvent e) {
-        final Block block = e.getBlock();
-        final BlockLocation location = BukkitAdapter.blockLocation(block);
-        if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
+        if (plugin.getBlockProtection(e.getBlock()).isPresent()) {
             e.setCancelled(true);
         }
     }
@@ -266,8 +252,7 @@ public class BlockListener implements Listener {
     @EventHandler
     public void onBlockMultiPlace(final BlockMultiPlaceEvent e) {
         for (final BlockState blockState : e.getReplacedBlockStates()) {
-            final BlockLocation location = BukkitAdapter.blockLocation(blockState);
-            if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
+            if (plugin.getBlockProtection(blockState.getBlock()).isPresent()) {
                 e.setCancelled(true);
                 return;
             }
@@ -276,27 +261,21 @@ public class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockFromTo(final BlockFromToEvent e) {
-        final Block block = e.getToBlock();
-        final BlockLocation location = BukkitAdapter.blockLocation(block);
-        if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
+        if (plugin.getBlockProtection(e.getToBlock()).isPresent()) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onBlockFade(final BlockFadeEvent e) {
-        final Block block = e.getBlock();
-        final BlockLocation location = BukkitAdapter.blockLocation(block);
-        if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
+        if (plugin.getBlockProtection(e.getBlock()).isPresent()) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onEntityBreakDoor(final EntityBreakDoorEvent e) {
-        final Block block = e.getBlock();
-        final BlockLocation location = BukkitAdapter.blockLocation(block);
-        if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
+        if (plugin.getBlockProtection(e.getBlock()).isPresent()) {
             e.setCancelled(true);
         }
     }
@@ -304,9 +283,9 @@ public class BlockListener implements Listener {
     @EventHandler
     public void onBlockPistonRetract(final BlockPistonRetractEvent e) {
         for (final Block block : e.getBlocks()) {
-            final BlockLocation location = BukkitAdapter.blockLocation(block);
-            if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
+            if (plugin.getBlockProtection(block).isPresent()) {
                 e.setCancelled(true);
+                return;
             }
         }
     }
@@ -314,37 +293,28 @@ public class BlockListener implements Listener {
     @EventHandler
     public void onBlockPistonExtend(final BlockPistonExtendEvent e) {
         for (final Block block : e.getBlocks()) {
-            final BlockLocation location = BukkitAdapter.blockLocation(block);
-            if (plugin.getBolt().getStore().loadBlockProtection(location).isPresent()) {
+            if (plugin.getBlockProtection(block).isPresent()) {
                 e.setCancelled(true);
+                return;
             }
         }
     }
 
     @EventHandler
     public void onBlockExplode(final BlockExplodeEvent e) {
-        e.blockList().removeIf(block -> {
-            final BlockLocation location = BukkitAdapter.blockLocation(block);
-            return plugin.getBolt().getStore().loadBlockProtection(location).isPresent();
-        });
+        e.blockList().removeIf(block -> plugin.getBlockProtection(block).isPresent());
     }
 
     @EventHandler
     public void onEntityExplode(final EntityExplodeEvent e) {
-        e.blockList().removeIf(block -> {
-            final BlockLocation location = BukkitAdapter.blockLocation(block);
-            return plugin.getBolt().getStore().loadBlockProtection(location).isPresent();
-        });
+        e.blockList().removeIf(block -> plugin.getBlockProtection(block).isPresent());
     }
 
     @EventHandler
     public void onPlayerTakeLecternBook(final PlayerTakeLecternBookEvent e) {
-        final Block block = e.getLectern().getBlock();
-        plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(block)).ifPresent(blockProtection -> {
-            if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(e.getPlayer()), blockProtection, Permission.WITHDRAW)) {
-                e.setCancelled(true);
-            }
-        });
+        if (!plugin.canAccessBlock(e.getPlayer(), e.getLectern().getBlock(), Permission.WITHDRAW)) {
+            e.setCancelled(true);
+        }
     }
 
     public void onPlayerRecipeBookClick(final PlayerEvent e) {
@@ -352,15 +322,9 @@ public class BlockListener implements Listener {
             return;
         }
         final Player player = e.getPlayer();
-        final Inventory inventory = player.getOpenInventory().getTopInventory();
-        final Location location = inventory.getLocation();
-        if (location == null) {
-            return;
+        final Location location = player.getOpenInventory().getTopInventory().getLocation();
+        if (location != null && !plugin.canAccessBlock(player, location.getBlock(), Permission.DEPOSIT, Permission.WITHDRAW)) {
+            cancellable.setCancelled(true);
         }
-        plugin.getBolt().getStore().loadBlockProtection(BukkitAdapter.blockLocation(location)).ifPresent(blockProtection -> {
-            if (!plugin.getBolt().getAccessManager().hasAccess(plugin.playerMeta(e.getPlayer()), blockProtection, Permission.DEPOSIT, Permission.WITHDRAW)) {
-                cancellable.setCancelled(true);
-            }
-        });
     }
 }
