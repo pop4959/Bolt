@@ -1,4 +1,4 @@
-package org.popcraft.bolt.event.adapter;
+package org.popcraft.bolt.listeners.adapter;
 
 import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
 import org.bukkit.event.EventHandler;

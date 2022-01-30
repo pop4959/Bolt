@@ -17,10 +17,10 @@ import org.popcraft.bolt.command.impl.ReportCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
 import org.popcraft.bolt.data.SQLiteStore;
 import org.popcraft.bolt.data.SimpleProtectionCache;
-import org.popcraft.bolt.event.BlockListener;
-import org.popcraft.bolt.event.EntityListener;
-import org.popcraft.bolt.event.InventoryListener;
-import org.popcraft.bolt.event.adapter.PlayerRecipeBookClickListener;
+import org.popcraft.bolt.listeners.BlockListener;
+import org.popcraft.bolt.listeners.EntityListener;
+import org.popcraft.bolt.listeners.InventoryListener;
+import org.popcraft.bolt.listeners.adapter.PlayerRecipeBookClickListener;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.lang.Translation;
@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 public class BoltPlugin extends JavaPlugin {

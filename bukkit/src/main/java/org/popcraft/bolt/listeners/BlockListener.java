@@ -1,4 +1,4 @@
-package org.popcraft.bolt.event;
+package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.Location;

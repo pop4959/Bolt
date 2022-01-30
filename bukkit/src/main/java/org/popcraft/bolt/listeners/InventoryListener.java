@@ -1,4 +1,4 @@
-package org.popcraft.bolt.event;
+package org.popcraft.bolt.listeners;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
