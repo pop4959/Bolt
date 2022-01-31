@@ -5,9 +5,9 @@ public class Translation {
     public static final String COMMAND_PLAYER_ONLY = "command_player_only";
     public static final String COMMAND_PERSIST = "command_persist";
     public static final String CLICK_ACTION = "click_action";
-    public static final String CLICK_MODIFIED = "click_modified";
+    public static final String CLICK_EDITED = "click_edited";
+    public static final String CLICK_EDITED_NO_PERMISSION = "click_edited_no_permission";
     public static final String CLICK_INFO = "click_info";
-    public static final String CLICK_NOT_PROTECTED = "click_not_protected";
     public static final String CLICK_LOCKED_ALREADY = "click_locked_already";
     public static final String CLICK_LOCKED = "click_locked";
     public static final String CLICK_UNLOCKED = "click_unlocked";
@@ -22,7 +22,7 @@ public class Translation {
     public static final String YOU = "you";
     public static final String LOCK = "lock";
     public static final String UNLOCK = "unlock";
-    public static final String MODIFY = "modify";
+    public static final String EDIT = "edit";
 
     private Translation() {
     }

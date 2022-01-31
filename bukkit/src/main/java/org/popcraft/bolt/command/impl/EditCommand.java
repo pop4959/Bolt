@@ -20,8 +20,8 @@ import java.util.UUID;
 
 import static org.popcraft.bolt.util.lang.Translator.translate;
 
-public class ModifyCommand extends BoltCommand {
-    public ModifyCommand(BoltPlugin plugin) {
+public class EditCommand extends BoltCommand {
+    public EditCommand(BoltPlugin plugin) {
         super(plugin);
     }
 
@@ -29,7 +29,7 @@ public class ModifyCommand extends BoltCommand {
     public void execute(CommandSender sender, Arguments arguments) {
         if (sender instanceof final Player player && arguments.remaining() >= 3) {
             final PlayerMeta playerMeta = plugin.playerMeta(player);
-            playerMeta.setAction(Action.MODIFY);
+            playerMeta.setAction(Action.EDIT);
             final String sourceType = arguments.next();
             final String inputIdentifier = arguments.next();
             String sourceIdentifier;
@@ -46,7 +46,7 @@ public class ModifyCommand extends BoltCommand {
             }
             final String access = arguments.next();
             playerMeta.getModifications().put(new Source(sourceType, sourceIdentifier), access);
-            BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Template.of("action", translate(Translation.MODIFY)));
+            BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Template.of("action", translate(Translation.EDIT)));
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
         }

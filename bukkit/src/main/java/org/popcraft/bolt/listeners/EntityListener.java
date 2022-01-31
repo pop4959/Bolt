@@ -144,17 +144,21 @@ public final class EntityListener implements Listener {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(entity.getType())));
                 }
             }
-            case MODIFY -> {
+            case EDIT -> {
                 if (protection != null) {
-                    playerMeta.getModifications().forEach((source, type) -> {
-                        if (type == null || plugin.getBolt().getAccessRegistry().get(type).isEmpty()) {
-                            protection.getAccess().remove(source);
-                        } else {
-                            protection.getAccess().put(source, type);
-                        }
-                    });
-                    plugin.getBolt().getStore().saveEntityProtection(protection);
-                    BoltComponents.sendMessage(player, Translation.CLICK_MODIFIED);
+                    if (plugin.canAccessProtection(player, protection, Permission.EDIT)) {
+                        playerMeta.getModifications().forEach((source, type) -> {
+                            if (type == null || plugin.getBolt().getAccessRegistry().get(type).isEmpty()) {
+                                protection.getAccess().remove(source);
+                            } else {
+                                protection.getAccess().put(source, type);
+                            }
+                        });
+                        plugin.getBolt().getStore().saveEntityProtection(protection);
+                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED, Template.of("type", Strings.toTitleCase(entity.getType())));
+                    } else {
+                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_PERMISSION);
+                    }
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(entity.getType())));
                 }

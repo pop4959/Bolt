@@ -4,6 +4,6 @@ public enum Action {
     LOCK,
     UNLOCK,
     INFO,
-    MODIFY,
+    EDIT,
     DEBUG
 }
