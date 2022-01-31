@@ -218,7 +218,7 @@ public final class EntityListener implements Listener {
         if (!(e.getEntity() instanceof final Player player)) {
             return;
         }
-        if (!plugin.canAccessEntity(player, e.getMount(), Permission.MOUNT)) {
+        if (plugin.playerMeta(player).triggeredAction() || !plugin.canAccessEntity(player, e.getMount(), Permission.MOUNT)) {
             e.setCancelled(true);
         }
     }

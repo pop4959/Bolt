@@ -8,6 +8,7 @@ public class PlayerMeta {
     private final UUID uuid;
     private final Map<Source, String> modifications = new HashMap<>();
     private Action action;
+    private Action lastAction;
     private boolean interacted;
     private boolean persist;
 
@@ -26,9 +27,14 @@ public class PlayerMeta {
     public Action triggerAction() {
         final Action triggered = action;
         if (triggered != null && !this.persist) {
+            this.lastAction = triggered;
             this.action = null;
         }
         return triggered;
+    }
+
+    public boolean triggeredAction() {
+        return lastAction != null;
     }
 
     public boolean hasInteracted() {
@@ -40,6 +46,7 @@ public class PlayerMeta {
     }
 
     public void clearInteraction() {
+        this.lastAction = null;
         this.interacted = false;
     }
 
