@@ -7,6 +7,7 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -30,6 +31,7 @@ import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
@@ -38,8 +40,12 @@ import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
+import org.popcraft.bolt.util.matcher.Match;
+import org.popcraft.bolt.util.matcher.block.BlockMatcher;
+import org.popcraft.bolt.util.matcher.block.DoubleChestMatcher;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 
 import static org.popcraft.bolt.util.lang.Translator.translate;
@@ -50,6 +56,7 @@ public final class BlockListener implements Listener {
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     // TODO: These uprooted types should be structures
     private static final EnumSet<Material> UPROOT = EnumSet.of(Material.BAMBOO, Material.CACTUS, Material.SUGAR_CANE);
+    private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new DoubleChestMatcher());
     private final BoltPlugin plugin;
 
     public BlockListener(final BoltPlugin plugin) {
@@ -68,7 +75,7 @@ public final class BlockListener implements Listener {
             e.setCancelled(true);
             return;
         }
-        final BlockProtection protection = plugin.getBlockProtection(clicked).orElse(null);
+        final Protection protection = plugin.getBlockProtection(clicked).map(Protection.class::cast).orElse(matchProtection(player, clicked));
         if (triggerActions(player, protection, clicked)) {
             playerMeta.setInteracted();
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, playerMeta::clearInteraction);
@@ -99,7 +106,7 @@ public final class BlockListener implements Listener {
     }
 
     @SuppressWarnings("java:S6205")
-    private boolean triggerActions(final Player player, final BlockProtection protection, final Block block) {
+    private boolean triggerActions(final Player player, final Protection protection, final Block block) {
         final PlayerMeta playerMeta = plugin.playerMeta(player);
         final Action action = playerMeta.triggerAction();
         if (action == null) {
@@ -116,7 +123,9 @@ public final class BlockListener implements Listener {
             }
             case UNLOCK -> {
                 if (protection != null) {
-                    plugin.getBolt().getStore().removeBlockProtection(protection);
+                    if (protection instanceof final BlockProtection blockProtection) {
+                        plugin.getBolt().getStore().removeBlockProtection(blockProtection);
+                    }
                     BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Strings.toTitleCase(block.getType())));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(block.getType())));
@@ -139,7 +148,9 @@ public final class BlockListener implements Listener {
                                 protection.getAccess().put(source, type);
                             }
                         });
-                        plugin.getBolt().getStore().saveBlockProtection(protection);
+                        if (protection instanceof final BlockProtection blockProtection) {
+                            plugin.getBolt().getStore().saveBlockProtection(blockProtection);
+                        }
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED, Template.of("type", Strings.toTitleCase(block.getType())));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_PERMISSION);
@@ -209,10 +220,39 @@ public final class BlockListener implements Listener {
                         plugin.getBolt().getStore().removeBlockProtection(blockProtection);
                     } else {
                         e.setCancelled(true);
+                        return;
                     }
                 }
             }
         }
+        final Protection matchedProtection = matchProtection(player, block);
+        if (matchedProtection != null && !plugin.canAccessProtection(player, matchedProtection, Permission.BREAK)) {
+            e.setCancelled(true);
+        }
+    }
+
+    private Protection matchProtection(final Player player, final Block block) {
+        for (final BlockMatcher blockMatcher : BLOCK_MATCHERS) {
+            if (blockMatcher.canMatch(block)) {
+                final Optional<Match> optionalMatch = blockMatcher.findMatch(block);
+                if (optionalMatch.isPresent()) {
+                    final Match match = optionalMatch.get();
+                    for (final Block matchBlock : match.blocks()) {
+                        final BlockProtection protection = plugin.getBlockProtection(matchBlock).orElse(null);
+                        if (protection != null) {
+                            return protection;
+                        }
+                    }
+                    for (final Entity matchEntity : match.entities()) {
+                        final EntityProtection protection = plugin.getEntityProtection(matchEntity).orElse(null);
+                        if (protection != null) {
+                            return protection;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     @EventHandler
