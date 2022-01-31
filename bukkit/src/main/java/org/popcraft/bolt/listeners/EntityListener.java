@@ -49,8 +49,13 @@ public final class EntityListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityDeath(final EntityDeathEvent e) {
-        // TODO: Figure out player in damage event to print unlock message
-        plugin.getEntityProtection(e.getEntity()).ifPresent(protection -> plugin.getBolt().getStore().removeEntityProtection(protection));
+        final Entity entity = e.getEntity();
+        plugin.getEntityProtection(entity).ifPresent(protection -> {
+            plugin.getBolt().getStore().removeEntityProtection(protection);
+            if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent entityDamageByEntityEvent && entityDamageByEntityEvent.getDamager() instanceof final Player player && plugin.canAccessProtection(player, protection, Permission.KILL)) {
+                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Strings.toTitleCase(entity.getType())));
+            }
+        });
     }
 
     @EventHandler
@@ -80,7 +85,18 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onHangingBreakByEntity(final HangingBreakByEntityEvent e) {
-        if (e.getRemover() instanceof final Player player && handlePlayerEntityInteraction(player, e.getEntity(), Permission.BREAK, true)) {
+        if (e.getRemover() instanceof final Player player) {
+            if (handlePlayerEntityInteraction(player, e.getEntity(), Permission.KILL, true)) {
+                e.setCancelled(true);
+            } else {
+                plugin.getEntityProtection(e.getEntity()).ifPresent(protection -> {
+                    plugin.getBolt().getStore().removeEntityProtection(protection);
+                    if (plugin.canAccessProtection(player, protection, Permission.KILL)) {
+                        BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Strings.toTitleCase(e.getEntity().getType())));
+                    }
+                });
+            }
+        } else if (plugin.getEntityProtection(e.getEntity()).isPresent()) {
             e.setCancelled(true);
         }
     }
