@@ -43,6 +43,7 @@ import org.popcraft.bolt.util.lang.Translation;
 import org.popcraft.bolt.util.matcher.Match;
 import org.popcraft.bolt.util.matcher.block.BlockMatcher;
 import org.popcraft.bolt.util.matcher.block.DoubleChestMatcher;
+import org.popcraft.bolt.util.matcher.block.FenceMatcher;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -56,7 +57,7 @@ public final class BlockListener implements Listener {
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     // TODO: These uprooted types should be structures
     private static final EnumSet<Material> UPROOT = EnumSet.of(Material.BAMBOO, Material.CACTUS, Material.SUGAR_CANE);
-    private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new DoubleChestMatcher());
+    private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new DoubleChestMatcher(), new FenceMatcher());
     private final BoltPlugin plugin;
 
     public BlockListener(final BoltPlugin plugin) {
