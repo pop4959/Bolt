@@ -37,4 +37,8 @@ public final class Bolt {
     public PlayerMeta getPlayerMeta(final UUID uuid) {
         return players.computeIfAbsent(uuid, x -> new PlayerMeta(uuid));
     }
+
+    public void removePlayerMeta(final UUID uuid) {
+        players.remove(uuid);
+    }
 }

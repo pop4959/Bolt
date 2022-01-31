@@ -8,6 +8,7 @@ public class PlayerMeta {
     private final UUID uuid;
     private final Map<Source, String> modifications = new HashMap<>();
     private Action action;
+    private boolean interacted;
     private boolean persist;
 
     public PlayerMeta(UUID uuid) {
@@ -18,24 +19,28 @@ public class PlayerMeta {
         return uuid;
     }
 
-    public boolean hasAction() {
-        return this.action != null;
-    }
-
-    public boolean hasAction(Action action) {
-        return action.equals(this.action);
-    }
-
     public void setAction(Action action) {
         this.action = action;
     }
 
-    public boolean triggerAction(Action action) {
-        final boolean triggered = hasAction(action);
-        if (triggered && !this.persist) {
+    public Action triggerAction() {
+        final Action triggered = action;
+        if (triggered != null && !this.persist) {
             this.action = null;
         }
         return triggered;
+    }
+
+    public boolean hasInteracted() {
+        return interacted;
+    }
+
+    public void setInteracted() {
+        this.interacted = true;
+    }
+
+    public void clearInteraction() {
+        this.interacted = false;
     }
 
     public boolean isPersist() {

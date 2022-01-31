@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.popcraft.bolt.command.Arguments;
@@ -22,6 +23,7 @@ import org.popcraft.bolt.data.SimpleProtectionCache;
 import org.popcraft.bolt.listeners.BlockListener;
 import org.popcraft.bolt.listeners.EntityListener;
 import org.popcraft.bolt.listeners.InventoryListener;
+import org.popcraft.bolt.listeners.PlayerListener;
 import org.popcraft.bolt.listeners.adapter.PlayerRecipeBookClickListener;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
@@ -105,11 +107,13 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     private void registerEvents() {
+        final PluginManager pluginManager = getServer().getPluginManager();
         final BlockListener blockListener = new BlockListener(this);
-        getServer().getPluginManager().registerEvents(blockListener, this);
-        getServer().getPluginManager().registerEvents(new PlayerRecipeBookClickListener(blockListener::onPlayerRecipeBookClick), this);
-        getServer().getPluginManager().registerEvents(new EntityListener(this), this);
-        getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+        pluginManager.registerEvents(blockListener, this);
+        pluginManager.registerEvents(new PlayerRecipeBookClickListener(blockListener::onPlayerRecipeBookClick), this);
+        pluginManager.registerEvents(new EntityListener(this), this);
+        pluginManager.registerEvents(new InventoryListener(this), this);
+        pluginManager.registerEvents(new PlayerListener(this), this);
     }
 
     private void registerCommands() {

@@ -20,7 +20,7 @@ import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Permission;
 
 @SuppressWarnings("ClassCanBeRecord")
-public class InventoryListener implements Listener {
+public final class InventoryListener implements Listener {
     private final BoltPlugin plugin;
 
     public InventoryListener(final BoltPlugin plugin) {
@@ -86,7 +86,6 @@ public class InventoryListener implements Listener {
     }
 
     @EventHandler
-    @SuppressWarnings("java:S2583")
     public void onInventoryDrag(final InventoryDragEvent e) {
         if (!(e.getWhoClicked() instanceof final Player player)) {
             return;
@@ -104,7 +103,6 @@ public class InventoryListener implements Listener {
     }
 
     @EventHandler
-    @SuppressWarnings("java:S2583")
     public void onInventoryMoveItem(final InventoryMoveItemEvent e) {
         Protection sourceProtection = getHolderProtection(e.getSource().getHolder());
         Protection destinationProtection = getHolderProtection(e.getDestination().getHolder());
