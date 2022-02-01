@@ -51,7 +51,7 @@ public class SQLiteStore implements Store {
     }
 
     @Override
-    public Optional<BlockProtection> loadBlockProtection(BlockLocation location) {
+    public BlockProtection loadBlockProtection(BlockLocation location) {
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
             try (final PreparedStatement selectBlock = connection.prepareStatement("SELECT * FROM blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;")) {
                 selectBlock.setString(1, location.world());
@@ -60,14 +60,14 @@ public class SQLiteStore implements Store {
                 selectBlock.setInt(4, location.z());
                 final ResultSet blockResultSet = selectBlock.executeQuery();
                 if (blockResultSet.next()) {
-                    return Optional.of(blockProtectionFromResultSet(blockResultSet));
+                    return blockProtectionFromResultSet(blockResultSet);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         Metrics.recordProtectionAccess(false);
-        return Optional.empty();
+        return null;
     }
 
     @Override
@@ -154,20 +154,20 @@ public class SQLiteStore implements Store {
     }
 
     @Override
-    public Optional<EntityProtection> loadEntityProtection(UUID id) {
+    public EntityProtection loadEntityProtection(UUID id) {
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
             try (final PreparedStatement selectEntity = connection.prepareStatement("SELECT * FROM entities WHERE id = ?;")) {
                 selectEntity.setString(1, id.toString());
                 final ResultSet entityResultSet = selectEntity.executeQuery();
                 if (entityResultSet.next()) {
-                    return Optional.of(entityProtectionFromResultSet(entityResultSet));
+                    return entityProtectionFromResultSet(entityResultSet);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         Metrics.recordProtectionAccess(false);
-        return Optional.empty();
+        return null;
     }
 
     @Override

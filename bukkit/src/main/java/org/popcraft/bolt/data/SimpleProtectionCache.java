@@ -31,7 +31,7 @@ public class SimpleProtectionCache implements Store {
     }
 
     @Override
-    public Optional<BlockProtection> loadBlockProtection(BlockLocation location) {
+    public BlockProtection loadBlockProtection(BlockLocation location) {
         final long startTimeNanos = System.nanoTime();
 
         final BlockProtection blockProtection = cachedBlocks.get(location);
@@ -44,7 +44,7 @@ public class SimpleProtectionCache implements Store {
         }
         Metrics.recordProtectionAccess(hit);
 
-        return Optional.ofNullable(blockProtection);
+        return blockProtection;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class SimpleProtectionCache implements Store {
     }
 
     @Override
-    public Optional<EntityProtection> loadEntityProtection(UUID id) {
+    public EntityProtection loadEntityProtection(UUID id) {
         final long startTimeNanos = System.nanoTime();
 
         final EntityProtection entityProtection = cachedEntities.get(id);
@@ -90,7 +90,7 @@ public class SimpleProtectionCache implements Store {
         }
         Metrics.recordProtectionAccess(hit);
 
-        return Optional.ofNullable(entityProtection);
+        return entityProtection;
     }
 
     @Override

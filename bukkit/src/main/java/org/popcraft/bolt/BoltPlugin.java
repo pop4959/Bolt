@@ -32,6 +32,11 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.lang.Translation;
+import org.popcraft.bolt.util.matcher.Match;
+import org.popcraft.bolt.util.matcher.block.BlockMatcher;
+import org.popcraft.bolt.util.matcher.block.DoubleChestMatcher;
+import org.popcraft.bolt.util.matcher.block.FenceMatcher;
+import org.popcraft.bolt.util.matcher.entity.EntityMatcher;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
@@ -49,6 +54,8 @@ import java.util.UUID;
 
 public class BoltPlugin extends JavaPlugin {
     private static final String COMMAND_PERMISSION_KEY = "bolt.command.";
+    private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new DoubleChestMatcher(), new FenceMatcher());
+    private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
     private YamlConfigurationLoader configurationLoader;
@@ -174,12 +181,32 @@ public class BoltPlugin extends JavaPlugin {
         return bolt.getPlayerMeta(uuid);
     }
 
-    public Optional<BlockProtection> getBlockProtection(final Block block) {
-        return bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
+    public Optional<Protection> findProtection(final Block block) {
+        final Protection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
+        return Optional.ofNullable(protection != null ? protection : matchProtection(block));
     }
 
-    public Optional<EntityProtection> getEntityProtection(final Entity entity) {
-        return bolt.getStore().loadEntityProtection(entity.getUniqueId());
+    public Optional<Protection> findProtection(final Entity entity) {
+        final Protection protection = bolt.getStore().loadEntityProtection(entity.getUniqueId());
+        return Optional.ofNullable(protection != null ? protection : matchProtection(entity));
+    }
+
+    @SuppressWarnings("java:S2583")
+    public void saveProtection(final Protection protection) {
+        if (protection instanceof final BlockProtection blockProtection) {
+            bolt.getStore().saveBlockProtection(blockProtection);
+        } else if (protection instanceof final EntityProtection entityProtection) {
+            bolt.getStore().saveEntityProtection(entityProtection);
+        }
+    }
+
+    @SuppressWarnings("java:S2583")
+    public void removeProtection(final Protection protection) {
+        if (protection instanceof final BlockProtection blockProtection) {
+            bolt.getStore().removeBlockProtection(blockProtection);
+        } else if (protection instanceof final EntityProtection entityProtection) {
+            bolt.getStore().removeEntityProtection(entityProtection);
+        }
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -191,11 +218,61 @@ public class BoltPlugin extends JavaPlugin {
         return bolt.getAccessManager().hasAccess(playerMeta(player), protection, permissions);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canAccessBlock(final Player player, final Block block, final String... permissions) {
-        return getBlockProtection(block).map(protection -> canAccessProtection(player, protection, permissions)).orElse(true);
+        return findProtection(block).map(protection -> canAccessProtection(player, protection, permissions)).orElse(true);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canAccessEntity(final Player player, final Entity entity, final String... permissions) {
-        return getEntityProtection(entity).map(protection -> canAccessProtection(player, protection, permissions)).orElse(true);
+        return findProtection(entity).map(protection -> canAccessProtection(player, protection, permissions)).orElse(true);
+    }
+
+    private Protection matchProtection(final Block block) {
+        for (final BlockMatcher blockMatcher : BLOCK_MATCHERS) {
+            if (blockMatcher.canMatch(block)) {
+                final Optional<Match> optionalMatch = blockMatcher.findMatch(block);
+                if (optionalMatch.isPresent()) {
+                    final Match match = optionalMatch.get();
+                    for (final Block matchBlock : match.blocks()) {
+                        final BlockProtection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(matchBlock));
+                        if (protection != null) {
+                            return protection;
+                        }
+                    }
+                    for (final Entity matchEntity : match.entities()) {
+                        final EntityProtection protection = bolt.getStore().loadEntityProtection(matchEntity.getUniqueId());
+                        if (protection != null) {
+                            return protection;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private Protection matchProtection(final Entity entity) {
+        for (final EntityMatcher entityMatcher : ENTITY_MATCHERS) {
+            if (entityMatcher.canMatch(entity)) {
+                final Optional<Match> optionalMatch = entityMatcher.findMatch(entity);
+                if (optionalMatch.isPresent()) {
+                    final Match match = optionalMatch.get();
+                    for (final Block matchBlock : match.blocks()) {
+                        final BlockProtection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(matchBlock));
+                        if (protection != null) {
+                            return protection;
+                        }
+                    }
+                    for (final Entity matchEntity : match.entities()) {
+                        final EntityProtection protection = bolt.getStore().loadEntityProtection(matchEntity.getUniqueId());
+                        if (protection != null) {
+                            return protection;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

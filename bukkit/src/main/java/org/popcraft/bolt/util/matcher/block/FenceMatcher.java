@@ -7,7 +7,7 @@ import org.popcraft.bolt.util.matcher.Match;
 
 import java.util.Optional;
 
-public class FenceMatcher extends BlockMatcher {
+public class FenceMatcher implements BlockMatcher {
     @Override
     public boolean canMatch(Block block) {
         return Tag.FENCES.isTagged(block.getType());

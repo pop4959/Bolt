@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface Store {
-    Optional<BlockProtection> loadBlockProtection(BlockLocation location);
+    BlockProtection loadBlockProtection(BlockLocation location);
 
     Collection<BlockProtection> loadBlockProtections();
 
@@ -17,7 +17,7 @@ public interface Store {
 
     void removeBlockProtection(BlockProtection protection);
 
-    Optional<EntityProtection> loadEntityProtection(UUID id);
+    EntityProtection loadEntityProtection(UUID id);
 
     Collection<EntityProtection> loadEntityProtections();
 

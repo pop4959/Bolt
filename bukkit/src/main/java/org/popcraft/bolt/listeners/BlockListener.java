@@ -7,7 +7,6 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -31,7 +30,6 @@ import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.BlockProtection;
-import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
@@ -40,13 +38,8 @@ import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
-import org.popcraft.bolt.util.matcher.Match;
-import org.popcraft.bolt.util.matcher.block.BlockMatcher;
-import org.popcraft.bolt.util.matcher.block.DoubleChestMatcher;
-import org.popcraft.bolt.util.matcher.block.FenceMatcher;
 
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Optional;
 
 import static org.popcraft.bolt.util.lang.Translator.translate;
@@ -57,7 +50,6 @@ public final class BlockListener implements Listener {
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     // TODO: These uprooted types should be structures
     private static final EnumSet<Material> UPROOT = EnumSet.of(Material.BAMBOO, Material.CACTUS, Material.SUGAR_CANE);
-    private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new DoubleChestMatcher(), new FenceMatcher());
     private final BoltPlugin plugin;
 
     public BlockListener(final BoltPlugin plugin) {
@@ -76,7 +68,7 @@ public final class BlockListener implements Listener {
             e.setCancelled(true);
             return;
         }
-        final Protection protection = plugin.getBlockProtection(clicked).map(Protection.class::cast).orElse(matchProtection(player, clicked));
+        final Protection protection = plugin.findProtection(clicked).orElse(null);
         if (triggerActions(player, protection, clicked)) {
             playerMeta.setInteracted();
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, playerMeta::clearInteraction);
@@ -124,9 +116,7 @@ public final class BlockListener implements Listener {
             }
             case UNLOCK -> {
                 if (protection != null) {
-                    if (protection instanceof final BlockProtection blockProtection) {
-                        plugin.getBolt().getStore().removeBlockProtection(blockProtection);
-                    }
+                    plugin.removeProtection(protection);
                     BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Strings.toTitleCase(block.getType())));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Strings.toTitleCase(block.getType())));
@@ -149,9 +139,7 @@ public final class BlockListener implements Listener {
                                 protection.getAccess().put(source, type);
                             }
                         });
-                        if (protection instanceof final BlockProtection blockProtection) {
-                            plugin.getBolt().getStore().saveBlockProtection(blockProtection);
-                        }
+                        plugin.saveProtection(protection);
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED, Template.of("type", Strings.toTitleCase(block.getType())));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_PERMISSION);
@@ -177,18 +165,18 @@ public final class BlockListener implements Listener {
                 final Block firstBlock = block.getRelative(blockFace);
                 final Block secondBlock = firstBlock.getRelative(blockFace);
                 if (Material.SNOW_BLOCK.equals(firstBlock.getType()) && Material.SNOW_BLOCK.equals(secondBlock.getType())) {
-                    final Optional<BlockProtection> firstProtection = plugin.getBlockProtection(firstBlock);
+                    final Optional<Protection> firstProtection = plugin.findProtection(firstBlock);
                     firstProtection.ifPresent(blockProtection -> {
                         if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
-                            plugin.getBolt().getStore().removeBlockProtection(blockProtection);
+                            plugin.removeProtection(blockProtection);
                         } else {
                             e.setCancelled(true);
                         }
                     });
-                    final Optional<BlockProtection> secondProtection = plugin.getBlockProtection(secondBlock);
+                    final Optional<Protection> secondProtection = plugin.findProtection(secondBlock);
                     secondProtection.ifPresent(blockProtection -> {
                         if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
-                            plugin.getBolt().getStore().removeBlockProtection(blockProtection);
+                            plugin.removeProtection(blockProtection);
                         } else {
                             e.setCancelled(true);
                         }
@@ -202,23 +190,23 @@ public final class BlockListener implements Listener {
     public void onBlockBreak(final BlockBreakEvent e) {
         final Block block = e.getBlock();
         final Material blockType = block.getType();
-        final Optional<BlockProtection> optionalProtection = plugin.getBlockProtection(block);
+        final Optional<Protection> optionalProtection = plugin.findProtection(block);
         final Player player = e.getPlayer();
         if (optionalProtection.isPresent()) {
-            final BlockProtection blockProtection = optionalProtection.get();
+            final Protection blockProtection = optionalProtection.get();
             if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
-                plugin.getBolt().getStore().removeBlockProtection(blockProtection);
+                plugin.removeProtection(blockProtection);
                 BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Strings.toTitleCase(block.getType())));
             } else {
                 e.setCancelled(true);
             }
         } else if (UPROOT.contains(blockType)) {
             for (Block above = block.getRelative(BlockFace.UP); UPROOT.contains(above.getType()); above = above.getRelative(BlockFace.UP)) {
-                final Optional<BlockProtection> optionalAboveProtection = plugin.getBlockProtection(above);
+                final Optional<Protection> optionalAboveProtection = plugin.findProtection(above);
                 if (optionalAboveProtection.isPresent()) {
-                    final BlockProtection blockProtection = optionalAboveProtection.get();
+                    final Protection blockProtection = optionalAboveProtection.get();
                     if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
-                        plugin.getBolt().getStore().removeBlockProtection(blockProtection);
+                        plugin.removeProtection(blockProtection);
                     } else {
                         e.setCancelled(true);
                         return;
@@ -226,34 +214,6 @@ public final class BlockListener implements Listener {
                 }
             }
         }
-        final Protection matchedProtection = matchProtection(player, block);
-        if (matchedProtection != null && !plugin.canAccessProtection(player, matchedProtection, Permission.BREAK)) {
-            e.setCancelled(true);
-        }
-    }
-
-    private Protection matchProtection(final Player player, final Block block) {
-        for (final BlockMatcher blockMatcher : BLOCK_MATCHERS) {
-            if (blockMatcher.canMatch(block)) {
-                final Optional<Match> optionalMatch = blockMatcher.findMatch(block);
-                if (optionalMatch.isPresent()) {
-                    final Match match = optionalMatch.get();
-                    for (final Block matchBlock : match.blocks()) {
-                        final BlockProtection protection = plugin.getBlockProtection(matchBlock).orElse(null);
-                        if (protection != null) {
-                            return protection;
-                        }
-                    }
-                    for (final Entity matchEntity : match.entities()) {
-                        final EntityProtection protection = plugin.getEntityProtection(matchEntity).orElse(null);
-                        if (protection != null) {
-                            return protection;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     @EventHandler
@@ -265,12 +225,12 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onStructureGrow(final StructureGrowEvent e) {
-        e.getBlocks().removeIf(blockState -> plugin.getBlockProtection(blockState.getBlock()).isPresent());
+        e.getBlocks().removeIf(blockState -> plugin.findProtection(blockState.getBlock()).isPresent());
     }
 
     @EventHandler
     public void onEntityChangeBlock(final EntityChangeBlockEvent e) {
-        if (plugin.getBlockProtection(e.getBlock()).isPresent()) {
+        if (plugin.findProtection(e.getBlock()).isPresent()) {
             e.setCancelled(true);
         }
     }
@@ -278,7 +238,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockMultiPlace(final BlockMultiPlaceEvent e) {
         for (final BlockState blockState : e.getReplacedBlockStates()) {
-            if (plugin.getBlockProtection(blockState.getBlock()).isPresent()) {
+            if (plugin.findProtection(blockState.getBlock()).isPresent()) {
                 e.setCancelled(true);
                 return;
             }
@@ -287,21 +247,21 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockFromTo(final BlockFromToEvent e) {
-        if (plugin.getBlockProtection(e.getToBlock()).isPresent()) {
+        if (plugin.findProtection(e.getToBlock()).isPresent()) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onBlockFade(final BlockFadeEvent e) {
-        if (plugin.getBlockProtection(e.getBlock()).isPresent()) {
+        if (plugin.findProtection(e.getBlock()).isPresent()) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onEntityBreakDoor(final EntityBreakDoorEvent e) {
-        if (plugin.getBlockProtection(e.getBlock()).isPresent()) {
+        if (plugin.findProtection(e.getBlock()).isPresent()) {
             e.setCancelled(true);
         }
     }
@@ -309,7 +269,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockPistonRetract(final BlockPistonRetractEvent e) {
         for (final Block block : e.getBlocks()) {
-            if (plugin.getBlockProtection(block).isPresent()) {
+            if (plugin.findProtection(block).isPresent()) {
                 e.setCancelled(true);
                 return;
             }
@@ -319,7 +279,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockPistonExtend(final BlockPistonExtendEvent e) {
         for (final Block block : e.getBlocks()) {
-            if (plugin.getBlockProtection(block).isPresent()) {
+            if (plugin.findProtection(block).isPresent()) {
                 e.setCancelled(true);
                 return;
             }
@@ -328,12 +288,12 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockExplode(final BlockExplodeEvent e) {
-        e.blockList().removeIf(block -> plugin.getBlockProtection(block).isPresent());
+        e.blockList().removeIf(block -> plugin.findProtection(block).isPresent());
     }
 
     @EventHandler
     public void onEntityExplode(final EntityExplodeEvent e) {
-        e.blockList().removeIf(block -> plugin.getBlockProtection(block).isPresent());
+        e.blockList().removeIf(block -> plugin.findProtection(block).isPresent());
     }
 
     @EventHandler

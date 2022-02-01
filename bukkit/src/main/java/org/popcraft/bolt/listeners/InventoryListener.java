@@ -132,9 +132,9 @@ public final class InventoryListener implements Listener {
     private Protection getHolderProtection(final InventoryHolder inventoryHolder) {
         final Protection protection;
         if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
-            protection = plugin.getBlockProtection(blockInventoryHolder.getBlock()).orElse(null);
+            protection = plugin.findProtection(blockInventoryHolder.getBlock()).orElse(null);
         } else if (inventoryHolder instanceof final Entity entity) {
-            protection = plugin.getEntityProtection(entity).orElse(null);
+            protection = plugin.findProtection(entity).orElse(null);
         } else {
             protection = null;
         }

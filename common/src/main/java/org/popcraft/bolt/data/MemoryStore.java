@@ -15,8 +15,8 @@ public class MemoryStore implements Store {
     private final Map<UUID, EntityProtection> entityProtectionMap = new ConcurrentHashMap<>();
 
     @Override
-    public Optional<BlockProtection> loadBlockProtection(final BlockLocation location) {
-        return Optional.ofNullable(blockProtectionMap.get(location));
+    public BlockProtection loadBlockProtection(final BlockLocation location) {
+        return blockProtectionMap.get(location);
     }
 
     @Override
@@ -37,8 +37,8 @@ public class MemoryStore implements Store {
     }
 
     @Override
-    public Optional<EntityProtection> loadEntityProtection(UUID id) {
-        return Optional.ofNullable(entityProtectionMap.get(id));
+    public EntityProtection loadEntityProtection(UUID id) {
+        return entityProtectionMap.get(id);
     }
 
     @Override
