@@ -12,9 +12,9 @@ import org.jetbrains.annotations.NotNull;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.command.impl.DebugCommand;
+import org.popcraft.bolt.command.impl.EditCommand;
 import org.popcraft.bolt.command.impl.InfoCommand;
 import org.popcraft.bolt.command.impl.LockCommand;
-import org.popcraft.bolt.command.impl.EditCommand;
 import org.popcraft.bolt.command.impl.PersistCommand;
 import org.popcraft.bolt.command.impl.ReportCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
@@ -33,9 +33,19 @@ import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.lang.Translation;
 import org.popcraft.bolt.util.matcher.Match;
+import org.popcraft.bolt.util.matcher.block.ArmorStandMatcher;
+import org.popcraft.bolt.util.matcher.block.BannerMatcher;
+import org.popcraft.bolt.util.matcher.block.BedMatcher;
 import org.popcraft.bolt.util.matcher.block.BlockMatcher;
-import org.popcraft.bolt.util.matcher.block.DoubleChestMatcher;
-import org.popcraft.bolt.util.matcher.block.FenceMatcher;
+import org.popcraft.bolt.util.matcher.block.ButtonMatcher;
+import org.popcraft.bolt.util.matcher.block.ChestMatcher;
+import org.popcraft.bolt.util.matcher.block.DoorMatcher;
+import org.popcraft.bolt.util.matcher.block.LeashHitchMatcher;
+import org.popcraft.bolt.util.matcher.block.LeverMatcher;
+import org.popcraft.bolt.util.matcher.block.PressurePlateMatcher;
+import org.popcraft.bolt.util.matcher.block.RailMatcher;
+import org.popcraft.bolt.util.matcher.block.SignMatcher;
+import org.popcraft.bolt.util.matcher.block.TrapdoorMatcher;
 import org.popcraft.bolt.util.matcher.entity.EntityMatcher;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -54,7 +64,10 @@ import java.util.UUID;
 
 public class BoltPlugin extends JavaPlugin {
     private static final String COMMAND_PERMISSION_KEY = "bolt.command.";
-    private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new DoubleChestMatcher(), new FenceMatcher());
+    private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new ArmorStandMatcher(), new BannerMatcher(),
+            new BedMatcher(), new ButtonMatcher(), new ChestMatcher(), new DoorMatcher(), new LeashHitchMatcher(),
+            new LeverMatcher(), new PressurePlateMatcher(), new RailMatcher(), new SignMatcher(),
+            new TrapdoorMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();

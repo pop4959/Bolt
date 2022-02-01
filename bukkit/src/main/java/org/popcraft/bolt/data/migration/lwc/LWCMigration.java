@@ -1,9 +1,9 @@
 package org.popcraft.bolt.data.migration.lwc;
 
 import com.google.gson.Gson;
-import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.data.MemoryStore;
 import org.popcraft.bolt.data.Migration;
+import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.defaults.DefaultAccess;

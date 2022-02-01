@@ -5,7 +5,6 @@ import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface Store {

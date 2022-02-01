@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
 
-public class DoubleChestMatcher implements BlockMatcher {
+public class ChestMatcher implements BlockMatcher {
     private static final EnumSet<Material> CHESTS = EnumSet.of(Material.CHEST, Material.TRAPPED_CHEST);
 
     @Override
