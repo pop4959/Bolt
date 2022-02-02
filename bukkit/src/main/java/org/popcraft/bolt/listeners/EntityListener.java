@@ -35,6 +35,7 @@ import org.popcraft.bolt.util.lang.Translation;
 import org.spigotmc.event.entity.EntityMountEvent;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.popcraft.bolt.util.lang.Translator.translate;
 
@@ -140,7 +141,8 @@ public final class EntityListener implements Listener {
                 if (protection != null) {
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Template.of("type", Strings.toTitleCase(entity.getType())));
                 } else {
-                    plugin.getBolt().getStore().saveEntityProtection(BukkitAdapter.createPrivateEntityProtection(entity, player));
+                    plugin.getBolt().getStore().saveEntityProtection(BukkitAdapter.createPrivateEntityProtection(entity, playerMeta.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId()));
+                    playerMeta.setLockNil(false);
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Template.of("type", Strings.toTitleCase(entity.getType())));
                 }
             }

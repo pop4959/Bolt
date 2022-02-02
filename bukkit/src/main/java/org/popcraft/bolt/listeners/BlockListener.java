@@ -40,6 +40,7 @@ import org.popcraft.bolt.util.lang.Translation;
 
 import java.util.EnumSet;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.popcraft.bolt.util.lang.Translator.translate;
 
@@ -109,7 +110,8 @@ public final class BlockListener implements Listener {
                 if (protection != null) {
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Template.of("type", Strings.toTitleCase(block.getType())));
                 } else {
-                    plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createPrivateBlockProtection(block, player));
+                    plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createPrivateBlockProtection(block, playerMeta.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId()));
+                    playerMeta.setLockNil(false);
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Template.of("type", Strings.toTitleCase(block.getType())));
                 }
             }

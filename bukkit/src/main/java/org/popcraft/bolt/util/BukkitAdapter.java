@@ -18,12 +18,12 @@ public final class BukkitAdapter {
     private BukkitAdapter() {
     }
 
-    public static BlockProtection createPrivateBlockProtection(final Block block, final Entity owner) {
+    public static BlockProtection createPrivateBlockProtection(final Block block, final UUID owner) {
         return createBlockProtection(block, owner, DefaultProtectionType.PRIVATE.type());
     }
 
-    public static BlockProtection createBlockProtection(final Block block, final Entity owner, final String type) {
-        return new BlockProtection(UUID.randomUUID(), owner.getUniqueId(), null, type, new HashMap<>(), block.getType().toString(), block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+    public static BlockProtection createBlockProtection(final Block block, final UUID owner, final String type) {
+        return new BlockProtection(UUID.randomUUID(), owner, null, type, new HashMap<>(), block.getType().toString(), block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
     }
 
     public static BlockProtection createBlockProtection(final Block block, final BlockProtection parent) {
@@ -47,12 +47,12 @@ public final class BukkitAdapter {
         return new BlockLocation(blockProtection.getWorld(), blockProtection.getX(), blockProtection.getY(), blockProtection.getZ());
     }
 
-    public static EntityProtection createPrivateEntityProtection(final Entity entity, final Entity owner) {
+    public static EntityProtection createPrivateEntityProtection(final Entity entity, final UUID owner) {
         return createEntityProtection(entity, owner, DefaultProtectionType.PRIVATE.type());
     }
 
-    public static EntityProtection createEntityProtection(final Entity entity, final Entity owner, final String type) {
-        return new EntityProtection(entity.getUniqueId(), owner.getUniqueId(), null, type, new HashMap<>(), entity.getType().toString());
+    public static EntityProtection createEntityProtection(final Entity entity, final UUID owner, final String type) {
+        return new EntityProtection(entity.getUniqueId(), owner, null, type, new HashMap<>(), entity.getType().toString());
     }
 
     public static EntityProtection createEntityProtection(final Entity entity, final EntityProtection parent) {

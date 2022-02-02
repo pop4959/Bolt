@@ -11,6 +11,7 @@ public class PlayerMeta {
     private Action lastAction;
     private boolean interacted;
     private boolean persist;
+    private boolean lockNil;
 
     public PlayerMeta(UUID uuid) {
         this.uuid = uuid;
@@ -63,5 +64,13 @@ public class PlayerMeta {
 
     public Map<Source, String> getModifications() {
         return modifications;
+    }
+
+    public boolean isLockNil() {
+        return lockNil;
+    }
+
+    public void setLockNil(boolean lockNil) {
+        this.lockNil = lockNil;
     }
 }
