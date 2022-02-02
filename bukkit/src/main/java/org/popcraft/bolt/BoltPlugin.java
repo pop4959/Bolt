@@ -37,14 +37,13 @@ import org.popcraft.bolt.util.matcher.block.ArmorStandMatcher;
 import org.popcraft.bolt.util.matcher.block.BannerMatcher;
 import org.popcraft.bolt.util.matcher.block.BedMatcher;
 import org.popcraft.bolt.util.matcher.block.BlockMatcher;
-import org.popcraft.bolt.util.matcher.block.ButtonMatcher;
 import org.popcraft.bolt.util.matcher.block.ChestMatcher;
 import org.popcraft.bolt.util.matcher.block.DoorMatcher;
 import org.popcraft.bolt.util.matcher.block.LeashHitchMatcher;
-import org.popcraft.bolt.util.matcher.block.LeverMatcher;
 import org.popcraft.bolt.util.matcher.block.PressurePlateMatcher;
 import org.popcraft.bolt.util.matcher.block.RailMatcher;
 import org.popcraft.bolt.util.matcher.block.SignMatcher;
+import org.popcraft.bolt.util.matcher.block.SwitchMatcher;
 import org.popcraft.bolt.util.matcher.block.TrapdoorMatcher;
 import org.popcraft.bolt.util.matcher.entity.EntityMatcher;
 import org.spongepowered.configurate.ConfigurateException;
@@ -65,8 +64,8 @@ import java.util.UUID;
 public class BoltPlugin extends JavaPlugin {
     private static final String COMMAND_PERMISSION_KEY = "bolt.command.";
     private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new ArmorStandMatcher(), new BannerMatcher(),
-            new BedMatcher(), new ButtonMatcher(), new ChestMatcher(), new DoorMatcher(), new LeashHitchMatcher(),
-            new LeverMatcher(), new PressurePlateMatcher(), new RailMatcher(), new SignMatcher(),
+            new BedMatcher(), new ChestMatcher(), new DoorMatcher(), new LeashHitchMatcher(),
+            new PressurePlateMatcher(), new RailMatcher(), new SignMatcher(), new SwitchMatcher(),
             new TrapdoorMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));

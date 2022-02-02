@@ -1,8 +1,9 @@
 package org.popcraft.bolt.util.matcher.block;
 
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.material.Banner;
+import org.bukkit.block.data.Directional;
 import org.popcraft.bolt.util.matcher.Match;
 
 import java.util.Collections;
@@ -20,12 +21,12 @@ public class BannerMatcher implements BlockMatcher {
     @Override
     public Optional<Match> findMatch(Block block) {
         final Block above = block.getRelative(BlockFace.UP);
-        if (above.getBlockData() instanceof Banner) {
+        if (Tag.BANNERS.isTagged(above.getType()) && !(above.getBlockData() instanceof Directional)) {
             return Optional.of(Match.ofBlocks(Collections.singleton(above)));
         }
         for (final BlockFace blockFace : CARDINAL_FACES) {
             final Block wall = block.getRelative(blockFace);
-            if (wall.getBlockData() instanceof final Banner banner && blockFace.equals(banner.getFacing())) {
+            if (Tag.BANNERS.isTagged(wall.getType()) && wall.getBlockData() instanceof final Directional directional && blockFace.equals(directional.getFacing())) {
                 return Optional.of(Match.ofBlocks(Collections.singleton(wall)));
             }
         }

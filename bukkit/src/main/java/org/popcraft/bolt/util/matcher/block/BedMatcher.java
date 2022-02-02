@@ -17,15 +17,15 @@ public class BedMatcher implements BlockMatcher {
     @Override
     public Optional<Match> findMatch(Block block) {
         if (block.getBlockData() instanceof final Bed bed) {
-            if (Bed.Part.HEAD.equals(bed.getPart())) {
-                final Block foot = block.getRelative(bed.getFacing());
-                if (foot.getBlockData() instanceof Bed) {
-                    return Optional.of(Match.ofBlocks(Collections.singleton(foot)));
+            if (Bed.Part.FOOT.equals(bed.getPart())) {
+                final Block head = block.getRelative(bed.getFacing());
+                if (Tag.BEDS.isTagged(head.getType())) {
+                    return Optional.of(Match.ofBlocks(Collections.singleton(head)));
                 }
             } else {
-                final Block head = block.getRelative(bed.getFacing().getOppositeFace());
-                if (head.getBlockData() instanceof Bed) {
-                    return Optional.of(Match.ofBlocks(Collections.singleton(head)));
+                final Block foot = block.getRelative(bed.getFacing().getOppositeFace());
+                if (Tag.BEDS.isTagged(foot.getType())) {
+                    return Optional.of(Match.ofBlocks(Collections.singleton(foot)));
                 }
             }
         }
