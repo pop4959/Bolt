@@ -9,17 +9,17 @@ import org.popcraft.bolt.util.matcher.Match;
 import java.util.Collections;
 import java.util.Optional;
 
-public class CropsMatcher implements BlockMatcher {
+public class FarmlandMatcher implements BlockMatcher {
     @Override
     public boolean canMatch(Block block) {
-        return Material.FARMLAND.equals(block.getType());
+        return Tag.CROPS.isTagged(block.getType());
     }
 
     @Override
     public Optional<Match> findMatch(Block block) {
-        final Block above = block.getRelative(BlockFace.UP);
-        if (Tag.CROPS.isTagged(above.getType())) {
-            return Optional.of(Match.ofBlocks(Collections.singleton(above)));
+        final Block below = block.getRelative(BlockFace.DOWN);
+        if (Material.FARMLAND.equals(below.getType())) {
+            return Optional.of(Match.ofBlocks(Collections.singleton(below)));
         }
         return Optional.empty();
     }
