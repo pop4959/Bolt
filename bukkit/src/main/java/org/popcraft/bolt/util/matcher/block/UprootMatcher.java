@@ -1,0 +1,33 @@
+package org.popcraft.bolt.util.matcher.block;
+
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.popcraft.bolt.util.matcher.Match;
+
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+public class UprootMatcher implements BlockMatcher {
+    private static final EnumSet<Material> UPROOT = EnumSet.of(Material.BAMBOO, Material.CACTUS, Material.SUGAR_CANE);
+
+    @Override
+    public boolean canMatch(Block block) {
+        return true;
+    }
+
+    @Override
+    public Optional<Match> findMatch(Block block) {
+        final Block above = block.getRelative(BlockFace.UP);
+        if (UPROOT.contains(block.getType()) || UPROOT.contains(above.getType())) {
+            final Set<Block> blocks = new HashSet<>();
+            for (Block next = block.getRelative(BlockFace.UP); UPROOT.contains(next.getType()); next = next.getRelative(BlockFace.UP)) {
+                blocks.add(next);
+            }
+            return Optional.of(Match.ofBlocks(blocks));
+        }
+        return Optional.empty();
+    }
+}

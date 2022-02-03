@@ -47,6 +47,7 @@ import org.popcraft.bolt.util.matcher.block.RailMatcher;
 import org.popcraft.bolt.util.matcher.block.SignMatcher;
 import org.popcraft.bolt.util.matcher.block.SwitchMatcher;
 import org.popcraft.bolt.util.matcher.block.TrapdoorMatcher;
+import org.popcraft.bolt.util.matcher.block.UprootMatcher;
 import org.popcraft.bolt.util.matcher.entity.EntityMatcher;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -68,7 +69,7 @@ public class BoltPlugin extends JavaPlugin {
     private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new ArmorStandMatcher(), new BannerMatcher(),
             new BedMatcher(), new ChestMatcher(), new DoorMatcher(), new LeashHitchMatcher(),
             new PressurePlateMatcher(), new RailMatcher(), new SignMatcher(), new SwitchMatcher(),
-            new TrapdoorMatcher(), new CropsMatcher(), new FarmlandMatcher());
+            new TrapdoorMatcher(), new CropsMatcher(), new FarmlandMatcher(), new UprootMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();

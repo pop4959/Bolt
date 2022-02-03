@@ -48,8 +48,6 @@ import static org.popcraft.bolt.util.lang.Translator.translate;
 public final class BlockListener implements Listener {
     private static final EnumSet<BlockFace> CARTESIAN_BLOCK_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN);
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
-    // TODO: These uprooted types should be structures
-    private static final EnumSet<Material> UPROOT = EnumSet.of(Material.BAMBOO, Material.CACTUS, Material.SUGAR_CANE);
     private final BoltPlugin plugin;
 
     public BlockListener(final BoltPlugin plugin) {
@@ -190,7 +188,6 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockBreak(final BlockBreakEvent e) {
         final Block block = e.getBlock();
-        final Material blockType = block.getType();
         final Optional<Protection> optionalProtection = plugin.findProtection(block);
         final Player player = e.getPlayer();
         if (optionalProtection.isPresent()) {
@@ -200,19 +197,6 @@ public final class BlockListener implements Listener {
                 BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Strings.toTitleCase(block.getType())));
             } else {
                 e.setCancelled(true);
-            }
-        } else if (UPROOT.contains(blockType)) {
-            for (Block above = block.getRelative(BlockFace.UP); UPROOT.contains(above.getType()); above = above.getRelative(BlockFace.UP)) {
-                final Optional<Protection> optionalAboveProtection = plugin.findProtection(above);
-                if (optionalAboveProtection.isPresent()) {
-                    final Protection blockProtection = optionalAboveProtection.get();
-                    if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
-                        plugin.removeProtection(blockProtection);
-                    } else {
-                        e.setCancelled(true);
-                        return;
-                    }
-                }
             }
         }
     }
