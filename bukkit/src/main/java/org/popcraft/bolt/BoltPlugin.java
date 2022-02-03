@@ -36,6 +36,7 @@ import org.popcraft.bolt.util.matcher.Match;
 import org.popcraft.bolt.util.matcher.block.ArmorStandMatcher;
 import org.popcraft.bolt.util.matcher.block.BannerMatcher;
 import org.popcraft.bolt.util.matcher.block.BedMatcher;
+import org.popcraft.bolt.util.matcher.block.BellMatcher;
 import org.popcraft.bolt.util.matcher.block.BlockMatcher;
 import org.popcraft.bolt.util.matcher.block.ChestMatcher;
 import org.popcraft.bolt.util.matcher.block.CropsMatcher;
@@ -69,7 +70,8 @@ public class BoltPlugin extends JavaPlugin {
     private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new ArmorStandMatcher(), new BannerMatcher(),
             new BedMatcher(), new ChestMatcher(), new DoorMatcher(), new LeashHitchMatcher(),
             new PressurePlateMatcher(), new RailMatcher(), new SignMatcher(), new SwitchMatcher(),
-            new TrapdoorMatcher(), new CropsMatcher(), new FarmlandMatcher(), new UprootMatcher());
+            new TrapdoorMatcher(), new CropsMatcher(), new FarmlandMatcher(), new UprootMatcher(),
+            new BellMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
