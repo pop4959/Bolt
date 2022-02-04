@@ -18,7 +18,7 @@ public class ItemFrameMatcher implements BlockMatcher {
     @Override
     public Optional<Match> findMatch(Block block) {
         final Set<Entity> entities = new HashSet<>();
-        block.getWorld().getNearbyEntities(block.getBoundingBox().expand(0.5, 0, 0.5, 0.5, 0, 0.5), ItemFrame.class::isInstance).forEach(entity -> {
+        block.getWorld().getNearbyEntities(block.getBoundingBox().expand(0.5, 0.5, 0.5, 0.5, 0.5, 0.5), ItemFrame.class::isInstance).forEach(entity -> {
             if (entity instanceof final ItemFrame itemFrame && itemFrame.getLocation().getBlock().getRelative(itemFrame.getAttachedFace()).getLocation().equals(block.getLocation())) {
                 entities.add(entity);
             }
