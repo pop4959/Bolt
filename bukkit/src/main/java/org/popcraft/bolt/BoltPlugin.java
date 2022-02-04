@@ -48,6 +48,7 @@ import org.popcraft.bolt.util.matcher.block.ItemFrameMatcher;
 import org.popcraft.bolt.util.matcher.block.LadderMatcher;
 import org.popcraft.bolt.util.matcher.block.LanternMatcher;
 import org.popcraft.bolt.util.matcher.block.LeashHitchMatcher;
+import org.popcraft.bolt.util.matcher.block.PaintingMatcher;
 import org.popcraft.bolt.util.matcher.block.PressurePlateMatcher;
 import org.popcraft.bolt.util.matcher.block.RailMatcher;
 import org.popcraft.bolt.util.matcher.block.SaplingMatcher;
@@ -82,7 +83,7 @@ public class BoltPlugin extends JavaPlugin {
             new TrapdoorMatcher(), new CropsMatcher(), new FarmlandMatcher(), new UprootMatcher(),
             new BellMatcher(), new TorchMatcher(), new LanternMatcher(), new LadderMatcher(),
             new CocoaMatcher(), new TripwireHookMatcher(), new AmethystClusterMatcher(), new SaplingMatcher(),
-            new TechnicalPistonMatcher(), new ItemFrameMatcher());
+            new TechnicalPistonMatcher(), new ItemFrameMatcher(), new PaintingMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
