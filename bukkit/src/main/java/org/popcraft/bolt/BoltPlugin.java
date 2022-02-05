@@ -44,6 +44,7 @@ import org.popcraft.bolt.util.matcher.block.CocoaMatcher;
 import org.popcraft.bolt.util.matcher.block.CropsMatcher;
 import org.popcraft.bolt.util.matcher.block.DoorMatcher;
 import org.popcraft.bolt.util.matcher.block.FarmlandMatcher;
+import org.popcraft.bolt.util.matcher.block.HangingVineMatcher;
 import org.popcraft.bolt.util.matcher.block.ItemFrameMatcher;
 import org.popcraft.bolt.util.matcher.block.LadderMatcher;
 import org.popcraft.bolt.util.matcher.block.LanternMatcher;
@@ -52,6 +53,7 @@ import org.popcraft.bolt.util.matcher.block.PaintingMatcher;
 import org.popcraft.bolt.util.matcher.block.PressurePlateMatcher;
 import org.popcraft.bolt.util.matcher.block.RailMatcher;
 import org.popcraft.bolt.util.matcher.block.SaplingMatcher;
+import org.popcraft.bolt.util.matcher.block.SeaPickleMatcher;
 import org.popcraft.bolt.util.matcher.block.SignMatcher;
 import org.popcraft.bolt.util.matcher.block.SwitchMatcher;
 import org.popcraft.bolt.util.matcher.block.TechnicalPistonMatcher;
@@ -59,6 +61,7 @@ import org.popcraft.bolt.util.matcher.block.TorchMatcher;
 import org.popcraft.bolt.util.matcher.block.TrapdoorMatcher;
 import org.popcraft.bolt.util.matcher.block.TripwireHookMatcher;
 import org.popcraft.bolt.util.matcher.block.UprootMatcher;
+import org.popcraft.bolt.util.matcher.block.VineMatcher;
 import org.popcraft.bolt.util.matcher.entity.EntityMatcher;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -83,7 +86,8 @@ public class BoltPlugin extends JavaPlugin {
             new TrapdoorMatcher(), new CropsMatcher(), new FarmlandMatcher(), new UprootMatcher(),
             new BellMatcher(), new TorchMatcher(), new LanternMatcher(), new LadderMatcher(),
             new CocoaMatcher(), new TripwireHookMatcher(), new AmethystClusterMatcher(), new SaplingMatcher(),
-            new TechnicalPistonMatcher(), new ItemFrameMatcher(), new PaintingMatcher());
+            new TechnicalPistonMatcher(), new ItemFrameMatcher(), new PaintingMatcher(), new HangingVineMatcher(),
+            new SeaPickleMatcher(), new VineMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
