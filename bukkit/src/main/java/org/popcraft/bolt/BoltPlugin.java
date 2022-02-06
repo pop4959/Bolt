@@ -47,6 +47,7 @@ import org.popcraft.bolt.util.matcher.block.ChorusMatcher;
 import org.popcraft.bolt.util.matcher.block.CocoaMatcher;
 import org.popcraft.bolt.util.matcher.block.CoralMatcher;
 import org.popcraft.bolt.util.matcher.block.CropsMatcher;
+import org.popcraft.bolt.util.matcher.block.DeadBushMatcher;
 import org.popcraft.bolt.util.matcher.block.DoorMatcher;
 import org.popcraft.bolt.util.matcher.block.FarmlandMatcher;
 import org.popcraft.bolt.util.matcher.block.GrassMatcher;
@@ -109,7 +110,8 @@ public class BoltPlugin extends JavaPlugin {
             new RedstoneWireMatcher(), new SmallFlowerMatcher(), new TallFlowerMatcher(), new SnowMatcher(),
             new CarpetMatcher(), new PortalMatcher(), new SmallDripleafMatcher(), new BigDripleafMatcher(),
             new ScaffoldingMatcher(), new MossCarpetMatcher(), new MushroomMatcher(), new NetherWartMatcher(),
-            new SweetBerryBushMatcher(), new ChorusMatcher(), new GrassMatcher(), new TallGrassMatcher());
+            new SweetBerryBushMatcher(), new ChorusMatcher(), new GrassMatcher(), new TallGrassMatcher(),
+            new DeadBushMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
