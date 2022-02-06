@@ -59,6 +59,7 @@ import org.popcraft.bolt.util.matcher.block.PressurePlateMatcher;
 import org.popcraft.bolt.util.matcher.block.RailMatcher;
 import org.popcraft.bolt.util.matcher.block.RedstoneWireMatcher;
 import org.popcraft.bolt.util.matcher.block.SaplingMatcher;
+import org.popcraft.bolt.util.matcher.block.ScaffoldingMatcher;
 import org.popcraft.bolt.util.matcher.block.SeaPickleMatcher;
 import org.popcraft.bolt.util.matcher.block.SignMatcher;
 import org.popcraft.bolt.util.matcher.block.SmallDripleafMatcher;
@@ -99,7 +100,8 @@ public class BoltPlugin extends JavaPlugin {
             new TechnicalPistonMatcher(), new ItemFrameMatcher(), new PaintingMatcher(), new HangingVineMatcher(),
             new SeaPickleMatcher(), new VineMatcher(), new CakeMatcher(), new CoralMatcher(),
             new RedstoneWireMatcher(), new SmallFlowerMatcher(), new TallFlowerMatcher(), new SnowMatcher(),
-            new CarpetMatcher(), new PortalMatcher(), new SmallDripleafMatcher(), new BigDripleafMatcher());
+            new CarpetMatcher(), new PortalMatcher(), new SmallDripleafMatcher(), new BigDripleafMatcher(),
+            new ScaffoldingMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
