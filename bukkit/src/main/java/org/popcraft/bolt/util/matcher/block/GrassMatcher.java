@@ -10,7 +10,7 @@ import java.util.EnumSet;
 import java.util.Optional;
 
 public class GrassMatcher implements BlockMatcher {
-    private static final EnumSet<Material> GRASS = EnumSet.of(Material.GRASS, Material.FERN);
+    private static final EnumSet<Material> GRASS = EnumSet.of(Material.GRASS, Material.FERN, Material.SEAGRASS);
 
     @Override
     public boolean canMatch(Block block) {

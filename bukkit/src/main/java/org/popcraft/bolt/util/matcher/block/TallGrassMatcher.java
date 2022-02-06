@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class TallGrassMatcher implements BlockMatcher {
-    private static final EnumSet<Material> TALL_GRASS = EnumSet.of(Material.TALL_GRASS, Material.LARGE_FERN);
+    private static final EnumSet<Material> TALL_GRASS = EnumSet.of(Material.TALL_GRASS, Material.LARGE_FERN, Material.TALL_SEAGRASS);
 
     @Override
     public boolean canMatch(Block block) {
