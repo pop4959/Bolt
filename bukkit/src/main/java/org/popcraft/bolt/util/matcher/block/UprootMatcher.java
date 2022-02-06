@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class UprootMatcher implements BlockMatcher {
-    private static final EnumSet<Material> UPROOT = EnumSet.of(Material.BAMBOO, Material.CACTUS, Material.SUGAR_CANE, Material.TWISTING_VINES, Material.TWISTING_VINES_PLANT);
+    private static final EnumSet<Material> UPROOT = EnumSet.of(Material.BAMBOO, Material.CACTUS, Material.SUGAR_CANE, Material.TWISTING_VINES, Material.TWISTING_VINES_PLANT, Material.KELP, Material.KELP_PLANT);
 
     @Override
     public boolean canMatch(Block block) {
