@@ -43,6 +43,7 @@ import org.popcraft.bolt.util.matcher.block.BlockMatcher;
 import org.popcraft.bolt.util.matcher.block.CakeMatcher;
 import org.popcraft.bolt.util.matcher.block.CarpetMatcher;
 import org.popcraft.bolt.util.matcher.block.ChestMatcher;
+import org.popcraft.bolt.util.matcher.block.ChorusMatcher;
 import org.popcraft.bolt.util.matcher.block.CocoaMatcher;
 import org.popcraft.bolt.util.matcher.block.CoralMatcher;
 import org.popcraft.bolt.util.matcher.block.CropsMatcher;
@@ -53,6 +54,9 @@ import org.popcraft.bolt.util.matcher.block.ItemFrameMatcher;
 import org.popcraft.bolt.util.matcher.block.LadderMatcher;
 import org.popcraft.bolt.util.matcher.block.LanternMatcher;
 import org.popcraft.bolt.util.matcher.block.LeashHitchMatcher;
+import org.popcraft.bolt.util.matcher.block.MossCarpetMatcher;
+import org.popcraft.bolt.util.matcher.block.MushroomMatcher;
+import org.popcraft.bolt.util.matcher.block.NetherWartMatcher;
 import org.popcraft.bolt.util.matcher.block.PaintingMatcher;
 import org.popcraft.bolt.util.matcher.block.PortalMatcher;
 import org.popcraft.bolt.util.matcher.block.PressurePlateMatcher;
@@ -65,6 +69,7 @@ import org.popcraft.bolt.util.matcher.block.SignMatcher;
 import org.popcraft.bolt.util.matcher.block.SmallDripleafMatcher;
 import org.popcraft.bolt.util.matcher.block.SmallFlowerMatcher;
 import org.popcraft.bolt.util.matcher.block.SnowMatcher;
+import org.popcraft.bolt.util.matcher.block.SweetBerryBushMatcher;
 import org.popcraft.bolt.util.matcher.block.SwitchMatcher;
 import org.popcraft.bolt.util.matcher.block.TallFlowerMatcher;
 import org.popcraft.bolt.util.matcher.block.TechnicalPistonMatcher;
@@ -101,7 +106,8 @@ public class BoltPlugin extends JavaPlugin {
             new SeaPickleMatcher(), new VineMatcher(), new CakeMatcher(), new CoralMatcher(),
             new RedstoneWireMatcher(), new SmallFlowerMatcher(), new TallFlowerMatcher(), new SnowMatcher(),
             new CarpetMatcher(), new PortalMatcher(), new SmallDripleafMatcher(), new BigDripleafMatcher(),
-            new ScaffoldingMatcher());
+            new ScaffoldingMatcher(), new MossCarpetMatcher(), new MushroomMatcher(), new NetherWartMatcher(),
+            new SweetBerryBushMatcher(), new ChorusMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
