@@ -51,6 +51,7 @@ import org.popcraft.bolt.util.matcher.block.DeadBushMatcher;
 import org.popcraft.bolt.util.matcher.block.DoorMatcher;
 import org.popcraft.bolt.util.matcher.block.FarmlandMatcher;
 import org.popcraft.bolt.util.matcher.block.GrassMatcher;
+import org.popcraft.bolt.util.matcher.block.HangingRootsMatcher;
 import org.popcraft.bolt.util.matcher.block.HangingVineMatcher;
 import org.popcraft.bolt.util.matcher.block.ItemFrameMatcher;
 import org.popcraft.bolt.util.matcher.block.LadderMatcher;
@@ -60,6 +61,7 @@ import org.popcraft.bolt.util.matcher.block.MossCarpetMatcher;
 import org.popcraft.bolt.util.matcher.block.MushroomMatcher;
 import org.popcraft.bolt.util.matcher.block.NetherWartMatcher;
 import org.popcraft.bolt.util.matcher.block.PaintingMatcher;
+import org.popcraft.bolt.util.matcher.block.PointedDripstoneMatcher;
 import org.popcraft.bolt.util.matcher.block.PortalMatcher;
 import org.popcraft.bolt.util.matcher.block.PressurePlateMatcher;
 import org.popcraft.bolt.util.matcher.block.RailMatcher;
@@ -111,7 +113,7 @@ public class BoltPlugin extends JavaPlugin {
             new CarpetMatcher(), new PortalMatcher(), new SmallDripleafMatcher(), new BigDripleafMatcher(),
             new ScaffoldingMatcher(), new MossCarpetMatcher(), new MushroomMatcher(), new NetherWartMatcher(),
             new SweetBerryBushMatcher(), new ChorusMatcher(), new GrassMatcher(), new TallGrassMatcher(),
-            new DeadBushMatcher());
+            new DeadBushMatcher(), new HangingRootsMatcher(), new PointedDripstoneMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
