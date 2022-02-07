@@ -7,4 +7,4 @@ access-types:
   withdrawal: [ "interact", "open", "withdraw" ]
   public: [ "interact", "open", "deposit", "withdraw", "modify", "mount" ]
   basic: [ "interact", "open", "deposit", "withdraw", "modify", "mount" ]
-  full: [ "interact", "open", "deposit", "withdraw", "break", "kill", "modify", "edit", "mount" ]
+  full: [ "interact", "open", "deposit", "withdraw", "modify", "mount", "edit", "destroy" ]

@@ -166,7 +166,7 @@ public final class BlockListener implements Listener {
                 if (Material.SNOW_BLOCK.equals(firstBlock.getType()) && Material.SNOW_BLOCK.equals(secondBlock.getType())) {
                     final Optional<Protection> firstProtection = plugin.findProtection(firstBlock);
                     firstProtection.ifPresent(blockProtection -> {
-                        if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
+                        if (plugin.canAccessProtection(player, blockProtection, Permission.DESTROY)) {
                             plugin.removeProtection(blockProtection);
                         } else {
                             e.setCancelled(true);
@@ -174,7 +174,7 @@ public final class BlockListener implements Listener {
                     });
                     final Optional<Protection> secondProtection = plugin.findProtection(secondBlock);
                     secondProtection.ifPresent(blockProtection -> {
-                        if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
+                        if (plugin.canAccessProtection(player, blockProtection, Permission.DESTROY)) {
                             plugin.removeProtection(blockProtection);
                         } else {
                             e.setCancelled(true);
@@ -192,7 +192,7 @@ public final class BlockListener implements Listener {
         final Player player = e.getPlayer();
         if (optionalProtection.isPresent()) {
             final Protection blockProtection = optionalProtection.get();
-            if (plugin.canAccessProtection(player, blockProtection, Permission.BREAK)) {
+            if (plugin.canAccessProtection(player, blockProtection, Permission.DESTROY)) {
                 plugin.removeProtection(blockProtection);
                 BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Strings.toTitleCase(block.getType())));
             } else {
