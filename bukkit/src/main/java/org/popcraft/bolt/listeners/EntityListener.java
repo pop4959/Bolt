@@ -189,9 +189,16 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onVehicleDestroy(final VehicleDestroyEvent e) {
-        final Optional<Protection> protection = plugin.findProtection(e.getVehicle());
-        if (protection.isPresent() && (!(getDamagerSource(e.getAttacker()) instanceof final Player player) || !plugin.canAccessProtection(player, protection.get(), Permission.DESTROY))) {
-            e.setCancelled(true);
+        final Entity vehicle = e.getVehicle();
+        final Optional<Protection> optionalProtection = plugin.findProtection(vehicle);
+        if (optionalProtection.isPresent()) {
+            final Protection protection = optionalProtection.get();
+            if (!(getDamagerSource(e.getAttacker()) instanceof final Player player) || !plugin.canAccessProtection(player, protection, Permission.DESTROY)) {
+                e.setCancelled(true);
+            } else {
+                plugin.removeProtection(protection);
+                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Strings.toTitleCase(vehicle.getType())));
+            }
         }
     }
 
