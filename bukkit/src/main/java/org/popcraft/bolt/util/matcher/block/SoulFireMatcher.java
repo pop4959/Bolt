@@ -6,12 +6,9 @@ import org.bukkit.block.BlockFace;
 import org.popcraft.bolt.util.matcher.Match;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Optional;
 
-public class GrassMatcher implements BlockMatcher {
-    private static final EnumSet<Material> GRASS = EnumSet.of(Material.GRASS, Material.FERN, Material.SEAGRASS, Material.NETHER_SPROUTS, Material.WARPED_ROOTS, Material.CRIMSON_ROOTS);
-
+public class SoulFireMatcher implements BlockMatcher {
     @Override
     public boolean canMatch(Block block) {
         return true;
@@ -20,7 +17,7 @@ public class GrassMatcher implements BlockMatcher {
     @Override
     public Optional<Match> findMatch(Block block) {
         final Block above = block.getRelative(BlockFace.UP);
-        if (GRASS.contains(above.getType())) {
+        if (Material.SOUL_FIRE.equals((above.getType()))) {
             return Optional.of(Match.ofBlocks(Collections.singleton(above)));
         }
         return Optional.empty();

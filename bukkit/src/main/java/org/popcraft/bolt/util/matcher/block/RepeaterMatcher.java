@@ -9,8 +9,8 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
 
-public class GrassMatcher implements BlockMatcher {
-    private static final EnumSet<Material> GRASS = EnumSet.of(Material.GRASS, Material.FERN, Material.SEAGRASS, Material.NETHER_SPROUTS, Material.WARPED_ROOTS, Material.CRIMSON_ROOTS);
+public class RepeaterMatcher implements BlockMatcher {
+    private static final EnumSet<Material> REPEATERS = EnumSet.of(Material.REPEATER, Material.COMPARATOR);
 
     @Override
     public boolean canMatch(Block block) {
@@ -20,7 +20,7 @@ public class GrassMatcher implements BlockMatcher {
     @Override
     public Optional<Match> findMatch(Block block) {
         final Block above = block.getRelative(BlockFace.UP);
-        if (GRASS.contains(above.getType())) {
+        if (REPEATERS.contains(above.getType())) {
             return Optional.of(Match.ofBlocks(Collections.singleton(above)));
         }
         return Optional.empty();
