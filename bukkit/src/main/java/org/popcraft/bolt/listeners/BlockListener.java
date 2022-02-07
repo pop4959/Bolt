@@ -56,6 +56,9 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(final PlayerInteractEvent e) {
+        if (org.bukkit.event.block.Action.LEFT_CLICK_AIR.equals(e.getAction()) || org.bukkit.event.block.Action.RIGHT_CLICK_AIR.equals(e.getAction()) || org.bukkit.event.block.Action.PHYSICAL.equals(e.getAction())) {
+            return;
+        }
         final Block clicked = e.getClickedBlock();
         if (clicked == null) {
             return;
