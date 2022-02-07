@@ -199,9 +199,6 @@ public final class EntityListener implements Listener {
         if (!(e.getRightClicked() instanceof final ItemFrame itemFrame)) {
             return;
         }
-        if (itemFrame.getItem().getType().isAir()) {
-            return;
-        }
         final Player player = e.getPlayer();
         if (plugin.playerMeta(player).triggeredAction() || !plugin.canAccessEntity(player, itemFrame, Permission.INTERACT)) {
             e.setCancelled(true);
