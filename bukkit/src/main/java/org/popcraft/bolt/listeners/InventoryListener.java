@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Permission;
+import org.popcraft.bolt.util.PlayerMeta;
 
 @SuppressWarnings("ClassCanBeRecord")
 public final class InventoryListener implements Listener {
@@ -30,6 +31,11 @@ public final class InventoryListener implements Listener {
     @EventHandler
     public void onInventoryOpen(final InventoryOpenEvent e) {
         if (!(e.getPlayer() instanceof Player player)) {
+            return;
+        }
+        final PlayerMeta playerMeta = plugin.playerMeta(player);
+        if (playerMeta.hasInteracted()) {
+            e.setCancelled(true);
             return;
         }
         final Protection protection = getHolderProtection(e.getInventory().getHolder());
