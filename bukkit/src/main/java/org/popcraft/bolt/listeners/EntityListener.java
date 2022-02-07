@@ -1,8 +1,10 @@
 package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.minimessage.Template;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Mule;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -206,11 +208,13 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent e) {
-        if (!(e.getRightClicked() instanceof final ItemFrame itemFrame)) {
+        final Player player = e.getPlayer();
+        if (plugin.playerMeta(player).triggeredAction()) {
+            e.setCancelled(true);
             return;
         }
-        final Player player = e.getPlayer();
-        if (plugin.playerMeta(player).triggeredAction() || !plugin.canAccessEntity(player, itemFrame, Permission.INTERACT)) {
+        final Entity clicked = e.getRightClicked();
+        if ((clicked instanceof ItemFrame || (clicked instanceof Mule && Material.CHEST.equals(player.getInventory().getItemInMainHand().getType()))) && !plugin.canAccessEntity(player, clicked, Permission.INTERACT)) {
             e.setCancelled(true);
         }
     }
