@@ -4,6 +4,7 @@ import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -52,7 +53,7 @@ public final class EntityListener implements Listener {
         final Entity entity = e.getEntity();
         plugin.findProtection(entity).ifPresent(protection -> {
             plugin.removeProtection(protection);
-            if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent entityDamageByEntityEvent && entityDamageByEntityEvent.getDamager() instanceof final Player player && plugin.canAccessProtection(player, protection, Permission.DESTROY)) {
+            if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent entityDamageByEntityEvent && getDamagerSource(entityDamageByEntityEvent.getDamager()) instanceof final Player player && plugin.canAccessProtection(player, protection, Permission.DESTROY)) {
                 BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Strings.toTitleCase(entity.getType())));
             }
         });
@@ -67,7 +68,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
-        final Entity damager = e.getDamager();
+        final Entity damager = getDamagerSource(e.getDamager());
         final Entity entity = e.getEntity();
         if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) || (!(damager instanceof Player) && plugin.findProtection(entity).isPresent())) {
             e.setCancelled(true);
@@ -76,7 +77,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onVehicleDamage(final VehicleDamageEvent e) {
-        final Entity attacker = e.getAttacker();
+        final Entity attacker = getDamagerSource(e.getAttacker());
         final Entity vehicle = e.getVehicle();
         if (attacker instanceof final Player player && handlePlayerEntityInteraction(player, vehicle, Permission.INTERACT, true)) {
             e.setCancelled(true);
@@ -85,7 +86,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onHangingBreakByEntity(final HangingBreakByEntityEvent e) {
-        if (e.getRemover() instanceof final Player player) {
+        if (getDamagerSource(e.getRemover()) instanceof final Player player) {
             if (handlePlayerEntityInteraction(player, e.getEntity(), Permission.DESTROY, true)) {
                 e.setCancelled(true);
             } else {
@@ -189,7 +190,7 @@ public final class EntityListener implements Listener {
     @EventHandler
     public void onVehicleDestroy(final VehicleDestroyEvent e) {
         final Optional<Protection> protection = plugin.findProtection(e.getVehicle());
-        if (protection.isPresent() && (!(e.getAttacker() instanceof final Player player) || !plugin.canAccessProtection(player, protection.get(), Permission.DESTROY))) {
+        if (protection.isPresent() && (!(getDamagerSource(e.getAttacker()) instanceof final Player player) || !plugin.canAccessProtection(player, protection.get(), Permission.DESTROY))) {
             e.setCancelled(true);
         }
     }
@@ -224,7 +225,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onEntityDamage(final EntityDamageEvent e) {
-        if (EntityDamageEvent.DamageCause.ENTITY_ATTACK.equals(e.getCause())) {
+        if (EntityDamageEvent.DamageCause.ENTITY_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.PROJECTILE.equals(e.getCause())) {
             return;
         }
         if (plugin.findProtection(e.getEntity()).isPresent()) {
@@ -283,6 +284,14 @@ public final class EntityListener implements Listener {
     public void onPlayerUnleashEntity(final PlayerUnleashEntityEvent e) {
         if (!plugin.canAccessEntity(e.getPlayer(), e.getEntity(), Permission.INTERACT)) {
             e.setCancelled(true);
+        }
+    }
+
+    private Entity getDamagerSource(final Entity damager) {
+        if (damager instanceof final Projectile projectile && projectile.getShooter() instanceof final Entity source) {
+            return source;
+        } else {
+            return damager;
         }
     }
 }
