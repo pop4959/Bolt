@@ -1,6 +1,7 @@
 package org.popcraft.bolt.util;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Nameable;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -26,7 +27,12 @@ public final class Protections {
             if (world == null || !world.isChunkLoaded(x >> 4, z >> 4)) {
                 return Strings.toTitleCase(blockProtection.getBlock());
             } else {
-                return displayType(world.getBlockAt(x, y, z));
+                final Block block = world.getBlockAt(x, y, z);
+                if (block.getState() instanceof final Nameable nameable && nameable.getCustomName() != null) {
+                    return nameable.getCustomName();
+                } else {
+                    return displayType(block);
+                }
             }
         } else if (protection instanceof final EntityProtection entityProtection) {
             final Entity entity = Bukkit.getServer().getEntity(entityProtection.getId());
