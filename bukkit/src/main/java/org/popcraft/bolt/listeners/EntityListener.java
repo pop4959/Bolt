@@ -213,8 +213,7 @@ public final class EntityListener implements Listener {
             e.setCancelled(true);
             return;
         }
-        final Entity clicked = e.getRightClicked();
-        if ((clicked instanceof ItemFrame || (clicked instanceof Mule && Material.CHEST.equals(player.getInventory().getItemInMainHand().getType()))) && !plugin.canAccessEntity(player, clicked, Permission.INTERACT)) {
+        if (!plugin.canAccessEntity(player, e.getRightClicked(), Permission.INTERACT)) {
             e.setCancelled(true);
         }
     }
