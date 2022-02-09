@@ -34,7 +34,7 @@ public final class InventoryListener implements Listener {
             return;
         }
         final PlayerMeta playerMeta = plugin.playerMeta(player);
-        if (playerMeta.hasInteracted()) {
+        if (playerMeta.triggeredAction()) {
             e.setCancelled(true);
             return;
         }
