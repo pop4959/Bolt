@@ -223,7 +223,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onPlayerArmorStandManipulate(final PlayerArmorStandManipulateEvent e) {
-        if (!plugin.canAccessEntity(e.getPlayer(), e.getRightClicked(), Permission.MODIFY)) {
+        if (!plugin.canAccessEntity(e.getPlayer(), e.getRightClicked(), Permission.INTERACT)) {
             e.setCancelled(true);
         }
     }

@@ -90,7 +90,7 @@ public final class BlockListener implements Listener {
                 final Material itemType = e.getItem().getType();
                 if (Material.LECTERN.equals(clicked.getType()) && (Material.WRITABLE_BOOK.equals(itemType) || Material.WRITTEN_BOOK.equals(itemType)) && !plugin.canAccessProtection(player, protection, Permission.DEPOSIT)) {
                     e.setUseItemInHand(Event.Result.DENY);
-                } else if ((Tag.SIGNS.isTagged(clicked.getType()) && (DYES.contains(itemType) || Material.GLOW_INK_SAC.equals(itemType)) && !plugin.canAccessProtection(player, protection, Permission.MODIFY))) {
+                } else if ((Tag.SIGNS.isTagged(clicked.getType()) && (DYES.contains(itemType) || Material.GLOW_INK_SAC.equals(itemType)) && !plugin.canAccessProtection(player, protection, Permission.INTERACT))) {
                     e.setUseItemInHand(Event.Result.DENY);
                     e.setUseInteractedBlock(Event.Result.DENY);
                 }
@@ -207,7 +207,7 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onSignChange(final SignChangeEvent e) {
-        if (!plugin.canAccessBlock(e.getPlayer(), e.getBlock(), Permission.MODIFY)) {
+        if (!plugin.canAccessBlock(e.getPlayer(), e.getBlock(), Permission.INTERACT)) {
             e.setCancelled(true);
         }
     }
