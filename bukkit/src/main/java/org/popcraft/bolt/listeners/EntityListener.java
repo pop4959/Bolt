@@ -240,7 +240,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onEntityDamage(final EntityDamageEvent e) {
-        if (EntityDamageEvent.DamageCause.ENTITY_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.PROJECTILE.equals(e.getCause())) {
+        if (EntityDamageEvent.DamageCause.ENTITY_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.PROJECTILE.equals(e.getCause()) || EntityDamageEvent.DamageCause.ENTITY_EXPLOSION.equals(e.getCause())) {
             return;
         }
         if (plugin.findProtection(e.getEntity()).isPresent()) {
