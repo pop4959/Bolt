@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityEnterLoveModeEvent;
+import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
@@ -295,6 +296,13 @@ public final class EntityListener implements Listener {
     @EventHandler
     public void onPlayerUnleashEntity(final PlayerUnleashEntityEvent e) {
         if (!plugin.canAccessEntity(e.getPlayer(), e.getEntity(), Permission.INTERACT)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityTransform(final EntityTransformEvent e) {
+        if (plugin.findProtection(e.getTransformedEntity()).isPresent()) {
             e.setCancelled(true);
         }
     }
