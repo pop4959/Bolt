@@ -14,6 +14,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityEnterLoveModeEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
@@ -303,6 +305,13 @@ public final class EntityListener implements Listener {
     @EventHandler
     public void onEntityTransform(final EntityTransformEvent e) {
         if (plugin.findProtection(e.getTransformedEntity()).isPresent()) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityTargetLivingEntity(final EntityTargetLivingEntityEvent e) {
+        if (EntityTargetEvent.TargetReason.TEMPT.equals(e.getReason()) && e.getTarget() instanceof final Player player && !plugin.canAccessEntity(player, e.getEntity(), Permission.INTERACT)) {
             e.setCancelled(true);
         }
     }
