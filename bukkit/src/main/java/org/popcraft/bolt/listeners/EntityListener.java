@@ -8,6 +8,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockShearEntityEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityCombustByBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
@@ -287,6 +288,13 @@ public final class EntityListener implements Listener {
     @EventHandler
     public void onPlayerShearEntity(final PlayerShearEntityEvent e) {
         if (!plugin.canAccessEntity(e.getPlayer(), e.getEntity(), Permission.INTERACT)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockShearEntity(final BlockShearEntityEvent e) {
+        if (plugin.findProtection(e.getEntity()).isPresent()) {
             e.setCancelled(true);
         }
     }
