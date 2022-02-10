@@ -21,6 +21,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -283,6 +284,15 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onEntityExplode(final EntityExplodeEvent e) {
         e.blockList().removeIf(block -> plugin.findProtection(block).isPresent());
+    }
+
+    @EventHandler
+    public void onSpongeAbsorb(final SpongeAbsorbEvent e) {
+        if (plugin.findProtection(e.getBlock()).isPresent()) {
+            e.setCancelled(true);
+            return;
+        }
+        e.getBlocks().removeIf(blockState -> plugin.findProtection(blockState.getBlock()).isPresent());
     }
 
     @EventHandler
