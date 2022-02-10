@@ -1,5 +1,7 @@
 package org.popcraft.bolt.util;
 
+import net.kyori.adventure.platform.bukkit.BukkitComponentSerializer;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Nameable;
 import org.bukkit.World;
@@ -47,7 +49,16 @@ public final class Protections {
     }
 
     public static String displayType(final Block block) {
-        return Strings.toTitleCase(block.getType().toString());
+        final String blockDataString = block.getBlockData().getAsString().replace(':', '.');
+        final int nbtIndex = blockDataString.indexOf('[');
+        final String key;
+        if (nbtIndex > -1) {
+            key = blockDataString.substring(0, nbtIndex);
+        } else {
+            key = blockDataString;
+        }
+        final Component translatable = Component.translatable("block.%s".formatted(key));
+        return BukkitComponentSerializer.legacy().serialize(translatable);
     }
 
     public static String displayType(final Entity entity) {
