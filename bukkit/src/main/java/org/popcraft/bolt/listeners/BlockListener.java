@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
@@ -320,6 +321,13 @@ public final class BlockListener implements Listener {
     public void onPlayerBucketFill(final PlayerBucketFillEvent e) {
         final Player player = e.getPlayer();
         if (!plugin.canAccessBlock(player, e.getBlockClicked(), Permission.INTERACT) || !plugin.canAccessBlock(player, e.getBlock(), Permission.DESTROY)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockForm(final BlockFormEvent e) {
+        if (plugin.findProtection(e.getBlock()).isPresent()) {
             e.setCancelled(true);
         }
     }
