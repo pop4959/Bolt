@@ -32,6 +32,7 @@ import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
@@ -211,6 +212,15 @@ public final class EntityListener implements Listener {
                 BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Protections.displayType(protection)));
             }
         }
+    }
+
+    @EventHandler
+    public void onVehicleEnter(final VehicleEnterEvent e) {
+        plugin.findProtection(e.getEntered()).ifPresent(entityProtection -> {
+            if (plugin.findProtection(e.getVehicle()).map(vehicleProtection -> !plugin.canAccessProtection(entityProtection.getOwner(), vehicleProtection, Permission.MOUNT)).orElse(true)) {
+                e.setCancelled(true);
+            }
+        });
     }
 
     @EventHandler
