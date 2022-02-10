@@ -11,7 +11,6 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.Source;
-import org.popcraft.bolt.util.defaults.DefaultAccess;
 import org.popcraft.bolt.util.defaults.DefaultSource;
 import org.popcraft.bolt.util.lang.Translation;
 
