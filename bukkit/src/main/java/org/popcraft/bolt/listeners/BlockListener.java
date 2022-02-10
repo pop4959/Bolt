@@ -219,6 +219,11 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onStructureGrow(final StructureGrowEvent e) {
+        final Block growingBlock = e.getLocation().getBlock();
+        if (plugin.findProtection(growingBlock).isPresent()) {
+            e.setCancelled(true);
+            return;
+        }
         e.getBlocks().removeIf(blockState -> plugin.findProtection(blockState.getBlock()).isPresent());
     }
 
