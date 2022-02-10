@@ -22,6 +22,7 @@ import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
@@ -332,6 +333,13 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockForm(final BlockFormEvent e) {
+        if (plugin.findProtection(e.getBlock()).isPresent()) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockSpread(final BlockSpreadEvent e) {
         if (plugin.findProtection(e.getBlock()).isPresent()) {
             e.setCancelled(true);
         }
