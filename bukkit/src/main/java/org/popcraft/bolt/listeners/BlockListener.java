@@ -22,6 +22,7 @@ import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
@@ -342,6 +343,13 @@ public final class BlockListener implements Listener {
     public void onBlockSpread(final BlockSpreadEvent e) {
         if (plugin.findProtection(e.getBlock()).isPresent()) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockRedstone(final BlockRedstoneEvent e) {
+        if (plugin.findProtection(e.getBlock()).isPresent()) {
+            e.setNewCurrent(e.getOldCurrent());
         }
     }
 
