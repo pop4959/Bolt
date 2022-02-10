@@ -2,7 +2,6 @@ package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -19,6 +18,7 @@ import org.bukkit.event.entity.EntityEnterLoveModeEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -364,6 +364,13 @@ public final class EntityListener implements Listener {
     @EventHandler
     public void onAreaEffectCloudApply(final AreaEffectCloudApplyEvent e) {
         e.getAffectedEntities().removeIf(livingEntity -> plugin.findProtection(livingEntity).map(protection -> !(e.getEntity().getSource() instanceof final Entity entity) || !(getDamagerSource(entity) instanceof final Player player) || !plugin.canAccessProtection(player, protection, Permission.DESTROY)).orElse(false));
+    }
+
+    @EventHandler
+    public void onExplosionPrime(final ExplosionPrimeEvent e) {
+        if (plugin.findProtection(e.getEntity()).isPresent()) {
+            e.setCancelled(true);
+        }
     }
 
     private Entity getDamagerSource(final Entity damager) {
