@@ -184,7 +184,7 @@ public final class EntityListener implements Listener {
                                 protection.getAccess().put(source, type);
                             }
                         });
-                        plugin.removeProtection(protection);
+                        plugin.saveProtection(protection);
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED, Template.of("type", Protections.displayType(protection)));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_PERMISSION);
