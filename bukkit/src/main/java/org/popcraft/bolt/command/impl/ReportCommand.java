@@ -53,7 +53,7 @@ public class ReportCommand extends BoltCommand {
     }
 
     @Override
-    public List<String> suggestions() {
+    public List<String> suggestions(Arguments arguments) {
         return Collections.emptyList();
     }
 }

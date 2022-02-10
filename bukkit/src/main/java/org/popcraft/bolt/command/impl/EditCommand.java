@@ -11,6 +11,7 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.Source;
+import org.popcraft.bolt.util.defaults.DefaultAccess;
 import org.popcraft.bolt.util.defaults.DefaultSource;
 import org.popcraft.bolt.util.lang.Translation;
 
@@ -27,7 +28,11 @@ public class EditCommand extends BoltCommand {
 
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
-        if (sender instanceof final Player player && arguments.remaining() >= 3) {
+        if (!(sender instanceof final Player player)) {
+            BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
+            return;
+        }
+        if (arguments.remaining() >= 3) {
             final PlayerMeta playerMeta = plugin.playerMeta(player);
             playerMeta.setAction(Action.EDIT);
             final String sourceType = arguments.next();
@@ -48,12 +53,27 @@ public class EditCommand extends BoltCommand {
             playerMeta.getModifications().put(new Source(sourceType, sourceIdentifier), access);
             BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Template.of("action", translate(Translation.EDIT)));
         } else {
-            BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
+            BoltComponents.sendMessage(sender, Translation.COMMAND_NOT_ENOUGH_ARGS);
         }
     }
 
     @Override
-    public List<String> suggestions() {
+    public List<String> suggestions(Arguments arguments) {
+        if (arguments.remaining() == 0) {
+            return Collections.emptyList();
+        }
+        arguments.next();
+        if (arguments.remaining() == 0) {
+            return List.of("player");
+        }
+        arguments.next();
+        if (arguments.remaining() == 0) {
+            return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
+        }
+        arguments.next();
+        if (arguments.remaining() == 0) {
+            return plugin.getBolt().getAccessRegistry().types();
+        }
         return Collections.emptyList();
     }
 }
