@@ -2,11 +2,15 @@ package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.EntityCombustByBlockEvent;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -15,6 +19,8 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
@@ -311,6 +317,45 @@ public final class EntityListener implements Listener {
         if (EntityTargetEvent.TargetReason.TEMPT.equals(e.getReason()) && e.getTarget() instanceof final Player player && !plugin.canAccessEntity(player, e.getEntity(), Permission.INTERACT)) {
             e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onEntityCombustByBlock(final EntityCombustByBlockEvent e) {
+        if (plugin.findProtection(e.getEntity()).isPresent()) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityCombustByEntity(final EntityCombustByEntityEvent e) {
+        plugin.findProtection(e.getEntity()).ifPresent(protection -> {
+            if (!(getDamagerSource(e.getCombuster()) instanceof final Player player) || !plugin.canAccessProtection(player, protection, Permission.DESTROY)) {
+                e.setCancelled(true);
+            }
+        });
+    }
+
+    @EventHandler
+    public void onProjectileHit(final ProjectileHitEvent e) {
+        final Entity hitEntity = e.getHitEntity();
+        if (hitEntity == null) {
+            return;
+        }
+        plugin.findProtection(hitEntity).ifPresent(protection -> {
+            if (!(getDamagerSource(e.getEntity()) instanceof final Player player) || !plugin.canAccessProtection(player, protection, Permission.DESTROY)) {
+                e.setCancelled(true);
+            }
+        });
+    }
+
+    @EventHandler
+    public void onPotionSplash(final PotionSplashEvent e) {
+        e.getAffectedEntities().removeIf(livingEntity -> plugin.findProtection(livingEntity).map(protection -> !(getDamagerSource(e.getEntity()) instanceof final Player player) || !plugin.canAccessProtection(player, protection, Permission.DESTROY)).orElse(false));
+    }
+
+    @EventHandler
+    public void onAreaEffectCloudApply(final AreaEffectCloudApplyEvent e) {
+        e.getAffectedEntities().removeIf(livingEntity -> plugin.findProtection(livingEntity).map(protection -> !(e.getEntity().getSource() instanceof final Entity entity) || !(getDamagerSource(entity) instanceof final Player player) || !plugin.canAccessProtection(player, protection, Permission.DESTROY)).orElse(false));
     }
 
     private Entity getDamagerSource(final Entity damager) {
