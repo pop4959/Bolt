@@ -1,10 +1,7 @@
 package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.minimessage.Template;
-import org.bukkit.Material;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Mule;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
