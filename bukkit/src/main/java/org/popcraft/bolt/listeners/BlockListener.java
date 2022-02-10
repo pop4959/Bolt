@@ -16,6 +16,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -25,6 +26,8 @@ import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
@@ -293,6 +296,32 @@ public final class BlockListener implements Listener {
             return;
         }
         e.getBlocks().removeIf(blockState -> plugin.findProtection(blockState.getBlock()).isPresent());
+    }
+
+    @EventHandler
+    public void onBlockIgnite(final BlockIgniteEvent e) {
+        plugin.findProtection(e.getBlock()).ifPresent(protection -> {
+            final Player player = e.getPlayer();
+            if (player == null || !plugin.canAccessProtection(player, protection, Permission.INTERACT)) {
+                e.setCancelled(true);
+            }
+        });
+    }
+
+    @EventHandler
+    public void onPlayerBucketEmpty(final PlayerBucketEmptyEvent e) {
+        final Player player = e.getPlayer();
+        if (!plugin.canAccessBlock(player, e.getBlockClicked(), Permission.INTERACT) || !plugin.canAccessBlock(player, e.getBlock(), Permission.DESTROY)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerBucketFill(final PlayerBucketFillEvent e) {
+        final Player player = e.getPlayer();
+        if (!plugin.canAccessBlock(player, e.getBlockClicked(), Permission.INTERACT) || !plugin.canAccessBlock(player, e.getBlock(), Permission.DESTROY)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
