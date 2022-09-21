@@ -1,6 +1,6 @@
 package org.popcraft.bolt.listeners;
 
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -88,11 +88,11 @@ public final class BlockListener implements Listener {
             if (!plugin.canAccessProtection(player, protection, Permission.INTERACT)) {
                 e.setCancelled(true);
                 if (!hasNotifyPermission) {
-                    BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("type", Protections.displayType(protection)));
+                    BoltComponents.sendMessage(player, Translation.LOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
                 }
             }
             if (hasNotifyPermission) {
-                BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Template.of("type", Protections.displayType(protection)), Template.of("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
+                BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
             }
             if (e.getItem() != null) {
                 final Material itemType = e.getItem().getType();
@@ -118,26 +118,26 @@ public final class BlockListener implements Listener {
         switch (action) {
             case LOCK -> {
                 if (protection != null) {
-                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Template.of("type", Protections.displayType(protection)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Placeholder.unparsed("type", Protections.displayType(protection)));
                 } else {
                     plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createPrivateBlockProtection(block, playerMeta.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId()));
                     playerMeta.setLockNil(false);
-                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Template.of("type", Protections.displayType(block)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 }
             }
             case UNLOCK -> {
                 if (protection != null) {
                     plugin.removeProtection(protection);
-                    BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Protections.displayType(protection)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
                 } else {
-                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Protections.displayType(block)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 }
             }
             case INFO -> {
                 if (protection != null) {
-                    BoltComponents.sendMessage(player, Translation.INFO, Template.of("access", Strings.toTitleCase(protection.getType())), Template.of("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
+                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
                 } else {
-                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Protections.displayType(block)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 }
             }
             case EDIT -> {
@@ -151,12 +151,12 @@ public final class BlockListener implements Listener {
                             }
                         });
                         plugin.saveProtection(protection);
-                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED, Template.of("type", Protections.displayType(protection)));
+                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED, Placeholder.unparsed("type", Protections.displayType(protection)));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_PERMISSION);
                     }
                 } else {
-                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Protections.displayType(block)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 }
                 playerMeta.getModifications().clear();
             }
@@ -206,7 +206,7 @@ public final class BlockListener implements Listener {
             final Protection protection = optionalProtection.get();
             if (plugin.canAccessProtection(player, protection, Permission.DESTROY)) {
                 plugin.removeProtection(protection);
-                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Protections.displayType(protection)));
+                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
             } else {
                 e.setCancelled(true);
             }

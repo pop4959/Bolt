@@ -1,6 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
@@ -50,7 +50,7 @@ public class EditCommand extends BoltCommand {
             }
             final String access = arguments.next();
             playerMeta.getModifications().put(new Source(sourceType, sourceIdentifier), access);
-            BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Template.of("action", translate(Translation.EDIT)));
+            BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.EDIT)));
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_NOT_ENOUGH_ARGS);
         }

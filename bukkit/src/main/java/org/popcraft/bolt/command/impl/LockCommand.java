@@ -1,6 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
@@ -28,7 +28,7 @@ public class LockCommand extends BoltCommand {
             if (arguments.remaining() > 0) {
                 playerMeta.setLockNil(true);
             }
-            BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Template.of("action", translate(Translation.LOCK)));
+            BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.LOCK)));
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
         }

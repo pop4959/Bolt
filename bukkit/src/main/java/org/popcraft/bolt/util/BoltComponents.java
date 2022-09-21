@@ -2,7 +2,7 @@ package org.popcraft.bolt.util;
 
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
@@ -18,7 +18,7 @@ public final class BoltComponents {
     public static void enable(final Plugin plugin) {
         if (adventure == null) {
             adventure = BukkitAudiences.create(plugin);
-            miniMessage = MiniMessage.get();
+            miniMessage = MiniMessage.miniMessage();
         }
     }
 
@@ -30,7 +30,7 @@ public final class BoltComponents {
         }
     }
 
-    public static void sendMessage(final CommandSender sender, String key, Template... placeholders) {
-        adventure.sender(sender).sendMessage(miniMessage.parse(translate(key), placeholders));
+    public static void sendMessage(final CommandSender sender, String key, TagResolver... placeholders) {
+        adventure.sender(sender).sendMessage(miniMessage.deserialize(translate(key), placeholders));
     }
 }

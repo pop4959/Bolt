@@ -1,6 +1,6 @@
 package org.popcraft.bolt.listeners;
 
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -65,7 +65,7 @@ public final class EntityListener implements Listener {
         plugin.findProtection(entity).ifPresent(protection -> {
             plugin.removeProtection(protection);
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent entityDamageByEntityEvent && getDamagerSource(entityDamageByEntityEvent.getDamager()) instanceof final Player player && plugin.canAccessProtection(player, protection, Permission.DESTROY)) {
-                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Protections.displayType(protection)));
+                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
             }
         });
     }
@@ -105,7 +105,7 @@ public final class EntityListener implements Listener {
                 plugin.findProtection(entity).ifPresent(protection -> {
                     plugin.removeProtection(protection);
                     if (plugin.canAccessProtection(player, protection, Permission.DESTROY)) {
-                        BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Protections.displayType(protection)));
+                        BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
                     }
                 });
             }
@@ -130,11 +130,11 @@ public final class EntityListener implements Listener {
             if (!plugin.canAccessProtection(player, protection, permission)) {
                 shouldCancel = true;
                 if (shouldSendMessage && !hasNotifyPermission) {
-                    BoltComponents.sendMessage(player, Translation.LOCKED, Template.of("type", Protections.displayType(protection)));
+                    BoltComponents.sendMessage(player, Translation.LOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
                 }
             }
             if (shouldSendMessage && hasNotifyPermission) {
-                BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Template.of("type", Protections.displayType(protection)), Template.of("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
+                BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
             }
             playerMeta.setInteracted();
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, playerMeta::clearInteraction);
@@ -152,26 +152,26 @@ public final class EntityListener implements Listener {
         switch (action) {
             case LOCK -> {
                 if (protection != null) {
-                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Template.of("type", Protections.displayType(protection)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Placeholder.unparsed("type", Protections.displayType(protection)));
                 } else {
                     plugin.getBolt().getStore().saveEntityProtection(BukkitAdapter.createPrivateEntityProtection(entity, playerMeta.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId()));
                     playerMeta.setLockNil(false);
-                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Template.of("type", Protections.displayType(entity)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
             }
             case UNLOCK -> {
                 if (protection != null) {
                     plugin.removeProtection(protection);
-                    BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Protections.displayType(protection)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
                 } else {
-                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Protections.displayType(entity)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
             }
             case INFO -> {
                 if (protection != null) {
-                    BoltComponents.sendMessage(player, Translation.INFO, Template.of("access", Strings.toTitleCase(protection.getType())), Template.of("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
+                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
                 } else {
-                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Protections.displayType(entity)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
             }
             case EDIT -> {
@@ -185,12 +185,12 @@ public final class EntityListener implements Listener {
                             }
                         });
                         plugin.saveProtection(protection);
-                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED, Template.of("type", Protections.displayType(protection)));
+                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED, Placeholder.unparsed("type", Protections.displayType(protection)));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_PERMISSION);
                     }
                 } else {
-                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Template.of("type", Protections.displayType(entity)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
                 playerMeta.getModifications().clear();
             }
@@ -209,7 +209,7 @@ public final class EntityListener implements Listener {
                 e.setCancelled(true);
             } else {
                 plugin.removeProtection(protection);
-                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Template.of("type", Protections.displayType(protection)));
+                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
             }
         }
     }

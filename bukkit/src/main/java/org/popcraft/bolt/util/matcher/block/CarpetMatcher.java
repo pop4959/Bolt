@@ -17,7 +17,7 @@ public class CarpetMatcher implements BlockMatcher {
     @Override
     public Optional<Match> findMatch(Block block) {
         final Block above = block.getRelative(BlockFace.UP);
-        if (Tag.CARPETS.isTagged(above.getType())) {
+        if (Tag.WOOL_CARPETS.isTagged(above.getType())) {
             return Optional.of(Match.ofBlocks(Collections.singleton(above)));
         }
         return Optional.empty();

@@ -1,6 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
@@ -25,7 +25,7 @@ public class PersistCommand extends BoltCommand {
         if (sender instanceof final Player player) {
             final PlayerMeta playerMeta = plugin.playerMeta(player);
             playerMeta.togglePersist();
-            BoltComponents.sendMessage(player, Translation.COMMAND_PERSIST, Template.of("toggle", translate(playerMeta.isPersist() ? Translation.ENABLED : Translation.DISABLED)));
+            BoltComponents.sendMessage(player, Translation.COMMAND_PERSIST, Placeholder.unparsed("toggle", translate(playerMeta.isPersist() ? Translation.ENABLED : Translation.DISABLED)));
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
         }

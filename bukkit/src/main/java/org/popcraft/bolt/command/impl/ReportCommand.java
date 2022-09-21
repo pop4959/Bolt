@@ -2,7 +2,7 @@ package org.popcraft.bolt.command.impl;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
@@ -30,17 +30,17 @@ public class ReportCommand extends BoltCommand {
         final long misses = Metrics.getProtectionMisses();
         final boolean hitsChanged = hits != previousHits;
         final boolean missesChanged = misses != previousMisses;
-        BoltComponents.sendMessage(sender, "Hits: <hits>", Template.of("hits", changeComponent(hitsChanged, previousHits, hits)));
-        BoltComponents.sendMessage(sender, "Misses: <misses>", Template.of("misses", changeComponent(missesChanged, previousMisses, misses)));
+        BoltComponents.sendMessage(sender, "Hits: <hits>", Placeholder.component("hits", changeComponent(hitsChanged, previousHits, hits)));
+        BoltComponents.sendMessage(sender, "Misses: <misses>", Placeholder.component("misses", changeComponent(missesChanged, previousMisses, misses)));
         final Map<Metrics.ProtectionAccess, Long> protectionAccessCounts = Metrics.getProtectionAccessCounts();
         final Map<String, List<Metrics.ProtectionAccess>> protectionAccessListByType = protectionAccessCounts.keySet().stream().collect(Collectors.groupingBy(Metrics.ProtectionAccess::type, Collectors.toList()));
         protectionAccessListByType.forEach((type, list) -> {
-            BoltComponents.sendMessage(sender, "<type>", Template.of("type", type));
+            BoltComponents.sendMessage(sender, "<type>", Placeholder.unparsed("type", type));
             list.forEach(protectionAccess -> {
                 final long count = protectionAccessCounts.get(protectionAccess);
                 final long previousCount = previousExecutionCounts == null ? 0 : previousExecutionCounts.getOrDefault(protectionAccess, 0L);
                 final boolean countChanged = count != previousCount;
-                BoltComponents.sendMessage(sender, "<consumer>: <count>", Template.of("consumer", protectionAccess.consumer()), Template.of("count", changeComponent(countChanged, previousCount, count)));
+                BoltComponents.sendMessage(sender, "<consumer>: <count>", Placeholder.unparsed("consumer", protectionAccess.consumer()), Placeholder.component("count", changeComponent(countChanged, previousCount, count)));
             });
         });
         this.previousHits = hits;
