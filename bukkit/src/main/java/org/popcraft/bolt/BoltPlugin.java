@@ -51,6 +51,7 @@ import org.popcraft.bolt.util.matcher.block.DeadBushMatcher;
 import org.popcraft.bolt.util.matcher.block.DoorMatcher;
 import org.popcraft.bolt.util.matcher.block.FarmlandMatcher;
 import org.popcraft.bolt.util.matcher.block.FireMatcher;
+import org.popcraft.bolt.util.matcher.block.FrogspawnMatcher;
 import org.popcraft.bolt.util.matcher.block.GlowLichenMatcher;
 import org.popcraft.bolt.util.matcher.block.GrassMatcher;
 import org.popcraft.bolt.util.matcher.block.HangingRootsMatcher;
@@ -60,6 +61,7 @@ import org.popcraft.bolt.util.matcher.block.LadderMatcher;
 import org.popcraft.bolt.util.matcher.block.LanternMatcher;
 import org.popcraft.bolt.util.matcher.block.LeashHitchMatcher;
 import org.popcraft.bolt.util.matcher.block.LilyPadMatcher;
+import org.popcraft.bolt.util.matcher.block.MangrovePropaguleMatcher;
 import org.popcraft.bolt.util.matcher.block.MossCarpetMatcher;
 import org.popcraft.bolt.util.matcher.block.MushroomMatcher;
 import org.popcraft.bolt.util.matcher.block.NetherWartMatcher;
@@ -74,6 +76,7 @@ import org.popcraft.bolt.util.matcher.block.SaplingMatcher;
 import org.popcraft.bolt.util.matcher.block.ScaffoldingMatcher;
 import org.popcraft.bolt.util.matcher.block.SeaPickleMatcher;
 import org.popcraft.bolt.util.matcher.block.SignMatcher;
+import org.popcraft.bolt.util.matcher.block.SkulkVeinMatcher;
 import org.popcraft.bolt.util.matcher.block.SmallDripleafMatcher;
 import org.popcraft.bolt.util.matcher.block.SmallFlowerMatcher;
 import org.popcraft.bolt.util.matcher.block.SnowMatcher;
@@ -121,7 +124,7 @@ public class BoltPlugin extends JavaPlugin {
             new SweetBerryBushMatcher(), new ChorusMatcher(), new GrassMatcher(), new TallGrassMatcher(),
             new DeadBushMatcher(), new HangingRootsMatcher(), new PointedDripstoneMatcher(), new FireMatcher(),
             new GlowLichenMatcher(), new LilyPadMatcher(), new RepeaterMatcher(), new SporeBlossomMatcher(),
-            new SoulFireMatcher());
+            new SoulFireMatcher(), new FrogspawnMatcher(), new MangrovePropaguleMatcher(), new SkulkVeinMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
