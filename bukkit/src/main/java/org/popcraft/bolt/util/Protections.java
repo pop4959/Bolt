@@ -30,7 +30,7 @@ public final class Protections {
                 return Strings.toTitleCase(blockProtection.getBlock());
             } else {
                 final Block block = world.getBlockAt(x, y, z);
-                if (block.getState() instanceof final Nameable nameable && nameable.getCustomName() != null) {
+                if (block.getState() instanceof final Nameable nameable && nameable.getCustomName() != null && !nameable.getCustomName().isEmpty()) {
                     return nameable.getCustomName();
                 } else {
                     return displayType(block);
