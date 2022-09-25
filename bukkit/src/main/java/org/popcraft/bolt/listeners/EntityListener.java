@@ -26,6 +26,7 @@ import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
+import org.bukkit.event.player.PlayerBucketEntityEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
@@ -194,7 +195,8 @@ public final class EntityListener implements Listener {
                 }
                 playerMeta.getModifications().clear();
             }
-            case DEBUG -> BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());
+            case DEBUG ->
+                    BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());
         }
         return true;
     }
@@ -348,6 +350,15 @@ public final class EntityListener implements Listener {
     public void onEntityCombustByEntity(final EntityCombustByEntityEvent e) {
         plugin.findProtection(e.getEntity()).ifPresent(protection -> {
             if (!(getDamagerSource(e.getCombuster()) instanceof final Player player) || !plugin.canAccessProtection(player, protection, Permission.DESTROY)) {
+                e.setCancelled(true);
+            }
+        });
+    }
+
+    @EventHandler
+    public void onPlayerBucketEntity(final PlayerBucketEntityEvent e) {
+        plugin.findProtection(e.getEntity()).ifPresent(protection -> {
+            if (!plugin.canAccessProtection(e.getPlayer(), protection, Permission.DESTROY)) {
                 e.setCancelled(true);
             }
         });
