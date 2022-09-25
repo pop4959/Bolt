@@ -216,6 +216,20 @@ public final class BlockListener implements Listener {
     }
 
     @EventHandler
+    public void onPlayerInteractPhysical(final PlayerInteractEvent e) {
+        if (!org.bukkit.event.block.Action.PHYSICAL.equals(e.getAction())) {
+            return;
+        }
+        final Block block = e.getClickedBlock();
+        if (block == null) {
+            return;
+        }
+        if (!plugin.canAccessBlock(e.getPlayer(), block, Permission.DESTROY)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void onSignChange(final SignChangeEvent e) {
         if (!plugin.canAccessBlock(e.getPlayer(), e.getBlock(), Permission.INTERACT)) {
             e.setCancelled(true);
