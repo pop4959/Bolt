@@ -35,6 +35,7 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.util.BoundingBox;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Action;
@@ -47,6 +48,7 @@ import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -280,10 +282,23 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockPistonExtend(final BlockPistonExtendEvent e) {
-        for (final Block block : e.getBlocks()) {
+        final List<Block> blocks = e.getBlocks();
+        for (final Block block : blocks) {
             if (plugin.findProtection(block).isPresent()) {
                 e.setCancelled(true);
                 return;
+            }
+            final BoundingBox moveArea = block.getBoundingBox().shift(e.getDirection().getDirection());
+            if (!block.getWorld().getNearbyEntities(moveArea, entity -> plugin.findProtection(entity).isPresent()).isEmpty()) {
+                e.setCancelled(true);
+                return;
+            }
+        }
+        if (blocks.isEmpty()) {
+            final Block piston = e.getBlock();
+            final BoundingBox moveArea = piston.getBoundingBox().shift(e.getDirection().getDirection());
+            if (!piston.getWorld().getNearbyEntities(moveArea, entity -> plugin.findProtection(entity).isPresent()).isEmpty()) {
+                e.setCancelled(true);
             }
         }
     }
