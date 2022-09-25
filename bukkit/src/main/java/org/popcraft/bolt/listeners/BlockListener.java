@@ -19,7 +19,6 @@ import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -160,7 +159,8 @@ public final class BlockListener implements Listener {
                 }
                 playerMeta.getModifications().clear();
             }
-            case DEBUG -> BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());
+            case DEBUG ->
+                    BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());
         }
         return true;
     }
@@ -354,12 +354,13 @@ public final class BlockListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onBlockPhysics(final BlockPhysicsEvent e) {
-        if (plugin.findProtection(e.getBlock()).isPresent()) {
-            e.setCancelled(true);
-        }
-    }
+    // TODO: Expensive event, needs to be checked only for specific cases
+//    @EventHandler
+//    public void onBlockPhysics(final BlockPhysicsEvent e) {
+//        if (plugin.findProtection(e.getBlock()).isPresent()) {
+//            e.setCancelled(true);
+//        }
+//    }
 
     @EventHandler
     public void onPlayerTakeLecternBook(final PlayerTakeLecternBookEvent e) {
