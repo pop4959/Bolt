@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class PlayerMeta {
     private final UUID uuid;
-    private final Map<Source, String> modifications = new HashMap<>();
+    private final Map<String, String> modifications = new HashMap<>();
     private Action action;
     private Action lastAction;
     private boolean interacted;
@@ -62,7 +62,7 @@ public class PlayerMeta {
         }
     }
 
-    public Map<Source, String> getModifications() {
+    public Map<String, String> getModifications() {
         return modifications;
     }
 

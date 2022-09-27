@@ -11,7 +11,6 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.Source;
-import org.popcraft.bolt.util.defaults.DefaultSource;
 import org.popcraft.bolt.util.lang.Translation;
 
 import java.util.Collections;
@@ -34,22 +33,22 @@ public class EditCommand extends BoltCommand {
         if (arguments.remaining() >= 3) {
             final PlayerMeta playerMeta = plugin.playerMeta(player);
             playerMeta.setAction(Action.EDIT);
-            final String sourceType = arguments.next();
+            final String type = arguments.next();
             final String inputIdentifier = arguments.next();
-            String sourceIdentifier;
-            if (DefaultSource.PLAYER.getType().equals(sourceType)) {
+            String identifier;
+            if (Source.PLAYER.equals(type)) {
                 UUID uuid;
                 try {
                     uuid = UUID.fromString(inputIdentifier);
                 } catch (IllegalArgumentException ignored) {
                     uuid = null;
                 }
-                sourceIdentifier = (uuid == null ? BukkitAdapter.playerUUID(inputIdentifier) : uuid).toString();
+                identifier = (uuid == null ? BukkitAdapter.playerUUID(inputIdentifier) : uuid).toString();
             } else {
-                sourceIdentifier = inputIdentifier;
+                identifier = inputIdentifier;
             }
             final String access = arguments.next();
-            playerMeta.getModifications().put(new Source(sourceType, sourceIdentifier), access);
+            playerMeta.getModifications().put(Source.from(type, identifier), access);
             BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.EDIT)));
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_NOT_ENOUGH_ARGS);
@@ -63,7 +62,7 @@ public class EditCommand extends BoltCommand {
         }
         arguments.next();
         if (arguments.remaining() == 0) {
-            return List.of("player");
+            return List.of(Source.PLAYER);
         }
         arguments.next();
         if (arguments.remaining() == 0) {

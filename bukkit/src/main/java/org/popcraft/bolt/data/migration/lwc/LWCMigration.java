@@ -8,7 +8,6 @@ import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.defaults.DefaultAccess;
 import org.popcraft.bolt.util.defaults.DefaultProtectionType;
-import org.popcraft.bolt.util.defaults.DefaultSource;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,8 +31,6 @@ public class LWCMigration implements Migration {
     private static final int ACCESS_TYPE_TOWN = 3;
     private static final int ACCESS_TYPE_REGION = 5;
     private static final int RIGHTS_TYPE_ADMIN = 2;
-    private static final String LWC_SOURCE_TOWN = "town";
-    private static final String LWC_SOURCE_REGION = "region";
     private static final Block BLOCK_AIR = new Block(-1, "AIR");
 
     @Override
@@ -102,31 +99,31 @@ public class LWCMigration implements Migration {
             } else {
                 protectionType = DefaultProtectionType.PRIVATE.type();
             }
-            final Map<Source, String> access = new HashMap<>();
+            final Map<String, String> access = new HashMap<>();
             final Data data = gson.fromJson(protection.data(), Data.class);
             if (data != null) {
                 for (DataFlag flag : data.getFlags()) {
                     if (flag.getId() == FLAG_TYPE_REDSTONE) {
-                        access.put(new Source(DefaultSource.REDSTONE.getType(), DefaultSource.REDSTONE.getType()), DefaultAccess.FULL.type());
+                        access.put(Source.from(Source.REDSTONE, Source.REDSTONE), DefaultAccess.FULL.type());
                     } else if (flag.getId() == FLAG_TYPE_HOPPER) {
-                        access.put(new Source(DefaultSource.HOPPER.getType(), DefaultSource.HOPPER.getType()), DefaultAccess.FULL.type());
+                        access.put(Source.from(Source.HOPPER, Source.HOPPER), DefaultAccess.FULL.type());
                     }
                 }
                 for (DataRights rights : data.getRights()) {
                     final String accessType = rights.getRights() == RIGHTS_TYPE_ADMIN ? DefaultAccess.FULL.type() : DefaultAccess.BASIC.type();
                     if (rights.getType() == ACCESS_TYPE_GROUP) {
-                        access.put(new Source(DefaultSource.PERMISSION.getType(), rights.getName()), accessType);
+                        access.put(Source.from(Source.PERMISSION, rights.getName()), accessType);
                     } else if (rights.getType() == ACCESS_TYPE_PLAYER) {
-                        access.put(new Source(DefaultSource.PLAYER.getType(), rights.getName()), accessType);
+                        access.put(Source.from(Source.PLAYER, rights.getName()), accessType);
                     } else if (rights.getType() == ACCESS_TYPE_TOWN) {
-                        access.put(new Source(LWC_SOURCE_TOWN, rights.getName()), accessType);
+                        access.put(Source.from(Source.TOWN, rights.getName()), accessType);
                     } else if (rights.getType() == ACCESS_TYPE_REGION) {
-                        access.put(new Source(LWC_SOURCE_REGION, rights.getName()), accessType);
+                        access.put(Source.from(Source.REGION, rights.getName()), accessType);
                     }
                 }
             }
             if (protection.password() != null && !protection.password().isEmpty()) {
-                access.put(new Source(DefaultSource.PASSWORD.getType(), protection.password()), DefaultAccess.BASIC.type());
+                access.put(Source.from(Source.PASSWORD, protection.password()), DefaultAccess.BASIC.type());
             }
             UUID ownerUUID;
             try {

@@ -29,13 +29,13 @@ public class Strings {
         return builder.toString();
     }
 
-    public static String access(final Map<Source, String> accessMap) {
+    public static String access(final Map<String, String> accessMap) {
         if (accessMap == null || accessMap.isEmpty()) {
             return translate(Translation.EMPTY);
         }
         final List<String> access = new ArrayList<>();
-        for (final Source source : accessMap.keySet()) {
-            access.add("%s (%s)".formatted(source.identifier(), toTitleCase(source.type())));
+        for (final String source : accessMap.keySet()) {
+            access.add("%s (%s)".formatted(Source.identifier(source), toTitleCase(Source.type(source))));
         }
         return String.join(", ", access);
     }

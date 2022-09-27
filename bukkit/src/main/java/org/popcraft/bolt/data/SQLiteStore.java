@@ -1,10 +1,11 @@
 package org.popcraft.bolt.data;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.Metrics;
-import org.popcraft.bolt.util.Source;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,12 +17,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.LogManager;
-import java.util.stream.Collectors;
 
 public class SQLiteStore implements Store {
     private static final String JDBC_SQLITE_URL = "jdbc:sqlite:bolt.db";
+    private static final Gson GSON = new Gson();
 
     public SQLiteStore() {
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
@@ -87,25 +89,15 @@ public class SQLiteStore implements Store {
         final String id = resultSet.getString(1);
         final String owner = resultSet.getString(2);
         final String type = resultSet.getString(3);
-        final String accessString = resultSet.getString(4);
-        final Map<Source, String> accessMap = new HashMap<>();
-        if (!accessString.isEmpty()) {
-            String[] accessSplit = accessString.split(",");
-            for (String accessEntry : accessSplit) {
-                String[] keyValue = accessEntry.split(":");
-                String[] sourceTypeIdentifier = keyValue[0].split(";");
-                String sourceType = sourceTypeIdentifier[0];
-                String sourceIdentifier = sourceTypeIdentifier[1];
-                String access = keyValue[1];
-                accessMap.put(new Source(sourceType, sourceIdentifier), access);
-            }
-        }
+        final String accessText = resultSet.getString(4);
+        final HashMap<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, new TypeToken<HashMap<String, String>>() {
+        }.getType()), new HashMap<>());
         final String block = resultSet.getString(5);
         final String world = resultSet.getString(6);
         final int x = resultSet.getInt(7);
         final int y = resultSet.getInt(8);
         final int z = resultSet.getInt(9);
-        return new BlockProtection(UUID.fromString(id), UUID.fromString(owner), type, accessMap, block, world, x, y, z);
+        return new BlockProtection(UUID.fromString(id), UUID.fromString(owner), type, access, block, world, x, y, z);
     }
 
     @Override
@@ -115,7 +107,8 @@ public class SQLiteStore implements Store {
                 replaceBlock.setString(1, protection.getId().toString());
                 replaceBlock.setString(2, protection.getOwner().toString());
                 replaceBlock.setString(3, protection.getType());
-                replaceBlock.setString(4, protection.getAccess().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
+                replaceBlock.setString(4, GSON.toJson(protection.getAccess(), new TypeToken<Map<String, String>>() {
+                }.getType()));
                 replaceBlock.setString(5, protection.getBlock());
                 replaceBlock.setString(6, protection.getWorld());
                 replaceBlock.setInt(7, protection.getX());
@@ -185,21 +178,11 @@ public class SQLiteStore implements Store {
         final String id = resultSet.getString(1);
         final String owner = resultSet.getString(2);
         final String type = resultSet.getString(3);
-        final String accessString = resultSet.getString(4);
-        final Map<Source, String> accessMap = new HashMap<>();
-        if (!accessString.isEmpty()) {
-            String[] accessSplit = accessString.split(",");
-            for (String accessEntry : accessSplit) {
-                String[] keyValue = accessEntry.split(":");
-                String[] sourceTypeIdentifier = keyValue[0].split(";");
-                String sourceType = sourceTypeIdentifier[0];
-                String sourceIdentifier = sourceTypeIdentifier[1];
-                String access = keyValue[1];
-                accessMap.put(new Source(sourceType, sourceIdentifier), access);
-            }
-        }
+        final String accessText = resultSet.getString(4);
+        final HashMap<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, new TypeToken<HashMap<String, String>>() {
+        }.getType()), new HashMap<>());
         final String entity = resultSet.getString(5);
-        return new EntityProtection(UUID.fromString(id), UUID.fromString(owner), type, accessMap, entity);
+        return new EntityProtection(UUID.fromString(id), UUID.fromString(owner), type, access, entity);
     }
 
     @Override
@@ -209,7 +192,8 @@ public class SQLiteStore implements Store {
                 replaceEntity.setString(1, protection.getId().toString());
                 replaceEntity.setString(2, protection.getOwner().toString());
                 replaceEntity.setString(3, protection.getType());
-                replaceEntity.setString(4, protection.getAccess().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
+                replaceEntity.setString(4, GSON.toJson(protection.getAccess(), new TypeToken<Map<String, String>>() {
+                }.getType()));
                 replaceEntity.setString(5, protection.getEntity());
                 replaceEntity.execute();
             }
