@@ -8,14 +8,12 @@ import java.util.UUID;
 public abstract class Protection {
     protected final UUID id;
     protected final UUID owner;
-    protected final UUID parent;
     protected final String type;
     protected final Map<Source, String> access;
 
-    protected Protection(UUID id, UUID owner, UUID parent, String type, Map<Source, String> access) {
+    protected Protection(UUID id, UUID owner, String type, Map<Source, String> access) {
         this.id = id;
         this.owner = owner;
-        this.parent = parent;
         this.type = type;
         this.access = access;
     }
@@ -26,10 +24,6 @@ public abstract class Protection {
 
     public UUID getOwner() {
         return owner;
-    }
-
-    public UUID getParent() {
-        return parent;
     }
 
     public String getType() {
@@ -45,7 +39,6 @@ public abstract class Protection {
         return "Protection{" +
                 "id=" + id +
                 ", owner=" + owner +
-                ", parent=" + parent +
                 ", type='" + type + '\'' +
                 ", access=" + access +
                 '}';

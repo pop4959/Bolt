@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.LogManager;
 import java.util.stream.Collectors;
@@ -26,22 +25,16 @@ public class SQLiteStore implements Store {
 
     public SQLiteStore() {
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS blocks (id varchar(36) PRIMARY KEY, owner varchar(36), parent varchar(36), type varchar(128), access text, block varchar(128), world varchar(128), x integer, y integer, z integer);")) {
+            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS blocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), access text, block varchar(128), world varchar(128), x integer, y integer, z integer);")) {
                 statement.execute();
             }
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS entities (id varchar(36) PRIMARY KEY, owner varchar(36), parent varchar(36), type varchar(128), access text, entity varchar(128));")) {
+            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS entities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), access text, entity varchar(128));")) {
                 statement.execute();
             }
             try (final PreparedStatement statement = connection.prepareStatement("CREATE INDEX IF NOT EXISTS block_owner ON blocks(owner);")) {
                 statement.execute();
             }
             try (final PreparedStatement statement = connection.prepareStatement("CREATE UNIQUE INDEX IF NOT EXISTS block_location ON blocks(world, x, y, z);")) {
-                statement.execute();
-            }
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE INDEX IF NOT EXISTS block_parent ON blocks(parent);")) {
-                statement.execute();
-            }
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE INDEX IF NOT EXISTS entity_parent ON entities(parent);")) {
                 statement.execute();
             }
         } catch (SQLException e) {
@@ -93,9 +86,8 @@ public class SQLiteStore implements Store {
     private BlockProtection blockProtectionFromResultSet(final ResultSet resultSet) throws SQLException {
         final String id = resultSet.getString(1);
         final String owner = resultSet.getString(2);
-        final String parent = resultSet.getString(3);
-        final String type = resultSet.getString(4);
-        final String accessString = resultSet.getString(5);
+        final String type = resultSet.getString(3);
+        final String accessString = resultSet.getString(4);
         final Map<Source, String> accessMap = new HashMap<>();
         if (!accessString.isEmpty()) {
             String[] accessSplit = accessString.split(",");
@@ -108,28 +100,27 @@ public class SQLiteStore implements Store {
                 accessMap.put(new Source(sourceType, sourceIdentifier), access);
             }
         }
-        final String block = resultSet.getString(6);
-        final String world = resultSet.getString(7);
-        final int x = resultSet.getInt(8);
-        final int y = resultSet.getInt(9);
-        final int z = resultSet.getInt(10);
-        return new BlockProtection(UUID.fromString(id), UUID.fromString(owner), parent.isEmpty() ? null : UUID.fromString(parent), type, accessMap, block, world, x, y, z);
+        final String block = resultSet.getString(5);
+        final String world = resultSet.getString(6);
+        final int x = resultSet.getInt(7);
+        final int y = resultSet.getInt(8);
+        final int z = resultSet.getInt(9);
+        return new BlockProtection(UUID.fromString(id), UUID.fromString(owner), type, accessMap, block, world, x, y, z);
     }
 
     @Override
     public void saveBlockProtection(BlockProtection protection) {
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
-            try (final PreparedStatement replaceBlock = connection.prepareStatement("REPLACE INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")) {
+            try (final PreparedStatement replaceBlock = connection.prepareStatement("REPLACE INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);")) {
                 replaceBlock.setString(1, protection.getId().toString());
                 replaceBlock.setString(2, protection.getOwner().toString());
-                replaceBlock.setString(3, String.valueOf(Objects.requireNonNullElse(protection.getParent(), "")));
-                replaceBlock.setString(4, protection.getType());
-                replaceBlock.setString(5, protection.getAccess().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
-                replaceBlock.setString(6, protection.getBlock());
-                replaceBlock.setString(7, protection.getWorld());
-                replaceBlock.setInt(8, protection.getX());
-                replaceBlock.setInt(9, protection.getY());
-                replaceBlock.setInt(10, protection.getZ());
+                replaceBlock.setString(3, protection.getType());
+                replaceBlock.setString(4, protection.getAccess().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
+                replaceBlock.setString(5, protection.getBlock());
+                replaceBlock.setString(6, protection.getWorld());
+                replaceBlock.setInt(7, protection.getX());
+                replaceBlock.setInt(8, protection.getY());
+                replaceBlock.setInt(9, protection.getZ());
                 replaceBlock.execute();
             }
         } catch (SQLException e) {
@@ -193,9 +184,8 @@ public class SQLiteStore implements Store {
     private EntityProtection entityProtectionFromResultSet(final ResultSet resultSet) throws SQLException {
         final String id = resultSet.getString(1);
         final String owner = resultSet.getString(2);
-        final String parent = resultSet.getString(3);
-        final String type = resultSet.getString(4);
-        final String accessString = resultSet.getString(5);
+        final String type = resultSet.getString(3);
+        final String accessString = resultSet.getString(4);
         final Map<Source, String> accessMap = new HashMap<>();
         if (!accessString.isEmpty()) {
             String[] accessSplit = accessString.split(",");
@@ -208,20 +198,19 @@ public class SQLiteStore implements Store {
                 accessMap.put(new Source(sourceType, sourceIdentifier), access);
             }
         }
-        final String entity = resultSet.getString(6);
-        return new EntityProtection(UUID.fromString(id), UUID.fromString(owner), parent.isEmpty() ? null : UUID.fromString(parent), type, accessMap, entity);
+        final String entity = resultSet.getString(5);
+        return new EntityProtection(UUID.fromString(id), UUID.fromString(owner), type, accessMap, entity);
     }
 
     @Override
     public void saveEntityProtection(EntityProtection protection) {
         try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
-            try (final PreparedStatement replaceEntity = connection.prepareStatement("REPLACE INTO entities VALUES (?, ?, ?, ?, ?, ?);")) {
+            try (final PreparedStatement replaceEntity = connection.prepareStatement("REPLACE INTO entities VALUES (?, ?, ?, ?, ?);")) {
                 replaceEntity.setString(1, protection.getId().toString());
                 replaceEntity.setString(2, protection.getOwner().toString());
-                replaceEntity.setString(3, String.valueOf(Objects.requireNonNullElse(protection.getParent(), "")));
-                replaceEntity.setString(4, protection.getType());
-                replaceEntity.setString(5, protection.getAccess().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
-                replaceEntity.setString(6, protection.getEntity());
+                replaceEntity.setString(3, protection.getType());
+                replaceEntity.setString(4, protection.getAccess().entrySet().stream().map(entry -> "%s;%s:%s".formatted(entry.getKey().type(), entry.getKey().identifier().replace(",", ""), entry.getValue())).collect(Collectors.joining(",")));
+                replaceEntity.setString(5, protection.getEntity());
                 replaceEntity.execute();
             }
         } catch (SQLException e) {
