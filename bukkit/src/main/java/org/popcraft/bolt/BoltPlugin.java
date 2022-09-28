@@ -31,6 +31,7 @@ import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.PlayerMeta;
+import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.lang.Translation;
 import org.popcraft.bolt.util.matcher.Match;
 import org.popcraft.bolt.util.matcher.block.AmethystClusterMatcher;
@@ -279,23 +280,28 @@ public class BoltPlugin extends JavaPlugin {
         }
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean canAccessProtection(final UUID uuid, final Protection protection, final String... permissions) {
-        return bolt.getAccessManager().hasAccess(playerMeta(uuid), protection, permissions);
-    }
-
-    public boolean canAccessProtection(final Player player, final Protection protection, final String... permissions) {
-        return bolt.getAccessManager().hasAccess(playerMeta(player), protection, permissions);
+    @SuppressWarnings("unused")
+    public boolean canAccess(final Protection protection, final String source, final String... permissions) {
+        return bolt.hasAccess(protection, source, permissions);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean canAccessBlock(final Player player, final Block block, final String... permissions) {
-        return findProtection(block).map(protection -> canAccessProtection(player, protection, permissions)).orElse(true);
+    public boolean canAccess(final Protection protection, final UUID uuid, final String... permissions) {
+        return bolt.hasAccess(protection, Source.fromPlayer(uuid), permissions);
+    }
+
+    public boolean canAccess(final Protection protection, final Player player, final String... permissions) {
+        return bolt.hasAccess(protection, Source.fromPlayer(player.getUniqueId()), permissions);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean canAccessEntity(final Player player, final Entity entity, final String... permissions) {
-        return findProtection(entity).map(protection -> canAccessProtection(player, protection, permissions)).orElse(true);
+    public boolean canAccess(final Block block, final Player player, final String... permissions) {
+        return findProtection(block).map(protection -> canAccess(protection, player, permissions)).orElse(true);
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean canAccess(final Entity entity, final Player player, final String... permissions) {
+        return findProtection(entity).map(protection -> canAccess(protection, player, permissions)).orElse(true);
     }
 
     private Protection matchProtection(final Block block) {

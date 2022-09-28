@@ -19,6 +19,7 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.PlayerMeta;
+import org.popcraft.bolt.util.Source;
 
 @SuppressWarnings("ClassCanBeRecord")
 public final class InventoryListener implements Listener {
@@ -39,7 +40,7 @@ public final class InventoryListener implements Listener {
             return;
         }
         final Protection protection = getHolderProtection(e.getInventory().getHolder());
-        if (protection != null && !plugin.canAccessProtection(player, protection, Permission.OPEN)) {
+        if (protection != null && !plugin.canAccess(protection, player, Permission.OPEN)) {
             e.setCancelled(true);
         }
     }
@@ -70,18 +71,21 @@ public final class InventoryListener implements Listener {
             return;
         }
         final boolean shouldCancel = switch (action) {
-            case PLACE_ALL, PLACE_ONE, PLACE_SOME -> !plugin.canAccessProtection(player, protection, Permission.DEPOSIT);
-            case COLLECT_TO_CURSOR, DROP_ALL_SLOT, DROP_ONE_SLOT, PICKUP_ALL, PICKUP_HALF, PICKUP_ONE, PICKUP_SOME -> !plugin.canAccessProtection(player, protection, Permission.WITHDRAW);
-            case HOTBAR_MOVE_AND_READD, SWAP_WITH_CURSOR, UNKNOWN -> !plugin.canAccessProtection(player, protection, Permission.DEPOSIT, Permission.WITHDRAW);
-            case MOVE_TO_OTHER_INVENTORY -> !plugin.canAccessProtection(player, protection, InventoryType.PLAYER.equals(clickedInventoryType) ? Permission.DEPOSIT : Permission.WITHDRAW);
+            case PLACE_ALL, PLACE_ONE, PLACE_SOME -> !plugin.canAccess(protection, player, Permission.DEPOSIT);
+            case COLLECT_TO_CURSOR, DROP_ALL_SLOT, DROP_ONE_SLOT, PICKUP_ALL, PICKUP_HALF, PICKUP_ONE, PICKUP_SOME ->
+                    !plugin.canAccess(protection, player, Permission.WITHDRAW);
+            case HOTBAR_MOVE_AND_READD, SWAP_WITH_CURSOR, UNKNOWN ->
+                    !plugin.canAccess(protection, player, Permission.DEPOSIT, Permission.WITHDRAW);
+            case MOVE_TO_OTHER_INVENTORY ->
+                    !plugin.canAccess(protection, player, InventoryType.PLAYER.equals(clickedInventoryType) ? Permission.DEPOSIT : Permission.WITHDRAW);
             case HOTBAR_SWAP -> {
                 final ItemStack clickedItem = e.getCurrentItem();
                 if (clickedItem == null) {
-                    yield !plugin.canAccessProtection(player, protection, Permission.DEPOSIT, Permission.WITHDRAW);
+                    yield !plugin.canAccess(protection, player, Permission.DEPOSIT, Permission.WITHDRAW);
                 } else if (clickedItem.getType().isAir()) {
-                    yield !plugin.canAccessProtection(player, protection, Permission.DEPOSIT);
+                    yield !plugin.canAccess(protection, player, Permission.DEPOSIT);
                 } else {
-                    yield !plugin.canAccessProtection(player, protection, Permission.WITHDRAW);
+                    yield !plugin.canAccess(protection, player, Permission.WITHDRAW);
                 }
             }
             default -> true;
@@ -100,7 +104,7 @@ public final class InventoryListener implements Listener {
             final Inventory slotInventory = e.getView().getInventory(rawSlot);
             if (slotInventory != null && !InventoryType.PLAYER.equals(slotInventory.getType())) {
                 final Protection protection = getHolderProtection(slotInventory.getHolder());
-                if (protection != null && !plugin.canAccessProtection(player, protection, Permission.DEPOSIT)) {
+                if (protection != null && !plugin.canAccess(protection, player, Permission.DEPOSIT)) {
                     e.setCancelled(true);
                     return;
                 }
@@ -116,12 +120,15 @@ public final class InventoryListener implements Listener {
             return;
         }
         if (sourceProtection != null && destinationProtection != null) {
-            if (!plugin.canAccessProtection(sourceProtection.getOwner(), destinationProtection, Permission.DEPOSIT) || !plugin.canAccessProtection(destinationProtection.getOwner(), sourceProtection, Permission.WITHDRAW)) {
+            if (!plugin.canAccess(destinationProtection, sourceProtection.getOwner(), Permission.DEPOSIT) || !plugin.canAccess(sourceProtection, destinationProtection.getOwner(), Permission.WITHDRAW)) {
                 e.setCancelled(true);
             }
-        } else if (sourceProtection != null) {
+        } else if (sourceProtection != null && !plugin.canAccess(sourceProtection, Source.from(Source.HOPPER, Source.HOPPER), Permission.WITHDRAW)) {
+            e.setCancelled(true);
+        } else if (destinationProtection != null && !plugin.canAccess(destinationProtection, Source.from(Source.HOPPER, Source.HOPPER), Permission.DEPOSIT)) {
             e.setCancelled(true);
         }
+        // TODO: Improve the above 2 checks (not necessarily hopper only)
     }
 
     @EventHandler
@@ -129,7 +136,7 @@ public final class InventoryListener implements Listener {
         if (!(e.getWhoClicked() instanceof final Player player) || !(e.getInventory().getHolder() instanceof final Entity entity)) {
             return;
         }
-        if (!plugin.canAccessEntity(player, entity, Permission.DEPOSIT)) {
+        if (!plugin.canAccess(entity, player, Permission.DEPOSIT)) {
             e.setCancelled(true);
         }
     }

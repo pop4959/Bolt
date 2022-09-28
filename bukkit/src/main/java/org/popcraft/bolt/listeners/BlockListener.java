@@ -86,7 +86,7 @@ public final class BlockListener implements Listener {
             e.setCancelled(true);
         } else if (protection != null) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
-            if (!plugin.canAccessProtection(player, protection, Permission.INTERACT)) {
+            if (!plugin.canAccess(protection, player, Permission.INTERACT)) {
                 e.setCancelled(true);
                 if (!hasNotifyPermission) {
                     BoltComponents.sendMessage(player, Translation.LOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
@@ -97,9 +97,9 @@ public final class BlockListener implements Listener {
             }
             if (e.getItem() != null) {
                 final Material itemType = e.getItem().getType();
-                if (Material.LECTERN.equals(clicked.getType()) && (Material.WRITABLE_BOOK.equals(itemType) || Material.WRITTEN_BOOK.equals(itemType)) && !plugin.canAccessProtection(player, protection, Permission.DEPOSIT)) {
+                if (Material.LECTERN.equals(clicked.getType()) && (Material.WRITABLE_BOOK.equals(itemType) || Material.WRITTEN_BOOK.equals(itemType)) && !plugin.canAccess(protection, player, Permission.DEPOSIT)) {
                     e.setUseItemInHand(Event.Result.DENY);
-                } else if ((Tag.SIGNS.isTagged(clicked.getType()) && (DYES.contains(itemType) || Material.GLOW_INK_SAC.equals(itemType)) && !plugin.canAccessProtection(player, protection, Permission.INTERACT))) {
+                } else if ((Tag.SIGNS.isTagged(clicked.getType()) && (DYES.contains(itemType) || Material.GLOW_INK_SAC.equals(itemType)) && !plugin.canAccess(protection, player, Permission.INTERACT))) {
                     e.setUseItemInHand(Event.Result.DENY);
                     e.setUseInteractedBlock(Event.Result.DENY);
                 }
@@ -143,7 +143,7 @@ public final class BlockListener implements Listener {
             }
             case EDIT -> {
                 if (protection != null) {
-                    if (plugin.canAccessProtection(player, protection, Permission.EDIT)) {
+                    if (plugin.canAccess(protection, player, Permission.EDIT)) {
                         playerMeta.getModifications().forEach((source, type) -> {
                             if (type == null || plugin.getBolt().getAccessRegistry().get(type).isEmpty()) {
                                 protection.getAccess().remove(source);
@@ -180,7 +180,7 @@ public final class BlockListener implements Listener {
                 if (Material.SNOW_BLOCK.equals(firstBlock.getType()) && Material.SNOW_BLOCK.equals(secondBlock.getType())) {
                     final Optional<Protection> firstProtection = plugin.findProtection(firstBlock);
                     firstProtection.ifPresent(blockProtection -> {
-                        if (plugin.canAccessProtection(player, blockProtection, Permission.DESTROY)) {
+                        if (plugin.canAccess(blockProtection, player, Permission.DESTROY)) {
                             plugin.removeProtection(blockProtection);
                         } else {
                             e.setCancelled(true);
@@ -188,7 +188,7 @@ public final class BlockListener implements Listener {
                     });
                     final Optional<Protection> secondProtection = plugin.findProtection(secondBlock);
                     secondProtection.ifPresent(blockProtection -> {
-                        if (plugin.canAccessProtection(player, blockProtection, Permission.DESTROY)) {
+                        if (plugin.canAccess(blockProtection, player, Permission.DESTROY)) {
                             plugin.removeProtection(blockProtection);
                         } else {
                             e.setCancelled(true);
@@ -206,7 +206,7 @@ public final class BlockListener implements Listener {
         final Player player = e.getPlayer();
         if (optionalProtection.isPresent()) {
             final Protection protection = optionalProtection.get();
-            if (plugin.canAccessProtection(player, protection, Permission.DESTROY)) {
+            if (plugin.canAccess(protection, player, Permission.DESTROY)) {
                 plugin.removeProtection(protection);
                 BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
             } else {
@@ -224,14 +224,14 @@ public final class BlockListener implements Listener {
         if (block == null) {
             return;
         }
-        if (!plugin.canAccessBlock(e.getPlayer(), block, Permission.DESTROY)) {
+        if (!plugin.canAccess(block, e.getPlayer(), Permission.DESTROY)) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onSignChange(final SignChangeEvent e) {
-        if (!plugin.canAccessBlock(e.getPlayer(), e.getBlock(), Permission.INTERACT)) {
+        if (!plugin.canAccess(e.getBlock(), e.getPlayer(), Permission.INTERACT)) {
             e.setCancelled(true);
         }
     }
@@ -340,7 +340,7 @@ public final class BlockListener implements Listener {
     public void onBlockIgnite(final BlockIgniteEvent e) {
         plugin.findProtection(e.getBlock()).ifPresent(protection -> {
             final Player player = e.getPlayer();
-            if (player == null || !plugin.canAccessProtection(player, protection, Permission.INTERACT)) {
+            if (player == null || !plugin.canAccess(protection, player, Permission.INTERACT)) {
                 e.setCancelled(true);
             }
         });
@@ -349,7 +349,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onPlayerBucketEmpty(final PlayerBucketEmptyEvent e) {
         final Player player = e.getPlayer();
-        if (!plugin.canAccessBlock(player, e.getBlockClicked(), Permission.INTERACT) || !plugin.canAccessBlock(player, e.getBlock(), Permission.DESTROY)) {
+        if (!plugin.canAccess(e.getBlockClicked(), player, Permission.INTERACT) || !plugin.canAccess(e.getBlock(), player, Permission.DESTROY)) {
             e.setCancelled(true);
         }
     }
@@ -357,7 +357,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onPlayerBucketFill(final PlayerBucketFillEvent e) {
         final Player player = e.getPlayer();
-        if (!plugin.canAccessBlock(player, e.getBlockClicked(), Permission.INTERACT) || !plugin.canAccessBlock(player, e.getBlock(), Permission.DESTROY)) {
+        if (!plugin.canAccess(e.getBlockClicked(), player, Permission.INTERACT) || !plugin.canAccess(e.getBlock(), player, Permission.DESTROY)) {
             e.setCancelled(true);
         }
     }
@@ -393,7 +393,7 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onPlayerTakeLecternBook(final PlayerTakeLecternBookEvent e) {
-        if (!plugin.canAccessBlock(e.getPlayer(), e.getLectern().getBlock(), Permission.WITHDRAW)) {
+        if (!plugin.canAccess(e.getLectern().getBlock(), e.getPlayer(), Permission.WITHDRAW)) {
             e.setCancelled(true);
         }
     }
@@ -404,7 +404,7 @@ public final class BlockListener implements Listener {
         }
         final Player player = e.getPlayer();
         final Location location = player.getOpenInventory().getTopInventory().getLocation();
-        if (location != null && !plugin.canAccessBlock(player, location.getBlock(), Permission.DEPOSIT, Permission.WITHDRAW)) {
+        if (location != null && !plugin.canAccess(location.getBlock(), player, Permission.DEPOSIT, Permission.WITHDRAW)) {
             cancellable.setCancelled(true);
         }
     }

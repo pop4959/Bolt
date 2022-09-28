@@ -1,5 +1,7 @@
 package org.popcraft.bolt.util;
 
+import java.util.UUID;
+
 public final class Source {
     private Source() {
     }
@@ -12,6 +14,10 @@ public final class Source {
     public static final String HOPPER = "hopper";
     public static final String TOWN = "town";
     public static final String REGION = "region";
+
+    public static String fromPlayer(final UUID uuid) {
+        return "player:" + uuid.toString();
+    }
 
     public static String from(final String type, final String identifier) {
         return type + ':' + identifier;
