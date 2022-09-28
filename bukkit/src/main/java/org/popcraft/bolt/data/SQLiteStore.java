@@ -90,7 +90,7 @@ public class SQLiteStore implements Store {
         final String owner = resultSet.getString(2);
         final String type = resultSet.getString(3);
         final String accessText = resultSet.getString(4);
-        final HashMap<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, new TypeToken<HashMap<String, String>>() {
+        final Map<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, new TypeToken<HashMap<String, String>>() {
         }.getType()), new HashMap<>());
         final String block = resultSet.getString(5);
         final String world = resultSet.getString(6);
@@ -179,7 +179,7 @@ public class SQLiteStore implements Store {
         final String owner = resultSet.getString(2);
         final String type = resultSet.getString(3);
         final String accessText = resultSet.getString(4);
-        final HashMap<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, new TypeToken<HashMap<String, String>>() {
+        final Map<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, new TypeToken<HashMap<String, String>>() {
         }.getType()), new HashMap<>());
         final String entity = resultSet.getString(5);
         return new EntityProtection(UUID.fromString(id), UUID.fromString(owner), type, access, entity);
