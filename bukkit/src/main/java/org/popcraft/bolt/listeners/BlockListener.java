@@ -377,12 +377,13 @@ public final class BlockListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onBlockRedstone(final BlockRedstoneEvent e) {
-        if (plugin.findProtection(e.getBlock()).isPresent()) {
-            e.setNewCurrent(e.getOldCurrent());
-        }
-    }
+    // TODO: This needs to be revisited
+//    @EventHandler
+//    public void onBlockRedstone(final BlockRedstoneEvent e) {
+//        if (plugin.findProtection(e.getBlock()).isPresent()) {
+//            e.setNewCurrent(e.getOldCurrent());
+//        }
+//    }
 
     // TODO: Expensive event, needs to be checked only for specific cases
 //    @EventHandler
