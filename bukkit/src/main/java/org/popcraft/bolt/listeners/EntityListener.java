@@ -47,6 +47,7 @@ import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
 import org.spigotmc.event.entity.EntityMountEvent;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -135,7 +136,7 @@ public final class EntityListener implements Listener {
                 }
             }
             if (shouldSendMessage && hasNotifyPermission) {
-                BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
+                BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : Objects.requireNonNullElse(plugin.getUuidCache().getName(protection.getOwner()), translate(Translation.UNKNOWN))));
             }
             playerMeta.setInteracted();
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, playerMeta::clearInteraction);
@@ -170,7 +171,7 @@ public final class EntityListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
-                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
+                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("owner", Objects.requireNonNullElse(plugin.getUuidCache().getName(protection.getOwner()), translate(Translation.UNKNOWN))));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
                 }

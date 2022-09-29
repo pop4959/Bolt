@@ -8,7 +8,6 @@ import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.PlayerMeta;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.lang.Translation;
@@ -43,7 +42,7 @@ public class EditCommand extends BoltCommand {
                 } catch (IllegalArgumentException ignored) {
                     uuid = null;
                 }
-                identifier = (uuid == null ? BukkitAdapter.playerUUID(inputIdentifier) : uuid).toString();
+                identifier = (uuid == null ? plugin.getUuidCache().getUniqueId(inputIdentifier) : uuid).toString();
             } else {
                 identifier = inputIdentifier;
             }

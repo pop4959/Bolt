@@ -49,6 +49,7 @@ import org.popcraft.bolt.util.lang.Translation;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -93,7 +94,7 @@ public final class BlockListener implements Listener {
                 }
             }
             if (hasNotifyPermission) {
-                BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
+                BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : Objects.requireNonNullElse(plugin.getUuidCache().getName(protection.getOwner()), translate(Translation.UNKNOWN))));
             }
             if (e.getItem() != null) {
                 final Material itemType = e.getItem().getType();
@@ -136,7 +137,7 @@ public final class BlockListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
-                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("owner", BukkitAdapter.playerName(protection.getOwner()).orElse(translate(Translation.UNKNOWN))));
+                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("owner", Objects.requireNonNullElse(plugin.getUuidCache().getName(protection.getOwner()), translate(Translation.UNKNOWN))));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 }

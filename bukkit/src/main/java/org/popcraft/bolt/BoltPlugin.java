@@ -20,6 +20,8 @@ import org.popcraft.bolt.command.impl.ReportCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
 import org.popcraft.bolt.data.SQLiteStore;
 import org.popcraft.bolt.data.SimpleProtectionCache;
+import org.popcraft.bolt.data.SimpleUuidCache;
+import org.popcraft.bolt.data.UuidCache;
 import org.popcraft.bolt.listeners.BlockListener;
 import org.popcraft.bolt.listeners.EntityListener;
 import org.popcraft.bolt.listeners.InventoryListener;
@@ -99,6 +101,7 @@ import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -129,6 +132,8 @@ public class BoltPlugin extends JavaPlugin {
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
+    private final Path uuidCachePath = getDataFolder().toPath().resolve("uuidcache");
+    private final UuidCache uuidCache = new SimpleUuidCache();
     private YamlConfigurationLoader configurationLoader;
     private ConfigurationNode configurationRootNode;
 
@@ -139,6 +144,16 @@ public class BoltPlugin extends JavaPlugin {
         BoltComponents.enable(this);
         registerEvents();
         registerCommands();
+        uuidCache.load(uuidCachePath);
+    }
+
+    @Override
+    public void onDisable() {
+        BoltComponents.disable();
+        HandlerList.unregisterAll(this);
+        commands.clear();
+        saveConfiguration();
+        uuidCache.save(uuidCachePath);
     }
 
     private void loadConfiguration() {
@@ -205,14 +220,6 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     @Override
-    public void onDisable() {
-        BoltComponents.disable();
-        HandlerList.unregisterAll(this);
-        commands.clear();
-        saveConfiguration();
-    }
-
-    @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (args.length > 0 && commands.containsKey(args[0].toLowerCase())) {
             if (sender.hasPermission(COMMAND_PERMISSION_KEY + args[0].toLowerCase())) {
@@ -242,6 +249,10 @@ public class BoltPlugin extends JavaPlugin {
 
     public Bolt getBolt() {
         return bolt;
+    }
+
+    public UuidCache getUuidCache() {
+        return uuidCache;
     }
 
     public PlayerMeta playerMeta(final Player player) {

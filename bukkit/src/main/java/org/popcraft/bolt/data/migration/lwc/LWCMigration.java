@@ -1,10 +1,10 @@
 package org.popcraft.bolt.data.migration.lwc;
 
 import com.google.gson.Gson;
+import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.data.MemoryStore;
 import org.popcraft.bolt.data.Migration;
 import org.popcraft.bolt.protection.BlockProtection;
-import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.defaults.DefaultAccess;
 import org.popcraft.bolt.util.defaults.DefaultProtectionType;
@@ -32,6 +32,11 @@ public class LWCMigration implements Migration {
     private static final int ACCESS_TYPE_REGION = 5;
     private static final int RIGHTS_TYPE_ADMIN = 2;
     private static final Block BLOCK_AIR = new Block(-1, "AIR");
+    private final BoltPlugin plugin;
+
+    public LWCMigration(final BoltPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public MemoryStore convert() {
@@ -129,7 +134,7 @@ public class LWCMigration implements Migration {
             try {
                 ownerUUID = UUID.fromString(protection.owner());
             } catch (IllegalArgumentException e) {
-                ownerUUID = BukkitAdapter.playerUUID(protection.owner());
+                ownerUUID = plugin.getUuidCache().getUniqueId(protection.owner());
             }
             store.saveBlockProtection(new BlockProtection(
                     UUID.randomUUID(),

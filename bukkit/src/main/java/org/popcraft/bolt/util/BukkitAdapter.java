@@ -1,6 +1,5 @@
 package org.popcraft.bolt.util;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -11,7 +10,6 @@ import org.popcraft.bolt.util.defaults.DefaultProtectionType;
 
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 public final class BukkitAdapter {
@@ -49,14 +47,5 @@ public final class BukkitAdapter {
 
     public static EntityProtection createEntityProtection(final Entity entity, final UUID owner, final String type) {
         return new EntityProtection(entity.getUniqueId(), owner, type, new HashMap<>(), entity.getType().toString());
-    }
-
-    @SuppressWarnings("deprecation")
-    public static UUID playerUUID(final String name) {
-        return Bukkit.getOfflinePlayer(name).getUniqueId();
-    }
-
-    public static Optional<String> playerName(final UUID uuid) {
-        return Optional.ofNullable(Bukkit.getOfflinePlayer(uuid).getName());
     }
 }
