@@ -21,7 +21,6 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
@@ -166,38 +165,6 @@ public final class BlockListener implements Listener {
                     BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());
         }
         return true;
-    }
-
-    @EventHandler
-    public void onBlockPlace(final BlockPlaceEvent e) {
-        final Block block = e.getBlock();
-        final Material blockType = block.getType();
-        final Player player = e.getPlayer();
-        // TODO: move to matcher
-        if (Material.CARVED_PUMPKIN.equals(blockType) || Material.JACK_O_LANTERN.equals(blockType)) {
-            for (final BlockFace blockFace : CARTESIAN_BLOCK_FACES) {
-                final Block firstBlock = block.getRelative(blockFace);
-                final Block secondBlock = firstBlock.getRelative(blockFace);
-                if (Material.SNOW_BLOCK.equals(firstBlock.getType()) && Material.SNOW_BLOCK.equals(secondBlock.getType())) {
-                    final Optional<Protection> firstProtection = plugin.findProtection(firstBlock);
-                    firstProtection.ifPresent(blockProtection -> {
-                        if (plugin.canAccess(blockProtection, player, Permission.DESTROY)) {
-                            plugin.removeProtection(blockProtection);
-                        } else {
-                            e.setCancelled(true);
-                        }
-                    });
-                    final Optional<Protection> secondProtection = plugin.findProtection(secondBlock);
-                    secondProtection.ifPresent(blockProtection -> {
-                        if (plugin.canAccess(blockProtection, player, Permission.DESTROY)) {
-                            plugin.removeProtection(blockProtection);
-                        } else {
-                            e.setCancelled(true);
-                        }
-                    });
-                }
-            }
-        }
     }
 
     @EventHandler
