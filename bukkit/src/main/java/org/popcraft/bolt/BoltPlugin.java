@@ -15,6 +15,7 @@ import org.popcraft.bolt.command.impl.DebugCommand;
 import org.popcraft.bolt.command.impl.EditCommand;
 import org.popcraft.bolt.command.impl.InfoCommand;
 import org.popcraft.bolt.command.impl.LockCommand;
+import org.popcraft.bolt.command.impl.PasswordCommand;
 import org.popcraft.bolt.command.impl.PersistCommand;
 import org.popcraft.bolt.command.impl.ReportCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
@@ -33,6 +34,7 @@ import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.Permissible;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.lang.Translation;
 import org.popcraft.bolt.util.matcher.Match;
@@ -214,6 +216,7 @@ public class BoltPlugin extends JavaPlugin {
         commands.put("edit", new EditCommand(this));
         commands.put("info", new InfoCommand(this));
         commands.put("lock", new LockCommand(this));
+        commands.put("password", new PasswordCommand(this));
         commands.put("persist", new PersistCommand(this));
         commands.put("report", new ReportCommand(this));
         commands.put("unlock", new UnlockCommand(this));
@@ -292,17 +295,17 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     @SuppressWarnings("unused")
-    public boolean canAccess(final Protection protection, final String source, final String... permissions) {
-        return bolt.hasAccess(protection, source, permissions);
+    public boolean canAccess(final Protection protection, final Permissible permissible, final String... permissions) {
+        return bolt.hasAccess(protection, permissible, permissions);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canAccess(final Protection protection, final UUID uuid, final String... permissions) {
-        return bolt.hasAccess(protection, Source.fromPlayer(uuid), permissions);
+        return bolt.hasAccess(protection, bolt.getPlayerMeta(uuid), permissions);
     }
 
     public boolean canAccess(final Protection protection, final Player player, final String... permissions) {
-        return bolt.hasAccess(protection, Source.fromPlayer(player.getUniqueId()), permissions);
+        return bolt.hasAccess(protection, bolt.getPlayerMeta(player.getUniqueId()), permissions);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

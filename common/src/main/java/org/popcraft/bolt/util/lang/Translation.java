@@ -24,6 +24,8 @@ public class Translation {
     public static final String LOCK = "lock";
     public static final String UNLOCK = "unlock";
     public static final String EDIT = "edit";
+    public static final String ENTER_PASSWORD = "enter_password";
+    public static final String ENTER_PASSWORD_NONE = "enter_password_none";
 
     private Translation() {
     }

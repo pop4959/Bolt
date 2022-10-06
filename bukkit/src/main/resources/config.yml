@@ -5,6 +5,7 @@ access-types:
   display: [ "interact", "open" ]
   deposit: [ "interact", "open", "deposit" ]
   withdrawal: [ "interact", "open", "withdraw" ]
+  redstone: [ "redstone" ]
   public: [ "interact", "open", "deposit", "withdraw", "mount" ]
   basic: [ "interact", "open", "deposit", "withdraw", "mount" ]
   full: [ "interact", "open", "deposit", "withdraw", "mount", "edit", "destroy" ]

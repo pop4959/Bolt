@@ -9,6 +9,7 @@ public final class Permission {
     public static final String MOUNT = "mount";
     public static final String EDIT = "edit";
     public static final String DESTROY = "destroy";
+    public static final String REDSTONE = "redstone";
 
     private Permission() {
     }

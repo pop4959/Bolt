@@ -17,6 +17,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.util.BasicPermissible;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Source;
@@ -123,12 +124,12 @@ public final class InventoryListener implements Listener {
             if (!plugin.canAccess(destinationProtection, sourceProtection.getOwner(), Permission.DEPOSIT) || !plugin.canAccess(sourceProtection, destinationProtection.getOwner(), Permission.WITHDRAW)) {
                 e.setCancelled(true);
             }
-        } else if (sourceProtection != null && !plugin.canAccess(sourceProtection, Source.from(Source.HOPPER, Source.HOPPER), Permission.WITHDRAW)) {
+        } else if (sourceProtection != null && !plugin.canAccess(sourceProtection, new BasicPermissible(Source.from(Source.HOPPER, Source.HOPPER)), Permission.WITHDRAW)) {
             e.setCancelled(true);
-        } else if (destinationProtection != null && !plugin.canAccess(destinationProtection, Source.from(Source.HOPPER, Source.HOPPER), Permission.DEPOSIT)) {
+        } else if (destinationProtection != null && !plugin.canAccess(destinationProtection, new BasicPermissible(Source.from(Source.HOPPER, Source.HOPPER)), Permission.DEPOSIT)) {
             e.setCancelled(true);
         }
-        // TODO: Improve the above 2 checks (not necessarily hopper only)
+        // TODO: Improve the above 2 checks (not necessarily hopper only, like droppers - "block")
     }
 
     @EventHandler

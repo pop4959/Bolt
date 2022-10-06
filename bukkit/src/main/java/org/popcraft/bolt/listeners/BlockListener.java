@@ -21,6 +21,7 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
@@ -37,11 +38,13 @@ import org.bukkit.util.BoundingBox;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Action;
+import org.popcraft.bolt.util.BasicPermissible;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Protections;
+import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
 
@@ -343,13 +346,14 @@ public final class BlockListener implements Listener {
         }
     }
 
-    // TODO: This needs to be revisited
-//    @EventHandler
-//    public void onBlockRedstone(final BlockRedstoneEvent e) {
-//        if (plugin.findProtection(e.getBlock()).isPresent()) {
-//            e.setNewCurrent(e.getOldCurrent());
-//        }
-//    }
+    @EventHandler
+    public void onBlockRedstone(final BlockRedstoneEvent e) {
+        plugin.findProtection(e.getBlock()).ifPresent(protection -> {
+            if (!plugin.canAccess(protection, new BasicPermissible(Source.from(Source.REDSTONE, Source.REDSTONE)), Permission.REDSTONE)) {
+                e.setNewCurrent(e.getOldCurrent());
+            }
+        });
+    }
 
     // TODO: Expensive event, needs to be checked only for specific cases
 //    @EventHandler

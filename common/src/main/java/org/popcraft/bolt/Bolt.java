@@ -3,10 +3,13 @@ package org.popcraft.bolt;
 import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.Permissible;
 import org.popcraft.bolt.util.Source;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class Bolt {
@@ -38,33 +41,21 @@ public final class Bolt {
         return accessRegistry;
     }
 
-    public boolean hasAccess(final Protection protection, final String source, String... permissions) {
-        final String sourceType = Source.type(source);
-        final String sourceIdentifier = Source.identifier(source);
-        if (Source.PLAYER.equals(sourceType) && protection.getOwner().toString().equals(sourceIdentifier)) {
+    public boolean hasAccess(final Protection protection, final Permissible permissible, String... permissions) {
+        final Set<String> sources = permissible.sources();
+        final String ownerSource = Source.fromPlayer(protection.getOwner());
+        if (sources.contains(ownerSource)) {
             return true;
         }
-        final int numPermissionChecks = permissions.length;
-        final boolean[] results = new boolean[numPermissionChecks];
-        accessRegistry.get(protection.getType()).ifPresent(access -> {
-            for (int i = 0; i < numPermissionChecks; ++i) {
-                if (access.permissions().contains(permissions[i])) {
-                    results[i] = true;
-                }
+        final Set<String> heldPermissions = new HashSet<>();
+        accessRegistry.get(protection.getType()).ifPresent(access -> heldPermissions.addAll(access.permissions()));
+        protection.getAccess().forEach((source, accessType) -> {
+            if (sources.contains(source)) {
+                accessRegistry.get(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
             }
         });
-        final String accessType = protection.getAccess().get(source);
-        if (accessType != null) {
-            accessRegistry.get(accessType).ifPresent(access -> {
-                for (int i = 0; i < numPermissionChecks; ++i) {
-                    if (access.permissions().contains(permissions[i])) {
-                        results[i] = true;
-                    }
-                }
-            });
-        }
-        for (boolean result : results) {
-            if (!result) {
+        for (final String permission : permissions) {
+            if (!heldPermissions.contains(permission)) {
                 return false;
             }
         }
