@@ -7,7 +7,7 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.PlayerMeta;
+import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.lang.Translation;
 
 import java.util.Collections;
@@ -23,9 +23,9 @@ public class PersistCommand extends BoltCommand {
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
         if (sender instanceof final Player player) {
-            final PlayerMeta playerMeta = plugin.playerMeta(player);
-            playerMeta.togglePersist();
-            BoltComponents.sendMessage(player, Translation.COMMAND_PERSIST, Placeholder.unparsed("toggle", translate(playerMeta.isPersist() ? Translation.ENABLED : Translation.DISABLED)));
+            final BoltPlayer boltPlayer = plugin.player(player);
+            boltPlayer.togglePersist();
+            BoltComponents.sendMessage(player, Translation.COMMAND_PERSIST, Placeholder.unparsed("toggle", translate(boltPlayer.isPersist() ? Translation.ENABLED : Translation.DISABLED)));
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
         }

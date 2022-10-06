@@ -8,7 +8,7 @@ import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.PlayerMeta;
+import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.lang.Translation;
 
@@ -30,8 +30,8 @@ public class EditCommand extends BoltCommand {
             return;
         }
         if (arguments.remaining() >= 3) {
-            final PlayerMeta playerMeta = plugin.playerMeta(player);
-            playerMeta.setAction(Action.EDIT);
+            final BoltPlayer boltPlayer = plugin.player(player);
+            boltPlayer.setAction(Action.EDIT);
             final String type = arguments.next();
             final String inputIdentifier = arguments.next();
             String identifier;
@@ -47,7 +47,7 @@ public class EditCommand extends BoltCommand {
                 identifier = inputIdentifier;
             }
             final String access = arguments.next();
-            playerMeta.getModifications().put(Source.from(type, identifier), access);
+            boltPlayer.getModifications().put(Source.from(type, identifier), access);
             BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.EDIT)));
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_NOT_ENOUGH_ARGS);

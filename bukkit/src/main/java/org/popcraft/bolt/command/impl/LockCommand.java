@@ -8,7 +8,7 @@ import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.PlayerMeta;
+import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.lang.Translation;
 
 import java.util.Collections;
@@ -23,10 +23,10 @@ public class LockCommand extends BoltCommand {
 
     public void execute(CommandSender sender, Arguments arguments) {
         if (sender instanceof final Player player) {
-            final PlayerMeta playerMeta = plugin.playerMeta(player);
-            playerMeta.setAction(Action.LOCK);
+            final BoltPlayer boltPlayer = plugin.player(player);
+            boltPlayer.setAction(Action.LOCK);
             if (arguments.remaining() > 0) {
-                playerMeta.setLockNil(true);
+                boltPlayer.setLockNil(true);
             }
             BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.LOCK)));
         } else {

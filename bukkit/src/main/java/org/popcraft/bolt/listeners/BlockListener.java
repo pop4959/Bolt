@@ -21,7 +21,6 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
@@ -41,7 +40,7 @@ import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permission;
-import org.popcraft.bolt.util.PlayerMeta;
+import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
@@ -74,15 +73,15 @@ public final class BlockListener implements Listener {
             return;
         }
         final Player player = e.getPlayer();
-        final PlayerMeta playerMeta = plugin.playerMeta(player);
-        if (playerMeta.hasInteracted()) {
+        final BoltPlayer boltPlayer = plugin.player(player);
+        if (boltPlayer.hasInteracted()) {
             e.setCancelled(true);
             return;
         }
         final Protection protection = plugin.findProtection(clicked).orElse(null);
         if (triggerActions(player, protection, clicked)) {
-            playerMeta.setInteracted();
-            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, playerMeta::clearInteraction);
+            boltPlayer.setInteracted();
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, boltPlayer::clearInteraction);
             e.setCancelled(true);
         } else if (protection != null) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
@@ -104,15 +103,15 @@ public final class BlockListener implements Listener {
                     e.setUseInteractedBlock(Event.Result.DENY);
                 }
             }
-            playerMeta.setInteracted();
-            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, playerMeta::clearInteraction);
+            boltPlayer.setInteracted();
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, boltPlayer::clearInteraction);
         }
     }
 
     @SuppressWarnings("java:S6205")
     private boolean triggerActions(final Player player, final Protection protection, final Block block) {
-        final PlayerMeta playerMeta = plugin.playerMeta(player);
-        final Action action = playerMeta.triggerAction();
+        final BoltPlayer boltPlayer = plugin.player(player);
+        final Action action = boltPlayer.triggerAction();
         if (action == null) {
             return false;
         }
@@ -121,8 +120,8 @@ public final class BlockListener implements Listener {
                 if (protection != null) {
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Placeholder.unparsed("type", Protections.displayType(protection)));
                 } else {
-                    plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createPrivateBlockProtection(block, playerMeta.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId()));
-                    playerMeta.setLockNil(false);
+                    plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createPrivateBlockProtection(block, boltPlayer.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId()));
+                    boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 }
             }
@@ -144,7 +143,7 @@ public final class BlockListener implements Listener {
             case EDIT -> {
                 if (protection != null) {
                     if (plugin.canAccess(protection, player, Permission.EDIT)) {
-                        playerMeta.getModifications().forEach((source, type) -> {
+                        boltPlayer.getModifications().forEach((source, type) -> {
                             if (type == null || plugin.getBolt().getAccessRegistry().get(type).isEmpty()) {
                                 protection.getAccess().remove(source);
                             } else {
@@ -159,7 +158,7 @@ public final class BlockListener implements Listener {
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 }
-                playerMeta.getModifications().clear();
+                boltPlayer.getModifications().clear();
             }
             case DEBUG ->
                     BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());

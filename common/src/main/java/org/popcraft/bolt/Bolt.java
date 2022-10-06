@@ -2,7 +2,7 @@ package org.popcraft.bolt;
 
 import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.util.PlayerMeta;
+import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Source;
 
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public final class Bolt {
     private final AccessRegistry accessRegistry = new AccessRegistry();
-    private final Map<UUID, PlayerMeta> players = new HashMap<>();
+    private final Map<UUID, BoltPlayer> players = new HashMap<>();
     private Store store;
 
     public Bolt(final Store store) {
@@ -26,8 +26,8 @@ public final class Bolt {
         this.store = store;
     }
 
-    public PlayerMeta getPlayerMeta(final UUID uuid) {
-        return players.computeIfAbsent(uuid, x -> new PlayerMeta(uuid));
+    public BoltPlayer getPlayerMeta(final UUID uuid) {
+        return players.computeIfAbsent(uuid, x -> new BoltPlayer(uuid));
     }
 
     public void removePlayerMeta(final UUID uuid) {

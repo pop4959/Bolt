@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class PlayerMeta {
+public class BoltPlayer {
     private final UUID uuid;
     private final Map<String, String> modifications = new HashMap<>();
     private Action action;
@@ -13,7 +13,7 @@ public class PlayerMeta {
     private boolean persist;
     private boolean lockNil;
 
-    public PlayerMeta(UUID uuid) {
+    public BoltPlayer(UUID uuid) {
         this.uuid = uuid;
     }
 

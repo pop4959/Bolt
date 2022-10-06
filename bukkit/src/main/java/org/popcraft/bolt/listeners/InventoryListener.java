@@ -18,7 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Permission;
-import org.popcraft.bolt.util.PlayerMeta;
+import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Source;
 
 @SuppressWarnings("ClassCanBeRecord")
@@ -34,8 +34,8 @@ public final class InventoryListener implements Listener {
         if (!(e.getPlayer() instanceof Player player)) {
             return;
         }
-        final PlayerMeta playerMeta = plugin.playerMeta(player);
-        if (playerMeta.triggeredAction()) {
+        final BoltPlayer boltPlayer = plugin.player(player);
+        if (boltPlayer.triggeredAction()) {
             e.setCancelled(true);
             return;
         }

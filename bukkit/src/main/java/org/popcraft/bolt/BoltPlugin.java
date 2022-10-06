@@ -32,7 +32,7 @@ import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
-import org.popcraft.bolt.util.PlayerMeta;
+import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.lang.Translation;
 import org.popcraft.bolt.util.matcher.Match;
@@ -255,11 +255,11 @@ public class BoltPlugin extends JavaPlugin {
         return uuidCache;
     }
 
-    public PlayerMeta playerMeta(final Player player) {
-        return playerMeta(player.getUniqueId());
+    public BoltPlayer player(final Player player) {
+        return player(player.getUniqueId());
     }
 
-    public PlayerMeta playerMeta(final UUID uuid) {
+    public BoltPlayer player(final UUID uuid) {
         return bolt.getPlayerMeta(uuid);
     }
 
