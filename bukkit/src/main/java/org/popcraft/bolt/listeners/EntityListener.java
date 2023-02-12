@@ -39,9 +39,9 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
+import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permission;
-import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.lang.Strings;
 import org.popcraft.bolt.util.lang.Translation;
@@ -144,7 +144,6 @@ public final class EntityListener implements Listener {
         return shouldCancel;
     }
 
-    @SuppressWarnings("java:S6205")
     private boolean triggerActions(final Player player, final Protection protection, final Entity entity) {
         final BoltPlayer boltPlayer = plugin.player(player);
         final Action action = boltPlayer.triggerAction();

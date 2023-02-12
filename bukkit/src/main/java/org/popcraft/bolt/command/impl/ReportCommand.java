@@ -17,7 +17,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ReportCommand extends BoltCommand {
-    private long previousHits, previousMisses;
+    private long previousHits;
+    private long previousMisses;
     private Map<Metrics.ProtectionAccess, Long> previousExecutionCounts;
 
     public ReportCommand(BoltPlugin plugin) {

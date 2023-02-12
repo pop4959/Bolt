@@ -28,14 +28,6 @@ import org.popcraft.bolt.listeners.EntityListener;
 import org.popcraft.bolt.listeners.InventoryListener;
 import org.popcraft.bolt.listeners.PlayerListener;
 import org.popcraft.bolt.listeners.adapter.PlayerRecipeBookClickListener;
-import org.popcraft.bolt.protection.BlockProtection;
-import org.popcraft.bolt.protection.EntityProtection;
-import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.BukkitAdapter;
-import org.popcraft.bolt.util.BoltPlayer;
-import org.popcraft.bolt.util.Permissible;
-import org.popcraft.bolt.util.lang.Translation;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.matcher.block.AmethystClusterMatcher;
 import org.popcraft.bolt.matcher.block.ArmorStandMatcher;
@@ -97,6 +89,14 @@ import org.popcraft.bolt.matcher.block.TripwireHookMatcher;
 import org.popcraft.bolt.matcher.block.UprootMatcher;
 import org.popcraft.bolt.matcher.block.VineMatcher;
 import org.popcraft.bolt.matcher.entity.EntityMatcher;
+import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.util.BoltComponents;
+import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Permissible;
+import org.popcraft.bolt.util.lang.Translation;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
@@ -275,7 +275,6 @@ public class BoltPlugin extends JavaPlugin {
         return Optional.ofNullable(protection != null ? protection : matchProtection(entity));
     }
 
-    @SuppressWarnings("java:S2583")
     public void saveProtection(final Protection protection) {
         if (protection instanceof final BlockProtection blockProtection) {
             bolt.getStore().saveBlockProtection(blockProtection);
@@ -284,7 +283,6 @@ public class BoltPlugin extends JavaPlugin {
         }
     }
 
-    @SuppressWarnings("java:S2583")
     public void removeProtection(final Protection protection) {
         if (protection instanceof final BlockProtection blockProtection) {
             bolt.getStore().removeBlockProtection(blockProtection);

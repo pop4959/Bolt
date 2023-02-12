@@ -5,7 +5,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -40,9 +39,9 @@ import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BasicPermissible;
 import org.popcraft.bolt.util.BoltComponents;
+import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permission;
-import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.lang.Strings;
@@ -56,9 +55,7 @@ import java.util.UUID;
 
 import static org.popcraft.bolt.util.lang.Translator.translate;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class BlockListener implements Listener {
-    private static final EnumSet<BlockFace> CARTESIAN_BLOCK_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN);
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     private final BoltPlugin plugin;
 
@@ -111,7 +108,6 @@ public final class BlockListener implements Listener {
         }
     }
 
-    @SuppressWarnings("java:S6205")
     private boolean triggerActions(final Player player, final Protection protection, final Block block) {
         final BoltPlayer boltPlayer = plugin.player(player);
         final Action action = boltPlayer.triggerAction();

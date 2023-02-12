@@ -18,8 +18,8 @@ import org.bukkit.inventory.ItemStack;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.BasicPermissible;
-import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Source;
 
 @SuppressWarnings("ClassCanBeRecord")
@@ -142,7 +142,6 @@ public final class InventoryListener implements Listener {
         }
     }
 
-    @SuppressWarnings("java:S2583")
     private Protection getHolderProtection(final InventoryHolder inventoryHolder) {
         final Protection protection;
         if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {

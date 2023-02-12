@@ -19,7 +19,6 @@ public final class Protections {
     private Protections() {
     }
 
-    @SuppressWarnings("java:S2583")
     public static String displayType(final Protection protection) {
         if (protection instanceof final BlockProtection blockProtection) {
             final World world = Bukkit.getWorld(blockProtection.getWorld());
