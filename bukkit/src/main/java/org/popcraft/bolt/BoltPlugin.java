@@ -147,7 +147,7 @@ public class BoltPlugin extends JavaPlugin {
         registerEvents();
         registerCommands();
         uuidCache.load(uuidCachePath);
-        new Metrics(this, 17709);
+        new Metrics(this, 17711);
     }
 
     @Override
