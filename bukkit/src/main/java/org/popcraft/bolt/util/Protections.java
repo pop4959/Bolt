@@ -29,11 +29,7 @@ public final class Protections {
                 return Strings.toTitleCase(blockProtection.getBlock());
             } else {
                 final Block block = world.getBlockAt(x, y, z);
-                if (block.getState() instanceof final Nameable nameable && nameable.getCustomName() != null && !nameable.getCustomName().isEmpty()) {
-                    return nameable.getCustomName();
-                } else {
-                    return displayType(block);
-                }
+                return displayType(block);
             }
         } else if (protection instanceof final EntityProtection entityProtection) {
             final Entity entity = Bukkit.getServer().getEntity(entityProtection.getId());
@@ -48,19 +44,22 @@ public final class Protections {
     }
 
     public static String displayType(final Block block) {
-        final String blockDataString = block.getBlockData().getAsString().replace(':', '.');
-        final int nbtIndex = blockDataString.indexOf('[');
-        final String key;
-        if (nbtIndex > -1) {
-            key = blockDataString.substring(0, nbtIndex);
-        } else {
-            key = blockDataString;
+        if (block.getState() instanceof final Nameable nameable) {
+            final String customName = nameable.getCustomName();
+            if (customName != null && !customName.isEmpty()) {
+                return customName;
+            }
         }
-        final Component translatable = Component.translatable("block.%s".formatted(key));
+        final Component translatable = Component.translatable(block.getTranslationKey());
         return BukkitComponentSerializer.legacy().serialize(translatable);
     }
 
     public static String displayType(final Entity entity) {
-        return entity.getName();
+        final String customName = entity.getCustomName();
+        if (customName != null && !customName.isEmpty()) {
+            return customName;
+        }
+        final Component translatable = Component.translatable(entity.getType().getTranslationKey());
+        return BukkitComponentSerializer.legacy().serialize(translatable);
     }
 }
