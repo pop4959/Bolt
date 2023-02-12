@@ -5,11 +5,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.19.2-R0.1-SNAPSHOT")
+    compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.19.3-R0.1-SNAPSHOT")
     implementation("org.spongepowered", name = "configurate-yaml", version = "4.1.2")
-    implementation(group = "net.kyori", name = "adventure-api", version = "4.11.0")
-    implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.11.0")
-    implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.1.1")
+    implementation(group = "net.kyori", name = "adventure-api", version = "4.12.0")
+    implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.12.0")
+    implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.2.0")
     implementation(group = "org.bstats", name = "bstats-bukkit", version = "3.0.0")
     implementation(project(":bolt-common"))
     implementation(project(":bolt-paper"))
