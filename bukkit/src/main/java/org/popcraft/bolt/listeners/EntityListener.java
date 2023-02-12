@@ -136,7 +136,13 @@ public final class EntityListener implements Listener {
                 }
             }
             if (shouldSendMessage && hasNotifyPermission) {
-                BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", player.getUniqueId().equals(protection.getOwner()) ? translate(Translation.YOU) : Objects.requireNonNullElse(plugin.getUuidCache().getName(protection.getOwner()), translate(Translation.UNKNOWN))));
+                final boolean isYou = player.getUniqueId().equals(protection.getOwner());
+                final String owner = isYou ? translate(Translation.YOU) : plugin.getUuidCache().getName(protection.getOwner());
+                if (owner == null) {
+                    BoltComponents.sendMessage(player, Translation.LOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
+                } else {
+                    BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner));
+                }
             }
             boltPlayer.setInteracted();
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, boltPlayer::clearInteraction);
