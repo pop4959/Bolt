@@ -1,5 +1,6 @@
 package org.popcraft.bolt;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -146,6 +147,7 @@ public class BoltPlugin extends JavaPlugin {
         registerEvents();
         registerCommands();
         uuidCache.load(uuidCachePath);
+        new Metrics(this, 17709);
     }
 
     @Override
