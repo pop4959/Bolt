@@ -135,7 +135,7 @@ public class SQLiteStore implements Store {
             replaceBlock.setInt(7, protection.getX());
             replaceBlock.setInt(8, protection.getY());
             replaceBlock.setInt(9, protection.getZ());
-            replaceBlock.executeUpdate();
+            replaceBlock.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
