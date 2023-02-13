@@ -22,11 +22,12 @@ import java.util.UUID;
 import java.util.logging.LogManager;
 
 public class SQLiteStore implements Store {
-    private static final String JDBC_SQLITE_URL = "jdbc:sqlite:bolt.db";
     private static final Gson GSON = new Gson();
+    private final String jdbcSqliteUrl;
 
-    public SQLiteStore() {
-        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+    public SQLiteStore(final String directory) {
+        jdbcSqliteUrl = "jdbc:sqlite:%s/bolt.db".formatted(directory);
+        try (final Connection connection = DriverManager.getConnection(jdbcSqliteUrl)) {
             try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS blocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), access text, block varchar(128), world varchar(128), x integer, y integer, z integer);")) {
                 statement.execute();
             }
@@ -46,7 +47,7 @@ public class SQLiteStore implements Store {
 
     @Override
     public BlockProtection loadBlockProtection(BlockLocation location) {
-        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+        try (final Connection connection = DriverManager.getConnection(jdbcSqliteUrl)) {
             try (final PreparedStatement selectBlock = connection.prepareStatement("SELECT * FROM blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;")) {
                 selectBlock.setString(1, location.world());
                 selectBlock.setInt(2, location.x());
@@ -67,7 +68,7 @@ public class SQLiteStore implements Store {
     @Override
     public List<BlockProtection> loadBlockProtections() {
         final long startTimeNanos = System.nanoTime();
-        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+        try (final Connection connection = DriverManager.getConnection(jdbcSqliteUrl)) {
             try (final PreparedStatement selectBlocks = connection.prepareStatement("SELECT * FROM blocks;")) {
                 final ResultSet blocksResultSet = selectBlocks.executeQuery();
                 final List<BlockProtection> protections = new ArrayList<>();
@@ -102,7 +103,7 @@ public class SQLiteStore implements Store {
 
     @Override
     public void saveBlockProtection(BlockProtection protection) {
-        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+        try (final Connection connection = DriverManager.getConnection(jdbcSqliteUrl)) {
             try (final PreparedStatement replaceBlock = connection.prepareStatement("REPLACE INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);")) {
                 replaceBlock.setString(1, protection.getId().toString());
                 replaceBlock.setString(2, protection.getOwner().toString());
@@ -123,7 +124,7 @@ public class SQLiteStore implements Store {
 
     @Override
     public void removeBlockProtection(BlockProtection protection) {
-        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+        try (final Connection connection = DriverManager.getConnection(jdbcSqliteUrl)) {
             try (final PreparedStatement deleteBlock = connection.prepareStatement("DELETE FROM blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;")) {
                 deleteBlock.setString(1, protection.getWorld());
                 deleteBlock.setInt(2, protection.getX());
@@ -138,7 +139,7 @@ public class SQLiteStore implements Store {
 
     @Override
     public EntityProtection loadEntityProtection(UUID id) {
-        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+        try (final Connection connection = DriverManager.getConnection(jdbcSqliteUrl)) {
             try (final PreparedStatement selectEntity = connection.prepareStatement("SELECT * FROM entities WHERE id = ?;")) {
                 selectEntity.setString(1, id.toString());
                 final ResultSet entityResultSet = selectEntity.executeQuery();
@@ -156,7 +157,7 @@ public class SQLiteStore implements Store {
     @Override
     public List<EntityProtection> loadEntityProtections() {
         final long startTimeNanos = System.nanoTime();
-        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+        try (final Connection connection = DriverManager.getConnection(jdbcSqliteUrl)) {
             try (final PreparedStatement selectEntities = connection.prepareStatement("SELECT * FROM entities;")) {
                 final ResultSet entitiesResultSet = selectEntities.executeQuery();
                 final List<EntityProtection> protections = new ArrayList<>();
@@ -187,7 +188,7 @@ public class SQLiteStore implements Store {
 
     @Override
     public void saveEntityProtection(EntityProtection protection) {
-        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+        try (final Connection connection = DriverManager.getConnection(jdbcSqliteUrl)) {
             try (final PreparedStatement replaceEntity = connection.prepareStatement("REPLACE INTO entities VALUES (?, ?, ?, ?, ?);")) {
                 replaceEntity.setString(1, protection.getId().toString());
                 replaceEntity.setString(2, protection.getOwner().toString());
@@ -204,7 +205,7 @@ public class SQLiteStore implements Store {
 
     @Override
     public void removeEntityProtection(EntityProtection protection) {
-        try (final Connection connection = DriverManager.getConnection(JDBC_SQLITE_URL)) {
+        try (final Connection connection = DriverManager.getConnection(jdbcSqliteUrl)) {
             try (final PreparedStatement deleteEntity = connection.prepareStatement("DELETE FROM entities WHERE id = ?;")) {
                 deleteEntity.setString(1, protection.getId().toString());
                 deleteEntity.execute();

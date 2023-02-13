@@ -132,15 +132,16 @@ public class BoltPlugin extends JavaPlugin {
             new GlowLichenMatcher(), new LilyPadMatcher(), new RepeaterMatcher(), new SporeBlossomMatcher(),
             new SoulFireMatcher(), new FrogspawnMatcher(), new MangrovePropaguleMatcher(), new SkulkVeinMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
-    private final Bolt bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore()));
     private final Map<String, BoltCommand> commands = new HashMap<>();
     private final Path uuidCachePath = getDataFolder().toPath().resolve("uuidcache");
     private final UuidCache uuidCache = new SimpleUuidCache();
+    private Bolt bolt;
     private YamlConfigurationLoader configurationLoader;
     private ConfigurationNode configurationRootNode;
 
     @Override
     public void onEnable() {
+        this.bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore(getDataFolder().getPath())));
         loadConfiguration();
         registerAccessTypes();
         BoltComponents.enable(this);
