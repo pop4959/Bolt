@@ -4,9 +4,11 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MemoryStore implements Store {
@@ -14,13 +16,13 @@ public class MemoryStore implements Store {
     private final Map<UUID, EntityProtection> entityProtectionMap = new ConcurrentHashMap<>();
 
     @Override
-    public BlockProtection loadBlockProtection(final BlockLocation location) {
-        return blockProtectionMap.get(location);
+    public CompletableFuture<BlockProtection> loadBlockProtection(final BlockLocation location) {
+        return CompletableFuture.completedFuture(blockProtectionMap.get(location));
     }
 
     @Override
-    public List<BlockProtection> loadBlockProtections() {
-        return List.copyOf(blockProtectionMap.values());
+    public CompletableFuture<Collection<BlockProtection>> loadBlockProtections() {
+        return CompletableFuture.completedFuture(List.copyOf(blockProtectionMap.values()));
     }
 
     @Override
@@ -36,13 +38,13 @@ public class MemoryStore implements Store {
     }
 
     @Override
-    public EntityProtection loadEntityProtection(UUID id) {
-        return entityProtectionMap.get(id);
+    public CompletableFuture<EntityProtection> loadEntityProtection(UUID id) {
+        return CompletableFuture.completedFuture(entityProtectionMap.get(id));
     }
 
     @Override
-    public List<EntityProtection> loadEntityProtections() {
-        return List.copyOf(entityProtectionMap.values());
+    public CompletableFuture<Collection<EntityProtection>> loadEntityProtections() {
+        return CompletableFuture.completedFuture(List.copyOf(entityProtectionMap.values()));
     }
 
     @Override
@@ -53,5 +55,10 @@ public class MemoryStore implements Store {
     @Override
     public void removeEntityProtection(EntityProtection protection) {
         entityProtectionMap.remove(protection.getId());
+    }
+
+    @Override
+    public CompletableFuture<Void> flush() {
+        return CompletableFuture.completedFuture(null);
     }
 }

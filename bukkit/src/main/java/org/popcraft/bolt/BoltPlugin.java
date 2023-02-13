@@ -158,6 +158,7 @@ public class BoltPlugin extends JavaPlugin {
         commands.clear();
         saveConfiguration();
         uuidCache.save(uuidCachePath);
+        this.bolt.getStore().flush().join();
     }
 
     private void loadConfiguration() {
@@ -269,12 +270,12 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     public Optional<Protection> findProtection(final Block block) {
-        final Protection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(block));
+        final Protection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(block)).join();
         return Optional.ofNullable(protection != null ? protection : matchProtection(block));
     }
 
     public Optional<Protection> findProtection(final Entity entity) {
-        final Protection protection = bolt.getStore().loadEntityProtection(entity.getUniqueId());
+        final Protection protection = bolt.getStore().loadEntityProtection(entity.getUniqueId()).join();
         return Optional.ofNullable(protection != null ? protection : matchProtection(entity));
     }
 
@@ -325,13 +326,13 @@ public class BoltPlugin extends JavaPlugin {
                 if (optionalMatch.isPresent()) {
                     final Match match = optionalMatch.get();
                     for (final Block matchBlock : match.blocks()) {
-                        final BlockProtection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(matchBlock));
+                        final BlockProtection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(matchBlock)).join();
                         if (protection != null) {
                             return protection;
                         }
                     }
                     for (final Entity matchEntity : match.entities()) {
-                        final EntityProtection protection = bolt.getStore().loadEntityProtection(matchEntity.getUniqueId());
+                        final EntityProtection protection = bolt.getStore().loadEntityProtection(matchEntity.getUniqueId()).join();
                         if (protection != null) {
                             return protection;
                         }
@@ -349,13 +350,13 @@ public class BoltPlugin extends JavaPlugin {
                 if (optionalMatch.isPresent()) {
                     final Match match = optionalMatch.get();
                     for (final Block matchBlock : match.blocks()) {
-                        final BlockProtection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(matchBlock));
+                        final BlockProtection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(matchBlock)).join();
                         if (protection != null) {
                             return protection;
                         }
                     }
                     for (final Entity matchEntity : match.entities()) {
-                        final EntityProtection protection = bolt.getStore().loadEntityProtection(matchEntity.getUniqueId());
+                        final EntityProtection protection = bolt.getStore().loadEntityProtection(matchEntity.getUniqueId()).join();
                         if (protection != null) {
                             return protection;
                         }

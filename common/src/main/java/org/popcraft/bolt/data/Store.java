@@ -6,21 +6,24 @@ import org.popcraft.bolt.util.BlockLocation;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface Store {
-    BlockProtection loadBlockProtection(BlockLocation location);
+    CompletableFuture<BlockProtection> loadBlockProtection(BlockLocation location);
 
-    Collection<BlockProtection> loadBlockProtections();
+    CompletableFuture<Collection<BlockProtection>> loadBlockProtections();
 
     void saveBlockProtection(BlockProtection protection);
 
     void removeBlockProtection(BlockProtection protection);
 
-    EntityProtection loadEntityProtection(UUID id);
+    CompletableFuture<EntityProtection> loadEntityProtection(UUID id);
 
-    Collection<EntityProtection> loadEntityProtections();
+    CompletableFuture<Collection<EntityProtection>> loadEntityProtections();
 
     void saveEntityProtection(EntityProtection protection);
 
     void removeEntityProtection(EntityProtection protection);
+
+    CompletableFuture<Void> flush();
 }
