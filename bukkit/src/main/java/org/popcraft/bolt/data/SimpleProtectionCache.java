@@ -13,7 +13,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.logging.LogManager;
 
 public class SimpleProtectionCache implements Store {
     private final Map<BlockLocation, BlockProtection> cachedBlocks = new ConcurrentHashMap<>();
