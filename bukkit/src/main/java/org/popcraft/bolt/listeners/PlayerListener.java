@@ -23,6 +23,6 @@ public final class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(final PlayerQuitEvent e) {
-        plugin.getBolt().removePlayerMeta(e.getPlayer().getUniqueId());
+        plugin.getBolt().removeBoltPlayer(e.getPlayer().getUniqueId());
     }
 }

@@ -265,7 +265,7 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     public BoltPlayer player(final UUID uuid) {
-        return bolt.getPlayerMeta(uuid);
+        return bolt.getBoltPlayer(uuid);
     }
 
     public Optional<Protection> findProtection(final Block block) {
@@ -301,11 +301,11 @@ public class BoltPlugin extends JavaPlugin {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canAccess(final Protection protection, final UUID uuid, final String... permissions) {
-        return bolt.hasAccess(protection, bolt.getPlayerMeta(uuid), permissions);
+        return bolt.hasAccess(protection, bolt.getBoltPlayer(uuid), permissions);
     }
 
     public boolean canAccess(final Protection protection, final Player player, final String... permissions) {
-        return bolt.hasAccess(protection, bolt.getPlayerMeta(player.getUniqueId()), permissions);
+        return bolt.hasAccess(protection, bolt.getBoltPlayer(player.getUniqueId()), permissions);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

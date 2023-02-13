@@ -29,11 +29,11 @@ public final class Bolt {
         this.store = store;
     }
 
-    public BoltPlayer getPlayerMeta(final UUID uuid) {
+    public BoltPlayer getBoltPlayer(final UUID uuid) {
         return players.computeIfAbsent(uuid, x -> new BoltPlayer(uuid));
     }
 
-    public void removePlayerMeta(final UUID uuid) {
+    public void removeBoltPlayer(final UUID uuid) {
         players.remove(uuid);
     }
 
