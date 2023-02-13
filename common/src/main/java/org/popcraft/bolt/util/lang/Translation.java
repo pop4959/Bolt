@@ -1,10 +1,11 @@
 package org.popcraft.bolt.util.lang;
 
 public class Translation {
+    public static final String ACTION_PERSIST_ON = "action_persist_on";
+    public static final String ACTION_PERSIST_OFF = "action_persist_off";
     public static final String COMMAND_NO_PERMISSION = "command_no_permission";
     public static final String COMMAND_PLAYER_ONLY = "command_player_only";
     public static final String COMMAND_NOT_ENOUGH_ARGS = "command_not_enough_args";
-    public static final String COMMAND_PERSIST = "command_persist";
     public static final String CLICK_ACTION = "click_action";
     public static final String CLICK_EDITED = "click_edited";
     public static final String CLICK_EDITED_NO_PERMISSION = "click_edited_no_permission";

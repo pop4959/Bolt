@@ -1,6 +1,5 @@
 package org.popcraft.bolt.command.impl;
 
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
@@ -13,8 +12,6 @@ import org.popcraft.bolt.util.lang.Translation;
 import java.util.Collections;
 import java.util.List;
 
-import static org.popcraft.bolt.util.lang.Translator.translate;
-
 public class PersistCommand extends BoltCommand {
     public PersistCommand(BoltPlugin plugin) {
         super(plugin);
@@ -25,7 +22,7 @@ public class PersistCommand extends BoltCommand {
         if (sender instanceof final Player player) {
             final BoltPlayer boltPlayer = plugin.player(player);
             boltPlayer.togglePersist();
-            BoltComponents.sendMessage(player, Translation.COMMAND_PERSIST, Placeholder.unparsed("toggle", translate(boltPlayer.isPersist() ? Translation.ENABLED : Translation.DISABLED)));
+            BoltComponents.sendMessage(player, boltPlayer.isPersist() ? Translation.ACTION_PERSIST_ON : Translation.ACTION_PERSIST_OFF);
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
         }
