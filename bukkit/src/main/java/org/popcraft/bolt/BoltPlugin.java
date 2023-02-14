@@ -4,6 +4,7 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -100,10 +101,6 @@ import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permissible;
 import org.popcraft.bolt.util.lang.Translation;
 import org.popcraft.bolt.util.lang.Translator;
-import org.spongepowered.configurate.ConfigurateException;
-import org.spongepowered.configurate.ConfigurationNode;
-import org.spongepowered.configurate.serialize.SerializationException;
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -138,14 +135,13 @@ public class BoltPlugin extends JavaPlugin {
     private final Path uuidCachePath = getDataFolder().toPath().resolve("uuidcache");
     private final UuidCache uuidCache = new SimpleUuidCache();
     private Bolt bolt;
-    private YamlConfigurationLoader configurationLoader;
-    private ConfigurationNode configurationRootNode;
 
     @Override
     public void onEnable() {
+        getConfig().options().copyDefaults(true);
+        saveConfig();
         this.bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore(getDataFolder().getPath())));
-        loadConfiguration();
-        Translator.load(getDataFolder().toPath(), configurationRootNode.node("language").getString("en"));
+        Translator.load(getDataFolder().toPath(), getConfig().getString("language", "en"));
         registerAccessTypes();
         BoltComponents.enable(this);
         registerEvents();
@@ -159,51 +155,17 @@ public class BoltPlugin extends JavaPlugin {
         BoltComponents.disable();
         HandlerList.unregisterAll(this);
         commands.clear();
-        saveConfiguration();
         uuidCache.save(uuidCachePath);
         this.bolt.getStore().flush().join();
     }
 
-    private void loadConfiguration() {
-        configurationLoader = YamlConfigurationLoader.builder()
-                .path(getDataFolder().toPath().resolve("config.yml"))
-                .build();
-        try {
-            configurationRootNode = configurationLoader.load();
-            if (!configurationRootNode.hasChild("version")) {
-                final YamlConfigurationLoader defaultLoader = YamlConfigurationLoader.builder()
-                        .url(getClassLoader().getResource("config.yml"))
-                        .build();
-                final ConfigurationNode configurationDefaultRootNode = defaultLoader.load();
-                configurationRootNode.mergeFrom(configurationDefaultRootNode);
-                configurationLoader.save(configurationRootNode);
-            }
-        } catch (ConfigurateException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void saveConfiguration() {
-        try {
-            configurationLoader.save(configurationRootNode);
-        } catch (ConfigurateException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void registerAccessTypes() {
-        final ConfigurationNode accessTypesMapNode = configurationRootNode.node("access-types");
-        if (accessTypesMapNode.isMap()) {
-            accessTypesMapNode.childrenMap().forEach((key, permissionsNode) -> {
-                try {
-                    final List<String> permissions = permissionsNode.getList(String.class);
-                    if (key instanceof String type && permissions != null) {
-                        bolt.getAccessRegistry().register(type, new HashSet<>(permissions));
-                    }
-                } catch (SerializationException e) {
-                    e.printStackTrace();
-                }
-            });
+        final ConfigurationSection section = getConfig().getConfigurationSection("access-types");
+        if (section != null)  {
+            for (final String type : section.getKeys(false)) {
+                final List<String> permissions = section.getStringList(type);
+                bolt.getAccessRegistry().register(type, new HashSet<>(permissions));
+            }
         }
     }
 

@@ -6,7 +6,6 @@ repositories {
 
 dependencies {
     compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.19.3-R0.1-SNAPSHOT")
-    implementation("org.spongepowered", name = "configurate-yaml", version = "4.1.2")
     implementation(group = "net.kyori", name = "adventure-api", version = "4.12.0")
     implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.12.0")
     implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.2.0")
@@ -31,7 +30,6 @@ tasks {
         minimize {
             exclude(project(":bolt-common"))
         }
-        relocate("org.spongepowered", "${project.group}.${rootProject.name}.lib.org.spongepowered")
         relocate("org.yaml", "${project.group}.${rootProject.name}.lib.org.yaml")
         relocate("io.leangen", "${project.group}.${rootProject.name}.lib.io.leangen")
         relocate("net.kyori", "${project.group}.${rootProject.name}.lib.net.kyori")
