@@ -99,6 +99,7 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permissible;
 import org.popcraft.bolt.util.lang.Translation;
+import org.popcraft.bolt.util.lang.Translator;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
@@ -144,6 +145,7 @@ public class BoltPlugin extends JavaPlugin {
     public void onEnable() {
         this.bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore(getDataFolder().getPath())));
         loadConfiguration();
+        Translator.load(getDataFolder().toPath(), configurationRootNode.node("language").getString("en"));
         registerAccessTypes();
         BoltComponents.enable(this);
         registerEvents();
