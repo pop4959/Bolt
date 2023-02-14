@@ -45,10 +45,8 @@ public class LWCMigration implements Migration {
         final List<Protection> protections = new ArrayList<>();
         Connection connection = null;
         try {
-            // create a database connection
             connection = DriverManager.getConnection("jdbc:sqlite:lwc.db");
             try (Statement statement = connection.createStatement()) {
-                statement.setQueryTimeout(30);  // set timeout to 30 sec.
                 try {
                     ResultSet blockSet = statement.executeQuery("select * from lwc_blocks");
                     while (blockSet.next()) {
@@ -73,7 +71,7 @@ public class LWCMigration implements Migration {
                                 protectionSet.getInt("blockId"),
                                 protectionSet.getString("world"),
                                 protectionSet.getString("password"),
-                                protectionSet.getString("date"),
+                                protectionSet.getDate("date"),
                                 protectionSet.getLong("last_accessed")
                         ));
                     }
@@ -140,12 +138,14 @@ public class LWCMigration implements Migration {
                     UUID.randomUUID(),
                     ownerUUID,
                     protectionType,
+                    protection.date().getTime(),
+                    protection.lastAccessed(),
                     access,
-                    blocks.getOrDefault(protection.blockId(), BLOCK_AIR).name(),
                     protection.world(),
                     protection.x(),
                     protection.y(),
-                    protection.z()
+                    protection.z(),
+                    blocks.getOrDefault(protection.blockId(), BLOCK_AIR).name()
             ));
         }
         return store;

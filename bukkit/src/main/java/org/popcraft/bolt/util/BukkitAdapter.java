@@ -21,7 +21,8 @@ public final class BukkitAdapter {
     }
 
     public static BlockProtection createBlockProtection(final Block block, final UUID owner, final String type) {
-        return new BlockProtection(UUID.randomUUID(), owner, type, new HashMap<>(), block.getType().name(), block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+        final long now = System.currentTimeMillis();
+        return new BlockProtection(UUID.randomUUID(), owner, type, now, now, new HashMap<>(), block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), block.getType().name());
     }
 
     public static BlockLocation blockLocation(final Block block) {
@@ -46,6 +47,7 @@ public final class BukkitAdapter {
     }
 
     public static EntityProtection createEntityProtection(final Entity entity, final UUID owner, final String type) {
-        return new EntityProtection(entity.getUniqueId(), owner, type, new HashMap<>(), entity.getType().name());
+        final long now = System.currentTimeMillis();
+        return new EntityProtection(entity.getUniqueId(), owner, type, now, now, new HashMap<>(), entity.getType().name());
     }
 }

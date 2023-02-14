@@ -40,16 +40,19 @@ public class SQLiteStore implements Store {
     public SQLiteStore(final String directory) {
         try {
             this.connection = DriverManager.getConnection("jdbc:sqlite:%s/bolt.db".formatted(directory));
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS blocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), access text, block varchar(128), world varchar(128), x integer, y integer, z integer);")) {
+            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS blocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created integer, accessed integer, access text, world varchar(128), x integer, y integer, z integer, block varchar(128));")) {
                 statement.execute();
             }
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS entities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), access text, entity varchar(128));")) {
+            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS entities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created integer, accessed integer, access text, entity varchar(128));")) {
                 statement.execute();
             }
             try (final PreparedStatement statement = connection.prepareStatement("CREATE INDEX IF NOT EXISTS block_owner ON blocks(owner);")) {
                 statement.execute();
             }
             try (final PreparedStatement statement = connection.prepareStatement("CREATE UNIQUE INDEX IF NOT EXISTS block_location ON blocks(world, x, y, z);")) {
+                statement.execute();
+            }
+            try (final PreparedStatement statement = connection.prepareStatement("CREATE INDEX IF NOT EXISTS entity_owner ON entities(owner);")) {
                 statement.execute();
             }
         } catch (SQLException e) {
@@ -107,15 +110,17 @@ public class SQLiteStore implements Store {
         final String id = resultSet.getString(1);
         final String owner = resultSet.getString(2);
         final String type = resultSet.getString(3);
-        final String accessText = resultSet.getString(4);
+        final long created = resultSet.getLong(4);
+        final long accessed = resultSet.getLong(5);
+        final String accessText = resultSet.getString(6);
         final Map<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, new TypeToken<HashMap<String, String>>() {
         }.getType()), new HashMap<>());
-        final String block = resultSet.getString(5);
-        final String world = resultSet.getString(6);
-        final int x = resultSet.getInt(7);
-        final int y = resultSet.getInt(8);
-        final int z = resultSet.getInt(9);
-        return new BlockProtection(UUID.fromString(id), UUID.fromString(owner), type, access, block, world, x, y, z);
+        final String world = resultSet.getString(7);
+        final int x = resultSet.getInt(8);
+        final int y = resultSet.getInt(9);
+        final int z = resultSet.getInt(10);
+        final String block = resultSet.getString(11);
+        return new BlockProtection(UUID.fromString(id), UUID.fromString(owner), type, created, accessed, access, world, x, y, z, block);
     }
 
     @Override
@@ -124,17 +129,19 @@ public class SQLiteStore implements Store {
     }
 
     private void saveBlockProtectionNow(BlockProtection protection) {
-        try (final PreparedStatement replaceBlock = connection.prepareStatement("REPLACE INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);")) {
+        try (final PreparedStatement replaceBlock = connection.prepareStatement("REPLACE INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")) {
             replaceBlock.setString(1, protection.getId().toString());
             replaceBlock.setString(2, protection.getOwner().toString());
             replaceBlock.setString(3, protection.getType());
-            replaceBlock.setString(4, GSON.toJson(protection.getAccess(), new TypeToken<Map<String, String>>() {
+            replaceBlock.setLong(4, protection.getCreated());
+            replaceBlock.setLong(5, protection.getAccessed());
+            replaceBlock.setString(6, GSON.toJson(protection.getAccess(), new TypeToken<Map<String, String>>() {
             }.getType()));
-            replaceBlock.setString(5, protection.getBlock());
-            replaceBlock.setString(6, protection.getWorld());
-            replaceBlock.setInt(7, protection.getX());
-            replaceBlock.setInt(8, protection.getY());
-            replaceBlock.setInt(9, protection.getZ());
+            replaceBlock.setString(7, protection.getWorld());
+            replaceBlock.setInt(8, protection.getX());
+            replaceBlock.setInt(9, protection.getY());
+            replaceBlock.setInt(10, protection.getZ());
+            replaceBlock.setString(11, protection.getBlock());
             replaceBlock.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -204,11 +211,13 @@ public class SQLiteStore implements Store {
         final String id = resultSet.getString(1);
         final String owner = resultSet.getString(2);
         final String type = resultSet.getString(3);
-        final String accessText = resultSet.getString(4);
+        final long created = resultSet.getLong(4);
+        final long accessed = resultSet.getLong(5);
+        final String accessText = resultSet.getString(6);
         final Map<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, new TypeToken<HashMap<String, String>>() {
         }.getType()), new HashMap<>());
-        final String entity = resultSet.getString(5);
-        return new EntityProtection(UUID.fromString(id), UUID.fromString(owner), type, access, entity);
+        final String entity = resultSet.getString(7);
+        return new EntityProtection(UUID.fromString(id), UUID.fromString(owner), type, created, accessed, access, entity);
     }
 
     @Override
@@ -217,13 +226,15 @@ public class SQLiteStore implements Store {
     }
 
     private void saveEntityProtectionNow(EntityProtection protection) {
-        try (final PreparedStatement replaceEntity = connection.prepareStatement("REPLACE INTO entities VALUES (?, ?, ?, ?, ?);")) {
+        try (final PreparedStatement replaceEntity = connection.prepareStatement("REPLACE INTO entities VALUES (?, ?, ?, ?, ?, ?, ?);")) {
             replaceEntity.setString(1, protection.getId().toString());
             replaceEntity.setString(2, protection.getOwner().toString());
             replaceEntity.setString(3, protection.getType());
-            replaceEntity.setString(4, GSON.toJson(protection.getAccess(), new TypeToken<Map<String, String>>() {
+            replaceEntity.setLong(4, protection.getCreated());
+            replaceEntity.setLong(5, protection.getAccessed());
+            replaceEntity.setString(6, GSON.toJson(protection.getAccess(), new TypeToken<Map<String, String>>() {
             }.getType()));
-            replaceEntity.setString(5, protection.getEntity());
+            replaceEntity.setString(7, protection.getEntity());
             replaceEntity.execute();
         } catch (SQLException e) {
             e.printStackTrace();
