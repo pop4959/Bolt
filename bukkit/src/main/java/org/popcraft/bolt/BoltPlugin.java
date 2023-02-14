@@ -95,6 +95,7 @@ import org.popcraft.bolt.matcher.entity.EntityMatcher;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
@@ -134,15 +135,16 @@ public class BoltPlugin extends JavaPlugin {
     private final Map<String, BoltCommand> commands = new HashMap<>();
     private final Path uuidCachePath = getDataFolder().toPath().resolve("uuidcache");
     private final UuidCache uuidCache = new SimpleUuidCache();
+    private final Map<String, Access> protectableAccess = new HashMap<>();
     private Bolt bolt;
 
     @Override
     public void onEnable() {
-        getConfig().options().copyDefaults(true);
-        saveConfig();
+        saveDefaultConfig();
         this.bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore(getDataFolder().getPath())));
         Translator.load(getDataFolder().toPath(), getConfig().getString("language", "en"));
         registerAccessTypes();
+        registerProtectableAccess();
         BoltComponents.enable(this);
         registerEvents();
         registerCommands();
@@ -161,10 +163,27 @@ public class BoltPlugin extends JavaPlugin {
 
     private void registerAccessTypes() {
         final ConfigurationSection section = getConfig().getConfigurationSection("access-types");
-        if (section != null)  {
+        if (section != null) {
             for (final String type : section.getKeys(false)) {
                 final List<String> permissions = section.getStringList(type);
                 bolt.getAccessRegistry().register(type, new HashSet<>(permissions));
+            }
+        }
+    }
+
+    private void registerProtectableAccess() {
+        final ConfigurationSection blocks = getConfig().getConfigurationSection("blocks");
+        if (blocks != null) {
+            for (final String block : blocks.getKeys(false)) {
+                final Access defaultAccess = bolt.getAccessRegistry().get(blocks.getString(block, "none")).orElse(null);
+                protectableAccess.put(block.toUpperCase(), defaultAccess);
+            }
+        }
+        final ConfigurationSection entities = getConfig().getConfigurationSection("entities");
+        if (entities != null) {
+            for (final String entity : entities.getKeys(false)) {
+                final Access defaultAccess = bolt.getAccessRegistry().get(entities.getString(entity, "none")).orElse(null);
+                protectableAccess.put(entity.toUpperCase(), defaultAccess);
             }
         }
     }
@@ -233,6 +252,22 @@ public class BoltPlugin extends JavaPlugin {
 
     public BoltPlayer player(final UUID uuid) {
         return bolt.getBoltPlayer(uuid);
+    }
+
+    public boolean isProtectable(final Block block) {
+        return protectableAccess.containsKey(block.getType().name());
+    }
+
+    public boolean isProtectable(final Entity entity) {
+        return protectableAccess.containsKey(entity.getType().name());
+    }
+
+    public Access getDefaultAccess(final Block block) {
+        return protectableAccess.get(block.getType().name());
+    }
+
+    public Access getDefaultAccess(final Entity entity) {
+        return protectableAccess.get(entity.getType().name());
     }
 
     public Optional<Protection> findProtection(final Block block) {

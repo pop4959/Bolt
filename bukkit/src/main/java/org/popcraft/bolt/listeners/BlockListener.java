@@ -20,6 +20,7 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
@@ -36,6 +37,7 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.util.BoundingBox;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BasicPermissible;
 import org.popcraft.bolt.util.BoltComponents;
@@ -124,7 +126,7 @@ public final class BlockListener implements Listener {
             case LOCK -> {
                 if (protection != null) {
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Placeholder.unparsed("type", Protections.displayType(protection)));
-                } else {
+                } else if (plugin.isProtectable(block)) {
                     plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createPrivateBlockProtection(block, boltPlayer.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId()));
                     boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
@@ -169,6 +171,21 @@ public final class BlockListener implements Listener {
                     BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());
         }
         return true;
+    }
+
+    @EventHandler
+    public void onBlockPlace(final BlockPlaceEvent e) {
+        final Block block = e.getBlock();
+        if (!plugin.isProtectable(block)) {
+            return;
+        }
+        final Access defaultAccess = plugin.getDefaultAccess(block);
+        if (defaultAccess == null) {
+            return;
+        }
+        final Player player = e.getPlayer();
+        plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createBlockProtection(block, player.getUniqueId(), defaultAccess.type()));
+        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
     }
 
     @EventHandler

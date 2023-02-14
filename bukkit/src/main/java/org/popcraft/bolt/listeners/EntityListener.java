@@ -25,6 +25,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBucketEntityEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -37,6 +38,7 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
@@ -53,12 +55,29 @@ import java.util.UUID;
 
 import static org.popcraft.bolt.util.lang.Translator.translate;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class EntityListener implements Listener {
     private final BoltPlugin plugin;
 
     public EntityListener(final BoltPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onHangingPlace(final HangingPlaceEvent e) {
+        final Entity entity = e.getEntity();
+        if (!plugin.isProtectable(entity)) {
+            return;
+        }
+        final Access defaultAccess = plugin.getDefaultAccess(entity);
+        if (defaultAccess == null) {
+            return;
+        }
+        final Player player = e.getPlayer();
+        if (player == null) {
+            return;
+        }
+        plugin.getBolt().getStore().saveEntityProtection(BukkitAdapter.createEntityProtection(entity, player.getUniqueId(), defaultAccess.type()));
+        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -160,7 +179,7 @@ public final class EntityListener implements Listener {
             case LOCK -> {
                 if (protection != null) {
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Placeholder.unparsed("type", Protections.displayType(protection)));
-                } else {
+                } else if (plugin.isProtectable(entity)) {
                     plugin.getBolt().getStore().saveEntityProtection(BukkitAdapter.createPrivateEntityProtection(entity, boltPlayer.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId()));
                     boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
