@@ -14,7 +14,6 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityEnterLoveModeEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
@@ -298,17 +297,6 @@ public final class EntityListener implements Listener {
             return;
         }
         if (plugin.player(player).triggeredAction() || !plugin.canAccess(e.getMount(), player, Permission.MOUNT)) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onEntityEnterLoveMode(final EntityEnterLoveModeEvent e) {
-        // TODO: Potentially look into a solution for items being lost when cancelling
-        if (!(e.getHumanEntity() instanceof final Player player)) {
-            return;
-        }
-        if (!plugin.canAccess(e.getEntity(), player, Permission.INTERACT)) {
             e.setCancelled(true);
         }
     }
