@@ -109,7 +109,7 @@ public class LWCMigration implements Migration {
                     if (flag.getId() == FLAG_TYPE_REDSTONE) {
                         access.put(Source.from(Source.REDSTONE, Source.REDSTONE), DefaultAccess.FULL.type());
                     } else if (flag.getId() == FLAG_TYPE_HOPPER) {
-                        access.put(Source.from(Source.HOPPER, Source.HOPPER), DefaultAccess.FULL.type());
+                        access.put(Source.from(Source.BLOCK, Source.BLOCK), DefaultAccess.FULL.type());
                     }
                 }
                 for (DataRights rights : data.getRights()) {

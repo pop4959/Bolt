@@ -124,12 +124,11 @@ public final class InventoryListener implements Listener {
             if (!plugin.canAccess(destinationProtection, sourceProtection.getOwner(), Permission.DEPOSIT) || !plugin.canAccess(sourceProtection, destinationProtection.getOwner(), Permission.WITHDRAW)) {
                 e.setCancelled(true);
             }
-        } else if (sourceProtection != null && !plugin.canAccess(sourceProtection, new BasicPermissible(Source.from(Source.HOPPER, Source.HOPPER)), Permission.WITHDRAW)) {
+        } else if (sourceProtection != null && !plugin.canAccess(sourceProtection, new BasicPermissible(Source.from(Source.BLOCK, Source.BLOCK)), Permission.WITHDRAW)) {
             e.setCancelled(true);
-        } else if (destinationProtection != null && !plugin.canAccess(destinationProtection, new BasicPermissible(Source.from(Source.HOPPER, Source.HOPPER)), Permission.DEPOSIT)) {
+        } else if (destinationProtection != null && !plugin.canAccess(destinationProtection, new BasicPermissible(Source.from(Source.BLOCK, Source.BLOCK)), Permission.DEPOSIT)) {
             e.setCancelled(true);
         }
-        // TODO: Improve the above 2 checks (not necessarily hopper only, like droppers - "block")
     }
 
     @EventHandler

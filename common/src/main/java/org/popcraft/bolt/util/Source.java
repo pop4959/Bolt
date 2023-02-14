@@ -11,7 +11,7 @@ public final class Source {
     public static final String PERMISSION = "permission";
     public static final String PASSWORD = "password";
     public static final String REDSTONE = "redstone";
-    public static final String HOPPER = "hopper";
+    public static final String BLOCK = "block";
     public static final String TOWN = "town";
     public static final String REGION = "region";
 
