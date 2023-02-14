@@ -7,7 +7,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.popcraft.bolt.BoltPlugin;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class PlayerListener implements Listener {
     private final BoltPlugin plugin;
 

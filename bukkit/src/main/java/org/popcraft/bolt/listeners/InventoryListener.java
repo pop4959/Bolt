@@ -22,7 +22,6 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Source;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class InventoryListener implements Listener {
     private final BoltPlugin plugin;
 
