@@ -377,14 +377,6 @@ public final class BlockListener implements Listener {
         });
     }
 
-    // TODO: Expensive event, needs to be checked only for specific cases
-//    @EventHandler
-//    public void onBlockPhysics(final BlockPhysicsEvent e) {
-//        if (plugin.findProtection(e.getBlock()).isPresent()) {
-//            e.setCancelled(true);
-//        }
-//    }
-
     @EventHandler
     public void onPlayerTakeLecternBook(final PlayerTakeLecternBookEvent e) {
         if (!plugin.canAccess(e.getLectern().getBlock(), e.getPlayer(), Permission.WITHDRAW)) {
