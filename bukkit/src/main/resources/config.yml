@@ -1,15 +1,15 @@
 version: 0
 language: en
-protection-types: [ "private", "display", "deposit", "withdrawal", "public" ]
-access-types:
+protections:
   private: [ ]
+  redstone: [ "redstone" ]
   display: [ "interact", "open" ]
   deposit: [ "interact", "open", "deposit" ]
   withdrawal: [ "interact", "open", "withdraw" ]
-  redstone: [ "redstone" ]
   public: [ "interact", "open", "deposit", "withdraw", "mount" ]
-  basic: [ "interact", "open", "deposit", "withdraw", "mount" ]
-  full: [ "interact", "open", "deposit", "withdraw", "mount", "edit", "destroy" ]
+access:
+  normal: [ "interact", "open", "deposit", "withdraw", "mount" ]
+  admin: [ "interact", "open", "deposit", "withdraw", "mount", "edit", "destroy" ]
 blocks:
   chest: private
   trapped_chest: private

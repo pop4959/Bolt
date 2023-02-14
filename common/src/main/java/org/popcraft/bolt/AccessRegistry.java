@@ -11,8 +11,8 @@ import java.util.Set;
 public class AccessRegistry {
     private final Map<String, Access> accessMap = new HashMap<>();
 
-    public void register(final String type, final Set<String> permissions) {
-        accessMap.put(type, new Access(type, permissions));
+    public void register(final boolean protection, final String type, final Set<String> permissions) {
+        accessMap.put(type, new Access(protection, type, permissions));
     }
 
     public void unregister(final String type) {

@@ -6,8 +6,6 @@ import org.popcraft.bolt.data.MemoryStore;
 import org.popcraft.bolt.data.Migration;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.Source;
-import org.popcraft.bolt.util.defaults.DefaultAccess;
-import org.popcraft.bolt.util.defaults.DefaultProtectionType;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,6 +30,12 @@ public class LWCMigration implements Migration {
     private static final int ACCESS_TYPE_REGION = 5;
     private static final int RIGHTS_TYPE_ADMIN = 2;
     private static final Block BLOCK_AIR = new Block(-1, "AIR");
+    private static final String DEFAULT_PROTECTION_PUBLIC = "public";
+    private static final String DEFAULT_PROTECTION_DEPOSIT = "deposit";
+    private static final String DEFAULT_PROTECTION_DISPLAY = "display";
+    private static final String DEFAULT_PROTECTION_PRIVATE = "private";
+    private static final String DEFAULT_ACCESS_NORMAL = "normal";
+    private static final String DEFAULT_ACCESS_ADMIN = "admin";
     private final BoltPlugin plugin;
 
     public LWCMigration(final BoltPlugin plugin) {
@@ -94,26 +98,26 @@ public class LWCMigration implements Migration {
         for (final Protection protection : protections) {
             final String protectionType;
             if (protection.type() == PROTECTION_TYPE_PUBLIC) {
-                protectionType = DefaultProtectionType.PUBLIC.type();
+                protectionType = DEFAULT_PROTECTION_PUBLIC;
             } else if (protection.type() == PROTECTION_TYPE_DONATION) {
-                protectionType = DefaultProtectionType.DEPOSIT.type();
+                protectionType = DEFAULT_PROTECTION_DEPOSIT;
             } else if (protection.type() == PROTECTION_TYPE_DISPLAY) {
-                protectionType = DefaultProtectionType.DISPLAY.type();
+                protectionType = DEFAULT_PROTECTION_DISPLAY;
             } else {
-                protectionType = DefaultProtectionType.PRIVATE.type();
+                protectionType = DEFAULT_PROTECTION_PRIVATE;
             }
             final Map<String, String> access = new HashMap<>();
             final Data data = gson.fromJson(protection.data(), Data.class);
             if (data != null) {
                 for (DataFlag flag : data.getFlags()) {
                     if (flag.getId() == FLAG_TYPE_REDSTONE) {
-                        access.put(Source.from(Source.REDSTONE, Source.REDSTONE), DefaultAccess.FULL.type());
+                        access.put(Source.from(Source.REDSTONE, Source.REDSTONE), DEFAULT_ACCESS_ADMIN);
                     } else if (flag.getId() == FLAG_TYPE_HOPPER) {
-                        access.put(Source.from(Source.BLOCK, Source.BLOCK), DefaultAccess.FULL.type());
+                        access.put(Source.from(Source.BLOCK, Source.BLOCK), DEFAULT_ACCESS_ADMIN);
                     }
                 }
                 for (DataRights rights : data.getRights()) {
-                    final String accessType = rights.getRights() == RIGHTS_TYPE_ADMIN ? DefaultAccess.FULL.type() : DefaultAccess.BASIC.type();
+                    final String accessType = rights.getRights() == RIGHTS_TYPE_ADMIN ? DEFAULT_ACCESS_ADMIN : DEFAULT_ACCESS_NORMAL;
                     if (rights.getType() == ACCESS_TYPE_GROUP) {
                         access.put(Source.from(Source.PERMISSION, rights.getName()), accessType);
                     } else if (rights.getType() == ACCESS_TYPE_PLAYER) {
@@ -126,7 +130,7 @@ public class LWCMigration implements Migration {
                 }
             }
             if (protection.password() != null && !protection.password().isEmpty()) {
-                access.put(Source.from(Source.PASSWORD, protection.password()), DefaultAccess.BASIC.type());
+                access.put(Source.from(Source.PASSWORD, protection.password()), DEFAULT_ACCESS_NORMAL);
             }
             UUID ownerUUID;
             try {

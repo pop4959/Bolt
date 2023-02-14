@@ -112,6 +112,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class BoltPlugin extends JavaPlugin {
@@ -137,6 +138,8 @@ public class BoltPlugin extends JavaPlugin {
     private final Path uuidCachePath = getDataFolder().toPath().resolve("uuidcache");
     private final UuidCache uuidCache = new SimpleUuidCache();
     private final Map<String, Access> protectableAccess = new HashMap<>();
+    private String defaultProtectionType = "private";
+    private String defaultAccessType = "normal";
     private Bolt bolt;
 
     @Override
@@ -163,11 +166,24 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     private void registerAccessTypes() {
-        final ConfigurationSection section = getConfig().getConfigurationSection("access-types");
-        if (section != null) {
-            for (final String type : section.getKeys(false)) {
-                final List<String> permissions = section.getStringList(type);
-                bolt.getAccessRegistry().register(type, new HashSet<>(permissions));
+        final ConfigurationSection protections = getConfig().getConfigurationSection("protections");
+        if (protections != null) {
+            for (final String type : protections.getKeys(false)) {
+                final List<String> permissions = protections.getStringList(type);
+                bolt.getAccessRegistry().register(true, type, new HashSet<>(permissions));
+                if (defaultProtectionType == null || permissions.size() < bolt.getAccessRegistry().get(defaultProtectionType).map(Access::permissions).map(Set::size).orElse(0)) {
+                    defaultProtectionType = type;
+                }
+            }
+        }
+        final ConfigurationSection access = getConfig().getConfigurationSection("access");
+        if (access != null) {
+            for (final String type : access.getKeys(false)) {
+                final List<String> permissions = access.getStringList(type);
+                bolt.getAccessRegistry().register(false, type, new HashSet<>(permissions));
+                if (defaultAccessType == null || permissions.size() < bolt.getAccessRegistry().get(defaultAccessType).map(Access::permissions).map(Set::size).orElse(0)) {
+                    defaultAccessType = type;
+                }
             }
         }
     }
@@ -269,6 +285,14 @@ public class BoltPlugin extends JavaPlugin {
 
     public Access getDefaultAccess(final Entity entity) {
         return protectableAccess.get(entity.getType().name());
+    }
+
+    public String getDefaultProtectionType() {
+        return defaultProtectionType;
+    }
+
+    public String getDefaultAccessType() {
+        return defaultAccessType;
     }
 
     public Optional<Protection> findProtection(final Block block) {
