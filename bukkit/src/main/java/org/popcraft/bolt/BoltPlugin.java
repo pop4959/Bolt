@@ -100,8 +100,8 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permissible;
-import org.popcraft.bolt.util.lang.Translation;
-import org.popcraft.bolt.util.lang.Translator;
+import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.lang.Translator;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

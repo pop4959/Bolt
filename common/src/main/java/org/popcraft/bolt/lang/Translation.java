@@ -1,4 +1,4 @@
-package org.popcraft.bolt.util.lang;
+package org.popcraft.bolt.lang;
 
 public class Translation {
     public static final String ACTION_PERSIST_ON = "action_persist_on";

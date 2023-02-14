@@ -10,10 +10,10 @@ import org.bukkit.entity.Entity;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.util.lang.Strings;
-import org.popcraft.bolt.util.lang.Translation;
+import org.popcraft.bolt.lang.Strings;
+import org.popcraft.bolt.lang.Translation;
 
-import static org.popcraft.bolt.util.lang.Translator.translate;
+import static org.popcraft.bolt.lang.Translator.translate;
 
 public final class Protections {
     private Protections() {

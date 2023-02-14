@@ -1,4 +1,4 @@
-package org.popcraft.bolt.util.lang;
+package org.popcraft.bolt.lang;
 
 import java.io.File;
 import java.io.FileInputStream;

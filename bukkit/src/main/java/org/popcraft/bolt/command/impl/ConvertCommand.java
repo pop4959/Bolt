@@ -11,7 +11,7 @@ import org.popcraft.bolt.data.migration.lwc.LWCMigration;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.lang.Translation;
+import org.popcraft.bolt.lang.Translation;
 
 import java.util.Collections;
 import java.util.List;

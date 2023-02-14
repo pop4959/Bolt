@@ -10,13 +10,13 @@ import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Source;
-import org.popcraft.bolt.util.lang.Translation;
+import org.popcraft.bolt.lang.Translation;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.popcraft.bolt.util.lang.Translator.translate;
+import static org.popcraft.bolt.lang.Translator.translate;
 
 public class EditCommand extends BoltCommand {
     public EditCommand(BoltPlugin plugin) {

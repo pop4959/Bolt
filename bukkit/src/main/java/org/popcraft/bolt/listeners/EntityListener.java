@@ -44,15 +44,15 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Protections;
-import org.popcraft.bolt.util.lang.Strings;
-import org.popcraft.bolt.util.lang.Translation;
+import org.popcraft.bolt.lang.Strings;
+import org.popcraft.bolt.lang.Translation;
 import org.spigotmc.event.entity.EntityMountEvent;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.popcraft.bolt.util.lang.Translator.translate;
+import static org.popcraft.bolt.lang.Translator.translate;
 
 public final class EntityListener implements Listener {
     private final BoltPlugin plugin;

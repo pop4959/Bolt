@@ -6,7 +6,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
-import static org.popcraft.bolt.util.lang.Translator.translate;
+import static org.popcraft.bolt.lang.Translator.translate;
 
 public final class BoltComponents {
     private static MiniMessage miniMessage;

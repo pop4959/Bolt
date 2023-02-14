@@ -1,12 +1,10 @@
-package org.popcraft.bolt.util.lang;
+package org.popcraft.bolt.lang;
 
 import org.popcraft.bolt.util.Source;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static org.popcraft.bolt.util.lang.Translator.translate;
 
 public class Strings {
     private Strings() {
@@ -31,7 +29,7 @@ public class Strings {
 
     public static String access(final Map<String, String> accessMap) {
         if (accessMap == null || accessMap.isEmpty()) {
-            return translate(Translation.EMPTY);
+            return Translator.translate(Translation.EMPTY);
         }
         final List<String> access = new ArrayList<>();
         for (final String source : accessMap.keySet()) {
