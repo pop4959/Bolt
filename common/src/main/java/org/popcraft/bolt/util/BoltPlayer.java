@@ -28,17 +28,20 @@ public class BoltPlayer implements Permissible {
         return uuid;
     }
 
+    public Action getAction() {
+        return action;
+    }
+
     public void setAction(Action action) {
         this.action = action;
     }
 
-    public Action triggerAction() {
+    public void clearAction() {
         final Action triggered = action;
         if (triggered != null && !this.persist) {
             this.lastAction = triggered;
             this.action = null;
         }
-        return triggered;
     }
 
     public boolean triggeredAction() {

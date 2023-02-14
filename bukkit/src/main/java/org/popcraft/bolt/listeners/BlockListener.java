@@ -118,7 +118,7 @@ public final class BlockListener implements Listener {
 
     private boolean triggerActions(final Player player, final Protection protection, final Block block) {
         final BoltPlayer boltPlayer = plugin.player(player);
-        final Action action = boltPlayer.triggerAction();
+        final Action action = boltPlayer.getAction();
         if (action == null) {
             return false;
         }
@@ -130,6 +130,8 @@ public final class BlockListener implements Listener {
                     plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createPrivateBlockProtection(block, boltPlayer.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId()));
                     boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
+                } else {
+                    return true;
                 }
             }
             case UNLOCK -> {
@@ -170,6 +172,7 @@ public final class BlockListener implements Listener {
             case DEBUG ->
                     BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());
         }
+        boltPlayer.clearAction();
         return true;
     }
 
