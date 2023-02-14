@@ -12,6 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.command.impl.ConvertCommand;
 import org.popcraft.bolt.command.impl.DebugCommand;
 import org.popcraft.bolt.command.impl.EditCommand;
 import org.popcraft.bolt.command.impl.InfoCommand;
@@ -215,6 +216,7 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
+        commands.put("convert", new ConvertCommand(this));
         commands.put("debug", new DebugCommand(this));
         commands.put("edit", new EditCommand(this));
         commands.put("info", new InfoCommand(this));
