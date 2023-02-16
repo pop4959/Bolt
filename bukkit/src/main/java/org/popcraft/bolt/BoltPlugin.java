@@ -21,6 +21,7 @@ import org.popcraft.bolt.command.impl.LockCommand;
 import org.popcraft.bolt.command.impl.PasswordCommand;
 import org.popcraft.bolt.command.impl.PersistCommand;
 import org.popcraft.bolt.command.impl.ReportCommand;
+import org.popcraft.bolt.command.impl.TransferCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
 import org.popcraft.bolt.data.SQLiteStore;
 import org.popcraft.bolt.data.SimpleProtectionCache;
@@ -224,6 +225,7 @@ public class BoltPlugin extends JavaPlugin {
         commands.put("password", new PasswordCommand(this));
         commands.put("persist", new PersistCommand(this));
         commands.put("report", new ReportCommand(this));
+        commands.put("transfer", new TransferCommand(this));
         commands.put("unlock", new UnlockCommand(this));
     }
 

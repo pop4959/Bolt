@@ -27,6 +27,7 @@ public class Action {
         UNLOCK,
         INFO,
         EDIT,
-        DEBUG
+        DEBUG,
+        TRANSFER,
     }
 }

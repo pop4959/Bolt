@@ -234,6 +234,16 @@ public final class EntityListener implements Listener {
             }
             case DEBUG ->
                     BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());
+            case TRANSFER -> {
+                if (player.getUniqueId().equals(protection.getOwner())) {
+                    final UUID uuid = UUID.fromString(action.getData());
+                    protection.setOwner(uuid);
+                    plugin.saveProtection(protection);
+                    BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(plugin.getUuidCache().getName(uuid)).orElse(translate(Translation.UNKNOWN))));
+                } else {
+                    BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER);
+                }
+            }
         }
         boltPlayer.clearAction();
         return true;

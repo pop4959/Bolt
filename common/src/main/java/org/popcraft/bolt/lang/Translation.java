@@ -9,12 +9,15 @@ public class Translation {
     public static final String CLICK_ACTION = "click_action";
     public static final String CLICK_EDITED = "click_edited";
     public static final String CLICK_EDITED_NO_PERMISSION = "click_edited_no_permission";
+    public static final String CLICK_EDITED_NO_OWNER = "click_edited_no_owner";
     public static final String CLICK_INFO = "click_info";
     public static final String CLICK_LOCKED_ALREADY = "click_locked_already";
     public static final String CLICK_LOCKED_CHANGED = "click_locked_changed";
     public static final String CLICK_LOCKED = "click_locked";
     public static final String CLICK_UNLOCKED = "click_unlocked";
     public static final String CLICK_NOT_LOCKED = "click_not_locked";
+    public static final String CLICK_TRANSFER = "click_transfer";
+    public static final String CLICK_TRANSFER_CONFIRM = "click_transfer_confirm";
     public static final String DISABLED = "disabled";
     public static final String EDIT_ACCESS_INVALID = "edit_access_invalid";
     public static final String EDIT_PASSWORD_INVALID = "edit_password_invalid";
