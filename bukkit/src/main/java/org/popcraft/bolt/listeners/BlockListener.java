@@ -122,12 +122,17 @@ public final class BlockListener implements Listener {
         if (action == null) {
             return false;
         }
-        switch (action) {
+        final Action.Type actionType = action.getType();
+        switch (actionType) {
             case LOCK -> {
                 if (protection != null) {
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Placeholder.unparsed("type", Protections.displayType(protection)));
                 } else if (plugin.isProtectable(block)) {
-                    plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createBlockProtection(block, boltPlayer.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId(), plugin.getDefaultProtectionType()));
+                    final String protectionType = Optional.ofNullable(action.getData())
+                            .flatMap(type -> plugin.getBolt().getAccessRegistry().get(type))
+                            .map(Access::type)
+                            .orElse(plugin.getDefaultProtectionType());
+                    plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createBlockProtection(block, boltPlayer.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId(), protectionType));
                     boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 } else {
@@ -153,10 +158,10 @@ public final class BlockListener implements Listener {
                 if (protection != null) {
                     if (plugin.canAccess(protection, player, Permission.EDIT)) {
                         boltPlayer.getModifications().forEach((source, type) -> {
-                            if (type == null || plugin.getBolt().getAccessRegistry().get(type).isEmpty()) {
-                                protection.getAccess().remove(source);
-                            } else {
+                            if (Boolean.parseBoolean(action.getData())) {
                                 protection.getAccess().put(source, type);
+                            } else {
+                                protection.getAccess().remove(source);
                             }
                         });
                         plugin.saveProtection(protection);

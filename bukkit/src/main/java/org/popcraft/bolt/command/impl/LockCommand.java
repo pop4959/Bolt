@@ -24,8 +24,9 @@ public class LockCommand extends BoltCommand {
     public void execute(CommandSender sender, Arguments arguments) {
         if (sender instanceof final Player player) {
             final BoltPlayer boltPlayer = plugin.player(player);
-            boltPlayer.setAction(Action.LOCK);
-            if (arguments.remaining() > 0) {
+            final String type = arguments.next();
+            boltPlayer.setAction(new Action(Action.Type.LOCK, type));
+            if (BoltPlugin.DEBUG && arguments.remaining() > 0) {
                 boltPlayer.setLockNil(true);
             }
             BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.LOCK)));

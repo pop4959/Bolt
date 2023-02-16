@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
@@ -29,29 +30,40 @@ public class EditCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
             return;
         }
-        if (arguments.remaining() >= 3) {
-            final BoltPlayer boltPlayer = plugin.player(player);
-            boltPlayer.setAction(Action.EDIT);
-            final String type = arguments.next();
-            final String inputIdentifier = arguments.next();
-            String identifier;
-            if (Source.PLAYER.equals(type)) {
+        if (arguments.remaining() < 3) {
+            BoltComponents.sendMessage(sender, Translation.COMMAND_NOT_ENOUGH_ARGS);
+            return;
+        }
+        final BoltPlayer boltPlayer = plugin.player(player);
+        final boolean adding = "add".equalsIgnoreCase(arguments.next());
+        boltPlayer.setAction(new Action(Action.Type.EDIT, Boolean.toString(adding)));
+        final Access access = plugin.getBolt().getAccessRegistry().get(arguments.next()).orElse(null);
+        if (access == null || access.protection()) {
+            BoltComponents.sendMessage(sender, Translation.EDIT_ACCESS_INVALID);
+            return;
+        }
+        String source;
+        while ((source = arguments.next()) != null) {
+            if (Source.REDSTONE.equals(source) || Source.BLOCK.equals(source)) {
+                boltPlayer.getModifications().put(Source.from(source), access.type());
+            } else if (source.startsWith(Source.PASSWORD)) {
+                final String[] split = source.split(":");
+                if (split.length < 2) {
+                    BoltComponents.sendMessage(sender, Translation.EDIT_PASSWORD_INVALID);
+                    return;
+                }
+                boltPlayer.getModifications().put(Source.from(split[0], split[1]), access.type());
+            } else {
                 UUID uuid;
                 try {
-                    uuid = UUID.fromString(inputIdentifier);
-                } catch (IllegalArgumentException ignored) {
-                    uuid = null;
+                    uuid = UUID.fromString(source);
+                } catch (IllegalArgumentException e) {
+                    uuid = plugin.getUuidCache().getUniqueId(source);
                 }
-                identifier = (uuid == null ? plugin.getUuidCache().getUniqueId(inputIdentifier) : uuid).toString();
-            } else {
-                identifier = inputIdentifier;
+                boltPlayer.getModifications().put(Source.fromPlayer(uuid), access.type());
             }
-            final String access = arguments.next();
-            boltPlayer.getModifications().put(Source.from(type, identifier), access);
-            BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.EDIT)));
-        } else {
-            BoltComponents.sendMessage(sender, Translation.COMMAND_NOT_ENOUGH_ARGS);
         }
+        BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.EDIT)));
     }
 
     @Override
@@ -61,16 +73,12 @@ public class EditCommand extends BoltCommand {
         }
         arguments.next();
         if (arguments.remaining() == 0) {
-            return List.of(Source.PLAYER);
+            return List.of("add", "remove");
         }
         arguments.next();
         if (arguments.remaining() == 0) {
-            return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
+            return plugin.getBolt().getAccessRegistry().access().stream().filter(access -> !access.protection()).map(Access::type).toList();
         }
-        arguments.next();
-        if (arguments.remaining() == 0) {
-            return plugin.getBolt().getAccessRegistry().types();
-        }
-        return Collections.emptyList();
+        return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
     }
 }

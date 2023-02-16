@@ -23,6 +23,10 @@ public final class Source {
         return type + ':' + identifier;
     }
 
+    public static String from(final String type) {
+        return "%s:%s".formatted(type, type);
+    }
+
     public static String type(final String source) {
         return source.split(":")[0];
     }

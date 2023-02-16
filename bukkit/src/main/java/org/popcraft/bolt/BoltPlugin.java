@@ -116,7 +116,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class BoltPlugin extends JavaPlugin {
-    private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("boltDebug", "false"));
+    public static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("boltDebug", "false"));
     private static final String COMMAND_PERMISSION_KEY = "bolt.command.";
     private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new ArmorStandMatcher(), new BannerMatcher(),
             new BedMatcher(), new ChestMatcher(), new DoorMatcher(), new LeashHitchMatcher(),

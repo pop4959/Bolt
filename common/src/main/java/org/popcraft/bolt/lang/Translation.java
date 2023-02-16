@@ -15,6 +15,8 @@ public class Translation {
     public static final String CLICK_UNLOCKED = "click_unlocked";
     public static final String CLICK_NOT_LOCKED = "click_not_locked";
     public static final String DISABLED = "disabled";
+    public static final String EDIT_ACCESS_INVALID = "edit_access_invalid";
+    public static final String EDIT_PASSWORD_INVALID = "edit_password_invalid";
     public static final String ENABLED = "enabled";
     public static final String MIGRATION_STARTED = "migration_started";
     public static final String MIGRATION_COMPLETED = "migration_completed";

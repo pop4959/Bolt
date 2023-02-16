@@ -2,6 +2,8 @@ package org.popcraft.bolt;
 
 import org.popcraft.bolt.util.Access;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +23,10 @@ public class AccessRegistry {
 
     public Optional<Access> get(String type) {
         return Optional.ofNullable(accessMap.get(type));
+    }
+
+    public Collection<Access> access() {
+        return new ArrayList<>(accessMap.values());
     }
 
     public List<String> types() {
