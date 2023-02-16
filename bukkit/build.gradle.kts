@@ -9,7 +9,7 @@ dependencies {
     implementation(group = "net.kyori", name = "adventure-api", version = "4.12.0")
     implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.12.0")
     implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.2.0")
-    implementation(group = "org.bstats", name = "bstats-bukkit", version = "3.0.0")
+    implementation(group = "org.bstats", name = "bstats-bukkit", version = "3.0.1")
     implementation(project(":bolt-common"))
     implementation(project(":bolt-paper"))
 }
