@@ -5,11 +5,11 @@ import java.util.UUID;
 
 public abstract class Protection {
     protected final UUID id;
-    protected final UUID owner;
-    protected final String type;
-    protected final long created;
-    protected final long accessed;
-    protected final Map<String, String> access;
+    protected UUID owner;
+    protected String type;
+    protected long created;
+    protected long accessed;
+    protected Map<String, String> access;
 
     protected Protection(UUID id, UUID owner, String type, long created, long accessed, Map<String, String> access) {
         this.id = id;
@@ -28,20 +28,40 @@ public abstract class Protection {
         return owner;
     }
 
+    public void setOwner(UUID owner) {
+        this.owner = owner;
+    }
+
     public String getType() {
         return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public long getCreated() {
         return created;
     }
 
+    public void setCreated(long created) {
+        this.created = created;
+    }
+
     public long getAccessed() {
         return accessed;
     }
 
+    public void setAccessed(long accessed) {
+        this.accessed = accessed;
+    }
+
     public Map<String, String> getAccess() {
         return access;
+    }
+
+    public void setAccess(Map<String, String> access) {
+        this.access = access;
     }
 
     @Override

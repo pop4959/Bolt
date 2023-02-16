@@ -177,13 +177,19 @@ public final class EntityListener implements Listener {
         final Action.Type actionType = action.getType();
         switch (actionType) {
             case LOCK -> {
+                final String protectionType = Optional.ofNullable(action.getData())
+                        .flatMap(type -> plugin.getBolt().getAccessRegistry().get(type))
+                        .map(Access::type)
+                        .orElse(plugin.getDefaultProtectionType());
                 if (protection != null) {
-                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Placeholder.unparsed("type", Protections.displayType(protection)));
+                    if (player.getUniqueId() == protection.getOwner() && !protection.getType().equals(protectionType)) {
+                        protection.setType(protectionType);
+                        plugin.saveProtection(protection);
+                        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_CHANGED, Placeholder.unparsed("type", protectionType));
+                    } else {
+                        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Placeholder.unparsed("type", Protections.displayType(protection)));
+                    }
                 } else if (plugin.isProtectable(entity)) {
-                    final String protectionType = Optional.ofNullable(action.getData())
-                            .flatMap(type -> plugin.getBolt().getAccessRegistry().get(type))
-                            .map(Access::type)
-                            .orElse(plugin.getDefaultProtectionType());
                     plugin.getBolt().getStore().saveEntityProtection(BukkitAdapter.createEntityProtection(entity, boltPlayer.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId(), protectionType));
                     boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
