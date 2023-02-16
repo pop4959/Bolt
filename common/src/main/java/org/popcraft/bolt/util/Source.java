@@ -1,5 +1,8 @@
 package org.popcraft.bolt.util;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 public final class Source {
@@ -17,6 +20,21 @@ public final class Source {
 
     public static String fromPlayer(final UUID uuid) {
         return "player:" + uuid.toString();
+    }
+
+    public static String fromPassword(final String password) {
+        try {
+            final MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+            messageDigest.update(password.getBytes(StandardCharsets.UTF_8));
+            final StringBuilder hash = new StringBuilder();
+            for (final byte b : messageDigest.digest()) {
+                hash.append("%02x".formatted(b));
+            }
+            return Source.from(Source.PASSWORD, hash.toString());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return Source.from(Source.PASSWORD, Source.PASSWORD);
+        }
     }
 
     public static String from(final String type, final String identifier) {

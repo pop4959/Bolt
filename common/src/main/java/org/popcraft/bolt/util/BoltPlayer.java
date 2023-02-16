@@ -1,8 +1,5 @@
 package org.popcraft.bolt.util;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -85,17 +82,7 @@ public class BoltPlayer implements Permissible {
     }
 
     public void addPassword(String password) {
-        try {
-            final MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
-            messageDigest.update(password.getBytes(StandardCharsets.UTF_8));
-            final StringBuilder hash = new StringBuilder();
-            for (final byte b : messageDigest.digest()) {
-                hash.append("%02x".formatted(b));
-            }
-            sources.add(Source.from(Source.PASSWORD, hash.toString()));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        sources.add(Source.fromPassword(password));
     }
 
     @Override

@@ -52,7 +52,7 @@ public class EditCommand extends BoltCommand {
                     BoltComponents.sendMessage(sender, Translation.EDIT_PASSWORD_INVALID);
                     return;
                 }
-                boltPlayer.getModifications().put(Source.from(split[0], split[1]), access.type());
+                boltPlayer.getModifications().put(Source.fromPassword(split[1]), access.type());
             } else {
                 UUID uuid;
                 try {
