@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.type.Leaves;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -23,6 +24,7 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
@@ -385,6 +387,17 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockSpread(final BlockSpreadEvent e) {
         if (plugin.findProtection(e.getBlock()).isPresent()) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onLeavesDecay(final LeavesDecayEvent e) {
+        final Block block = e.getBlock();
+        if (plugin.findProtection(e.getBlock()).isPresent()) {
+            if (block.getBlockData() instanceof final Leaves leaves) {
+                leaves.setPersistent(true);
+            }
             e.setCancelled(true);
         }
     }
