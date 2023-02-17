@@ -3,7 +3,7 @@ package org.popcraft.bolt.data;
 import java.nio.file.Path;
 import java.util.UUID;
 
-public interface UuidCache {
+public interface ProfileCache {
     void load(final Path path);
 
     void save(final Path path);

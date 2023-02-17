@@ -58,7 +58,7 @@ public class EditCommand extends BoltCommand {
                 try {
                     uuid = UUID.fromString(source);
                 } catch (IllegalArgumentException e) {
-                    uuid = plugin.getUuidCache().getUniqueId(source);
+                    uuid = plugin.getProfileCache().getUniqueId(source);
                 }
                 boltPlayer.getModifications().put(Source.fromPlayer(uuid), access.type());
             }

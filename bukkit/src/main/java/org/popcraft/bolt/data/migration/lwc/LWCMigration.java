@@ -136,7 +136,7 @@ public class LWCMigration implements Migration {
             try {
                 ownerUUID = UUID.fromString(protection.owner());
             } catch (IllegalArgumentException e) {
-                ownerUUID = plugin.getUuidCache().getUniqueId(protection.owner());
+                ownerUUID = plugin.getProfileCache().getUniqueId(protection.owner());
             }
             store.saveBlockProtection(new BlockProtection(
                     UUID.randomUUID(),

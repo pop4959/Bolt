@@ -166,7 +166,7 @@ public final class EntityListener implements Listener {
             }
             if (shouldSendMessage && hasNotifyPermission) {
                 final boolean isYou = player.getUniqueId().equals(protection.getOwner());
-                final String owner = isYou ? translate(Translation.YOU) : plugin.getUuidCache().getName(protection.getOwner());
+                final String owner = isYou ? translate(Translation.YOU) : plugin.getProfileCache().getName(protection.getOwner());
                 if (owner == null) {
                     BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY_GENERIC, Placeholder.unparsed("type", Protections.displayType(protection)));
                 } else {
@@ -218,7 +218,7 @@ public final class EntityListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
-                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("owner", Objects.requireNonNullElse(plugin.getUuidCache().getName(protection.getOwner()), translate(Translation.UNKNOWN))));
+                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("owner", Objects.requireNonNullElse(plugin.getProfileCache().getName(protection.getOwner()), translate(Translation.UNKNOWN))));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
@@ -250,7 +250,7 @@ public final class EntityListener implements Listener {
                     final UUID uuid = UUID.fromString(action.getData());
                     protection.setOwner(uuid);
                     plugin.saveProtection(protection);
-                    BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(plugin.getUuidCache().getName(uuid)).orElse(translate(Translation.UNKNOWN))));
+                    BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(plugin.getProfileCache().getName(uuid)).orElse(translate(Translation.UNKNOWN))));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER);
                 }

@@ -17,7 +17,7 @@ public final class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(final PlayerJoinEvent e) {
         final Player player = e.getPlayer();
-        plugin.getUuidCache().add(player.getUniqueId(), player.getName());
+        plugin.getProfileCache().add(player.getUniqueId(), player.getName());
     }
 
     @EventHandler

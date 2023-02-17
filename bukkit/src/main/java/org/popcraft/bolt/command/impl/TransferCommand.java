@@ -33,7 +33,7 @@ public class TransferCommand extends BoltCommand {
         try {
             uuid = UUID.fromString(owner);
         } catch (IllegalArgumentException e) {
-            uuid = plugin.getUuidCache().getUniqueId(owner);
+            uuid = plugin.getProfileCache().getUniqueId(owner);
         }
         plugin.player(player).setAction(new Action(Action.Type.TRANSFER, uuid.toString()));
         BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER);

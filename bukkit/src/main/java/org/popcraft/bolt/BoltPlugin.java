@@ -25,8 +25,8 @@ import org.popcraft.bolt.command.impl.TransferCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
 import org.popcraft.bolt.data.SQLiteStore;
 import org.popcraft.bolt.data.SimpleProtectionCache;
-import org.popcraft.bolt.data.SimpleUuidCache;
-import org.popcraft.bolt.data.UuidCache;
+import org.popcraft.bolt.data.SimpleProfileCache;
+import org.popcraft.bolt.data.ProfileCache;
 import org.popcraft.bolt.listeners.BlockListener;
 import org.popcraft.bolt.listeners.EntityListener;
 import org.popcraft.bolt.listeners.InventoryListener;
@@ -136,8 +136,8 @@ public class BoltPlugin extends JavaPlugin {
             new SoulFireMatcher(), new FrogspawnMatcher(), new MangrovePropaguleMatcher(), new SkulkVeinMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Map<String, BoltCommand> commands = new HashMap<>();
-    private final Path uuidCachePath = getDataFolder().toPath().resolve("uuidcache");
-    private final UuidCache uuidCache = new SimpleUuidCache();
+    private final Path profileCachePath = getDataFolder().toPath().resolve("profiles");
+    private final ProfileCache profileCache = new SimpleProfileCache();
     private final Map<String, Access> protectableAccess = new HashMap<>();
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
@@ -153,7 +153,7 @@ public class BoltPlugin extends JavaPlugin {
         BoltComponents.enable(this);
         registerEvents();
         registerCommands();
-        uuidCache.load(uuidCachePath);
+        profileCache.load(profileCachePath);
         new Metrics(this, 17711);
     }
 
@@ -162,7 +162,7 @@ public class BoltPlugin extends JavaPlugin {
         BoltComponents.disable();
         HandlerList.unregisterAll(this);
         commands.clear();
-        uuidCache.save(uuidCachePath);
+        profileCache.save(profileCachePath);
         this.bolt.getStore().flush().join();
     }
 
@@ -261,8 +261,8 @@ public class BoltPlugin extends JavaPlugin {
         return bolt;
     }
 
-    public UuidCache getUuidCache() {
-        return uuidCache;
+    public ProfileCache getProfileCache() {
+        return profileCache;
     }
 
     public BoltPlayer player(final Player player) {

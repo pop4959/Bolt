@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SimpleUuidCache implements UuidCache {
+public class SimpleProfileCache implements ProfileCache {
     private final Map<UUID, String> uuidName = new ConcurrentHashMap<>();
     private final Map<String, UUID> nameUuid = new ConcurrentHashMap<>();
 
