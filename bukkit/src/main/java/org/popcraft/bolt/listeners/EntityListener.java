@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
@@ -62,17 +63,27 @@ public final class EntityListener implements Listener {
     }
 
     @EventHandler
+    public void onEntityPlace(final EntityPlaceEvent e) {
+        final Player player = e.getPlayer();
+        if (player != null) {
+            handleEntityPlacementByPlayer(e.getEntity(), player);
+        }
+    }
+
+    @EventHandler
     public void onHangingPlace(final HangingPlaceEvent e) {
-        final Entity entity = e.getEntity();
+        final Player player = e.getPlayer();
+        if (player != null) {
+            handleEntityPlacementByPlayer(e.getEntity(), player);
+        }
+    }
+
+    private void handleEntityPlacementByPlayer(final Entity entity, final Player player) {
         if (!plugin.isProtectable(entity)) {
             return;
         }
         final Access defaultAccess = plugin.getDefaultAccess(entity);
         if (defaultAccess == null) {
-            return;
-        }
-        final Player player = e.getPlayer();
-        if (player == null) {
             return;
         }
         plugin.getBolt().getStore().saveEntityProtection(BukkitAdapter.createEntityProtection(entity, player.getUniqueId(), defaultAccess.type()));
