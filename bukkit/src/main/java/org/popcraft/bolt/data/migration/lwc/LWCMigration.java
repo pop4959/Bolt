@@ -41,11 +41,11 @@ public class LWCMigration {
         this.plugin = plugin;
     }
 
-    public MemoryStore convert(final String directory) {
+    public MemoryStore convert() {
         final MemoryStore store = new MemoryStore();
         final Map<Integer, Block> blocks = new HashMap<>();
         final List<Protection> protections = new ArrayList<>();
-        try (final Connection connection = DriverManager.getConnection("jdbc:sqlite:%s/lwc.db".formatted(directory));
+        try (final Connection connection = DriverManager.getConnection("jdbc:sqlite:%s/lwc.db".formatted(plugin.getDataFolder().toPath().resolve("../LWC").toFile().getPath()));
              final Statement statement = connection.createStatement()) {
             final ResultSet blockSet = statement.executeQuery("SELECT * FROM lwc_blocks");
             while (blockSet.next()) {

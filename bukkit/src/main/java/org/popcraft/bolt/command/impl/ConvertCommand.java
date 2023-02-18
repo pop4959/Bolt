@@ -7,6 +7,7 @@ import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.data.MemoryStore;
 import org.popcraft.bolt.data.Store;
+import org.popcraft.bolt.data.migration.lwc.BoltMigration;
 import org.popcraft.bolt.data.migration.lwc.LWCMigration;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
@@ -23,15 +24,22 @@ public class ConvertCommand extends BoltCommand {
 
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
-        final LWCMigration migration = new LWCMigration(plugin);
-        final MemoryStore converted = migration.convert(plugin.getDataFolder().toPath().resolve("../LWC").toFile().getPath());
-        final Store destination = plugin.getBolt().getStore();
-        BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed("source", "LWC"), Placeholder.unparsed("destination", "Bolt"));
-        for (final BlockProtection blockProtection : converted.loadBlockProtections().join()) {
-            destination.saveBlockProtection(blockProtection);
-        }
-        for (final EntityProtection entityProtection : converted.loadEntityProtections().join()) {
-            destination.saveEntityProtection(entityProtection);
+        final boolean convertBack = arguments.remaining() > 0 && arguments.next().equals("back");
+        if (convertBack) {
+            final BoltMigration migration = new BoltMigration(plugin);
+            BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed("source", "Bolt"), Placeholder.unparsed("destination", "LWC"));
+            migration.convert();
+        } else {
+            final LWCMigration migration = new LWCMigration(plugin);
+            final MemoryStore converted = migration.convert();
+            final Store destination = plugin.getBolt().getStore();
+            BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed("source", "LWC"), Placeholder.unparsed("destination", "Bolt"));
+            for (final BlockProtection blockProtection : converted.loadBlockProtections().join()) {
+                destination.saveBlockProtection(blockProtection);
+            }
+            for (final EntityProtection entityProtection : converted.loadEntityProtections().join()) {
+                destination.saveEntityProtection(entityProtection);
+            }
         }
         BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED);
     }
