@@ -39,6 +39,7 @@ public class BoltMigration {
                 }
             }
             final Gson gson = new Gson();
+            connection.setAutoCommit(false);
             for (final BlockProtection blockProtection : plugin.getBolt().getStore().loadBlockProtections().join()) {
                 final String protectionBlock = blockProtection.getBlock();
                 if (!blockIds.containsKey(protectionBlock)) {
@@ -62,6 +63,7 @@ public class BoltMigration {
                 addProtection.setString(12, null);
                 addProtection.execute();
             }
+            connection.setAutoCommit(true);
         } catch (SQLException e) {
             e.printStackTrace();
         }
