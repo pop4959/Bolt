@@ -16,18 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class LWCMigration {
-    private static final int PROTECTION_TYPE_PUBLIC = 0;
-    private static final int PROTECTION_TYPE_DONATION = 5;
-    private static final int PROTECTION_TYPE_DISPLAY = 6;
-    private static final int FLAG_TYPE_REDSTONE = 0;
-    private static final int FLAG_TYPE_HOPPER = 5;
-    private static final int ACCESS_TYPE_GROUP = 0;
-    private static final int ACCESS_TYPE_PLAYER = 1;
-    private static final int ACCESS_TYPE_TOWN = 3;
-    private static final int ACCESS_TYPE_REGION = 5;
-    private static final int RIGHTS_TYPE_ADMIN = 2;
     private static final Block BLOCK_AIR = new Block(-1, "AIR");
     private static final String DEFAULT_PROTECTION_PUBLIC = "public";
     private static final String DEFAULT_PROTECTION_DEPOSIT = "deposit";
@@ -77,11 +68,11 @@ public class LWCMigration {
         final Gson gson = new Gson();
         for (final Protection protection : protections) {
             final String protectionType;
-            if (protection.type() == PROTECTION_TYPE_PUBLIC) {
+            if (protection.type() == ProtectionType.PUBLIC.ordinal()) {
                 protectionType = DEFAULT_PROTECTION_PUBLIC;
-            } else if (protection.type() == PROTECTION_TYPE_DONATION) {
+            } else if (protection.type() == ProtectionType.DONATION.ordinal()) {
                 protectionType = DEFAULT_PROTECTION_DEPOSIT;
-            } else if (protection.type() == PROTECTION_TYPE_DISPLAY) {
+            } else if (protection.type() == ProtectionType.DISPLAY.ordinal()) {
                 protectionType = DEFAULT_PROTECTION_DISPLAY;
             } else {
                 protectionType = DEFAULT_PROTECTION_PRIVATE;
@@ -90,21 +81,21 @@ public class LWCMigration {
             final Data data = gson.fromJson(protection.data(), Data.class);
             if (data != null) {
                 for (DataFlag flag : data.getFlags()) {
-                    if (flag.getId() == FLAG_TYPE_REDSTONE) {
+                    if (flag.getId() == ProtectionFlag.REDSTONE.ordinal()) {
                         access.put(Source.from(Source.REDSTONE, Source.REDSTONE), DEFAULT_ACCESS_ADMIN);
-                    } else if (flag.getId() == FLAG_TYPE_HOPPER) {
+                    } else if (flag.getId() == ProtectionFlag.HOPPER.ordinal()) {
                         access.put(Source.from(Source.BLOCK, Source.BLOCK), DEFAULT_ACCESS_ADMIN);
                     }
                 }
                 for (DataRights rights : data.getRights()) {
-                    final String accessType = rights.getRights() == RIGHTS_TYPE_ADMIN ? DEFAULT_ACCESS_ADMIN : DEFAULT_ACCESS_NORMAL;
-                    if (rights.getType() == ACCESS_TYPE_GROUP) {
-                        access.put(Source.from(Source.PERMISSION, rights.getName()), accessType);
-                    } else if (rights.getType() == ACCESS_TYPE_PLAYER) {
+                    final String accessType = rights.getRights() == Permission.Access.ADMIN.ordinal() ? DEFAULT_ACCESS_ADMIN : DEFAULT_ACCESS_NORMAL;
+                    if (rights.getType() == Permission.Type.GROUP.ordinal()) {
+                        access.put(Source.from(Source.GROUP, rights.getName()), accessType);
+                    } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
                         access.put(Source.from(Source.PLAYER, rights.getName()), accessType);
-                    } else if (rights.getType() == ACCESS_TYPE_TOWN) {
+                    } else if (rights.getType() == Permission.Type.TOWN.ordinal()) {
                         access.put(Source.from(Source.TOWN, rights.getName()), accessType);
-                    } else if (rights.getType() == ACCESS_TYPE_REGION) {
+                    } else if (rights.getType() == Permission.Type.REGION.ordinal()) {
                         access.put(Source.from(Source.REGION, rights.getName()), accessType);
                     }
                 }
@@ -123,7 +114,7 @@ public class LWCMigration {
                     ownerUUID,
                     protectionType,
                     protection.date().getTime(),
-                    protection.lastAccessed(),
+                    TimeUnit.MILLISECONDS.convert(protection.lastAccessed(), TimeUnit.SECONDS),
                     access,
                     protection.world(),
                     protection.x(),

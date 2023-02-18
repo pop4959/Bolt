@@ -5,18 +5,22 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Source;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BoltMigration {
@@ -67,16 +71,16 @@ public class BoltMigration {
                     addBlock.execute();
                 }
                 addProtection.setString(1, blockProtection.getOwner().toString());
-                addProtection.setInt(2, 2);
+                addProtection.setInt(2, convertProtectionType(blockProtection));
                 addProtection.setInt(3, blockProtection.getX());
                 addProtection.setInt(4, blockProtection.getY());
                 addProtection.setInt(5, blockProtection.getZ());
-                addProtection.setString(6, gson.toJson(new Data()));
+                addProtection.setString(6, gson.toJson(convertData(blockProtection)));
                 addProtection.setInt(7, blockIds.get(protectionBlock));
                 addProtection.setString(8, blockProtection.getWorld());
-                addProtection.setString(9, "");
-                addProtection.setString(10, new Date(blockProtection.getCreated()).toString());
-                addProtection.setLong(11, blockProtection.getAccessed());
+                addProtection.setString(9, convertPassword(blockProtection));
+                addProtection.setString(10, new Timestamp(blockProtection.getCreated()).toString());
+                addProtection.setLong(11, TimeUnit.SECONDS.convert(blockProtection.getAccessed(), TimeUnit.MILLISECONDS));
                 addProtection.setString(12, null);
                 addProtection.execute();
             }
@@ -84,5 +88,75 @@ public class BoltMigration {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private int convertProtectionType(final BlockProtection blockProtection) {
+        if ("public".equals(blockProtection.getType())) {
+            return ProtectionType.PUBLIC.ordinal();
+        } else if ("deposit".equals(blockProtection.getType())) {
+            return ProtectionType.DONATION.ordinal();
+        } else if ("display".equals(blockProtection.getType())) {
+            return ProtectionType.DISPLAY.ordinal();
+        }
+        final boolean password = blockProtection.getAccess().entrySet().stream()
+                .anyMatch(entry -> Source.PASSWORD.equals(Source.type(entry.getKey())));
+        if (password) {
+            return ProtectionType.PASSWORD.ordinal();
+        } else {
+            return ProtectionType.PRIVATE.ordinal();
+        }
+    }
+
+    private Data convertData(final BlockProtection blockProtection) {
+        final Data data = new Data();
+        final List<DataFlag> flags = new ArrayList<>();
+        final List<DataRights> rights = new ArrayList<>();
+        if (blockProtection.getAccess().isEmpty()) {
+            data.setFlags(flags);
+            data.setRights(rights);
+            return data;
+        }
+        blockProtection.getAccess().forEach((source, access) -> {
+            final String sourceType = Source.type(source);
+            final String sourceIdentifier = Source.identifier(source);
+            if (Source.BLOCK.equals(sourceType)) {
+                final DataFlag dataFlag = new DataFlag();
+                dataFlag.setId(ProtectionFlag.HOPPER.ordinal());
+                flags.add(dataFlag);
+            }
+            final Permission.Access permissionAccess = switch (access) {
+                case "normal" -> Permission.Access.PLAYER;
+                case "admin" -> Permission.Access.ADMIN;
+                default -> null;
+            };
+            final Permission.Type permissionType = switch (sourceType) {
+                case Source.GROUP -> Permission.Type.GROUP;
+                case Source.PLAYER -> Permission.Type.PLAYER;
+                case Source.TOWN -> Permission.Type.TOWN;
+                case Source.REGION -> Permission.Type.REGION;
+                default -> null;
+            };
+            if (permissionAccess != null && permissionType != null) {
+                final DataRights dataRights = new DataRights();
+                dataRights.setRights(permissionAccess.ordinal());
+                dataRights.setType(permissionType.ordinal());
+                dataRights.setName(sourceIdentifier);
+                rights.add(dataRights);
+            }
+        });
+        data.setFlags(flags);
+        data.setRights(rights);
+        return data;
+    }
+
+    private String convertPassword(final BlockProtection blockProtection) {
+        if (blockProtection.getAccess().isEmpty()) {
+            return "";
+        }
+        return blockProtection.getAccess().keySet().stream()
+                .filter(source -> Source.PASSWORD.equals(Source.type(source)))
+                .map(Source::identifier)
+                .findFirst()
+                .orElse("");
     }
 }
