@@ -193,14 +193,14 @@ public class BoltPlugin extends JavaPlugin {
         final ConfigurationSection blocks = getConfig().getConfigurationSection("blocks");
         if (blocks != null) {
             for (final String block : blocks.getKeys(false)) {
-                final Access defaultAccess = bolt.getAccessRegistry().get(blocks.getString(block, "none")).orElse(null);
+                final Access defaultAccess = bolt.getAccessRegistry().get(blocks.getString("%s.autoProtect".formatted(block), "false")).orElse(null);
                 protectableAccess.put(block.toUpperCase(), defaultAccess);
             }
         }
         final ConfigurationSection entities = getConfig().getConfigurationSection("entities");
         if (entities != null) {
             for (final String entity : entities.getKeys(false)) {
-                final Access defaultAccess = bolt.getAccessRegistry().get(entities.getString(entity, "none")).orElse(null);
+                final Access defaultAccess = bolt.getAccessRegistry().get(entities.getString("%s.autoProtect".formatted(entity), "false")).orElse(null);
                 protectableAccess.put(entity.toUpperCase(), defaultAccess);
             }
         }

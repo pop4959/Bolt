@@ -11,93 +11,182 @@ access:
   normal: [ "interact", "open", "deposit", "withdraw", "mount" ]
   admin: [ "interact", "open", "deposit", "withdraw", "mount", "edit", "destroy" ]
 blocks:
-  chest: private
-  trapped_chest: private
-  furnace: private
-  blast_furnace: private
-  smoker: private
-  dispenser: private
-  dropper: private
-  barrel: private
-  composter: private
-  lectern: private
-  shulker_box: private
-  white_shulker_box: private
-  orange_shulker_box: private
-  magenta_shulker_box: private
-  light_blue_shulker_box: private
-  yellow_shulker_box: private
-  lime_shulker_box: private
-  pink_shulker_box: private
-  gray_shulker_box: private
-  light_gray_shulker_box: private
-  cyan_shulker_box: private
-  purple_shulker_box: private
-  blue_shulker_box: private
-  brown_shulker_box: private
-  green_shulker_box: private
-  red_shulker_box: private
-  black_shulker_box: private
-  sign: none
-  iron_door: none
-  oak_door: none
-  spruce_door: none
-  birch_door: none
-  jungle_door: none
-  acacia_door: none
-  dark_oak_door: none
-  crimson_door: none
-  warped_door: none
-  iron_trapdoor: none
-  oak_trapdoor: none
-  spruce_trapdoor: none
-  birch_trapdoor: none
-  jungle_trapdoor: none
-  acacia_trapdoor: none
-  dark_oak_trapdoor: none
-  crimson_trapdoor: none
-  warped_trapdoor: none
-  oak_fence_gate: none
-  spruce_fence_gate: none
-  birch_fence_gate: none
-  jungle_fence_gate: none
-  acacia_fence_gate: none
-  dark_oak_fence_gate: none
-  crimson_fence_gate: none
-  warped_fence_gate: none
-  white_banner: none
-  orange_banner: none
-  magenta_banner: none
-  light_blue_banner: none
-  yellow_banner: none
-  lime_banner: none
-  pink_banner: none
-  gray_banner: none
-  light_gray_banner: none
-  cyan_banner: none
-  purple_banner: none
-  blue_banner: none
-  brown_banner: none
-  green_banner: none
-  red_banner: none
-  black_banner: none
-  white_wall_banner: none
-  orange_wall_banner: none
-  magenta_wall_banner: none
-  light_blue_wall_banner: none
-  yellow_wall_banner: none
-  lime_wall_banner: none
-  pink_wall_banner: none
-  gray_wall_banner: none
-  light_gray_wall_banner: none
-  cyan_wall_banner: none
-  purple_wall_banner: none
-  blue_wall_banner: none
-  brown_wall_banner: none
-  green_wall_banner: none
-  red_wall_banner: none
-  black_wall_banner: none
+  chest:
+    autoProtect: private
+  trapped_chest:
+    autoProtect: private
+  furnace:
+    autoProtect: private
+  blast_furnace:
+    autoProtect: private
+  smoker:
+    autoProtect: private
+  dispenser:
+    autoProtect: private
+  dropper:
+    autoProtect: private
+  barrel:
+    autoProtect: private
+  composter:
+    autoProtect: private
+  lectern:
+    autoProtect: private
+  shulker_box:
+    autoProtect: private
+  white_shulker_box:
+    autoProtect: private
+  orange_shulker_box:
+    autoProtect: private
+  magenta_shulker_box:
+    autoProtect: private
+  light_blue_shulker_box:
+    autoProtect: private
+  yellow_shulker_box:
+    autoProtect: private
+  lime_shulker_box:
+    autoProtect: private
+  pink_shulker_box:
+    autoProtect: private
+  gray_shulker_box:
+    autoProtect: private
+  light_gray_shulker_box:
+    autoProtect: private
+  cyan_shulker_box:
+    autoProtect: private
+  purple_shulker_box:
+    autoProtect: private
+  blue_shulker_box:
+    autoProtect: private
+  brown_shulker_box:
+    autoProtect: private
+  green_shulker_box:
+    autoProtect: private
+  red_shulker_box:
+    autoProtect: private
+  black_shulker_box:
+    autoProtect: private
+  sign:
+    autoProtect: false
+  iron_door:
+    autoProtect: false
+  oak_door:
+    autoProtect: false
+  spruce_door:
+    autoProtect: false
+  birch_door:
+    autoProtect: false
+  jungle_door:
+    autoProtect: false
+  acacia_door:
+    autoProtect: false
+  dark_oak_door:
+    autoProtect: false
+  crimson_door:
+    autoProtect: false
+  warped_door:
+    autoProtect: false
+  iron_trapdoor:
+    autoProtect: false
+  oak_trapdoor:
+    autoProtect: false
+  spruce_trapdoor:
+    autoProtect: false
+  birch_trapdoor:
+    autoProtect: false
+  jungle_trapdoor:
+    autoProtect: false
+  acacia_trapdoor:
+    autoProtect: false
+  dark_oak_trapdoor:
+    autoProtect: false
+  crimson_trapdoor:
+    autoProtect: false
+  warped_trapdoor:
+    autoProtect: false
+  oak_fence_gate:
+    autoProtect: false
+  spruce_fence_gate:
+    autoProtect: false
+  birch_fence_gate:
+    autoProtect: false
+  jungle_fence_gate:
+    autoProtect: false
+  acacia_fence_gate:
+    autoProtect: false
+  dark_oak_fence_gate:
+    autoProtect: false
+  crimson_fence_gate:
+    autoProtect: false
+  warped_fence_gate:
+    autoProtect: false
+  white_banner:
+    autoProtect: false
+  orange_banner:
+    autoProtect: false
+  magenta_banner:
+    autoProtect: false
+  light_blue_banner:
+    autoProtect: false
+  yellow_banner:
+    autoProtect: false
+  lime_banner:
+    autoProtect: false
+  pink_banner:
+    autoProtect: false
+  gray_banner:
+    autoProtect: false
+  light_gray_banner:
+    autoProtect: false
+  cyan_banner:
+    autoProtect: false
+  purple_banner:
+    autoProtect: false
+  blue_banner:
+    autoProtect: false
+  brown_banner:
+    autoProtect: false
+  green_banner:
+    autoProtect: false
+  red_banner:
+    autoProtect: false
+  black_banner:
+    autoProtect: false
+  white_wall_banner:
+    autoProtect: false
+  orange_wall_banner:
+    autoProtect: false
+  magenta_wall_banner:
+    autoProtect: false
+  light_blue_wall_banner:
+    autoProtect: false
+  yellow_wall_banner:
+    autoProtect: false
+  lime_wall_banner:
+    autoProtect: false
+  pink_wall_banner:
+    autoProtect: false
+  gray_wall_banner:
+    autoProtect: false
+  light_gray_wall_banner:
+    autoProtect: false
+  cyan_wall_banner:
+    autoProtect: false
+  purple_wall_banner:
+    autoProtect: false
+  blue_wall_banner:
+    autoProtect: false
+  brown_wall_banner:
+    autoProtect: false
+  green_wall_banner:
+    autoProtect: false
+  red_wall_banner:
+    autoProtect: false
+  black_wall_banner:
+    autoProtect: false
 entities:
-  armor_stand: private
-  item_frame: private
-  glow_item_frame: private
+  armor_stand:
+    autoProtect: private
+  item_frame:
+    autoProtect: private
+  glow_item_frame:
+    autoProtect: private
