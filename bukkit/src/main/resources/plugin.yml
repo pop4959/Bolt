@@ -9,7 +9,29 @@ commands:
     description: Main bolt command
     permission: bolt.command
 permissions:
+  bolt.admin:
+    default: false
   bolt.command:
+    default: true
+  bolt.command.convert:
     default: op
+  bolt.command.debug:
+    default: op
+  bolt.command.edit:
+    default: true
+  bolt.command.info:
+    default: true
+  bolt.command.lock:
+    default: true
+  bolt.command.password:
+    default: true
+  bolt.command.persist:
+    default: true
+  bolt.command.report:
+    default: op
+  bolt.command.transfer:
+    default: true
+  bolt.command.unlock:
+    default: true
   bolt.protection.notify:
     default: false

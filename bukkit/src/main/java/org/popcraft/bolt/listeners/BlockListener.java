@@ -149,8 +149,12 @@ public final class BlockListener implements Listener {
             }
             case UNLOCK -> {
                 if (protection != null) {
-                    plugin.removeProtection(protection);
-                    BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
+                    if (plugin.canAccess(protection, player, Permission.DESTROY)) {
+                        plugin.removeProtection(protection);
+                        BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
+                    } else {
+                        BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED_NO_PERMISSION);
+                    }
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 }
