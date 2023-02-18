@@ -103,6 +103,7 @@ import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Permissible;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.lang.Translator;
+import org.popcraft.bolt.util.Source;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -322,28 +323,50 @@ public class BoltPlugin extends JavaPlugin {
         }
     }
 
-    @SuppressWarnings("unused")
-    public boolean canAccess(final Protection protection, final Permissible permissible, final String... permissions) {
-        return bolt.hasAccess(protection, permissible, permissions);
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean canAccess(final Protection protection, final UUID uuid, final String... permissions) {
-        return bolt.hasAccess(protection, bolt.getBoltPlayer(uuid), permissions);
-    }
-
-    public boolean canAccess(final Protection protection, final Player player, final String... permissions) {
-        return bolt.hasAccess(protection, bolt.getBoltPlayer(player.getUniqueId()), permissions);
-    }
-
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canAccess(final Block block, final Player player, final String... permissions) {
-        return findProtection(block).map(protection -> canAccess(protection, player, permissions)).orElse(true);
+        return findProtection(block).map(protection -> canAccess(protection, player.getUniqueId(), permissions)).orElse(true);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canAccess(final Entity entity, final Player player, final String... permissions) {
-        return findProtection(entity).map(protection -> canAccess(protection, player, permissions)).orElse(true);
+        return findProtection(entity).map(protection -> canAccess(protection, player.getUniqueId(), permissions)).orElse(true);
+    }
+
+    public boolean canAccess(final Protection protection, final Player player, final String... permissions) {
+        return canAccess(protection, player.getUniqueId(), permissions);
+    }
+
+    public boolean canAccess(final Protection protection, final UUID uuid, final String... permissions) {
+        return canAccess(protection, bolt.getBoltPlayer(uuid), permissions);
+    }
+
+    public boolean canAccess(final Protection protection, final Permissible permissible, String... permissions) {
+        final Set<String> sources = permissible.sources();
+        final String ownerSource = Source.fromPlayer(protection.getOwner());
+        if (sources.contains(ownerSource)) {
+            return true;
+        }
+        if (permissible instanceof BoltPlayer boltPlayer) {
+            final Player permissiblePlayer = getServer().getPlayer(boltPlayer.getUuid());
+            if (permissiblePlayer != null && permissiblePlayer.hasPermission("bolt.admin")) {
+                return true;
+            }
+        }
+        final AccessRegistry accessRegistry = bolt.getAccessRegistry();
+        final Set<String> heldPermissions = new HashSet<>();
+        accessRegistry.get(protection.getType()).ifPresent(access -> heldPermissions.addAll(access.permissions()));
+        protection.getAccess().forEach((source, accessType) -> {
+            if (sources.contains(source)) {
+                accessRegistry.get(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
+            }
+        });
+        for (final String permission : permissions) {
+            if (!heldPermissions.contains(permission)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Protection matchProtection(final Block block) {
