@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
@@ -37,6 +38,13 @@ public class LockCommand extends BoltCommand {
 
     @Override
     public List<String> suggestions(Arguments arguments) {
+        if (arguments.remaining() == 0) {
+            return Collections.emptyList();
+        }
+        arguments.next();
+        if (arguments.remaining() == 0) {
+            return plugin.getBolt().getAccessRegistry().access().stream().filter(Access::protection).map(Access::type).toList();
+        }
         return Collections.emptyList();
     }
 }

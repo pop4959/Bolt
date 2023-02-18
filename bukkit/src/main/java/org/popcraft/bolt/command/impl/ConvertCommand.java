@@ -46,6 +46,13 @@ public class ConvertCommand extends BoltCommand {
 
     @Override
     public List<String> suggestions(Arguments arguments) {
+        if (arguments.remaining() == 0) {
+            return Collections.emptyList();
+        }
+        arguments.next();
+        if (arguments.remaining() == 0) {
+            return List.of("back");
+        }
         return Collections.emptyList();
     }
 }

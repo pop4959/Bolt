@@ -14,7 +14,9 @@ import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.lang.Translation;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.popcraft.bolt.lang.Translator.translate;
@@ -79,6 +81,11 @@ public class EditCommand extends BoltCommand {
         if (arguments.remaining() == 0) {
             return plugin.getBolt().getAccessRegistry().access().stream().filter(access -> !access.protection()).map(Access::type).toList();
         }
-        return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
+        final Set<String> alreadyAdded = new HashSet<>();
+        String added;
+        while ((added = arguments.next()) != null) {
+            alreadyAdded.add(added);
+        }
+        return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).filter(name -> !alreadyAdded.contains(name)).toList();
     }
 }
