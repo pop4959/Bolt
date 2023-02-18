@@ -3,6 +3,8 @@ package org.popcraft.bolt.data.migration.lwc;
 import com.google.gson.Gson;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.util.BlockLocation;
+import org.popcraft.bolt.util.BukkitAdapter;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -12,7 +14,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BoltMigration {
@@ -25,6 +29,7 @@ public class BoltMigration {
     public void convert() {
         final Map<String, Integer> blockIds = new HashMap<>();
         final AtomicInteger blockId = new AtomicInteger();
+        final Set<BlockLocation> existing = new HashSet<>();
         try (final Connection connection = DriverManager.getConnection("jdbc:sqlite:%s/lwc.db".formatted(plugin.getDataFolder().toPath().resolve("../LWC").toFile().getPath()));
              final Statement statement = connection.createStatement();
              final PreparedStatement addBlock = connection.prepareStatement("INSERT INTO lwc_blocks VALUES (?, ?);");
@@ -38,10 +43,22 @@ public class BoltMigration {
                     blockId.set(id);
                 }
             }
+            final ResultSet existingSet = statement.executeQuery("SELECT * FROM lwc_protections");
+            while (existingSet.next()) {
+                existing.add(new BlockLocation(
+                        existingSet.getString("world"),
+                        existingSet.getInt("x"),
+                        existingSet.getInt("y"),
+                        existingSet.getInt("z")
+                ));
+            }
             final Gson gson = new Gson();
             connection.setAutoCommit(false);
             for (final BlockProtection blockProtection : plugin.getBolt().getStore().loadBlockProtections().join()) {
                 final String protectionBlock = blockProtection.getBlock();
+                if (existing.contains(BukkitAdapter.blockLocation(blockProtection))) {
+                    continue;
+                }
                 if (!blockIds.containsKey(protectionBlock)) {
                     final int nextId = blockId.incrementAndGet();
                     blockIds.put(protectionBlock, nextId);
