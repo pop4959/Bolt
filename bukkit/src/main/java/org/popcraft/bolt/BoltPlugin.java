@@ -137,7 +137,7 @@ public class BoltPlugin extends JavaPlugin {
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final Map<String, BoltCommand> commands = new HashMap<>();
     private final Path profileCachePath = getDataFolder().toPath().resolve("profiles");
-    private final ProfileCache profileCache = new SimpleProfileCache();
+    private final ProfileCache profileCache = new SimpleProfileCache(profileCachePath);
     private final Map<String, Access> protectableAccess = new HashMap<>();
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
@@ -153,7 +153,7 @@ public class BoltPlugin extends JavaPlugin {
         BoltComponents.enable(this);
         registerEvents();
         registerCommands();
-        profileCache.load(profileCachePath);
+        profileCache.load();
         new Metrics(this, 17711);
     }
 
@@ -162,7 +162,6 @@ public class BoltPlugin extends JavaPlugin {
         BoltComponents.disable();
         HandlerList.unregisterAll(this);
         commands.clear();
-        profileCache.save(profileCachePath);
         this.bolt.getStore().flush().join();
     }
 
