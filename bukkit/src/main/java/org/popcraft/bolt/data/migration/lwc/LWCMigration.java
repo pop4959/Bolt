@@ -3,7 +3,6 @@ package org.popcraft.bolt.data.migration.lwc;
 import com.google.gson.Gson;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.data.MemoryStore;
-import org.popcraft.bolt.data.Migration;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.Source;
 
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class LWCMigration implements Migration {
+public class LWCMigration {
     private static final int PROTECTION_TYPE_PUBLIC = 0;
     private static final int PROTECTION_TYPE_DONATION = 5;
     private static final int PROTECTION_TYPE_DISPLAY = 6;
@@ -42,57 +41,38 @@ public class LWCMigration implements Migration {
         this.plugin = plugin;
     }
 
-    @Override
-    public MemoryStore convert() {
+    public MemoryStore convert(final String directory) {
         final MemoryStore store = new MemoryStore();
         final Map<Integer, Block> blocks = new HashMap<>();
         final List<Protection> protections = new ArrayList<>();
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection("jdbc:sqlite:lwc.db");
-            try (Statement statement = connection.createStatement()) {
-                try {
-                    ResultSet blockSet = statement.executeQuery("select * from lwc_blocks");
-                    while (blockSet.next()) {
-                        final int id = blockSet.getInt("id");
-                        final String name = blockSet.getString("name");
-                        blocks.put(id, new Block(id, name));
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    ResultSet protectionSet = statement.executeQuery("select * from lwc_protections");
-                    while (protectionSet.next()) {
-                        protections.add(new Protection(
-                                protectionSet.getInt("id"),
-                                protectionSet.getString("owner"),
-                                protectionSet.getInt("type"),
-                                protectionSet.getInt("x"),
-                                protectionSet.getInt("y"),
-                                protectionSet.getInt("z"),
-                                protectionSet.getString("data"),
-                                protectionSet.getInt("blockId"),
-                                protectionSet.getString("world"),
-                                protectionSet.getString("password"),
-                                protectionSet.getDate("date"),
-                                protectionSet.getLong("last_accessed")
-                        ));
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+        try (final Connection connection = DriverManager.getConnection("jdbc:sqlite:%s/lwc.db".formatted(directory));
+             final Statement statement = connection.createStatement()) {
+            final ResultSet blockSet = statement.executeQuery("SELECT * FROM lwc_blocks");
+            while (blockSet.next()) {
+                final int id = blockSet.getInt("id");
+                final String name = blockSet.getString("name");
+                blocks.put(id, new Block(id, name));
+            }
+            final ResultSet protectionSet = statement.executeQuery("SELECT * FROM lwc_protections");
+            while (protectionSet.next()) {
+                protections.add(new Protection(
+                        protectionSet.getInt("id"),
+                        protectionSet.getString("owner"),
+                        protectionSet.getInt("type"),
+                        protectionSet.getInt("x"),
+                        protectionSet.getInt("y"),
+                        protectionSet.getInt("z"),
+                        protectionSet.getString("data"),
+                        protectionSet.getInt("blockId"),
+                        protectionSet.getString("world"),
+                        protectionSet.getString("password"),
+                        protectionSet.getDate("date"),
+                        protectionSet.getLong("last_accessed")
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            return store;
         }
         final Gson gson = new Gson();
         for (final Protection protection : protections) {

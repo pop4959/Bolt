@@ -24,7 +24,7 @@ public class ConvertCommand extends BoltCommand {
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
         final LWCMigration migration = new LWCMigration(plugin);
-        final MemoryStore converted = migration.convert();
+        final MemoryStore converted = migration.convert(plugin.getDataFolder().toPath().resolve("../LWC").toFile().getPath());
         final Store destination = plugin.getBolt().getStore();
         BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed("source", "LWC"), Placeholder.unparsed("destination", "Bolt"));
         for (final BlockProtection blockProtection : converted.loadBlockProtections().join()) {
