@@ -38,6 +38,7 @@ import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.util.BoundingBox;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.Action;
@@ -99,9 +100,9 @@ public final class BlockListener implements Listener {
                 final boolean isYou = player.getUniqueId().equals(protection.getOwner());
                 final String owner = isYou ? translate(Translation.YOU) : plugin.getProfileCache().getName(protection.getOwner());
                 if (owner == null) {
-                    BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY_GENERIC, Placeholder.unparsed("type", Protections.displayType(protection)));
+                    BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY_GENERIC, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
                 } else {
-                    BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner));
+                    BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner));
                 }
             }
             if (e.getItem() != null) {
@@ -140,9 +141,10 @@ public final class BlockListener implements Listener {
                         BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Placeholder.unparsed("type", Protections.displayType(protection)));
                     }
                 } else if (plugin.isProtectable(block)) {
-                    plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createBlockProtection(block, boltPlayer.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId(), protectionType));
+                    final BlockProtection newProtection = BukkitAdapter.createBlockProtection(block, boltPlayer.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId(), protectionType);
+                    plugin.getBolt().getStore().saveBlockProtection(newProtection);
                     boltPlayer.setLockNil(false);
-                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(block)));
                 } else {
                     return true;
                 }
@@ -151,7 +153,7 @@ public final class BlockListener implements Listener {
                 if (protection != null) {
                     if (plugin.canAccess(protection, player, Permission.DESTROY)) {
                         plugin.removeProtection(protection);
-                        BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
+                        BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED_NO_PERMISSION);
                     }
@@ -177,7 +179,7 @@ public final class BlockListener implements Listener {
                             }
                         });
                         plugin.saveProtection(protection);
-                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED, Placeholder.unparsed("type", Protections.displayType(protection)));
+                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_PERMISSION);
                     }
@@ -193,7 +195,7 @@ public final class BlockListener implements Listener {
                     final UUID uuid = UUID.fromString(action.getData());
                     protection.setOwner(uuid);
                     plugin.saveProtection(protection);
-                    BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(plugin.getProfileCache().getName(uuid)).orElse(translate(Translation.UNKNOWN))));
+                    BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(plugin.getProfileCache().getName(uuid)).orElse(translate(Translation.UNKNOWN))));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER);
                 }
@@ -214,8 +216,9 @@ public final class BlockListener implements Listener {
             return;
         }
         final Player player = e.getPlayer();
-        plugin.getBolt().getStore().saveBlockProtection(BukkitAdapter.createBlockProtection(block, player.getUniqueId(), defaultAccess.type()));
-        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
+        final BlockProtection newProtection = BukkitAdapter.createBlockProtection(block, player.getUniqueId(), defaultAccess.type());
+        plugin.getBolt().getStore().saveBlockProtection(newProtection);
+        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(block)));
     }
 
     @EventHandler
@@ -227,7 +230,7 @@ public final class BlockListener implements Listener {
             final Protection protection = optionalProtection.get();
             if (plugin.canAccess(protection, player, Permission.DESTROY)) {
                 plugin.removeProtection(protection);
-                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
+                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
             } else {
                 e.setCancelled(true);
             }
