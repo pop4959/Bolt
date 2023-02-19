@@ -52,5 +52,11 @@ entities:
     autoProtect: private
   glow_item_frame:
     autoProtect: private
+  chest_boat:
+    autoProtect: false
+  minecart_chest:
+    autoProtect: false
+  minecart_furnace:
+    autoProtect: false
   minecart_hopper:
     autoProtect: false
