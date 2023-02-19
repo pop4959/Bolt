@@ -19,7 +19,7 @@ import org.popcraft.bolt.command.impl.EditCommand;
 import org.popcraft.bolt.command.impl.InfoCommand;
 import org.popcraft.bolt.command.impl.LockCommand;
 import org.popcraft.bolt.command.impl.PasswordCommand;
-import org.popcraft.bolt.command.impl.PersistCommand;
+import org.popcraft.bolt.command.impl.ModeCommand;
 import org.popcraft.bolt.command.impl.ReportCommand;
 import org.popcraft.bolt.command.impl.TransferCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
@@ -222,8 +222,8 @@ public class BoltPlugin extends JavaPlugin {
         commands.put("edit", new EditCommand(this));
         commands.put("info", new InfoCommand(this));
         commands.put("lock", new LockCommand(this));
+        commands.put("mode", new ModeCommand(this));
         commands.put("password", new PasswordCommand(this));
-        commands.put("persist", new PersistCommand(this));
         commands.put("report", new ReportCommand(this));
         commands.put("transfer", new TransferCommand(this));
         commands.put("unlock", new UnlockCommand(this));

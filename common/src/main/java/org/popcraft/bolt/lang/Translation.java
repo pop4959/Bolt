@@ -25,6 +25,9 @@ public class Translation {
     public static final String ENABLED = "enabled";
     public static final String MIGRATION_STARTED = "migration_started";
     public static final String MIGRATION_COMPLETED = "migration_completed";
+    public static final String MODE_DISABLED = "mode_disabled";
+    public static final String MODE_ENABLED = "mode_enabled";
+    public static final String MODE_INVALID = "mode_invalid";
     public static final String PROTECTION_NOTIFY = "protection_notify";
     public static final String PROTECTION_NOTIFY_GENERIC = "protection_notify_generic";
     public static final String LOCKED = "locked";

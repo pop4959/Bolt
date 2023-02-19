@@ -10,10 +10,10 @@ public class BoltPlayer implements Permissible {
     private final UUID uuid;
     private final Map<String, String> modifications = new HashMap<>();
     private final Set<String> sources = new HashSet<>();
+    private final Set<Mode> modes = new HashSet<>();
     private Action action;
     private Action lastAction;
     private boolean interacted;
-    private boolean persist;
     private boolean lockNil;
 
     public BoltPlayer(UUID uuid) {
@@ -35,7 +35,7 @@ public class BoltPlayer implements Permissible {
 
     public void clearAction() {
         final Action triggered = action;
-        if (triggered != null && !this.persist) {
+        if (triggered != null && !hasMode(Mode.PERSIST)) {
             this.lastAction = triggered;
             this.action = null;
         }
@@ -58,13 +58,17 @@ public class BoltPlayer implements Permissible {
         this.interacted = false;
     }
 
-    public boolean isPersist() {
-        return persist;
+    public boolean hasMode(final Mode mode) {
+        return this.modes.contains(mode);
     }
 
-    public void togglePersist() {
-        this.persist = !this.persist;
-        if (!this.persist) {
+    public void toggleMode(final Mode mode) {
+        if (this.modes.contains(mode)) {
+            modes.remove(mode);
+        } else {
+            modes.add(mode);
+        }
+        if (!this.modes.contains(Mode.PERSIST)) {
             this.action = null;
         }
     }

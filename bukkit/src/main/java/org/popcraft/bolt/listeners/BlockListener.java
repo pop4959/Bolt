@@ -46,6 +46,7 @@ import org.popcraft.bolt.util.BasicPermissible;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.Source;
@@ -207,6 +208,10 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockPlace(final BlockPlaceEvent e) {
+        final Player player = e.getPlayer();
+        if (plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NO_LOCK)) {
+            return;
+        }
         final Block block = e.getBlock();
         if (!plugin.isProtectable(block)) {
             return;
@@ -215,10 +220,11 @@ public final class BlockListener implements Listener {
         if (defaultAccess == null) {
             return;
         }
-        final Player player = e.getPlayer();
         final BlockProtection newProtection = BukkitAdapter.createBlockProtection(block, player.getUniqueId(), defaultAccess.type());
         plugin.getBolt().getStore().saveBlockProtection(newProtection);
-        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(block)));
+        if (!plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NO_SPAM)) {
+            BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(block)));
+        }
     }
 
     @EventHandler

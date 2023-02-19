@@ -44,6 +44,7 @@ import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.lang.Strings;
@@ -80,6 +81,9 @@ public final class EntityListener implements Listener {
     }
 
     private void handleEntityPlacementByPlayer(final Entity entity, final Player player) {
+        if (plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NO_LOCK)) {
+            return;
+        }
         if (!plugin.isProtectable(entity)) {
             return;
         }
@@ -89,7 +93,9 @@ public final class EntityListener implements Listener {
         }
         final EntityProtection newProtection = BukkitAdapter.createEntityProtection(entity, player.getUniqueId(), defaultAccess.type());
         plugin.getBolt().getStore().saveEntityProtection(newProtection);
-        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(entity)));
+        if (!plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NO_SPAM)) {
+            BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(entity)));
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

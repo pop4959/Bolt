@@ -23,9 +23,9 @@ permissions:
     default: true
   bolt.command.lock:
     default: true
-  bolt.command.password:
+  bolt.command.mode:
     default: true
-  bolt.command.persist:
+  bolt.command.password:
     default: true
   bolt.command.report:
     default: op
