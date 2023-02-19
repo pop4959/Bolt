@@ -31,157 +31,17 @@ blocks:
     autoProtect: private
   lectern:
     autoProtect: private
-  shulker_box:
+  '#shulker_boxes':
     autoProtect: private
-  white_shulker_box:
-    autoProtect: private
-  orange_shulker_box:
-    autoProtect: private
-  magenta_shulker_box:
-    autoProtect: private
-  light_blue_shulker_box:
-    autoProtect: private
-  yellow_shulker_box:
-    autoProtect: private
-  lime_shulker_box:
-    autoProtect: private
-  pink_shulker_box:
-    autoProtect: private
-  gray_shulker_box:
-    autoProtect: private
-  light_gray_shulker_box:
-    autoProtect: private
-  cyan_shulker_box:
-    autoProtect: private
-  purple_shulker_box:
-    autoProtect: private
-  blue_shulker_box:
-    autoProtect: private
-  brown_shulker_box:
-    autoProtect: private
-  green_shulker_box:
-    autoProtect: private
-  red_shulker_box:
-    autoProtect: private
-  black_shulker_box:
-    autoProtect: private
-  sign:
+  '#signs':
     autoProtect: false
-  iron_door:
+  '#doors':
     autoProtect: false
-  oak_door:
+  '#trapdoors':
     autoProtect: false
-  spruce_door:
+  '#fence_gates':
     autoProtect: false
-  birch_door:
-    autoProtect: false
-  jungle_door:
-    autoProtect: false
-  acacia_door:
-    autoProtect: false
-  dark_oak_door:
-    autoProtect: false
-  crimson_door:
-    autoProtect: false
-  warped_door:
-    autoProtect: false
-  iron_trapdoor:
-    autoProtect: false
-  oak_trapdoor:
-    autoProtect: false
-  spruce_trapdoor:
-    autoProtect: false
-  birch_trapdoor:
-    autoProtect: false
-  jungle_trapdoor:
-    autoProtect: false
-  acacia_trapdoor:
-    autoProtect: false
-  dark_oak_trapdoor:
-    autoProtect: false
-  crimson_trapdoor:
-    autoProtect: false
-  warped_trapdoor:
-    autoProtect: false
-  oak_fence_gate:
-    autoProtect: false
-  spruce_fence_gate:
-    autoProtect: false
-  birch_fence_gate:
-    autoProtect: false
-  jungle_fence_gate:
-    autoProtect: false
-  acacia_fence_gate:
-    autoProtect: false
-  dark_oak_fence_gate:
-    autoProtect: false
-  crimson_fence_gate:
-    autoProtect: false
-  warped_fence_gate:
-    autoProtect: false
-  white_banner:
-    autoProtect: false
-  orange_banner:
-    autoProtect: false
-  magenta_banner:
-    autoProtect: false
-  light_blue_banner:
-    autoProtect: false
-  yellow_banner:
-    autoProtect: false
-  lime_banner:
-    autoProtect: false
-  pink_banner:
-    autoProtect: false
-  gray_banner:
-    autoProtect: false
-  light_gray_banner:
-    autoProtect: false
-  cyan_banner:
-    autoProtect: false
-  purple_banner:
-    autoProtect: false
-  blue_banner:
-    autoProtect: false
-  brown_banner:
-    autoProtect: false
-  green_banner:
-    autoProtect: false
-  red_banner:
-    autoProtect: false
-  black_banner:
-    autoProtect: false
-  white_wall_banner:
-    autoProtect: false
-  orange_wall_banner:
-    autoProtect: false
-  magenta_wall_banner:
-    autoProtect: false
-  light_blue_wall_banner:
-    autoProtect: false
-  yellow_wall_banner:
-    autoProtect: false
-  lime_wall_banner:
-    autoProtect: false
-  pink_wall_banner:
-    autoProtect: false
-  gray_wall_banner:
-    autoProtect: false
-  light_gray_wall_banner:
-    autoProtect: false
-  cyan_wall_banner:
-    autoProtect: false
-  purple_wall_banner:
-    autoProtect: false
-  blue_wall_banner:
-    autoProtect: false
-  brown_wall_banner:
-    autoProtect: false
-  green_wall_banner:
-    autoProtect: false
-  red_wall_banner:
-    autoProtect: false
-  black_wall_banner:
+  '#banners':
     autoProtect: false
 entities:
   armor_stand:

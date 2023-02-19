@@ -1,11 +1,16 @@
 package org.popcraft.bolt;
 
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Keyed;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
@@ -191,18 +196,43 @@ public class BoltPlugin extends JavaPlugin {
     private void registerProtectableAccess() {
         final ConfigurationSection blocks = getConfig().getConfigurationSection("blocks");
         if (blocks != null) {
-            for (final String block : blocks.getKeys(false)) {
-                final Access defaultAccess = bolt.getAccessRegistry().get(blocks.getString("%s.autoProtect".formatted(block), "false")).orElse(null);
-                protectableAccess.put(block.toUpperCase(), defaultAccess);
+            for (final String key : blocks.getKeys(false)) {
+                final String autoProtectType = blocks.getString("%s.autoProtect".formatted(key), "false");
+                final Access defaultAccess = bolt.getAccessRegistry().get(autoProtectType).orElse(null);
+                if (key.startsWith("#")) {
+                    final Tag<Material> tag = resolveTagProtectableAccess(Tag.REGISTRY_BLOCKS, Material.class, key.substring(1));
+                    if (tag == null) {
+                        getLogger().warning(() -> "Invalid block tag defined: %s. Skipping.".formatted(key));
+                        continue;
+                    }
+                    tag.getValues().forEach(block -> protectableAccess.put(block.name(), defaultAccess));
+                } else {
+                    protectableAccess.put(key.toUpperCase(), defaultAccess);
+                }
             }
         }
         final ConfigurationSection entities = getConfig().getConfigurationSection("entities");
         if (entities != null) {
-            for (final String entity : entities.getKeys(false)) {
-                final Access defaultAccess = bolt.getAccessRegistry().get(entities.getString("%s.autoProtect".formatted(entity), "false")).orElse(null);
-                protectableAccess.put(entity.toUpperCase(), defaultAccess);
+            for (final String key : entities.getKeys(false)) {
+                final String autoProtectType = entities.getString("%s.autoProtect".formatted(key), "false");
+                final Access defaultAccess = bolt.getAccessRegistry().get(autoProtectType).orElse(null);
+                if (key.startsWith("#")) {
+                    final Tag<EntityType> tag = resolveTagProtectableAccess(Tag.REGISTRY_ENTITY_TYPES, EntityType.class, key.substring(1));
+                    if (tag == null) {
+                        getLogger().warning(() -> "Invalid entity tag defined: %s. Skipping.".formatted(key));
+                        continue;
+                    }
+                    tag.getValues().forEach(entity -> protectableAccess.put(entity.name(), defaultAccess));
+                } else {
+                    protectableAccess.put(key.toUpperCase(), defaultAccess);
+                }
             }
         }
+    }
+
+    private <T extends Keyed> Tag<T> resolveTagProtectableAccess(final String registry, final Class<T> clazz, final String name) {
+        final NamespacedKey tagKey = NamespacedKey.fromString(name);
+        return tagKey == null ? null : getServer().getTag(registry, tagKey, clazz);
     }
 
     private void registerEvents() {
