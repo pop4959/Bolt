@@ -31,6 +31,8 @@ blocks:
     autoProtect: private
   lectern:
     autoProtect: private
+  hopper:
+    autoProtect: private
   '#shulker_boxes':
     autoProtect: private
   '#signs':
@@ -50,3 +52,5 @@ entities:
     autoProtect: private
   glow_item_frame:
     autoProtect: private
+  minecart_hopper:
+    autoProtect: false
