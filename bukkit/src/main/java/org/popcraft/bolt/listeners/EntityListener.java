@@ -81,7 +81,7 @@ public final class EntityListener implements Listener {
     }
 
     private void handleEntityPlacementByPlayer(final Entity entity, final Player player) {
-        if (plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NO_LOCK)) {
+        if (plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NOLOCK)) {
             return;
         }
         if (!plugin.isProtectable(entity)) {
@@ -93,7 +93,7 @@ public final class EntityListener implements Listener {
         }
         final EntityProtection newProtection = BukkitAdapter.createEntityProtection(entity, player.getUniqueId(), defaultAccess.type());
         plugin.getBolt().getStore().saveEntityProtection(newProtection);
-        if (!plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NO_SPAM)) {
+        if (!plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
             BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(entity)));
         }
     }
