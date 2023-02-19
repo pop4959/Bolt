@@ -108,7 +108,6 @@ import org.popcraft.bolt.util.Source;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -231,26 +230,33 @@ public class BoltPlugin extends JavaPlugin {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        if (args.length > 0 && commands.containsKey(args[0].toLowerCase())) {
-            if (sender.hasPermission(COMMAND_PERMISSION_KEY + args[0].toLowerCase())) {
-                commands.get(args[0].toLowerCase()).execute(sender, new Arguments(Arrays.copyOfRange(args, 1, args.length)));
-            } else {
-                BoltComponents.sendMessage(sender, Translation.COMMAND_NO_PERMISSION);
-            }
+        final boolean isBoltCommand = "bolt".equalsIgnoreCase(command.getName());
+        final int commandStart = isBoltCommand ? 1 : 0;
+        if (args.length < commandStart) {
+            return true;
         }
+        final String commandKey = (isBoltCommand ? args[0] : command.getName()).toLowerCase();
+        if (!commands.containsKey(commandKey)) {
+            return true;
+        }
+        if (!sender.hasPermission(COMMAND_PERMISSION_KEY + commandKey)) {
+            BoltComponents.sendMessage(sender, Translation.COMMAND_NO_PERMISSION);
+            return true;
+        }
+        commands.get(commandKey).execute(sender, new Arguments(Arrays.copyOfRange(args, commandStart, args.length)));
         return true;
     }
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
-        if (args.length < 1) {
-            return Collections.emptyList();
-        }
+        final boolean isBoltCommand = "bolt".equalsIgnoreCase(command.getName());
+        final int commandStart = isBoltCommand ? 1 : 0;
+        final String commandKey = (isBoltCommand ? args[0] : command.getName()).toLowerCase();
         final List<String> suggestions = new ArrayList<>();
-        if (args.length == 1) {
+        if (args.length == commandStart) {
             commands.keySet().stream().filter(name -> sender.hasPermission(COMMAND_PERMISSION_KEY + name)).forEach(suggestions::add);
-        } else if (commands.containsKey(args[0].toLowerCase()) && sender.hasPermission(COMMAND_PERMISSION_KEY + args[0].toLowerCase())) {
-            suggestions.addAll(commands.get(args[0].toLowerCase()).suggestions(new Arguments(Arrays.copyOfRange(args, 1, args.length))));
+        } else if (commands.containsKey(commandKey) && sender.hasPermission(COMMAND_PERMISSION_KEY + commandKey)) {
+            suggestions.addAll(commands.get(commandKey).suggestions(new Arguments(Arrays.copyOfRange(args, commandStart, args.length))));
         }
         return suggestions.stream()
                 .filter(s -> s.toLowerCase().contains(args[args.length - 1].toLowerCase()))

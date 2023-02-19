@@ -8,6 +8,12 @@ commands:
   bolt:
     description: Main bolt command
     permission: bolt.command
+  lock:
+    description: Shortcut lock command for convenience
+    permission: bolt.command.lock
+  unlock:
+    description: Shortcut unlock command for convenience
+    permission: bolt.command.unlock
 permissions:
   bolt.admin:
     default: false
