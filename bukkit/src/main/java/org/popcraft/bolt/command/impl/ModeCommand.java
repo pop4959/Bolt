@@ -26,6 +26,10 @@ public class ModeCommand extends BoltCommand {
         if (sender instanceof final Player player) {
             final BoltPlayer boltPlayer = plugin.player(player);
             final String modeArgument = arguments.next();
+            if (modeArgument == null) {
+                BoltComponents.sendMessage(player, Translation.MODE_INVALID);
+                return;
+            }
             final Mode mode;
             try {
                 mode = Mode.valueOf(modeArgument.toUpperCase());
