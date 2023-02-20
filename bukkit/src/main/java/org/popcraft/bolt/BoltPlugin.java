@@ -186,7 +186,7 @@ public class BoltPlugin extends JavaPlugin {
             Optional.ofNullable(getConfig().getConfigurationSection("blocks"))
                     .ifPresent(section -> {
                         final Set<String> types = section.getKeys(false);
-                        types.forEach(type -> map.put(type, Map.of(section.getString("autoProtect", "false"), 1)));
+                        types.forEach(type -> map.put(type, Map.of(section.getString("%s.autoProtect".formatted(type), "false"), 1)));
                     });
             return map;
         }));
@@ -195,7 +195,7 @@ public class BoltPlugin extends JavaPlugin {
             Optional.ofNullable(getConfig().getConfigurationSection("entities"))
                     .ifPresent(section -> {
                         final Set<String> types = section.getKeys(false);
-                        types.forEach(type -> map.put(type, Map.of(section.getString("autoProtect", "false"), 1)));
+                        types.forEach(type -> map.put(type, Map.of(section.getString("%s.autoProtect".formatted(type), "false"), 1)));
                     });
             return map;
         }));
