@@ -1,11 +1,5 @@
 package org.popcraft.bolt.lang;
 
-import org.popcraft.bolt.util.Source;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 public class Strings {
     private Strings() {
     }
@@ -25,16 +19,5 @@ public class Strings {
             builder.append(Character.isWhitespace(chars[i - 1]) ? Character.toUpperCase(chars[i]) : chars[i]);
         }
         return builder.toString();
-    }
-
-    public static String access(final Map<String, String> accessMap) {
-        if (accessMap == null || accessMap.isEmpty()) {
-            return Translator.translate(Translation.EMPTY);
-        }
-        final List<String> access = new ArrayList<>();
-        for (final String source : accessMap.keySet()) {
-            access.add("%s (%s)".formatted(Source.identifier(source), toTitleCase(Source.type(source))));
-        }
-        return String.join(", ", access);
     }
 }

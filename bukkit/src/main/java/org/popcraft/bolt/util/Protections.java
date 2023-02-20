@@ -7,11 +7,18 @@ import org.bukkit.Nameable;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.popcraft.bolt.lang.Translator.translate;
 
@@ -61,5 +68,25 @@ public final class Protections {
         }
         final Component translatable = Component.translatable(entity.getType().getTranslationKey());
         return BukkitComponentSerializer.legacy().serialize(translatable);
+    }
+
+    public static String accessList(final Protection protection) {
+        final BoltPlugin boltPlugin = JavaPlugin.getPlugin(BoltPlugin.class);
+        final Map<String, String> accessMap = protection.getAccess();
+        if (accessMap == null || accessMap.isEmpty()) {
+            return "";
+        }
+        final List<String> lines = new ArrayList<>();
+        accessMap.forEach((source, access) -> {
+            final String sourceType = Source.type(source);
+            final String subject;
+            if (Source.PLAYER.equals(sourceType)) {
+                subject = boltPlugin.getProfileCache().getName(UUID.fromString(Source.identifier(source)));
+            } else {
+                subject = Strings.toTitleCase(Source.type(source));
+            }
+            lines.add("%s (%s)".formatted(subject, Strings.toTitleCase(access)));
+        });
+        return String.join("\n", lines);
     }
 }

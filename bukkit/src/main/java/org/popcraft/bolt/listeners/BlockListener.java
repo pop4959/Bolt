@@ -164,7 +164,7 @@ public final class BlockListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
-                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("owner", Objects.requireNonNullElse(plugin.getProfileCache().getName(protection.getOwner()), translate(Translation.UNKNOWN))));
+                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Objects.requireNonNullElse(plugin.getProfileCache().getName(protection.getOwner()), translate(Translation.UNKNOWN))), Placeholder.unparsed("access_count", String.valueOf(protection.getAccess().size())), Placeholder.unparsed("access_list", Protections.accessList(protection)));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 }
