@@ -1,6 +1,9 @@
 package org.popcraft.bolt;
 
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.AdvancedPie;
+import org.bstats.charts.DrilldownPie;
+import org.bstats.charts.SimplePie;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -114,6 +117,7 @@ import org.popcraft.bolt.util.Source;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -144,7 +148,8 @@ public class BoltPlugin extends JavaPlugin {
     private final Map<String, BoltCommand> commands = new HashMap<>();
     private final Path profileCachePath = getDataFolder().toPath().resolve("profiles");
     private final ProfileCache profileCache = new SimpleProfileCache(profileCachePath);
-    private final Map<String, Access> protectableAccess = new HashMap<>();
+    private final Map<Material, Access> protectableBlocks = new EnumMap<>(Material.class);
+    private final Map<EntityType, Access> protectableEntities = new EnumMap<>(EntityType.class);
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
     private Bolt bolt;
@@ -160,7 +165,42 @@ public class BoltPlugin extends JavaPlugin {
         registerEvents();
         registerCommands();
         profileCache.load();
-        new Metrics(this, 17711);
+        final Metrics metrics = new Metrics(this, 17711);
+        registerCustomCharts(metrics);
+    }
+
+    private void registerCustomCharts(final Metrics metrics) {
+        metrics.addCustomChart(new SimplePie("config_language", () -> getConfig().getString("language", "en")));
+        metrics.addCustomChart(new AdvancedPie("config_protections", () -> {
+            final Map<String, Integer> map = new HashMap<>();
+            bolt.getAccessRegistry().access().stream().filter(Access::protection).toList().forEach(access -> map.put(access.type(), 1));
+            return map;
+        }));
+        metrics.addCustomChart(new AdvancedPie("config_access", () -> {
+            final Map<String, Integer> map = new HashMap<>();
+            bolt.getAccessRegistry().access().stream().filter(access -> !access.protection()).toList().forEach(access -> map.put(access.type(), 1));
+            return map;
+        }));
+        metrics.addCustomChart(new DrilldownPie("config_blocks", () -> {
+            Map<String, Map<String, Integer>> map = new HashMap<>();
+            Optional.ofNullable(getConfig().getConfigurationSection("blocks"))
+                    .ifPresent(section -> {
+                        final Set<String> types = section.getKeys(false);
+                        types.forEach(type -> map.put(type, Map.of(section.getString("autoProtect", "false"), 1)));
+                    });
+            return map;
+        }));
+        metrics.addCustomChart(new DrilldownPie("config_entities", () -> {
+            Map<String, Map<String, Integer>> map = new HashMap<>();
+            Optional.ofNullable(getConfig().getConfigurationSection("entities"))
+                    .ifPresent(section -> {
+                        final Set<String> types = section.getKeys(false);
+                        types.forEach(type -> map.put(type, Map.of(section.getString("autoProtect", "false"), 1)));
+                    });
+            return map;
+        }));
+        metrics.addCustomChart(new SimplePie("protections_blocks", () -> String.valueOf((bolt.getStore().loadBlockProtections().join().size() % 1000) * 1000)));
+        metrics.addCustomChart(new SimplePie("protections_entities", () -> String.valueOf((bolt.getStore().loadEntityProtections().join().size() % 1000) * 1000)));
     }
 
     @Override
@@ -206,10 +246,9 @@ public class BoltPlugin extends JavaPlugin {
                         getLogger().warning(() -> "Invalid block tag defined: %s. Skipping.".formatted(key));
                         continue;
                     }
-                    tag.getValues().forEach(block -> protectableAccess.put(block.name(), defaultAccess));
+                    tag.getValues().forEach(block -> protectableBlocks.put(block, defaultAccess));
                 } else {
-                    final String blockName = key.toUpperCase();
-                    EnumUtil.valueOf(Material.class, blockName).filter(Material::isBlock).ifPresentOrElse(ignored -> protectableAccess.put(blockName, defaultAccess), () -> getLogger().warning(() -> "Invalid block defined: %s. Skipping.".formatted(key)));
+                    EnumUtil.valueOf(Material.class, key.toUpperCase()).filter(Material::isBlock).ifPresentOrElse(block -> protectableBlocks.put(block, defaultAccess), () -> getLogger().warning(() -> "Invalid block defined: %s. Skipping.".formatted(key)));
                 }
             }
         }
@@ -224,10 +263,9 @@ public class BoltPlugin extends JavaPlugin {
                         getLogger().warning(() -> "Invalid entity tag defined: %s. Skipping.".formatted(key));
                         continue;
                     }
-                    tag.getValues().forEach(entity -> protectableAccess.put(entity.name(), defaultAccess));
+                    tag.getValues().forEach(entity -> protectableEntities.put(entity, defaultAccess));
                 } else {
-                    final String entityName = key.toUpperCase();
-                    EnumUtil.valueOf(EntityType.class, entityName).ifPresentOrElse(ignored -> protectableAccess.put(entityName, defaultAccess), () -> getLogger().warning(() -> "Invalid entity defined: %s. Skipping.".formatted(key)));
+                    EnumUtil.valueOf(EntityType.class, key.toUpperCase()).ifPresentOrElse(entity -> protectableEntities.put(entity, defaultAccess), () -> getLogger().warning(() -> "Invalid entity defined: %s. Skipping.".formatted(key)));
                 }
             }
         }
@@ -313,19 +351,19 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     public boolean isProtectable(final Block block) {
-        return DEBUG || protectableAccess.containsKey(block.getType().name());
+        return DEBUG || protectableBlocks.containsKey(block.getType());
     }
 
     public boolean isProtectable(final Entity entity) {
-        return DEBUG || protectableAccess.containsKey(entity.getType().name());
+        return DEBUG || protectableEntities.containsKey(entity.getType());
     }
 
     public Access getDefaultAccess(final Block block) {
-        return protectableAccess.get(block.getType().name());
+        return protectableBlocks.get(block.getType());
     }
 
     public Access getDefaultAccess(final Entity entity) {
-        return protectableAccess.get(entity.getType().name());
+        return protectableEntities.get(entity.getType());
     }
 
     public String getDefaultProtectionType() {
