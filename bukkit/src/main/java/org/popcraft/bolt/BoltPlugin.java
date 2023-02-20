@@ -105,6 +105,7 @@ import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Permissible;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.lang.Translator;
@@ -207,7 +208,8 @@ public class BoltPlugin extends JavaPlugin {
                     }
                     tag.getValues().forEach(block -> protectableAccess.put(block.name(), defaultAccess));
                 } else {
-                    protectableAccess.put(key.toUpperCase(), defaultAccess);
+                    final String blockName = key.toUpperCase();
+                    EnumUtil.valueOf(Material.class, blockName).filter(Material::isBlock).ifPresentOrElse(ignored -> protectableAccess.put(blockName, defaultAccess), () -> getLogger().warning(() -> "Invalid block defined: %s. Skipping.".formatted(key)));
                 }
             }
         }
@@ -224,7 +226,8 @@ public class BoltPlugin extends JavaPlugin {
                     }
                     tag.getValues().forEach(entity -> protectableAccess.put(entity.name(), defaultAccess));
                 } else {
-                    protectableAccess.put(key.toUpperCase(), defaultAccess);
+                    final String entityName = key.toUpperCase();
+                    EnumUtil.valueOf(EntityType.class, entityName).ifPresentOrElse(ignored -> protectableAccess.put(entityName, defaultAccess), () -> getLogger().warning(() -> "Invalid entity defined: %s. Skipping.".formatted(key)));
                 }
             }
         }
