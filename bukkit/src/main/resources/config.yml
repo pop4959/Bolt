@@ -45,6 +45,12 @@ blocks:
     autoProtect: false
   '#banners':
     autoProtect: false
+  '#buttons':
+    autoProtect: false
+  lever:
+    autoProtect: false
+  brewing_stand:
+    autoProtect: false
 entities:
   armor_stand:
     autoProtect: private
