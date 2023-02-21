@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.data.MemoryStore;
 import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Source;
 
 import java.sql.Connection;
@@ -103,12 +104,7 @@ public class LWCMigration {
             if (protection.password() != null && !protection.password().isEmpty()) {
                 access.put(Source.from(Source.PASSWORD, protection.password()), DEFAULT_ACCESS_NORMAL);
             }
-            UUID ownerUUID;
-            try {
-                ownerUUID = UUID.fromString(protection.owner());
-            } catch (IllegalArgumentException e) {
-                ownerUUID = plugin.getProfileCache().getUniqueId(protection.owner());
-            }
+            final UUID ownerUUID = BukkitAdapter.findPlayerUniqueId(protection.owner());
             store.saveBlockProtection(new BlockProtection(
                     UUID.randomUUID(),
                     ownerUUID,

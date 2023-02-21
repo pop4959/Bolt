@@ -10,6 +10,7 @@ import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.lang.Translation;
 
@@ -56,13 +57,12 @@ public class EditCommand extends BoltCommand {
                 }
                 boltPlayer.getModifications().put(Source.fromPassword(split[1]), access.type());
             } else {
-                UUID uuid;
-                try {
-                    uuid = UUID.fromString(source);
-                } catch (IllegalArgumentException e) {
-                    uuid = plugin.getProfileCache().getUniqueId(source);
+                final UUID uuid = BukkitAdapter.findPlayerUniqueId(source);
+                if (uuid != null) {
+                    boltPlayer.getModifications().put(Source.fromPlayer(uuid), access.type());
+                } else {
+                    BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", source));
                 }
-                boltPlayer.getModifications().put(Source.fromPlayer(uuid), access.type());
             }
         }
         BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.EDIT)));

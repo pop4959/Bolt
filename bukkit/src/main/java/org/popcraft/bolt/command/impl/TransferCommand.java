@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
@@ -8,6 +9,7 @@ import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.util.BukkitAdapter;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,14 +31,13 @@ public class TransferCommand extends BoltCommand {
             return;
         }
         final String owner = arguments.next();
-        UUID uuid;
-        try {
-            uuid = UUID.fromString(owner);
-        } catch (IllegalArgumentException e) {
-            uuid = plugin.getProfileCache().getUniqueId(owner);
+        final UUID uuid = BukkitAdapter.findPlayerUniqueId(owner);
+        if (uuid != null) {
+            plugin.player(player).setAction(new Action(Action.Type.TRANSFER, uuid.toString()));
+            BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER);
+        } else {
+            BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", owner));
         }
-        plugin.player(player).setAction(new Action(Action.Type.TRANSFER, uuid.toString()));
-        BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER);
     }
 
     @Override
