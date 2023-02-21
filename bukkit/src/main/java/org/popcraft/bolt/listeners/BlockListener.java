@@ -192,13 +192,17 @@ public final class BlockListener implements Listener {
             case DEBUG ->
                     BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());
             case TRANSFER -> {
-                if (player.getUniqueId().equals(protection.getOwner())) {
-                    final UUID uuid = UUID.fromString(action.getData());
-                    protection.setOwner(uuid);
-                    plugin.saveProtection(protection);
-                    BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(plugin.getProfileCache().getName(uuid)).orElse(translate(Translation.UNKNOWN))));
+                if (protection != null) {
+                    if (player.getUniqueId().equals(protection.getOwner())) {
+                        final UUID uuid = UUID.fromString(action.getData());
+                        protection.setOwner(uuid);
+                        plugin.saveProtection(protection);
+                        BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(plugin.getProfileCache().getName(uuid)).orElse(translate(Translation.UNKNOWN))));
+                    } else {
+                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER);
+                    }
                 } else {
-                    BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER);
+                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 }
             }
         }
