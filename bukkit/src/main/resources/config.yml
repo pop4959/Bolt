@@ -1,5 +1,14 @@
 version: 0
 language: en
+database:
+  type: sqlite
+  path: plugins/Bolt/bolt.db
+  hostname: ""
+  database: ""
+  username: ""
+  password: ""
+  prefix: ""
+  properties: [ ]
 protections:
   private: [ ]
   redstone: [ "redstone" ]

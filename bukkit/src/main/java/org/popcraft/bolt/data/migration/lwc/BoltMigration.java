@@ -1,7 +1,11 @@
 package org.popcraft.bolt.data.migration.lwc;
 
 import com.google.gson.Gson;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.data.SQLStore;
+import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
@@ -34,11 +38,25 @@ public class BoltMigration {
         final Map<String, Integer> blockIds = new HashMap<>();
         final AtomicInteger blockId = new AtomicInteger();
         final Set<BlockLocation> existing = new HashSet<>();
-        try (final Connection connection = DriverManager.getConnection("jdbc:sqlite:%s/lwc.db".formatted(plugin.getDataFolder().toPath().resolve("../LWC").toFile().getPath()));
+        final FileConfiguration lwcCoreConfig = YamlConfiguration.loadConfiguration(plugin.getDataFolder().toPath().resolve("../LWC/core.yml").toFile());
+        final SQLStore.Configuration configuration = new SQLStore.Configuration(
+                lwcCoreConfig.getString("database.adapter", "sqlite"),
+                lwcCoreConfig.getString("database.path", "plugins/LWC/lwc.db"),
+                lwcCoreConfig.getString("database.host", ""),
+                lwcCoreConfig.getString("database.database", ""),
+                lwcCoreConfig.getString("database.username", ""),
+                lwcCoreConfig.getString("database.password", ""),
+                lwcCoreConfig.getString("database.prefix", "lwc_"),
+                List.of("useSSL", lwcCoreConfig.getString("database.useSSL", "false"))
+        );
+        final String connectionUrl = "mysql".equals(configuration.type()) ?
+                "jdbc:mysql://%s:%s@%s/%s".formatted(configuration.username(), configuration.password(), configuration.hostname(), configuration.database()) :
+                "jdbc:sqlite:%s".formatted(configuration.path());
+        try (final Connection connection = DriverManager.getConnection(connectionUrl);
              final Statement statement = connection.createStatement();
-             final PreparedStatement addBlock = connection.prepareStatement("INSERT INTO lwc_blocks VALUES (?, ?);");
-             final PreparedStatement addProtection = connection.prepareStatement("INSERT OR IGNORE INTO lwc_protections (owner, type, x, y, z, data, blockId, world, password, date, last_accessed, rights) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")) {
-            final ResultSet blockSet = statement.executeQuery("SELECT * FROM lwc_blocks");
+             final PreparedStatement addBlock = connection.prepareStatement(Statements.LWC_INSERT_BLOCK_ID.get(configuration.type()).formatted(configuration.prefix()));
+             final PreparedStatement addProtection = connection.prepareStatement(Statements.LWC_INSERT_OR_IGNORE_PROTECTION.get(configuration.type()).formatted(configuration.prefix()))) {
+            final ResultSet blockSet = statement.executeQuery(Statements.LWC_SELECT_ALL_BLOCK_IDS.get(configuration.type()).formatted(configuration.prefix()));
             while (blockSet.next()) {
                 final int id = blockSet.getInt("id");
                 final String name = blockSet.getString("name");
@@ -47,7 +65,7 @@ public class BoltMigration {
                     blockId.set(id);
                 }
             }
-            final ResultSet existingSet = statement.executeQuery("SELECT * FROM lwc_protections");
+            final ResultSet existingSet = statement.executeQuery(Statements.LWC_SELECT_ALL_PROTECTIONS.get(configuration.type()).formatted(configuration.prefix()));
             while (existingSet.next()) {
                 existing.add(new BlockLocation(
                         existingSet.getString("world"),

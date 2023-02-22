@@ -31,7 +31,7 @@ import org.popcraft.bolt.command.impl.ModeCommand;
 import org.popcraft.bolt.command.impl.ReportCommand;
 import org.popcraft.bolt.command.impl.TransferCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
-import org.popcraft.bolt.data.SQLiteStore;
+import org.popcraft.bolt.data.SQLStore;
 import org.popcraft.bolt.data.SimpleProtectionCache;
 import org.popcraft.bolt.data.SimpleProfileCache;
 import org.popcraft.bolt.data.ProfileCache;
@@ -157,7 +157,17 @@ public class BoltPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        this.bolt = new Bolt(new SimpleProtectionCache(new SQLiteStore(getDataFolder().getPath())));
+        final SQLStore.Configuration databaseConfiguration = new SQLStore.Configuration(
+                getConfig().getString("database.type", "sqlite"),
+                getConfig().getString("database.path", "plugins/Bolt/bolt.db"),
+                getConfig().getString("database.hostname", ""),
+                getConfig().getString("database.database", ""),
+                getConfig().getString("database.username", ""),
+                getConfig().getString("database.password", ""),
+                getConfig().getString("database.prefix", ""),
+                getConfig().getStringList("database.properties")
+        );
+        this.bolt = new Bolt(new SimpleProtectionCache(new SQLStore(databaseConfiguration)));
         Translator.load(getDataFolder().toPath(), getConfig().getString("language", "en"));
         registerAccessTypes();
         registerProtectableAccess();
@@ -171,6 +181,7 @@ public class BoltPlugin extends JavaPlugin {
 
     private void registerCustomCharts(final Metrics metrics) {
         metrics.addCustomChart(new SimplePie("config_language", () -> getConfig().getString("language", "en")));
+        metrics.addCustomChart(new SimplePie("config_database", () -> getConfig().getString("database.type", "sqlite")));
         metrics.addCustomChart(new AdvancedPie("config_protections", () -> {
             final Map<String, Integer> map = new HashMap<>();
             bolt.getAccessRegistry().access().stream().filter(Access::protection).toList().forEach(access -> map.put(access.type(), 1));

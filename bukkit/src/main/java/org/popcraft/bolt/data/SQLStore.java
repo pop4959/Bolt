@@ -2,6 +2,7 @@ package org.popcraft.bolt.data;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
@@ -28,44 +29,66 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.LogManager;
 
-public class SQLiteStore implements Store {
+public class SQLStore implements Store {
     private static final Gson GSON = new Gson();
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private final Map<BlockLocation, BlockProtection> saveBlocks = new HashMap<>();
     private final Map<BlockLocation, BlockProtection> removeBlocks = new HashMap<>();
     private final Map<UUID, EntityProtection> saveEntities = new HashMap<>();
     private final Map<UUID, EntityProtection> removeEntities = new HashMap<>();
+    private final Configuration configuration;
+    private final String connectionUrl;
     private Connection connection;
 
-    public SQLiteStore(final String directory) {
-        try {
-            this.connection = DriverManager.getConnection("jdbc:sqlite:%s/bolt.db".formatted(directory));
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS blocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created integer, accessed integer, access text, world varchar(128), x integer, y integer, z integer, block varchar(128));")) {
-                statement.execute();
-            }
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS entities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created integer, accessed integer, access text, entity varchar(128));")) {
-                statement.execute();
-            }
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE INDEX IF NOT EXISTS block_owner ON blocks(owner);")) {
-                statement.execute();
-            }
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE UNIQUE INDEX IF NOT EXISTS block_location ON blocks(world, x, y, z);")) {
-                statement.execute();
-            }
-            try (final PreparedStatement statement = connection.prepareStatement("CREATE INDEX IF NOT EXISTS entity_owner ON entities(owner);")) {
-                statement.execute();
-            }
+    public SQLStore(final Configuration configuration) {
+        this.configuration = configuration;
+        final boolean usingMySQL = "mysql".equals(configuration.type());
+        this.connectionUrl = usingMySQL ?
+                "jdbc:mysql://%s:%s@%s/%s".formatted(configuration.username(), configuration.password(), configuration.hostname(), configuration.database()) :
+                "jdbc:sqlite:%s".formatted(configuration.path());
+        reconnect();
+        try (final PreparedStatement createBlocksTable = connection.prepareStatement(Statements.CREATE_TABLE_BLOCKS.get(configuration.type()).formatted(configuration.prefix()));
+             final PreparedStatement createEntitiesTable = connection.prepareStatement(Statements.CREATE_TABLE_ENTITIES.get(configuration.type()).formatted(configuration.prefix()))) {
+            createBlocksTable.execute();
+            createEntitiesTable.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try (final PreparedStatement createBlocksOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_BLOCK_OWNER.get(configuration.type()).formatted(configuration.prefix()));
+             final PreparedStatement createBlocksLocationIndex = connection.prepareStatement(Statements.CREATE_INDEX_BLOCK_LOCATION.get(configuration.type()).formatted(configuration.prefix()));
+             final PreparedStatement createEntitiesOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_ENTITY_OWNER.get(configuration.type()).formatted(configuration.prefix()))) {
+            createBlocksOwnerIndex.execute();
+            createBlocksLocationIndex.execute();
+            createEntitiesOwnerIndex.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         executor.scheduleWithFixedDelay(this::flush, 30, 30, TimeUnit.SECONDS);
+        if (usingMySQL) {
+            executor.scheduleWithFixedDelay(this::reconnect, 30, 30, TimeUnit.MINUTES);
+        }
+    }
+
+    public record Configuration(String type, String path, String hostname, String database, String username,
+                                String password, String prefix, List<String> properties) {
+    }
+
+    private void reconnect() {
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+            connection = DriverManager.getConnection(connectionUrl);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public CompletableFuture<BlockProtection> loadBlockProtection(BlockLocation location) {
         final CompletableFuture<BlockProtection> future = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            try (final PreparedStatement selectBlock = connection.prepareStatement("SELECT * FROM blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;")) {
+            try (final PreparedStatement selectBlock = connection.prepareStatement(Statements.SELECT_BLOCK_BY_LOCATION.get(configuration.type()).formatted(configuration.prefix()))) {
                 selectBlock.setString(1, location.world());
                 selectBlock.setInt(2, location.x());
                 selectBlock.setInt(3, location.y());
@@ -88,15 +111,17 @@ public class SQLiteStore implements Store {
         final CompletableFuture<Collection<BlockProtection>> future = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             final long startTimeNanos = System.nanoTime();
-            try (final PreparedStatement selectBlocks = connection.prepareStatement("SELECT * FROM blocks;")) {
+            long[] count = new long[1];
+            try (final PreparedStatement selectBlocks = connection.prepareStatement(Statements.SELECT_ALL_BLOCKS.get(configuration.type()).formatted(configuration.prefix()))) {
                 final ResultSet blocksResultSet = selectBlocks.executeQuery();
                 final List<BlockProtection> protections = new ArrayList<>();
                 while (blocksResultSet.next()) {
                     protections.add(blockProtectionFromResultSet(blocksResultSet));
+                    ++count[0];
                 }
                 final long timeNanos = System.nanoTime() - startTimeNanos;
                 final double timeMillis = timeNanos / 1e6d;
-                LogManager.getLogManager().getLogger("").info(() -> "Loading all block protections took %.3f ms".formatted(timeMillis));
+                LogManager.getLogManager().getLogger("").info(() -> "Loaded %d block protections in %.3f ms".formatted(count[0], timeMillis));
                 future.complete(protections);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -129,7 +154,7 @@ public class SQLiteStore implements Store {
     }
 
     private void saveBlockProtectionNow(BlockProtection protection) {
-        try (final PreparedStatement replaceBlock = connection.prepareStatement("REPLACE INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")) {
+        try (final PreparedStatement replaceBlock = connection.prepareStatement(Statements.REPLACE_BLOCK.get(configuration.type()).formatted(configuration.prefix()))) {
             replaceBlock.setString(1, protection.getId().toString());
             replaceBlock.setString(2, protection.getOwner().toString());
             replaceBlock.setString(3, protection.getType());
@@ -154,7 +179,7 @@ public class SQLiteStore implements Store {
     }
 
     private void removeBlockProtectionNow(BlockProtection protection) {
-        try (final PreparedStatement deleteBlock = connection.prepareStatement("DELETE FROM blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;")) {
+        try (final PreparedStatement deleteBlock = connection.prepareStatement(Statements.DELETE_BLOCK.get(configuration.type()).formatted(configuration.prefix()))) {
             deleteBlock.setString(1, protection.getWorld());
             deleteBlock.setInt(2, protection.getX());
             deleteBlock.setInt(3, protection.getY());
@@ -169,7 +194,7 @@ public class SQLiteStore implements Store {
     public CompletableFuture<EntityProtection> loadEntityProtection(UUID id) {
         final CompletableFuture<EntityProtection> future = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            try (final PreparedStatement selectEntity = connection.prepareStatement("SELECT * FROM entities WHERE id = ?;")) {
+            try (final PreparedStatement selectEntity = connection.prepareStatement(Statements.SELECT_ENTITY_BY_UUID.get(configuration.type()).formatted(configuration.prefix()))) {
                 selectEntity.setString(1, id.toString());
                 final ResultSet entityResultSet = selectEntity.executeQuery();
                 if (entityResultSet.next()) {
@@ -189,15 +214,17 @@ public class SQLiteStore implements Store {
         final CompletableFuture<Collection<EntityProtection>> future = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             final long startTimeNanos = System.nanoTime();
-            try (final PreparedStatement selectEntities = connection.prepareStatement("SELECT * FROM entities;")) {
+            long[] count = new long[1];
+            try (final PreparedStatement selectEntities = connection.prepareStatement(Statements.SELECT_ALL_ENTITIES.get(configuration.type()).formatted(configuration.prefix()))) {
                 final ResultSet entitiesResultSet = selectEntities.executeQuery();
                 final List<EntityProtection> protections = new ArrayList<>();
                 while (entitiesResultSet.next()) {
                     protections.add(entityProtectionFromResultSet(entitiesResultSet));
+                    ++count[0];
                 }
                 final long timeNanos = System.nanoTime() - startTimeNanos;
                 final double timeMillis = timeNanos / 1e6d;
-                LogManager.getLogManager().getLogger("").info(() -> "Loading all entity protections took %.3f ms".formatted(timeMillis));
+                LogManager.getLogManager().getLogger("").info(() -> "Loaded %d entity protections in %.3f ms".formatted(count[0], timeMillis));
                 future.complete(protections);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -226,7 +253,7 @@ public class SQLiteStore implements Store {
     }
 
     private void saveEntityProtectionNow(EntityProtection protection) {
-        try (final PreparedStatement replaceEntity = connection.prepareStatement("REPLACE INTO entities VALUES (?, ?, ?, ?, ?, ?, ?);")) {
+        try (final PreparedStatement replaceEntity = connection.prepareStatement(Statements.REPLACE_ENTITY.get(configuration.type()).formatted(configuration.prefix()))) {
             replaceEntity.setString(1, protection.getId().toString());
             replaceEntity.setString(2, protection.getOwner().toString());
             replaceEntity.setString(3, protection.getType());
@@ -247,7 +274,7 @@ public class SQLiteStore implements Store {
     }
 
     private void removeEntityProtectionNow(EntityProtection protection) {
-        try (final PreparedStatement deleteEntity = connection.prepareStatement("DELETE FROM entities WHERE id = ?;")) {
+        try (final PreparedStatement deleteEntity = connection.prepareStatement(Statements.DELETE_ENTITY.get(configuration.type()).formatted(configuration.prefix()))) {
             deleteEntity.setString(1, protection.getId().toString());
             deleteEntity.execute();
         } catch (SQLException e) {
