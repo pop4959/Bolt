@@ -210,8 +210,8 @@ public class BoltPlugin extends JavaPlugin {
                     });
             return map;
         }));
-        metrics.addCustomChart(new SimplePie("protections_blocks", () -> String.valueOf((bolt.getStore().loadBlockProtections().join().size() / 1000) * 1000)));
-        metrics.addCustomChart(new SimplePie("protections_entities", () -> String.valueOf((bolt.getStore().loadEntityProtections().join().size() / 1000) * 1000)));
+        metrics.addCustomChart(new SimplePie("protections_blocks", () -> String.valueOf((int) Math.ceil(bolt.getStore().loadBlockProtections().join().size() / 1000f) * 1000)));
+        metrics.addCustomChart(new SimplePie("protections_entities", () -> String.valueOf((int) Math.ceil(bolt.getStore().loadEntityProtections().join().size() / 1000f) * 1000)));
     }
 
     @Override
