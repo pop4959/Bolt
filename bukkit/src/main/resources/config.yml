@@ -18,7 +18,7 @@ protections:
   public: [ "interact", "open", "deposit", "withdraw", "mount" ]
 access:
   normal: [ "interact", "open", "deposit", "withdraw", "mount" ]
-  admin: [ "interact", "open", "deposit", "withdraw", "mount", "edit", "destroy" ]
+  admin: [ "interact", "open", "deposit", "withdraw", "mount", "edit" ]
 blocks:
   chest:
     autoProtect: private
