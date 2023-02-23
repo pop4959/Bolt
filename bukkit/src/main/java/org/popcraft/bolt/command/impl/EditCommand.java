@@ -40,8 +40,8 @@ public class EditCommand extends BoltCommand {
         final BoltPlayer boltPlayer = plugin.player(player);
         final boolean adding = "add".equalsIgnoreCase(arguments.next());
         boltPlayer.setAction(new Action(Action.Type.EDIT, Boolean.toString(adding)));
-        final Access access = plugin.getBolt().getAccessRegistry().get(arguments.next()).orElse(null);
-        if (access == null || access.protection()) {
+        final Access access = plugin.getBolt().getAccessRegistry().getAccessByType(arguments.next()).orElse(null);
+        if (access == null) {
             BoltComponents.sendMessage(sender, Translation.EDIT_ACCESS_INVALID);
             return;
         }
@@ -79,7 +79,7 @@ public class EditCommand extends BoltCommand {
         }
         arguments.next();
         if (arguments.remaining() == 0) {
-            return plugin.getBolt().getAccessRegistry().access().stream().filter(access -> !access.protection()).map(Access::type).toList();
+            return plugin.getBolt().getAccessRegistry().accessTypes();
         }
         final Set<String> alreadyAdded = new HashSet<>();
         String added;

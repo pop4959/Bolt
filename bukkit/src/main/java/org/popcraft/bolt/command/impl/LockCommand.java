@@ -43,7 +43,7 @@ public class LockCommand extends BoltCommand {
         }
         arguments.next();
         if (arguments.remaining() == 0) {
-            return plugin.getBolt().getAccessRegistry().access().stream().filter(Access::protection).map(Access::type).toList();
+            return plugin.getBolt().getAccessRegistry().protectionTypes();
         }
         return Collections.emptyList();
     }

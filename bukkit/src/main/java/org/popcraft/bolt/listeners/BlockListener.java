@@ -130,7 +130,7 @@ public final class BlockListener implements Listener {
         switch (actionType) {
             case LOCK -> {
                 final String protectionType = Optional.ofNullable(action.getData())
-                        .flatMap(type -> plugin.getBolt().getAccessRegistry().get(type))
+                        .flatMap(type -> plugin.getBolt().getAccessRegistry().getProtectionByType(type))
                         .map(Access::type)
                         .orElse(plugin.getDefaultProtectionType());
                 if (protection != null) {

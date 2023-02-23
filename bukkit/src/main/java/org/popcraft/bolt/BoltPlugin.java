@@ -184,12 +184,12 @@ public class BoltPlugin extends JavaPlugin {
         metrics.addCustomChart(new SimplePie("config_database", () -> getConfig().getString("database.type", "sqlite")));
         metrics.addCustomChart(new AdvancedPie("config_protections", () -> {
             final Map<String, Integer> map = new HashMap<>();
-            bolt.getAccessRegistry().access().stream().filter(Access::protection).toList().forEach(access -> map.put(access.type(), 1));
+            bolt.getAccessRegistry().protectionTypes().forEach(type -> map.put(type, 1));
             return map;
         }));
         metrics.addCustomChart(new AdvancedPie("config_access", () -> {
             final Map<String, Integer> map = new HashMap<>();
-            bolt.getAccessRegistry().access().stream().filter(access -> !access.protection()).toList().forEach(access -> map.put(access.type(), 1));
+            bolt.getAccessRegistry().accessTypes().forEach(type -> map.put(type, 1));
             return map;
         }));
         metrics.addCustomChart(new DrilldownPie("config_blocks", () -> {
@@ -227,8 +227,8 @@ public class BoltPlugin extends JavaPlugin {
         if (protections != null) {
             for (final String type : protections.getKeys(false)) {
                 final List<String> permissions = protections.getStringList(type);
-                bolt.getAccessRegistry().register(true, type, new HashSet<>(permissions));
-                if (defaultProtectionType == null || permissions.size() < bolt.getAccessRegistry().get(defaultProtectionType).map(Access::permissions).map(Set::size).orElse(0)) {
+                bolt.getAccessRegistry().registerProtectionType(type, new HashSet<>(permissions));
+                if (defaultProtectionType == null || permissions.size() < bolt.getAccessRegistry().getProtectionByType(defaultProtectionType).map(Access::permissions).map(Set::size).orElse(0)) {
                     defaultProtectionType = type;
                 }
             }
@@ -237,8 +237,8 @@ public class BoltPlugin extends JavaPlugin {
         if (access != null) {
             for (final String type : access.getKeys(false)) {
                 final List<String> permissions = access.getStringList(type);
-                bolt.getAccessRegistry().register(false, type, new HashSet<>(permissions));
-                if (defaultAccessType == null || permissions.size() < bolt.getAccessRegistry().get(defaultAccessType).map(Access::permissions).map(Set::size).orElse(0)) {
+                bolt.getAccessRegistry().registerAccessType(type, new HashSet<>(permissions));
+                if (defaultAccessType == null || permissions.size() < bolt.getAccessRegistry().getAccessByType(defaultAccessType).map(Access::permissions).map(Set::size).orElse(0)) {
                     defaultAccessType = type;
                 }
             }
@@ -250,7 +250,7 @@ public class BoltPlugin extends JavaPlugin {
         if (blocks != null) {
             for (final String key : blocks.getKeys(false)) {
                 final String autoProtectType = blocks.getString("%s.autoProtect".formatted(key), "false");
-                final Access defaultAccess = bolt.getAccessRegistry().get(autoProtectType).orElse(null);
+                final Access defaultAccess = bolt.getAccessRegistry().getProtectionByType(autoProtectType).orElse(null);
                 if (key.startsWith("#")) {
                     final Tag<Material> tag = resolveTagProtectableAccess(Tag.REGISTRY_BLOCKS, Material.class, key.substring(1));
                     if (tag == null) {
@@ -267,7 +267,7 @@ public class BoltPlugin extends JavaPlugin {
         if (entities != null) {
             for (final String key : entities.getKeys(false)) {
                 final String autoProtectType = entities.getString("%s.autoProtect".formatted(key), "false");
-                final Access defaultAccess = bolt.getAccessRegistry().get(autoProtectType).orElse(null);
+                final Access defaultAccess = bolt.getAccessRegistry().getProtectionByType(autoProtectType).orElse(null);
                 if (key.startsWith("#")) {
                     final Tag<EntityType> tag = resolveTagProtectableAccess(Tag.REGISTRY_ENTITY_TYPES, EntityType.class, key.substring(1));
                     if (tag == null) {
@@ -443,10 +443,10 @@ public class BoltPlugin extends JavaPlugin {
         }
         final AccessRegistry accessRegistry = bolt.getAccessRegistry();
         final Set<String> heldPermissions = new HashSet<>();
-        accessRegistry.get(protection.getType()).ifPresent(access -> heldPermissions.addAll(access.permissions()));
+        accessRegistry.getProtectionByType(protection.getType()).ifPresent(access -> heldPermissions.addAll(access.permissions()));
         protection.getAccess().forEach((source, accessType) -> {
             if (sources.contains(source)) {
-                accessRegistry.get(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
+                accessRegistry.getAccessByType(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
             }
         });
         for (final String permission : permissions) {
