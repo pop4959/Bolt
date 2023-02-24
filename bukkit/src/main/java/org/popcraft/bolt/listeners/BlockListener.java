@@ -224,6 +224,9 @@ public final class BlockListener implements Listener {
         if (defaultAccess == null) {
             return;
         }
+        if (plugin.findProtection(block).isPresent()) {
+            return;
+        }
         final BlockProtection newProtection = BukkitAdapter.createBlockProtection(block, player.getUniqueId(), defaultAccess.type());
         plugin.getBolt().getStore().saveBlockProtection(newProtection);
         if (!plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
