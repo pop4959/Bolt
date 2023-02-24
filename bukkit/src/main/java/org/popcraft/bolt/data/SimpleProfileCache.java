@@ -40,6 +40,9 @@ public class SimpleProfileCache implements ProfileCache {
 
     @Override
     public void add(final UUID uuid, final String name) {
+        if (uuidName.containsKey(uuid) && nameUuid.containsKey(name)) {
+            return;
+        }
         uuidName.put(uuid, name);
         nameUuid.put(name, uuid);
         CompletableFuture.runAsync(() -> save(uuid, name));
