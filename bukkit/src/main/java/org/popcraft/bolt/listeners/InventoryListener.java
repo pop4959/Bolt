@@ -1,5 +1,6 @@
 package org.popcraft.bolt.listeners;
 
+import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -144,6 +145,8 @@ public final class InventoryListener implements Listener {
         final Protection protection;
         if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
             protection = plugin.findProtection(blockInventoryHolder.getBlock()).orElse(null);
+        } else if (inventoryHolder instanceof final DoubleChest doubleChest) {
+            protection = plugin.findProtection(doubleChest.getLocation().getBlock()).orElse(null);
         } else if (inventoryHolder instanceof final Entity entity) {
             protection = plugin.findProtection(entity).orElse(null);
         } else {
