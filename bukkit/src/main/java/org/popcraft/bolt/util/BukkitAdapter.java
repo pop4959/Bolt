@@ -1,11 +1,13 @@
 package org.popcraft.bolt.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.profile.PlayerProfile;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.data.ProfileCache;
 import org.popcraft.bolt.protection.BlockProtection;
@@ -14,8 +16,12 @@ import org.popcraft.bolt.protection.EntityProtection;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public final class BukkitAdapter {
+    private static final String NIL_UUID_STRING = "00000000-0000-0000-0000-000000000000";
+    public static final UUID NIL_UUID = UUID.fromString(NIL_UUID_STRING);
+
     private BukkitAdapter() {
     }
 
@@ -47,7 +53,7 @@ public final class BukkitAdapter {
     }
 
     public static UUID findPlayerUniqueId(final String player) {
-        if (player == null) {
+        if (player == null || NIL_UUID_STRING.equals(player)) {
             return null;
         }
         try {
@@ -64,5 +70,33 @@ public final class BukkitAdapter {
             }
             return offlinePlayer == null ? null : offlinePlayer.getUniqueId();
         }
+    }
+
+    public static CompletableFuture<UUID> lookupPlayerUniqueId(final String name) {
+        final PlayerProfile playerProfile = Bukkit.createPlayerProfile(name);
+        final CompletableFuture<PlayerProfile> updatedProfile = playerProfile.update();
+        updatedProfile.thenAccept(profile -> {
+            if (profile.isComplete()) {
+                final ProfileCache profileCache = JavaPlugin.getPlugin(BoltPlugin.class).getProfileCache();
+                profileCache.add(profile.getUniqueId(), profile.getName());
+            }
+        });
+        return updatedProfile.thenApply(PlayerProfile::getUniqueId);
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public static CompletableFuture<String> lookupPlayerName(final UUID uuid) {
+        if (NIL_UUID.equals(uuid)) {
+            return CompletableFuture.completedFuture(null);
+        }
+        final PlayerProfile playerProfile = Bukkit.createPlayerProfile(uuid);
+        final CompletableFuture<PlayerProfile> updatedProfile = playerProfile.update();
+        updatedProfile.thenAccept(profile -> {
+            if (profile.isComplete()) {
+                final ProfileCache profileCache = JavaPlugin.getPlugin(BoltPlugin.class).getProfileCache();
+                profileCache.add(profile.getUniqueId(), profile.getName());
+            }
+        });
+        return updatedProfile.thenApply(PlayerProfile::getName);
     }
 }

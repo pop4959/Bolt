@@ -56,6 +56,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.popcraft.bolt.lang.Translator.translate;
+import static org.popcraft.bolt.util.BukkitAdapter.NIL_UUID;
 
 public final class EntityListener implements Listener {
     private final BoltPlugin plugin;
@@ -176,6 +177,7 @@ public final class EntityListener implements Listener {
                 final boolean isYou = player.getUniqueId().equals(protection.getOwner());
                 final String owner = isYou ? translate(Translation.YOU) : plugin.getProfileCache().getName(protection.getOwner());
                 if (owner == null) {
+                    BukkitAdapter.lookupPlayerName(protection.getOwner());
                     BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY_GENERIC, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
                 } else {
                     BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner));
@@ -209,7 +211,7 @@ public final class EntityListener implements Listener {
                         BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Placeholder.unparsed("type", Protections.displayType(protection)));
                     }
                 } else if (plugin.isProtectable(entity)) {
-                    final EntityProtection newProtection = BukkitAdapter.createEntityProtection(entity, boltPlayer.isLockNil() ? UUID.fromString("00000000-0000-0000-0000-000000000000") : player.getUniqueId(), protectionType);
+                    final EntityProtection newProtection = BukkitAdapter.createEntityProtection(entity, boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
                     plugin.getBolt().getStore().saveEntityProtection(newProtection);
                     boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(entity)));
@@ -227,7 +229,11 @@ public final class EntityListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
-                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Objects.requireNonNullElse(plugin.getProfileCache().getName(protection.getOwner()), translate(Translation.UNKNOWN))), Placeholder.unparsed("access_count", String.valueOf(protection.getAccess().size())), Placeholder.unparsed("access_list", Protections.accessList(protection)));
+                    final String owner = Objects.requireNonNullElseGet(plugin.getProfileCache().getName(protection.getOwner()), () -> {
+                        BukkitAdapter.lookupPlayerName(protection.getOwner());
+                        return translate(Translation.UNKNOWN);
+                    });
+                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner), Placeholder.unparsed("access_count", String.valueOf(protection.getAccess().size())), Placeholder.unparsed("access_list", Protections.accessList(protection)));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
                 }

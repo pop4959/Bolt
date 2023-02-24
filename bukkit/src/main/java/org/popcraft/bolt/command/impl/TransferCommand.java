@@ -36,6 +36,7 @@ public class TransferCommand extends BoltCommand {
             plugin.player(player).setAction(new Action(Action.Type.TRANSFER, uuid.toString()));
             BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER);
         } else {
+            BukkitAdapter.lookupPlayerUniqueId(owner);
             BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", owner));
         }
     }
