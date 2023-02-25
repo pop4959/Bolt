@@ -9,11 +9,15 @@ public final class Metrics {
     private static final Map<ProtectionAccess, Long> protectionAccessCounts = new HashMap<>();
     private static long protectionHits;
     private static long protectionMisses;
+    private static boolean enabled;
 
     private Metrics() {
     }
 
     public static void recordProtectionAccess(boolean hit) {
+        if (!enabled) {
+            return;
+        }
         if (hit) {
             ++protectionHits;
         } else {
@@ -48,6 +52,19 @@ public final class Metrics {
 
     public static long getProtectionMisses() {
         return protectionMisses;
+    }
+
+    public static boolean isEnabled() {
+        return enabled;
+    }
+
+    public static void setEnabled(boolean enabled) {
+        Metrics.enabled = enabled;
+        if (!enabled) {
+            protectionAccessCounts.clear();
+            protectionHits = 0;
+            protectionMisses = 0;
+        }
     }
 
     public record ProtectionAccess(String type, String consumer) {

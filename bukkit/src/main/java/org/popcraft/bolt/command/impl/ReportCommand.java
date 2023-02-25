@@ -27,6 +27,20 @@ public class ReportCommand extends BoltCommand {
 
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
+        if (!Metrics.isEnabled()) {
+            Metrics.setEnabled(true);
+            BoltComponents.sendMessage(sender, "Enabling reports. This will have a performance impact. Type '/bolt report disable' to turn off reports. Type '/bolt report' again to generate an updated report.");
+            return;
+        }
+        final boolean disable = arguments.next() != null;
+        if (disable) {
+            Metrics.setEnabled(false);
+            previousHits = 0;
+            previousMisses = 0;
+            previousExecutionCounts.clear();
+            BoltComponents.sendMessage(sender, "Disabling reports.");
+            return;
+        }
         final long hits = Metrics.getProtectionHits();
         final long misses = Metrics.getProtectionMisses();
         final boolean hitsChanged = hits != previousHits;
