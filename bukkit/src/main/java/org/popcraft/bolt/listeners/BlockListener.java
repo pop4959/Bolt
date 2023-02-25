@@ -174,7 +174,7 @@ public final class BlockListener implements Listener {
             case EDIT -> {
                 if (protection != null) {
                     if (plugin.canAccess(protection, player, Permission.EDIT)) {
-                        boltPlayer.getModifications().forEach((source, type) -> {
+                        boltPlayer.consumeModifications().forEach((source, type) -> {
                             if (Boolean.parseBoolean(action.getData())) {
                                 protection.getAccess().put(source, type);
                             } else {
@@ -189,7 +189,6 @@ public final class BlockListener implements Listener {
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(block)));
                 }
-                boltPlayer.getModifications().clear();
             }
             case DEBUG ->
                     BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());

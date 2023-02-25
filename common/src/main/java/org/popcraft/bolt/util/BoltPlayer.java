@@ -77,6 +77,14 @@ public class BoltPlayer implements Permissible {
         return modifications;
     }
 
+    public Map<String, String> consumeModifications() {
+        final Map<String, String> modificationsCopy = new HashMap<>(modifications);
+        if (!this.modes.contains(Mode.PERSIST)) {
+            modifications.clear();
+        }
+        return modificationsCopy;
+    }
+
     public boolean isLockNil() {
         return lockNil;
     }

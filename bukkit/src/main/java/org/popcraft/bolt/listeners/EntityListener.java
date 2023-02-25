@@ -51,10 +51,8 @@ import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
 import org.spigotmc.event.entity.EntityMountEvent;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 import static org.popcraft.bolt.lang.Translator.translate;
 import static org.popcraft.bolt.util.BukkitAdapter.NIL_UUID;
@@ -239,7 +237,7 @@ public final class EntityListener implements Listener {
             case EDIT -> {
                 if (protection != null) {
                     if (plugin.canAccess(protection, player, Permission.EDIT)) {
-                        boltPlayer.getModifications().forEach((source, type) -> {
+                        boltPlayer.consumeModifications().forEach((source, type) -> {
                             if (Boolean.parseBoolean(action.getData())) {
                                 protection.getAccess().put(source, type);
                             } else {
@@ -254,7 +252,6 @@ public final class EntityListener implements Listener {
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
-                boltPlayer.getModifications().clear();
             }
             case DEBUG ->
                     BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());
