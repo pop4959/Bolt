@@ -136,7 +136,7 @@ public final class BlockListener implements Listener {
                         .map(Access::type)
                         .orElse(plugin.getDefaultProtectionType());
                 if (protection != null) {
-                    if (player.getUniqueId() == protection.getOwner() && !protection.getType().equals(protectionType)) {
+                    if (protection.getOwner().equals(player.getUniqueId()) && !protection.getType().equals(protectionType)) {
                         protection.setType(protectionType);
                         plugin.saveProtection(protection);
                         BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_CHANGED, Placeholder.unparsed("type", protectionType));
