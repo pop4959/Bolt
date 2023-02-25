@@ -13,7 +13,6 @@ import org.popcraft.bolt.util.BukkitAdapter;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 public class TransferCommand extends BoltCommand {
     public TransferCommand(BoltPlugin plugin) {
@@ -31,14 +30,14 @@ public class TransferCommand extends BoltCommand {
             return;
         }
         final String owner = arguments.next();
-        final UUID uuid = BukkitAdapter.findPlayerUniqueId(owner);
-        if (uuid != null) {
-            plugin.player(player).setAction(new Action(Action.Type.TRANSFER, uuid.toString()));
-            BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER);
-        } else {
-            BukkitAdapter.lookupPlayerUniqueId(owner);
-            BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", owner));
-        }
+        BukkitAdapter.findOrLookupPlayerUniqueId(owner).thenAccept(uuid -> {
+            if (uuid != null) {
+                plugin.player(player).setAction(new Action(Action.Type.TRANSFER, uuid.toString()));
+                BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER);
+            } else {
+                BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", owner));
+            }
+        });
     }
 
     @Override

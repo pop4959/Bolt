@@ -40,7 +40,9 @@ public class SimpleProfileCache implements ProfileCache {
 
     @Override
     public void add(final UUID uuid, final String name) {
-        if (uuidName.containsKey(uuid) && nameUuid.containsKey(name)) {
+        final UUID existingUUID = nameUuid.get(name);
+        final String existingName = uuidName.get(uuid);
+        if (uuid.equals(existingUUID) && name.equals(existingName)) {
             return;
         }
         uuidName.put(uuid, name);

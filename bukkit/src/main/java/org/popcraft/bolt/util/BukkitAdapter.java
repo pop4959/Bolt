@@ -52,19 +52,19 @@ public final class BukkitAdapter {
         return new EntityProtection(entity.getUniqueId(), owner, type, now, now, new HashMap<>(), entity.getType().name());
     }
 
-    public static UUID findPlayerUniqueId(final String player) {
-        if (player == null || NIL_UUID_STRING.equals(player)) {
+    public static UUID findPlayerUniqueId(final String name) {
+        if (name == null || NIL_UUID_STRING.equals(name)) {
             return null;
         }
         try {
-            return UUID.fromString(player);
+            return UUID.fromString(name);
         } catch (final IllegalArgumentException e) {
             final ProfileCache profileCache = JavaPlugin.getPlugin(BoltPlugin.class).getProfileCache();
-            final UUID cached = profileCache.getUniqueId(player);
+            final UUID cached = profileCache.getUniqueId(name);
             if (cached != null) {
                 return cached;
             }
-            final OfflinePlayer offlinePlayer = PaperUtil.getOfflinePlayer(player);
+            final OfflinePlayer offlinePlayer = PaperUtil.getOfflinePlayer(name);
             if (offlinePlayer != null) {
                 profileCache.add(offlinePlayer.getUniqueId(), offlinePlayer.getName());
             }
@@ -81,10 +81,22 @@ public final class BukkitAdapter {
                 profileCache.add(profile.getUniqueId(), profile.getName());
             }
         });
-        return updatedProfile.thenApply(PlayerProfile::getUniqueId);
+        return updatedProfile.thenApplyAsync(PlayerProfile::getUniqueId, BukkitMainThreadExecutor.get());
     }
 
-    @SuppressWarnings("UnusedReturnValue")
+    public static CompletableFuture<UUID> findOrLookupPlayerUniqueId(final String name) {
+        final UUID found = BukkitAdapter.findPlayerUniqueId(name);
+        if (found != null) {
+            return CompletableFuture.completedFuture(found);
+        }
+        return lookupPlayerUniqueId(name);
+    }
+
+    public static String findPlayerName(final UUID uuid) {
+        final ProfileCache profileCache = JavaPlugin.getPlugin(BoltPlugin.class).getProfileCache();
+        return profileCache.getName(uuid);
+    }
+
     public static CompletableFuture<String> lookupPlayerName(final UUID uuid) {
         if (NIL_UUID.equals(uuid)) {
             return CompletableFuture.completedFuture(null);
@@ -97,6 +109,14 @@ public final class BukkitAdapter {
                 profileCache.add(profile.getUniqueId(), profile.getName());
             }
         });
-        return updatedProfile.thenApply(PlayerProfile::getName);
+        return updatedProfile.thenApplyAsync(PlayerProfile::getName, BukkitMainThreadExecutor.get());
+    }
+
+    public static CompletableFuture<String> findOrLookupPlayerName(final UUID uuid) {
+        final String found = BukkitAdapter.findPlayerName(uuid);
+        if (found != null) {
+            return CompletableFuture.completedFuture(found);
+        }
+        return lookupPlayerName(uuid);
     }
 }

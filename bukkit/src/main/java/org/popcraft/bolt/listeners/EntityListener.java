@@ -54,6 +54,7 @@ import org.spigotmc.event.entity.EntityMountEvent;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.popcraft.bolt.lang.Translator.translate;
 import static org.popcraft.bolt.util.BukkitAdapter.NIL_UUID;
@@ -174,14 +175,15 @@ public final class EntityListener implements Listener {
                 }
             }
             if (shouldSendMessage && hasNotifyPermission) {
-                final boolean isYou = player.getUniqueId().equals(protection.getOwner());
-                final String owner = isYou ? translate(Translation.YOU) : plugin.getProfileCache().getName(protection.getOwner());
-                if (owner == null) {
-                    BukkitAdapter.lookupPlayerName(protection.getOwner());
-                    BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY_GENERIC, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
-                } else {
-                    BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner));
-                }
+                BukkitAdapter.findOrLookupPlayerName(protection.getOwner()).thenAccept(name -> {
+                    final boolean isYou = player.getUniqueId().equals(protection.getOwner());
+                    final String owner = isYou ? translate(Translation.YOU) : name;
+                    if (owner == null) {
+                        BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY_GENERIC, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
+                    } else {
+                        BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner));
+                    }
+                });
             }
             boltPlayer.setInteracted();
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, boltPlayer::clearInteraction);
@@ -229,11 +231,7 @@ public final class EntityListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
-                    final String owner = Objects.requireNonNullElseGet(plugin.getProfileCache().getName(protection.getOwner()), () -> {
-                        BukkitAdapter.lookupPlayerName(protection.getOwner());
-                        return translate(Translation.UNKNOWN);
-                    });
-                    BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner), Placeholder.unparsed("access_count", String.valueOf(protection.getAccess().size())), Placeholder.unparsed("access_list", Protections.accessList(protection)));
+                    BukkitAdapter.findOrLookupPlayerName(protection.getOwner()).thenAccept(owner -> BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner), Placeholder.unparsed("access_count", String.valueOf(protection.getAccess().size())), Placeholder.unparsed("access_list", Protections.accessList(protection))));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
@@ -266,7 +264,7 @@ public final class EntityListener implements Listener {
                         final UUID uuid = UUID.fromString(action.getData());
                         protection.setOwner(uuid);
                         plugin.saveProtection(protection);
-                        BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(plugin.getProfileCache().getName(uuid)).orElse(translate(Translation.UNKNOWN))));
+                        BukkitAdapter.findOrLookupPlayerName(uuid).thenAccept(owner -> BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(owner).orElse(translate(Translation.UNKNOWN)))));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER);
                     }

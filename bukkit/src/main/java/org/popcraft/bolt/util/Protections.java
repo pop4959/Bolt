@@ -7,8 +7,6 @@ import org.bukkit.Nameable;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
@@ -18,6 +16,7 @@ import org.popcraft.bolt.lang.Translation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.popcraft.bolt.lang.Translator.translate;
@@ -71,7 +70,6 @@ public final class Protections {
     }
 
     public static String accessList(final Protection protection) {
-        final BoltPlugin boltPlugin = JavaPlugin.getPlugin(BoltPlugin.class);
         final Map<String, String> accessMap = protection.getAccess();
         if (accessMap == null || accessMap.isEmpty()) {
             return "";
@@ -81,7 +79,13 @@ public final class Protections {
             final String sourceType = Source.type(source);
             final String subject;
             if (Source.PLAYER.equals(sourceType)) {
-                subject = boltPlugin.getProfileCache().getName(UUID.fromString(Source.identifier(source)));
+                final String playerUuid = Source.identifier(source);
+                final UUID uuid = UUID.fromString(playerUuid);
+                final String playerName = BukkitAdapter.findPlayerName(uuid);
+                if (playerName == null) {
+                    BukkitAdapter.lookupPlayerName(uuid);
+                }
+                subject = Optional.ofNullable(playerName).orElse(playerUuid);
             } else {
                 subject = Strings.toTitleCase(Source.type(source));
             }

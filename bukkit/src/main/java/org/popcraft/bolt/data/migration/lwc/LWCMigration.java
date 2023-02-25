@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -122,10 +123,10 @@ public class LWCMigration {
             if (protection.password() != null && !protection.password().isEmpty()) {
                 access.put(Source.from(Source.PASSWORD, protection.password()), DEFAULT_ACCESS_NORMAL);
             }
-            final UUID ownerUUID = BukkitAdapter.findPlayerUniqueId(protection.owner());
+            final UUID ownerUUID = BukkitAdapter.findOrLookupPlayerUniqueId(protection.owner()).join();
             store.saveBlockProtection(new BlockProtection(
                     UUID.randomUUID(),
-                    ownerUUID,
+                    Objects.requireNonNullElse(ownerUUID, BukkitAdapter.NIL_UUID),
                     protectionType,
                     protection.date().getTime(),
                     TimeUnit.MILLISECONDS.convert(protection.lastAccessed(), TimeUnit.SECONDS),

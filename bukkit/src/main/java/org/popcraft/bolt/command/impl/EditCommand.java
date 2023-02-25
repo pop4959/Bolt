@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.popcraft.bolt.lang.Translator.translate;
 
@@ -57,13 +56,14 @@ public class EditCommand extends BoltCommand {
                 }
                 boltPlayer.getModifications().put(Source.fromPassword(split[1]), access.type());
             } else {
-                final UUID uuid = BukkitAdapter.findPlayerUniqueId(source);
-                if (uuid != null) {
-                    boltPlayer.getModifications().put(Source.fromPlayer(uuid), access.type());
-                } else {
-                    BukkitAdapter.lookupPlayerUniqueId(source);
-                    BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", source));
-                }
+                final String finalSource = source;
+                BukkitAdapter.findOrLookupPlayerUniqueId(source).thenAccept(uuid -> {
+                    if (uuid != null) {
+                        boltPlayer.getModifications().put(Source.fromPlayer(uuid), access.type());
+                    } else {
+                        BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", finalSource));
+                    }
+                });
             }
         }
         BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.EDIT)));
