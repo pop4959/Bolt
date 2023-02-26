@@ -18,6 +18,7 @@ public class Translation {
     public static final String CLICK_UNLOCKED_NO_PERMISSION = "click_unlocked_no_permission";
     public static final String CLICK_NOT_LOCKED = "click_not_locked";
     public static final String CLICK_TRANSFER = "click_transfer";
+    public static final String CLICK_TRANSFER_ALL = "click_transfer_all";
     public static final String CLICK_TRANSFER_CONFIRM = "click_transfer_confirm";
     public static final String DISABLED = "disabled";
     public static final String EDIT_ACCESS_INVALID = "edit_access_invalid";
@@ -31,6 +32,7 @@ public class Translation {
     public static final String PLAYER_NOT_FOUND = "player_not_found";
     public static final String PROTECTION_NOTIFY = "protection_notify";
     public static final String PROTECTION_NOTIFY_GENERIC = "protection_notify_generic";
+    public static final String PURGE = "purge";
     public static final String LOCKED = "locked";
     public static final String INFO = "info";
     public static final String UNKNOWN = "unknown";

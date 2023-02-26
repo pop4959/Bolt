@@ -18,7 +18,9 @@ public class AdminCommand extends BoltCommand {
         subcommands.putAll(Map.of(
                 "convert", new AdminConvertCommand(plugin),
                 "debug", new AdminDebugCommand(plugin),
-                "report", new AdminReportCommand(plugin)
+                "purge", new AdminPurgeCommand(plugin),
+                "report", new AdminReportCommand(plugin),
+                "transfer", new AdminTransferCommand(plugin)
         ));
     }
 

@@ -257,7 +257,7 @@ public final class EntityListener implements Listener {
                     BoltComponents.sendMessage(player, Optional.ofNullable(protection).map(Protection::toString).toString());
             case TRANSFER -> {
                 if (protection != null) {
-                    if (player.getUniqueId().equals(protection.getOwner())) {
+                    if (player.getUniqueId().equals(protection.getOwner()) || action.isAdmin()) {
                         final UUID uuid = UUID.fromString(action.getData());
                         protection.setOwner(uuid);
                         plugin.saveProtection(protection);
