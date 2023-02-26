@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class LWCMigration {
@@ -112,7 +113,8 @@ public class LWCMigration {
                     if (rights.getType() == Permission.Type.GROUP.ordinal()) {
                         access.put(Source.from(Source.GROUP, rights.getName()), accessType);
                     } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
-                        access.put(Source.from(Source.PLAYER, rights.getName()), accessType);
+                        final CompletableFuture<UUID> uuid = BukkitAdapter.findOrLookupPlayerUniqueId(rights.getName());
+                        access.put(Source.from(Source.PLAYER, Objects.requireNonNullElse(uuid, BukkitAdapter.NIL_UUID).toString()), accessType);
                     } else if (rights.getType() == Permission.Type.TOWN.ordinal()) {
                         access.put(Source.from(Source.TOWN, rights.getName()), accessType);
                     } else if (rights.getType() == Permission.Type.REGION.ordinal()) {
