@@ -4,16 +4,30 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
+import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class SmallDripleafMatcher implements BlockMatcher {
+    private boolean enabled;
+
+    @Override
+    public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
+        enabled = protectableBlocks.contains(Material.SMALL_DRIPLEAF);
+    }
+
+    @Override
+    public boolean enabled() {
+        return enabled;
+    }
+
     @Override
     public boolean canMatch(Block block) {
-        return true;
+        return enabled;
     }
 
     @Override

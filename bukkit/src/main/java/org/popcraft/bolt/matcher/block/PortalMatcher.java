@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Orientable;
+import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.EnumSet;
@@ -16,10 +17,21 @@ public class PortalMatcher implements BlockMatcher {
     private static final EnumSet<BlockFace> CARTESIAN_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN);
     private static final EnumSet<BlockFace> X_FACES = EnumSet.of(BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN);
     private static final EnumSet<BlockFace> Z_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.UP, BlockFace.DOWN);
+    private boolean enabled;
+
+    @Override
+    public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
+        enabled = protectableBlocks.contains(Material.NETHER_PORTAL);
+    }
+
+    @Override
+    public boolean enabled() {
+        return enabled;
+    }
 
     @Override
     public boolean canMatch(Block block) {
-        return Material.OBSIDIAN.equals(block.getType()) || Material.NETHER_PORTAL.equals(block.getType());
+        return enabled && (Material.OBSIDIAN.equals(block.getType()) || Material.NETHER_PORTAL.equals(block.getType()));
     }
 
     @Override

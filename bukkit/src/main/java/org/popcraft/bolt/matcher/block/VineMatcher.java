@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.MultipleFacing;
+import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.EnumSet;
@@ -13,10 +14,21 @@ import java.util.Set;
 
 public class VineMatcher implements BlockMatcher {
     private static final EnumSet<BlockFace> VINE_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.DOWN);
+    private boolean enabled;
+
+    @Override
+    public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
+        enabled = protectableBlocks.contains(Material.VINE);
+    }
+
+    @Override
+    public boolean enabled() {
+        return enabled;
+    }
 
     @Override
     public boolean canMatch(Block block) {
-        return true;
+        return enabled;
     }
 
     @Override

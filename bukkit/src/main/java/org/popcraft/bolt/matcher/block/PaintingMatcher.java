@@ -1,9 +1,11 @@
 package org.popcraft.bolt.matcher.block;
 
 import org.bukkit.Art;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Painting;
 import org.bukkit.util.BoundingBox;
 import org.popcraft.bolt.matcher.Match;
@@ -13,9 +15,21 @@ import java.util.Optional;
 import java.util.Set;
 
 public class PaintingMatcher implements BlockMatcher {
+    private boolean enabled;
+
+    @Override
+    public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
+        enabled = protectableEntities.contains(EntityType.PAINTING);
+    }
+
+    @Override
+    public boolean enabled() {
+        return enabled;
+    }
+
     @Override
     public boolean canMatch(Block block) {
-        return true;
+        return enabled;
     }
 
     @Override

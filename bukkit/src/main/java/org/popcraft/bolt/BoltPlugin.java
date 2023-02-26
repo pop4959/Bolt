@@ -145,6 +145,8 @@ public class BoltPlugin extends JavaPlugin {
             new GlowLichenMatcher(), new LilyPadMatcher(), new RepeaterMatcher(), new SporeBlossomMatcher(),
             new SoulFireMatcher(), new FrogspawnMatcher(), new MangrovePropaguleMatcher(), new SkulkVeinMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
+    private final List<BlockMatcher> enabledBlockMatchers = new ArrayList<>();
+    private final List<EntityMatcher> enabledEntityMatchers = new ArrayList<>();
     private final Map<String, BoltCommand> commands = new HashMap<>();
     private final Path profileCachePath = getDataFolder().toPath().resolve("profiles");
     private final ProfileCache profileCache = new SimpleProfileCache(profileCachePath);
@@ -171,6 +173,7 @@ public class BoltPlugin extends JavaPlugin {
         Translator.load(getDataFolder().toPath(), getConfig().getString("language", "en"));
         registerAccessTypes();
         registerProtectableAccess();
+        initializeMatchers();
         BoltComponents.enable(this);
         registerEvents();
         registerCommands();
@@ -285,6 +288,23 @@ public class BoltPlugin extends JavaPlugin {
     private <T extends Keyed> Tag<T> resolveTagProtectableAccess(final String registry, final Class<T> clazz, final String name) {
         final NamespacedKey tagKey = NamespacedKey.fromString(name);
         return tagKey == null ? null : getServer().getTag(registry, tagKey, clazz);
+    }
+
+    private void initializeMatchers() {
+        enabledBlockMatchers.clear();
+        enabledEntityMatchers.clear();
+        BLOCK_MATCHERS.forEach(blockMatcher -> blockMatcher.initialize(protectableBlocks.keySet(), protectableEntities.keySet()));
+        ENTITY_MATCHERS.forEach(entityMatcher -> entityMatcher.initialize(protectableBlocks.keySet(), protectableEntities.keySet()));
+        for (final BlockMatcher blockMatcher : BLOCK_MATCHERS) {
+            if (blockMatcher.enabled()) {
+                enabledBlockMatchers.add(blockMatcher);
+            }
+        }
+        for (final EntityMatcher entityMatcher : ENTITY_MATCHERS) {
+            if (entityMatcher.enabled()) {
+                enabledEntityMatchers.add(entityMatcher);
+            }
+        }
     }
 
     private void registerEvents() {
@@ -458,7 +478,7 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     private Protection matchProtection(final Block block) {
-        for (final BlockMatcher blockMatcher : BLOCK_MATCHERS) {
+        for (final BlockMatcher blockMatcher : enabledBlockMatchers) {
             if (blockMatcher.canMatch(block)) {
                 final Optional<Match> optionalMatch = blockMatcher.findMatch(block);
                 if (optionalMatch.isPresent()) {
@@ -482,7 +502,7 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     private Protection matchProtection(final Entity entity) {
-        for (final EntityMatcher entityMatcher : ENTITY_MATCHERS) {
+        for (final EntityMatcher entityMatcher : enabledEntityMatchers) {
             if (entityMatcher.canMatch(entity)) {
                 final Optional<Match> optionalMatch = entityMatcher.findMatch(entity);
                 if (optionalMatch.isPresent()) {
