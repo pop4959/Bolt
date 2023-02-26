@@ -1,7 +1,7 @@
 version: 0
 language: en
 settings:
-  use-action-bar: true
+  use-action-bar: false
 database:
   type: sqlite
   path: plugins/Bolt/bolt.db
