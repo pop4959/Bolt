@@ -1,5 +1,6 @@
 package org.popcraft.bolt.listeners;
 
+import org.bukkit.Location;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -40,7 +41,7 @@ public final class InventoryListener implements Listener {
             e.setCancelled(true);
             return;
         }
-        final Protection protection = getHolderProtection(e.getInventory().getHolder());
+        final Protection protection = getInventoryProtection(e.getInventory());
         if (protection != null && !plugin.canAccess(protection, player, Permission.OPEN)) {
             e.setCancelled(true);
         }
@@ -66,7 +67,7 @@ public final class InventoryListener implements Listener {
         if (InventoryType.PLAYER.equals(clickedInventoryType) && !InventoryAction.COLLECT_TO_CURSOR.equals(action) && !InventoryAction.MOVE_TO_OTHER_INVENTORY.equals(action)) {
             return;
         }
-        final Protection protection = getHolderProtection(e.getInventory().getHolder());
+        final Protection protection = getInventoryProtection(e.getInventory());
         // There isn't a protection
         if (protection == null) {
             return;
@@ -104,7 +105,7 @@ public final class InventoryListener implements Listener {
         for (int rawSlot : e.getRawSlots()) {
             final Inventory slotInventory = e.getView().getInventory(rawSlot);
             if (slotInventory != null && !InventoryType.PLAYER.equals(slotInventory.getType())) {
-                final Protection protection = getHolderProtection(slotInventory.getHolder());
+                final Protection protection = getInventoryProtection(slotInventory);
                 if (protection != null && !plugin.canAccess(protection, player, Permission.DEPOSIT)) {
                     e.setCancelled(true);
                     return;
@@ -115,8 +116,8 @@ public final class InventoryListener implements Listener {
 
     @EventHandler
     public void onInventoryMoveItem(final InventoryMoveItemEvent e) {
-        Protection sourceProtection = getHolderProtection(e.getSource().getHolder());
-        Protection destinationProtection = getHolderProtection(e.getDestination().getHolder());
+        final Protection sourceProtection = getInventoryProtection(e.getSource());
+        final Protection destinationProtection = getInventoryProtection(e.getDestination());
         if (sourceProtection == null && destinationProtection == null) {
             return;
         }
@@ -141,17 +142,26 @@ public final class InventoryListener implements Listener {
         }
     }
 
-    private Protection getHolderProtection(final InventoryHolder inventoryHolder) {
-        final Protection protection;
-        if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
-            protection = plugin.findProtection(blockInventoryHolder.getBlock()).orElse(null);
-        } else if (inventoryHolder instanceof final DoubleChest doubleChest) {
-            protection = plugin.findProtection(doubleChest.getLocation().getBlock()).orElse(null);
-        } else if (inventoryHolder instanceof final Entity entity) {
-            protection = plugin.findProtection(entity).orElse(null);
-        } else {
-            protection = null;
-        }
-        return protection;
+    private Protection getInventoryProtection(final Inventory inventory) {
+        return switch (inventory.getType()) {
+            case ANVIL, BARREL, BEACON, BLAST_FURNACE, BREWING, CARTOGRAPHY, CHEST, CHISELED_BOOKSHELF, COMPOSTER,
+                    DISPENSER, DROPPER, ENCHANTING, ENDER_CHEST, FURNACE, GRINDSTONE, LECTERN, LOOM, SHULKER_BOX,
+                    SMITHING, SMOKER, STONECUTTER, WORKBENCH -> {
+                final Location inventoryLocation = inventory.getLocation();
+                yield inventoryLocation == null ? null : plugin.findProtection(inventoryLocation.getBlock()).orElse(null);
+            }
+            default -> {
+                final InventoryHolder inventoryHolder = inventory.getHolder();
+                if (inventoryHolder instanceof final Entity entity) {
+                    yield plugin.findProtection(entity).orElse(null);
+                } else if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
+                    yield plugin.findProtection(blockInventoryHolder.getBlock()).orElse(null);
+                } else if (inventoryHolder instanceof final DoubleChest doubleChest) {
+                    yield plugin.findProtection(doubleChest.getLocation().getBlock()).orElse(null);
+                } else {
+                    yield null;
+                }
+            }
+        };
     }
 }
