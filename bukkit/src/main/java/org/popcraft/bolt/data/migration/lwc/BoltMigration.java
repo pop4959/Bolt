@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,7 +35,11 @@ public class BoltMigration {
         this.plugin = plugin;
     }
 
-    public void convert() {
+    public CompletableFuture<Void> convertAsync() {
+        return CompletableFuture.runAsync(this::convert);
+    }
+
+    private void convert() {
         final Map<String, Integer> blockIds = new HashMap<>();
         final AtomicInteger blockId = new AtomicInteger();
         final Set<BlockLocation> existing = new HashSet<>();

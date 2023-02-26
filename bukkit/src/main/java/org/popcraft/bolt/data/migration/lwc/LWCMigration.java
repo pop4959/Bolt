@@ -39,7 +39,11 @@ public class LWCMigration {
         this.plugin = plugin;
     }
 
-    public MemoryStore convert() {
+    public CompletableFuture<MemoryStore> convertAsync() {
+        return CompletableFuture.supplyAsync(this::convert);
+    }
+
+    private MemoryStore convert() {
         final MemoryStore store = new MemoryStore();
         final Map<Integer, Block> blocks = new HashMap<>();
         final List<Protection> protections = new ArrayList<>();
