@@ -20,7 +20,7 @@ public class SignMatcher implements BlockMatcher {
 
     @Override
     public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
-        enabled = protectableBlocks.stream().anyMatch(Tag.ALL_SIGNS::isTagged);
+        enabled = protectableBlocks.stream().anyMatch(material -> Tag.SIGNS.isTagged(material) || Tag.WALL_SIGNS.isTagged(material));
     }
 
     @Override
