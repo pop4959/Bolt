@@ -58,6 +58,11 @@ public class MemoryStore implements Store {
     }
 
     @Override
+    public long pendingSave() {
+        return 0;
+    }
+
+    @Override
     public CompletableFuture<Void> flush() {
         return CompletableFuture.completedFuture(null);
     }

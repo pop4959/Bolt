@@ -283,6 +283,11 @@ public class SQLStore implements Store {
     }
 
     @Override
+    public long pendingSave() {
+        return CompletableFuture.supplyAsync(() -> saveBlocks.size() + removeBlocks.size() + saveEntities.size() + removeEntities.size(), executor).join();
+    }
+
+    @Override
     public CompletableFuture<Void> flush() {
         final CompletableFuture<Void> completionFuture = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {

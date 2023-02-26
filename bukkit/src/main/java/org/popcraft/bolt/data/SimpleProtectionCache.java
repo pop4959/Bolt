@@ -72,6 +72,11 @@ public class SimpleProtectionCache implements Store {
     }
 
     @Override
+    public long pendingSave() {
+        return backingStore.pendingSave();
+    }
+
+    @Override
     public CompletableFuture<Void> flush() {
         return backingStore.flush();
     }

@@ -182,6 +182,15 @@ public class BoltPlugin extends JavaPlugin {
         registerCustomCharts(metrics);
     }
 
+    @Override
+    public void onDisable() {
+        BoltComponents.disable();
+        HandlerList.unregisterAll(this);
+        commands.clear();
+        getLogger().info("Flushing protection updates (%d)".formatted(bolt.getStore().pendingSave()));
+        bolt.getStore().flush().join();
+    }
+
     private void registerCustomCharts(final Metrics metrics) {
         metrics.addCustomChart(new SimplePie("config_language", () -> getConfig().getString("language", "en")));
         metrics.addCustomChart(new SimplePie("config_database", () -> getConfig().getString("database.type", "sqlite")));
@@ -215,14 +224,6 @@ public class BoltPlugin extends JavaPlugin {
         }));
         metrics.addCustomChart(new SimplePie("protections_blocks", () -> String.valueOf((int) Math.ceil(bolt.getStore().loadBlockProtections().join().size() / 1000f) * 1000)));
         metrics.addCustomChart(new SimplePie("protections_entities", () -> String.valueOf((int) Math.ceil(bolt.getStore().loadEntityProtections().join().size() / 1000f) * 1000)));
-    }
-
-    @Override
-    public void onDisable() {
-        BoltComponents.disable();
-        HandlerList.unregisterAll(this);
-        commands.clear();
-        this.bolt.getStore().flush().join();
     }
 
     private void registerAccessTypes() {

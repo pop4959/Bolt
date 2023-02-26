@@ -25,5 +25,7 @@ public interface Store {
 
     void removeEntityProtection(EntityProtection protection);
 
+    long pendingSave();
+
     CompletableFuture<Void> flush();
 }
