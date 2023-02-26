@@ -53,7 +53,7 @@ public final class BukkitAdapter {
     }
 
     public static UUID findPlayerUniqueId(final String name) {
-        if (name == null || NIL_UUID_STRING.equals(name)) {
+        if (name == null || name.isEmpty() || NIL_UUID_STRING.equals(name)) {
             return null;
         }
         try {
@@ -73,6 +73,9 @@ public final class BukkitAdapter {
     }
 
     public static CompletableFuture<UUID> lookupPlayerUniqueId(final String name) {
+        if (name == null || name.isEmpty() || NIL_UUID_STRING.equals(name)) {
+            return null;
+        }
         final PlayerProfile playerProfile = Bukkit.createPlayerProfile(name);
         final CompletableFuture<PlayerProfile> updatedProfile = playerProfile.update();
         updatedProfile.thenAccept(profile -> {
@@ -93,12 +96,15 @@ public final class BukkitAdapter {
     }
 
     public static String findPlayerName(final UUID uuid) {
+        if (uuid == null || NIL_UUID.equals(uuid)) {
+            return null;
+        }
         final ProfileCache profileCache = JavaPlugin.getPlugin(BoltPlugin.class).getProfileCache();
         return profileCache.getName(uuid);
     }
 
     public static CompletableFuture<String> lookupPlayerName(final UUID uuid) {
-        if (NIL_UUID.equals(uuid)) {
+        if (uuid == null || NIL_UUID.equals(uuid)) {
             return CompletableFuture.completedFuture(null);
         }
         final PlayerProfile playerProfile = Bukkit.createPlayerProfile(uuid);
