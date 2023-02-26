@@ -1,9 +1,9 @@
 package org.popcraft.bolt.lang;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -27,7 +27,7 @@ public final class Translator {
         if (directory != null) {
             final Path filePath = directory.resolve(language + ".properties");
             if (Files.exists(filePath)) {
-                translations = loadTranslationFromFile(filePath.toFile());
+                translations = loadTranslationFromFile(filePath);
                 return;
             }
         }
@@ -47,9 +47,9 @@ public final class Translator {
         return properties;
     }
 
-    private static Properties loadTranslationFromFile(final File file) {
+    private static Properties loadTranslationFromFile(final Path path) {
         final Properties properties = new Properties();
-        try (final InputStream input = new FileInputStream(file)) {
+        try (final BufferedReader input = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             properties.load(input);
         } catch (IOException e) {
             e.printStackTrace();
