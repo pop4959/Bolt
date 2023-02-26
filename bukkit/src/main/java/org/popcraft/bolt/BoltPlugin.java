@@ -185,7 +185,7 @@ public class BoltPlugin extends JavaPlugin {
         BoltComponents.disable();
         HandlerList.unregisterAll(this);
         commands.clear();
-        getLogger().info("Flushing protection updates (%d)".formatted(bolt.getStore().pendingSave()));
+        getLogger().info(() -> "Flushing protection updates (%d)".formatted(bolt.getStore().pendingSave()));
         bolt.getStore().flush().join();
     }
 
