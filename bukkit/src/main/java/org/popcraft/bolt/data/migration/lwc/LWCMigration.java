@@ -113,7 +113,7 @@ public class LWCMigration {
                     if (rights.getType() == Permission.Type.GROUP.ordinal()) {
                         access.put(Source.from(Source.GROUP, rights.getName()), accessType);
                     } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
-                        final CompletableFuture<UUID> uuid = BukkitAdapter.findOrLookupPlayerUniqueId(rights.getName());
+                        final UUID uuid = BukkitAdapter.findOrLookupPlayerUniqueId(rights.getName()).join();
                         access.put(Source.from(Source.PLAYER, Objects.requireNonNullElse(uuid, BukkitAdapter.NIL_UUID).toString()), accessType);
                     } else if (rights.getType() == Permission.Type.TOWN.ordinal()) {
                         access.put(Source.from(Source.TOWN, rights.getName()), accessType);
