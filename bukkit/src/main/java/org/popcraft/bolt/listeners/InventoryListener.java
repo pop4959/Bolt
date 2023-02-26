@@ -144,9 +144,7 @@ public final class InventoryListener implements Listener {
 
     private Protection getInventoryProtection(final Inventory inventory) {
         return switch (inventory.getType()) {
-            case ANVIL, BARREL, BEACON, BLAST_FURNACE, BREWING, CARTOGRAPHY, CHEST, CHISELED_BOOKSHELF, COMPOSTER,
-                    DISPENSER, DROPPER, ENCHANTING, ENDER_CHEST, FURNACE, GRINDSTONE, LECTERN, LOOM, SHULKER_BOX,
-                    SMITHING, SMOKER, STONECUTTER, WORKBENCH -> {
+            case BARREL, BLAST_FURNACE, CHEST, DISPENSER, DROPPER, FURNACE, SHULKER_BOX, SMOKER -> {
                 final Location inventoryLocation = inventory.getLocation();
                 yield inventoryLocation == null ? null : plugin.findProtection(inventoryLocation.getBlock()).orElse(null);
             }
