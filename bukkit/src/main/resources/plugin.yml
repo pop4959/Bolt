@@ -19,9 +19,7 @@ permissions:
     default: false
   bolt.command:
     default: true
-  bolt.command.convert:
-    default: op
-  bolt.command.debug:
+  bolt.command.admin:
     default: op
   bolt.command.edit:
     default: true
@@ -33,8 +31,6 @@ permissions:
     default: true
   bolt.command.password:
     default: true
-  bolt.command.report:
-    default: op
   bolt.command.transfer:
     default: true
   bolt.command.unlock:

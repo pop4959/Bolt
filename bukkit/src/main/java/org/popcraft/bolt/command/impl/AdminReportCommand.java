@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ReportCommand extends BoltCommand {
+public class AdminReportCommand extends BoltCommand {
     private long previousHits;
     private long previousMisses;
     private Map<Metrics.ProtectionAccess, Long> previousExecutionCounts;
 
-    public ReportCommand(BoltPlugin plugin) {
+    public AdminReportCommand(BoltPlugin plugin) {
         super(plugin);
     }
 

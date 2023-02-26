@@ -21,14 +21,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
-import org.popcraft.bolt.command.impl.ConvertCommand;
-import org.popcraft.bolt.command.impl.DebugCommand;
+import org.popcraft.bolt.command.impl.AdminCommand;
 import org.popcraft.bolt.command.impl.EditCommand;
 import org.popcraft.bolt.command.impl.InfoCommand;
 import org.popcraft.bolt.command.impl.LockCommand;
 import org.popcraft.bolt.command.impl.ModeCommand;
 import org.popcraft.bolt.command.impl.PasswordCommand;
-import org.popcraft.bolt.command.impl.ReportCommand;
 import org.popcraft.bolt.command.impl.TransferCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
 import org.popcraft.bolt.data.ProfileCache;
@@ -321,14 +319,12 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        commands.put("convert", new ConvertCommand(this));
-        commands.put("debug", new DebugCommand(this));
+        commands.put("admin", new AdminCommand(this));
         commands.put("edit", new EditCommand(this));
         commands.put("info", new InfoCommand(this));
         commands.put("lock", new LockCommand(this));
         commands.put("mode", new ModeCommand(this));
         commands.put("password", new PasswordCommand(this));
-        commands.put("report", new ReportCommand(this));
         commands.put("transfer", new TransferCommand(this));
         commands.put("unlock", new UnlockCommand(this));
     }

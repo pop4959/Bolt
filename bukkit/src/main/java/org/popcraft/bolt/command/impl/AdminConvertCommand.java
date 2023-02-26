@@ -8,17 +8,17 @@ import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.data.migration.lwc.BoltMigration;
 import org.popcraft.bolt.data.migration.lwc.LWCMigration;
+import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.BukkitMainThreadExecutor;
 
 import java.util.Collections;
 import java.util.List;
 
-public class ConvertCommand extends BoltCommand {
-    public ConvertCommand(BoltPlugin plugin) {
+public class AdminConvertCommand extends BoltCommand {
+    public AdminConvertCommand(BoltPlugin plugin) {
         super(plugin);
     }
 
