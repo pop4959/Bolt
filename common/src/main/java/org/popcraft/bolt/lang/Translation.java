@@ -33,6 +33,7 @@ public class Translation {
     public static final String PROTECTION_NOTIFY = "protection_notify";
     public static final String PROTECTION_NOTIFY_GENERIC = "protection_notify_generic";
     public static final String PURGE = "purge";
+    public static final String RELOAD = "reload";
     public static final String LOCKED = "locked";
     public static final String INFO = "info";
     public static final String UNKNOWN = "unknown";
