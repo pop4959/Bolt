@@ -37,6 +37,8 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.lang.Strings;
+import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Access;
@@ -47,8 +49,6 @@ import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Protections;
-import org.popcraft.bolt.lang.Strings;
-import org.popcraft.bolt.lang.Translation;
 import org.spigotmc.event.entity.EntityMountEvent;
 
 import java.util.Optional;
@@ -94,7 +94,7 @@ public final class EntityListener implements Listener {
         final EntityProtection newProtection = BukkitAdapter.createEntityProtection(entity, player.getUniqueId(), defaultAccess.type());
         plugin.getBolt().getStore().saveEntityProtection(newProtection);
         if (!plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
-            BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(entity)));
+            BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(entity)));
         }
     }
 
@@ -104,7 +104,7 @@ public final class EntityListener implements Listener {
         plugin.findProtection(entity).ifPresent(protection -> {
             plugin.removeProtection(protection);
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent entityDamageByEntityEvent && getDamagerSource(entityDamageByEntityEvent.getDamager()) instanceof final Player player && plugin.canAccess(protection, player, Permission.DESTROY)) {
-                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
+                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
             }
         });
     }
@@ -144,7 +144,7 @@ public final class EntityListener implements Listener {
                 plugin.findProtection(entity).ifPresent(protection -> {
                     plugin.removeProtection(protection);
                     if (plugin.canAccess(protection, player, Permission.DESTROY)) {
-                        BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
+                        BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
                     }
                 });
             }
@@ -169,7 +169,7 @@ public final class EntityListener implements Listener {
             if (!plugin.canAccess(protection, player, permission)) {
                 shouldCancel = true;
                 if (shouldSendMessage && !hasNotifyPermission) {
-                    BoltComponents.sendMessage(player, Translation.LOCKED, Placeholder.unparsed("type", Protections.displayType(protection)));
+                    BoltComponents.sendMessage(player, Translation.LOCKED, plugin.isUseActionBar(), Placeholder.unparsed("type", Protections.displayType(protection)));
                 }
             }
             if (shouldSendMessage && hasNotifyPermission) {
@@ -177,9 +177,9 @@ public final class EntityListener implements Listener {
                     final boolean isYou = player.getUniqueId().equals(protection.getOwner());
                     final String owner = isYou ? translate(Translation.YOU) : name;
                     if (owner == null) {
-                        BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY_GENERIC, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
+                        BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY_GENERIC, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
                     } else {
-                        BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner));
+                        BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner));
                     }
                 });
             }
@@ -206,15 +206,15 @@ public final class EntityListener implements Listener {
                     if (protection.getOwner().equals(player.getUniqueId()) && !protection.getType().equals(protectionType)) {
                         protection.setType(protectionType);
                         plugin.saveProtection(protection);
-                        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_CHANGED, Placeholder.unparsed("type", protectionType));
+                        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_CHANGED, plugin.isUseActionBar(), Placeholder.unparsed("type", protectionType));
                     } else {
-                        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, Placeholder.unparsed("type", Protections.displayType(protection)));
+                        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, plugin.isUseActionBar(), Placeholder.unparsed("type", Protections.displayType(protection)));
                     }
                 } else if (plugin.isProtectable(entity)) {
                     final EntityProtection newProtection = BukkitAdapter.createEntityProtection(entity, boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
                     plugin.getBolt().getStore().saveEntityProtection(newProtection);
                     boltPlayer.setLockNil(false);
-                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(entity)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(entity)));
                 } else {
                     return true;
                 }
@@ -222,16 +222,16 @@ public final class EntityListener implements Listener {
             case UNLOCK -> {
                 if (protection != null) {
                     plugin.removeProtection(protection);
-                    BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
                 } else {
-                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, plugin.isUseActionBar(), Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
             }
             case INFO -> {
                 if (protection != null) {
                     BukkitAdapter.findOrLookupPlayerName(protection.getOwner()).thenAccept(owner -> BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner), Placeholder.unparsed("access_count", String.valueOf(protection.getAccess().size())), Placeholder.unparsed("access_list", Protections.accessList(protection))));
                 } else {
-                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, plugin.isUseActionBar(), Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
             }
             case EDIT -> {
@@ -245,12 +245,12 @@ public final class EntityListener implements Listener {
                             }
                         });
                         plugin.saveProtection(protection);
-                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
+                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
                     } else {
-                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_PERMISSION);
+                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_PERMISSION, plugin.isUseActionBar());
                     }
                 } else {
-                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, plugin.isUseActionBar(), Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
             }
             case DEBUG ->
@@ -261,12 +261,12 @@ public final class EntityListener implements Listener {
                         final UUID uuid = UUID.fromString(action.getData());
                         protection.setOwner(uuid);
                         plugin.saveProtection(protection);
-                        BukkitAdapter.findOrLookupPlayerName(uuid).thenAccept(owner -> BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(owner).orElse(translate(Translation.UNKNOWN)))));
+                        BukkitAdapter.findOrLookupPlayerName(uuid).thenAccept(owner -> BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(owner).orElse(translate(Translation.UNKNOWN)))));
                     } else {
-                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER);
+                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER, plugin.isUseActionBar());
                     }
                 } else {
-                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, Placeholder.unparsed("type", Protections.displayType(entity)));
+                    BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, plugin.isUseActionBar(), Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
             }
         }
@@ -284,7 +284,7 @@ public final class EntityListener implements Listener {
                 e.setCancelled(true);
             } else {
                 plugin.removeProtection(protection);
-                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
+                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
             }
         }
     }

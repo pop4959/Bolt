@@ -1,6 +1,7 @@
 package org.popcraft.bolt.util;
 
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
@@ -31,6 +32,18 @@ public final class BoltComponents {
     }
 
     public static void sendMessage(final CommandSender sender, String key, TagResolver... placeholders) {
-        adventure.sender(sender).sendMessage(miniMessage.deserialize(translate(key), placeholders));
+        adventure.sender(sender).sendMessage(resolveTranslation(key, placeholders));
+    }
+
+    public static void sendMessage(final CommandSender sender, String key, boolean actionBar, TagResolver... placeholders) {
+        if (actionBar) {
+            adventure.sender(sender).sendActionBar(resolveTranslation(key, placeholders));
+        } else {
+            adventure.sender(sender).sendMessage(resolveTranslation(key, placeholders));
+        }
+    }
+
+    private static Component resolveTranslation(String key, TagResolver... placeholders) {
+        return miniMessage.deserialize(translate(key), placeholders);
     }
 }

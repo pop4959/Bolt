@@ -26,15 +26,17 @@ import org.popcraft.bolt.command.impl.DebugCommand;
 import org.popcraft.bolt.command.impl.EditCommand;
 import org.popcraft.bolt.command.impl.InfoCommand;
 import org.popcraft.bolt.command.impl.LockCommand;
-import org.popcraft.bolt.command.impl.PasswordCommand;
 import org.popcraft.bolt.command.impl.ModeCommand;
+import org.popcraft.bolt.command.impl.PasswordCommand;
 import org.popcraft.bolt.command.impl.ReportCommand;
 import org.popcraft.bolt.command.impl.TransferCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
-import org.popcraft.bolt.data.SQLStore;
-import org.popcraft.bolt.data.SimpleProtectionCache;
-import org.popcraft.bolt.data.SimpleProfileCache;
 import org.popcraft.bolt.data.ProfileCache;
+import org.popcraft.bolt.data.SQLStore;
+import org.popcraft.bolt.data.SimpleProfileCache;
+import org.popcraft.bolt.data.SimpleProtectionCache;
+import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.lang.Translator;
 import org.popcraft.bolt.listeners.BlockListener;
 import org.popcraft.bolt.listeners.EntityListener;
 import org.popcraft.bolt.listeners.InventoryListener;
@@ -110,8 +112,6 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Permissible;
-import org.popcraft.bolt.lang.Translation;
-import org.popcraft.bolt.lang.Translator;
 import org.popcraft.bolt.util.Source;
 
 import java.nio.file.Path;
@@ -154,11 +154,13 @@ public class BoltPlugin extends JavaPlugin {
     private final Map<EntityType, Access> protectableEntities = new EnumMap<>(EntityType.class);
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
+    private boolean useActionBar;
     private Bolt bolt;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        this.useActionBar = getConfig().getBoolean("settings.use-action-bar", false);
         final SQLStore.Configuration databaseConfiguration = new SQLStore.Configuration(
                 getConfig().getString("database.type", "sqlite"),
                 getConfig().getString("database.path", "plugins/Bolt/bolt.db"),
@@ -368,6 +370,10 @@ public class BoltPlugin extends JavaPlugin {
 
     public Bolt getBolt() {
         return bolt;
+    }
+
+    public boolean isUseActionBar() {
+        return useActionBar;
     }
 
     public ProfileCache getProfileCache() {
