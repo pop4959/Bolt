@@ -50,7 +50,7 @@ public class EditCommand extends BoltCommand {
         while ((source = arguments.next()) != null) {
             final Source parsed = Source.parse(source);
             if (SourceType.REDSTONE.equals(parsed.getType()) || SourceType.BLOCK.equals(parsed.getType())) {
-                boltPlayer.getModifications().put(Source.of(source), access.type());
+                boltPlayer.getModifications().put(Source.of(parsed.getType()), access.type());
             } else if (SourceType.PASSWORD.equals(parsed.getType())) {
                 boltPlayer.getModifications().put(Source.password(parsed.getIdentifier()), access.type());
             } else {
