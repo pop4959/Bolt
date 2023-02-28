@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class BoltPlayer implements SourceResolver {
+public class BoltPlayer {
     private final UUID uuid;
     private final Map<Source, String> modifications = new HashMap<>();
     private final Set<Source> sources = new HashSet<>();
@@ -97,8 +97,7 @@ public class BoltPlayer implements SourceResolver {
         sources.add(Source.password(password));
     }
 
-    @Override
-    public boolean resolve(Source source) {
-        return sources.contains(source);
+    public Set<Source> sources() {
+        return sources;
     }
 }

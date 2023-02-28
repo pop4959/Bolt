@@ -108,6 +108,7 @@ import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.SourceResolver;
@@ -457,19 +458,13 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     public boolean canAccess(final Protection protection, final UUID uuid, final String... permissions) {
-        return canAccess(protection, bolt.getBoltPlayer(uuid), permissions);
+        return canAccess(protection, new BukkitPlayerResolver(bolt.getBoltPlayer(uuid)), permissions);
     }
 
     public boolean canAccess(final Protection protection, final SourceResolver sourceResolver, String... permissions) {
         final Source ownerSource = Source.player(protection.getOwner());
         if (sourceResolver.resolve(ownerSource)) {
             return true;
-        }
-        if (sourceResolver instanceof final BoltPlayer boltPlayer) {
-            final Player permissiblePlayer = getServer().getPlayer(boltPlayer.getUuid());
-            if (permissiblePlayer != null && permissiblePlayer.hasPermission("bolt.admin")) {
-                return true;
-            }
         }
         final AccessRegistry accessRegistry = bolt.getAccessRegistry();
         final Set<String> heldPermissions = new HashSet<>();
