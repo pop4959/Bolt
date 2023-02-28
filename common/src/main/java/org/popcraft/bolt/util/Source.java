@@ -48,6 +48,9 @@ public final class Source {
     }
 
     public static Source parse(final String source) {
+        if (source == null) {
+            return null;
+        }
         final int split = source.indexOf(':');
         if (split < 0) {
             return new Source(source);

@@ -48,22 +48,18 @@ public class EditCommand extends BoltCommand {
         }
         String source;
         while ((source = arguments.next()) != null) {
-            if (SourceType.REDSTONE.equals(source) || SourceType.BLOCK.equals(source)) {
+            final Source parsed = Source.parse(source);
+            if (SourceType.REDSTONE.equals(parsed.getType()) || SourceType.BLOCK.equals(parsed.getType())) {
                 boltPlayer.getModifications().put(Source.of(source), access.type());
-            } else if (source.startsWith(SourceType.PASSWORD)) {
-                final String[] split = source.split(":");
-                if (split.length < 2) {
-                    BoltComponents.sendMessage(sender, Translation.EDIT_PASSWORD_INVALID);
-                    return;
-                }
-                boltPlayer.getModifications().put(Source.password(split[1]), access.type());
+            } else if (SourceType.PASSWORD.equals(parsed.getType())) {
+                boltPlayer.getModifications().put(Source.password(parsed.getIdentifier()), access.type());
             } else {
-                final String finalSource = source;
+                final String playerSource = source;
                 BukkitAdapter.findOrLookupPlayerUniqueId(source).thenAccept(uuid -> {
                     if (uuid != null) {
                         boltPlayer.getModifications().put(Source.player(uuid), access.type());
                     } else {
-                        BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", finalSource));
+                        BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", playerSource));
                     }
                 });
             }
