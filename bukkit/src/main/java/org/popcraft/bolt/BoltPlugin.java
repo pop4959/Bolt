@@ -158,7 +158,6 @@ public class BoltPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        this.useActionBar = getConfig().getBoolean("settings.use-action-bar", false);
         final SQLStore.Configuration databaseConfiguration = new SQLStore.Configuration(
                 getConfig().getString("database.type", "sqlite"),
                 getConfig().getString("database.path", "plugins/Bolt/bolt.db"),
@@ -191,6 +190,7 @@ public class BoltPlugin extends JavaPlugin {
     public void reload() {
         reloadConfig();
         Translator.load(getDataFolder().toPath(), getConfig().getString("language", "en"));
+        this.useActionBar = getConfig().getBoolean("settings.use-action-bar", false);
         registerAccessTypes();
         registerProtectableAccess();
         initializeMatchers();
