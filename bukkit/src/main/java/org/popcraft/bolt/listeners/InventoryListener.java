@@ -1,6 +1,8 @@
 package org.popcraft.bolt.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -24,7 +26,21 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Source;
 
+import java.util.EnumSet;
+import java.util.Map;
+
 public final class InventoryListener implements Listener {
+    private static final Map<InventoryType, EnumSet<Material>> INVENTORY_TYPE_BLOCKS = Map.of(
+            InventoryType.BARREL, EnumSet.of(Material.BARREL),
+            InventoryType.BLAST_FURNACE, EnumSet.of(Material.BLAST_FURNACE),
+            InventoryType.CHEST, EnumSet.of(Material.CHEST, Material.TRAPPED_CHEST),
+            InventoryType.DISPENSER, EnumSet.of(Material.DISPENSER),
+            InventoryType.DROPPER, EnumSet.of(Material.DROPPER),
+            InventoryType.FURNACE, EnumSet.of(Material.FURNACE),
+            InventoryType.HOPPER, EnumSet.of(Material.HOPPER),
+            InventoryType.SHULKER_BOX, EnumSet.of(Material.SHULKER_BOX),
+            InventoryType.SMOKER, EnumSet.of(Material.SMOKER)
+    );
     private final BoltPlugin plugin;
 
     public InventoryListener(final BoltPlugin plugin) {
@@ -143,23 +159,29 @@ public final class InventoryListener implements Listener {
     }
 
     private Protection getInventoryProtection(final Inventory inventory) {
-        return switch (inventory.getType()) {
-            case BARREL, BLAST_FURNACE, CHEST, DISPENSER, DROPPER, FURNACE, SHULKER_BOX, SMOKER -> {
-                final Location inventoryLocation = inventory.getLocation();
-                yield inventoryLocation == null ? null : plugin.findProtection(inventoryLocation.getBlock()).orElse(null);
-            }
-            default -> {
-                final InventoryHolder inventoryHolder = inventory.getHolder();
-                if (inventoryHolder instanceof final Entity entity) {
-                    yield plugin.findProtection(entity).orElse(null);
-                } else if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
-                    yield plugin.findProtection(blockInventoryHolder.getBlock()).orElse(null);
-                } else if (inventoryHolder instanceof final DoubleChest doubleChest) {
-                    yield plugin.findProtection(doubleChest.getLocation().getBlock()).orElse(null);
-                } else {
-                    yield null;
+        final InventoryType inventoryType = inventory.getType();
+        final EnumSet<Material> blockTypes = INVENTORY_TYPE_BLOCKS.get(inventoryType);
+        if (blockTypes != null) {
+            final Location inventoryLocation = inventory.getLocation();
+            if (inventoryLocation != null) {
+                final Block block = inventoryLocation.getBlock();
+                if (blockTypes.contains(block.getType())) {
+                    return plugin.findProtection(block).orElse(null);
                 }
             }
-        };
+        }
+        return getHolderProtection(inventory.getHolder());
+    }
+
+    private Protection getHolderProtection(final InventoryHolder inventoryHolder) {
+        if (inventoryHolder instanceof final Entity entity) {
+            return plugin.findProtection(entity).orElse(null);
+        } else if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
+            return plugin.findProtection(blockInventoryHolder.getBlock()).orElse(null);
+        } else if (inventoryHolder instanceof final DoubleChest doubleChest) {
+            return plugin.findProtection(doubleChest.getLocation().getBlock()).orElse(null);
+        } else {
+            return null;
+        }
     }
 }
