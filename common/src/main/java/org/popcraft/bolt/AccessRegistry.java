@@ -22,6 +22,11 @@ public class AccessRegistry {
         access.put(type, new Access(type, permissions));
     }
 
+    public void unregisterAll() {
+        protections.clear();
+        access.clear();
+    }
+
     public Optional<Access> getProtectionByType(String type) {
         return Optional.ofNullable(protections.get(type));
     }

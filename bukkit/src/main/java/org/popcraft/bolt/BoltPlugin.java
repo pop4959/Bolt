@@ -232,6 +232,7 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     private void registerAccessTypes() {
+        bolt.getAccessRegistry().unregisterAll();
         final ConfigurationSection protections = getConfig().getConfigurationSection("protections");
         if (protections != null) {
             for (final String type : protections.getKeys(false)) {
