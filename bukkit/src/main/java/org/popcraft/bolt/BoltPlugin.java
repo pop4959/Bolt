@@ -171,7 +171,6 @@ public class BoltPlugin extends JavaPlugin {
         );
         this.bolt = new Bolt(new SimpleProtectionCache(new SQLStore(databaseConfiguration)));
         reload();
-        initializeMatchers();
         BoltComponents.enable(this);
         registerEvents();
         registerCommands();
@@ -194,6 +193,7 @@ public class BoltPlugin extends JavaPlugin {
         Translator.load(getDataFolder().toPath(), getConfig().getString("language", "en"));
         registerAccessTypes();
         registerProtectableAccess();
+        initializeMatchers();
     }
 
     private void registerCustomCharts(final Metrics metrics) {
@@ -255,6 +255,8 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     private void registerProtectableAccess() {
+        protectableBlocks.clear();
+        protectableEntities.clear();
         final ConfigurationSection blocks = getConfig().getConfigurationSection("blocks");
         if (blocks != null) {
             for (final String key : blocks.getKeys(false)) {
