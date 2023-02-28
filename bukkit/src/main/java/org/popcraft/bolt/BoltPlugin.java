@@ -476,7 +476,7 @@ public class BoltPlugin extends JavaPlugin {
         final Set<String> heldPermissions = new HashSet<>();
         accessRegistry.getProtectionByType(protection.getType()).ifPresent(access -> heldPermissions.addAll(access.permissions()));
         protection.getAccess().forEach((source, accessType) -> {
-            if (sources.contains(source)) {
+            if (sources.contains(Source.parse(source))) {
                 accessRegistry.getAccessByType(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
             }
         });
