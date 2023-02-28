@@ -6,13 +6,14 @@ import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.Access;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Source;
-import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.util.SourceType;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -47,20 +48,20 @@ public class EditCommand extends BoltCommand {
         }
         String source;
         while ((source = arguments.next()) != null) {
-            if (Source.REDSTONE.equals(source) || Source.BLOCK.equals(source)) {
-                boltPlayer.getModifications().put(Source.from(source), access.type());
-            } else if (source.startsWith(Source.PASSWORD)) {
+            if (SourceType.REDSTONE.equals(source) || SourceType.BLOCK.equals(source)) {
+                boltPlayer.getModifications().put(Source.of(source), access.type());
+            } else if (source.startsWith(SourceType.PASSWORD)) {
                 final String[] split = source.split(":");
                 if (split.length < 2) {
                     BoltComponents.sendMessage(sender, Translation.EDIT_PASSWORD_INVALID);
                     return;
                 }
-                boltPlayer.getModifications().put(Source.fromPassword(split[1]), access.type());
+                boltPlayer.getModifications().put(Source.password(split[1]), access.type());
             } else {
                 final String finalSource = source;
                 BukkitAdapter.findOrLookupPlayerUniqueId(source).thenAccept(uuid -> {
                     if (uuid != null) {
-                        boltPlayer.getModifications().put(Source.fromPlayer(uuid), access.type());
+                        boltPlayer.getModifications().put(Source.player(uuid), access.type());
                     } else {
                         BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", finalSource));
                     }

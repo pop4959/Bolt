@@ -239,9 +239,9 @@ public final class EntityListener implements Listener {
                     if (plugin.canAccess(protection, player, Permission.EDIT)) {
                         boltPlayer.consumeModifications().forEach((source, type) -> {
                             if (Boolean.parseBoolean(action.getData())) {
-                                protection.getAccess().put(source, type);
+                                protection.getAccess().put(source.toString(), type);
                             } else {
-                                protection.getAccess().remove(source);
+                                protection.getAccess().remove(source.toString());
                             }
                         });
                         plugin.saveProtection(protection);

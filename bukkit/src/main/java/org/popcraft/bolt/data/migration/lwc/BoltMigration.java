@@ -10,6 +10,7 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Source;
+import org.popcraft.bolt.util.SourceType;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -122,7 +123,7 @@ public class BoltMigration {
             return ProtectionType.DISPLAY.ordinal();
         }
         final boolean password = blockProtection.getAccess().entrySet().stream()
-                .anyMatch(entry -> Source.PASSWORD.equals(Source.type(entry.getKey())));
+                .anyMatch(entry -> SourceType.PASSWORD.equals(Source.parse(entry.getKey()).getType()));
         if (password) {
             return ProtectionType.PASSWORD.ordinal();
         } else {
@@ -139,10 +140,9 @@ public class BoltMigration {
             data.setRights(rights);
             return data;
         }
-        blockProtection.getAccess().forEach((source, access) -> {
-            final String sourceType = Source.type(source);
-            final String sourceIdentifier = Source.identifier(source);
-            if (Source.BLOCK.equals(sourceType)) {
+        blockProtection.getAccess().forEach((entry, access) -> {
+            final Source source = Source.parse(entry);
+            if (SourceType.BLOCK.equals(source.getType())) {
                 final DataFlag dataFlag = new DataFlag();
                 dataFlag.setId(ProtectionFlag.HOPPER.ordinal());
                 flags.add(dataFlag);
@@ -152,18 +152,18 @@ public class BoltMigration {
                 case "admin" -> Permission.Access.ADMIN;
                 default -> null;
             };
-            final Permission.Type permissionType = switch (sourceType) {
-                case Source.GROUP -> Permission.Type.GROUP;
-                case Source.PLAYER -> Permission.Type.PLAYER;
-                case Source.TOWN -> Permission.Type.TOWN;
-                case Source.REGION -> Permission.Type.REGION;
+            final Permission.Type permissionType = switch (source.getType()) {
+                case SourceType.GROUP -> Permission.Type.GROUP;
+                case SourceType.PLAYER -> Permission.Type.PLAYER;
+                case SourceType.TOWN -> Permission.Type.TOWN;
+                case SourceType.REGION -> Permission.Type.REGION;
                 default -> null;
             };
             if (permissionAccess != null && permissionType != null) {
                 final DataRights dataRights = new DataRights();
                 dataRights.setRights(permissionAccess.ordinal());
                 dataRights.setType(permissionType.ordinal());
-                dataRights.setName(sourceIdentifier);
+                dataRights.setName(source.getIdentifier());
                 rights.add(dataRights);
             }
         });
@@ -177,8 +177,9 @@ public class BoltMigration {
             return "";
         }
         return blockProtection.getAccess().keySet().stream()
-                .filter(source -> Source.PASSWORD.equals(Source.type(source)))
-                .map(Source::identifier)
+                .map(Source::parse)
+                .filter(source -> SourceType.PASSWORD.equals(source.getType()))
+                .map(Source::getIdentifier)
                 .findFirst()
                 .orElse("");
     }

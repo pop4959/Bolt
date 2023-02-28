@@ -10,6 +10,7 @@ import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Source;
+import org.popcraft.bolt.util.SourceType;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -107,29 +108,32 @@ public class LWCMigration {
             if (data != null) {
                 for (DataFlag flag : data.getFlags()) {
                     if (flag.getId() == ProtectionFlag.REDSTONE.ordinal()) {
-                        access.put(Source.from(Source.REDSTONE, Source.REDSTONE), DEFAULT_ACCESS_ADMIN);
+                        access.put(Source.of(SourceType.REDSTONE).toString(), DEFAULT_ACCESS_ADMIN);
                     } else if (flag.getId() == ProtectionFlag.HOPPER.ordinal()) {
-                        access.put(Source.from(Source.BLOCK, Source.BLOCK), DEFAULT_ACCESS_ADMIN);
+                        access.put(Source.of(SourceType.BLOCK).toString(), DEFAULT_ACCESS_ADMIN);
                     }
                 }
                 for (DataRights rights : data.getRights()) {
                     final String accessType = rights.getRights() == Permission.Access.ADMIN.ordinal() ? DEFAULT_ACCESS_ADMIN : DEFAULT_ACCESS_NORMAL;
                     if (rights.getType() == Permission.Type.GROUP.ordinal()) {
-                        access.put(Source.from(Source.GROUP, rights.getName()), accessType);
+                        access.put(Source.of(SourceType.GROUP, rights.getName()).toString(), accessType);
                     } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
                         final UUID uuid = BukkitAdapter.findOrLookupPlayerUniqueId(rights.getName()).join();
                         if (uuid != null) {
-                            access.put(Source.from(Source.PLAYER, uuid.toString()), accessType);
+                            access.put(Source.player(uuid).toString(), accessType);
                         }
                     } else if (rights.getType() == Permission.Type.TOWN.ordinal()) {
-                        access.put(Source.from(Source.TOWN, rights.getName()), accessType);
+                        access.put(Source.of(SourceType.TOWN, rights.getName()).toString(), accessType);
                     } else if (rights.getType() == Permission.Type.REGION.ordinal()) {
-                        access.put(Source.from(Source.REGION, rights.getName()), accessType);
+                        access.put(Source.of(SourceType.REGION, rights.getName()).toString(), accessType);
                     }
                 }
             }
             if (protection.password() != null && !protection.password().isEmpty()) {
-                access.put(Source.from(Source.PASSWORD, protection.password()), DEFAULT_ACCESS_NORMAL);
+                final Source passwordSource = Source.password(protection.password());
+                if (passwordSource != null) {
+                    access.put(passwordSource.toString(), DEFAULT_ACCESS_NORMAL);
+                }
             }
             final UUID ownerUUID = BukkitAdapter.findOrLookupPlayerUniqueId(protection.owner()).join();
             store.saveBlockProtection(new BlockProtection(

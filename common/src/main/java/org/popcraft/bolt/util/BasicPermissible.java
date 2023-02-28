@@ -2,9 +2,9 @@ package org.popcraft.bolt.util;
 
 import java.util.Set;
 
-public record BasicPermissible(String source) implements Permissible {
+public record BasicPermissible(Source source) implements Permissible {
     @Override
-    public Set<String> sources() {
+    public Set<Source> sources() {
         return Set.of(source);
     }
 }

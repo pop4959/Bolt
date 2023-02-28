@@ -52,6 +52,7 @@ import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.Source;
+import org.popcraft.bolt.util.SourceType;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -176,9 +177,9 @@ public final class BlockListener implements Listener {
                     if (plugin.canAccess(protection, player, Permission.EDIT)) {
                         boltPlayer.consumeModifications().forEach((source, type) -> {
                             if (Boolean.parseBoolean(action.getData())) {
-                                protection.getAccess().put(source, type);
+                                protection.getAccess().put(source.toString(), type);
                             } else {
-                                protection.getAccess().remove(source);
+                                protection.getAccess().remove(source.toString());
                             }
                         });
                         plugin.saveProtection(protection);
@@ -428,7 +429,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockRedstone(final BlockRedstoneEvent e) {
         plugin.findProtection(e.getBlock()).ifPresent(protection -> {
-            if (!plugin.canAccess(protection, new BasicPermissible(Source.from(Source.REDSTONE, Source.REDSTONE)), Permission.REDSTONE)) {
+            if (!plugin.canAccess(protection, new BasicPermissible(Source.of(SourceType.REDSTONE)), Permission.REDSTONE)) {
                 e.setNewCurrent(e.getOldCurrent());
             }
         });

@@ -8,8 +8,8 @@ import java.util.UUID;
 
 public class BoltPlayer implements Permissible {
     private final UUID uuid;
-    private final Map<String, String> modifications = new HashMap<>();
-    private final Set<String> sources = new HashSet<>();
+    private final Map<Source, String> modifications = new HashMap<>();
+    private final Set<Source> sources = new HashSet<>();
     private final Set<Mode> modes = new HashSet<>();
     private Action action;
     private Action lastAction;
@@ -18,7 +18,7 @@ public class BoltPlayer implements Permissible {
 
     public BoltPlayer(UUID uuid) {
         this.uuid = uuid;
-        this.sources.add(Source.fromPlayer(uuid));
+        this.sources.add(Source.player(uuid));
     }
 
     public UUID getUuid() {
@@ -73,12 +73,12 @@ public class BoltPlayer implements Permissible {
         }
     }
 
-    public Map<String, String> getModifications() {
+    public Map<Source, String> getModifications() {
         return modifications;
     }
 
-    public Map<String, String> consumeModifications() {
-        final Map<String, String> modificationsCopy = new HashMap<>(modifications);
+    public Map<Source, String> consumeModifications() {
+        final Map<Source, String> modificationsCopy = new HashMap<>(modifications);
         if (!this.modes.contains(Mode.PERSIST)) {
             modifications.clear();
         }
@@ -94,11 +94,11 @@ public class BoltPlayer implements Permissible {
     }
 
     public void addPassword(String password) {
-        sources.add(Source.fromPassword(password));
+        sources.add(Source.password(password));
     }
 
     @Override
-    public Set<String> sources() {
+    public Set<Source> sources() {
         return sources;
     }
 }

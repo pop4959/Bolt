@@ -461,8 +461,8 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     public boolean canAccess(final Protection protection, final Permissible permissible, String... permissions) {
-        final Set<String> sources = permissible.sources();
-        final String ownerSource = Source.fromPlayer(protection.getOwner());
+        final Set<Source> sources = permissible.sources();
+        final Source ownerSource = Source.player(protection.getOwner());
         if (sources.contains(ownerSource)) {
             return true;
         }

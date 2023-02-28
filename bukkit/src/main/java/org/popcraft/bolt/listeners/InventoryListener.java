@@ -25,6 +25,7 @@ import org.popcraft.bolt.util.BasicPermissible;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Source;
+import org.popcraft.bolt.util.SourceType;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -141,9 +142,9 @@ public final class InventoryListener implements Listener {
             if (!plugin.canAccess(destinationProtection, sourceProtection.getOwner(), Permission.DEPOSIT) || !plugin.canAccess(sourceProtection, destinationProtection.getOwner(), Permission.WITHDRAW)) {
                 e.setCancelled(true);
             }
-        } else if (sourceProtection != null && !plugin.canAccess(sourceProtection, new BasicPermissible(Source.from(Source.BLOCK, Source.BLOCK)), Permission.WITHDRAW)) {
+        } else if (sourceProtection != null && !plugin.canAccess(sourceProtection, new BasicPermissible(Source.of(SourceType.BLOCK)), Permission.WITHDRAW)) {
             e.setCancelled(true);
-        } else if (destinationProtection != null && !plugin.canAccess(destinationProtection, new BasicPermissible(Source.from(Source.BLOCK, Source.BLOCK)), Permission.DEPOSIT)) {
+        } else if (destinationProtection != null && !plugin.canAccess(destinationProtection, new BasicPermissible(Source.of(SourceType.BLOCK)), Permission.DEPOSIT)) {
             e.setCancelled(true);
         }
     }

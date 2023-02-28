@@ -7,11 +7,11 @@ import org.bukkit.Nameable;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.popcraft.bolt.lang.Strings;
+import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.lang.Strings;
-import org.popcraft.bolt.lang.Translation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,11 +75,11 @@ public final class Protections {
             return "";
         }
         final List<String> lines = new ArrayList<>();
-        accessMap.forEach((source, access) -> {
-            final String sourceType = Source.type(source);
+        accessMap.forEach((entry, access) -> {
+            final Source source = Source.parse(entry);
             final String subject;
-            if (Source.PLAYER.equals(sourceType)) {
-                final String playerUuid = Source.identifier(source);
+            if (SourceType.PLAYER.equals(source.getType())) {
+                final String playerUuid = source.getIdentifier();
                 final UUID uuid = UUID.fromString(playerUuid);
                 final String playerName = BukkitAdapter.findPlayerName(uuid);
                 if (playerName == null) {
@@ -87,7 +87,7 @@ public final class Protections {
                 }
                 subject = Optional.ofNullable(playerName).orElse(playerUuid);
             } else {
-                subject = Strings.toTitleCase(Source.type(source));
+                subject = Strings.toTitleCase(source.getType());
             }
             lines.add("%s (%s)".formatted(subject, Strings.toTitleCase(access)));
         });
