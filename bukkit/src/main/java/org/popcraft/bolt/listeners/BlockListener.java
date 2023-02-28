@@ -243,8 +243,10 @@ public final class BlockListener implements Listener {
         if (optionalProtection.isPresent()) {
             final Protection protection = optionalProtection.get();
             if (plugin.canAccess(protection, player, Permission.DESTROY)) {
-                plugin.removeProtection(protection);
-                BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
+                if (protection instanceof BlockProtection) {
+                    plugin.removeProtection(protection);
+                    BoltComponents.sendMessage(player, Translation.CLICK_UNLOCKED, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
+                }
             } else {
                 e.setCancelled(true);
             }
