@@ -49,6 +49,7 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Mode;
+import org.popcraft.bolt.util.Permissible;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.Source;
@@ -63,6 +64,7 @@ import static org.popcraft.bolt.lang.Translator.translate;
 import static org.popcraft.bolt.util.BukkitAdapter.NIL_UUID;
 
 public final class BlockListener implements Listener {
+    private static final Permissible REDSTONE_PERMISSIBLE = new BasicPermissible(Source.of(SourceType.REDSTONE));
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     private final BoltPlugin plugin;
 
@@ -429,7 +431,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockRedstone(final BlockRedstoneEvent e) {
         plugin.findProtection(e.getBlock()).ifPresent(protection -> {
-            if (!plugin.canAccess(protection, new BasicPermissible(Source.of(SourceType.REDSTONE)), Permission.REDSTONE)) {
+            if (!plugin.canAccess(protection, REDSTONE_PERMISSIBLE, Permission.REDSTONE)) {
                 e.setNewCurrent(e.getOldCurrent());
             }
         });
