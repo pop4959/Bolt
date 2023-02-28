@@ -217,7 +217,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockPlace(final BlockPlaceEvent e) {
         final Player player = e.getPlayer();
-        if (plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NOLOCK)) {
+        if (plugin.player(player.getUniqueId()).hasMode(Mode.NOLOCK)) {
             return;
         }
         final Block block = e.getBlock();
@@ -233,7 +233,7 @@ public final class BlockListener implements Listener {
         }
         final BlockProtection newProtection = BukkitAdapter.createBlockProtection(block, player.getUniqueId(), defaultAccess.type());
         plugin.getBolt().getStore().saveBlockProtection(newProtection);
-        if (!plugin.getBolt().getBoltPlayer(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
+        if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
             BoltComponents.sendMessage(player, Translation.CLICK_LOCKED, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(newProtection.getType())), Placeholder.unparsed("type", Protections.displayType(block)));
         }
     }
