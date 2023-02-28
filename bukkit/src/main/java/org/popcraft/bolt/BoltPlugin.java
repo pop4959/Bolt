@@ -109,8 +109,8 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.EnumUtil;
-import org.popcraft.bolt.util.Permissible;
 import org.popcraft.bolt.util.Source;
+import org.popcraft.bolt.util.SourceResolver;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -460,13 +460,12 @@ public class BoltPlugin extends JavaPlugin {
         return canAccess(protection, bolt.getBoltPlayer(uuid), permissions);
     }
 
-    public boolean canAccess(final Protection protection, final Permissible permissible, String... permissions) {
-        final Set<Source> sources = permissible.sources();
+    public boolean canAccess(final Protection protection, final SourceResolver sourceResolver, String... permissions) {
         final Source ownerSource = Source.player(protection.getOwner());
-        if (sources.contains(ownerSource)) {
+        if (sourceResolver.resolve(ownerSource)) {
             return true;
         }
-        if (permissible instanceof BoltPlayer boltPlayer) {
+        if (sourceResolver instanceof final BoltPlayer boltPlayer) {
             final Player permissiblePlayer = getServer().getPlayer(boltPlayer.getUuid());
             if (permissiblePlayer != null && permissiblePlayer.hasPermission("bolt.admin")) {
                 return true;
@@ -476,7 +475,7 @@ public class BoltPlugin extends JavaPlugin {
         final Set<String> heldPermissions = new HashSet<>();
         accessRegistry.getProtectionByType(protection.getType()).ifPresent(access -> heldPermissions.addAll(access.permissions()));
         protection.getAccess().forEach((source, accessType) -> {
-            if (sources.contains(Source.parse(source))) {
+            if (sourceResolver.resolve(Source.parse(source))) {
                 accessRegistry.getAccessByType(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
             }
         });

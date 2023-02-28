@@ -21,9 +21,9 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.util.BasicPermissible;
+import org.popcraft.bolt.util.SourceResolver;
+import org.popcraft.bolt.util.SourceTypeResolver;
 import org.popcraft.bolt.util.BoltPlayer;
-import org.popcraft.bolt.util.Permissible;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.SourceType;
@@ -32,7 +32,7 @@ import java.util.EnumSet;
 import java.util.Map;
 
 public final class InventoryListener implements Listener {
-    private static final Permissible BLOCK_PERMISSIBLE = new BasicPermissible(Source.of(SourceType.BLOCK));
+    private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceType.BLOCK));
     private static final Map<InventoryType, EnumSet<Material>> INVENTORY_TYPE_BLOCKS = Map.of(
             InventoryType.BARREL, EnumSet.of(Material.BARREL),
             InventoryType.BLAST_FURNACE, EnumSet.of(Material.BLAST_FURNACE),
@@ -144,9 +144,9 @@ public final class InventoryListener implements Listener {
             if (!plugin.canAccess(destinationProtection, sourceProtection.getOwner(), Permission.DEPOSIT) || !plugin.canAccess(sourceProtection, destinationProtection.getOwner(), Permission.WITHDRAW)) {
                 e.setCancelled(true);
             }
-        } else if (sourceProtection != null && !plugin.canAccess(sourceProtection, BLOCK_PERMISSIBLE, Permission.WITHDRAW)) {
+        } else if (sourceProtection != null && !plugin.canAccess(sourceProtection, BLOCK_SOURCE_RESOLVER, Permission.WITHDRAW)) {
             e.setCancelled(true);
-        } else if (destinationProtection != null && !plugin.canAccess(destinationProtection, BLOCK_PERMISSIBLE, Permission.DEPOSIT)) {
+        } else if (destinationProtection != null && !plugin.canAccess(destinationProtection, BLOCK_SOURCE_RESOLVER, Permission.DEPOSIT)) {
             e.setCancelled(true);
         }
     }

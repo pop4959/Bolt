@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class BoltPlayer implements Permissible {
+public class BoltPlayer implements SourceResolver {
     private final UUID uuid;
     private final Map<Source, String> modifications = new HashMap<>();
     private final Set<Source> sources = new HashSet<>();
@@ -98,7 +98,7 @@ public class BoltPlayer implements Permissible {
     }
 
     @Override
-    public Set<Source> sources() {
-        return sources;
+    public boolean resolve(Source source) {
+        return sources.contains(source);
     }
 }
