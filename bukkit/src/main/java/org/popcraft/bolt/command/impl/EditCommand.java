@@ -53,7 +53,7 @@ public class EditCommand extends BoltCommand {
                 boltPlayer.getModifications().put(Source.of(parsed.getType()), access.type());
             } else if (SourceType.PASSWORD.equals(parsed.getType())) {
                 boltPlayer.getModifications().put(Source.password(parsed.getIdentifier()), access.type());
-            } else if (SourceType.PERMISSION.equals(parsed.getType())) {
+            } else if (SourceType.PERMISSION.equals(parsed.getType()) || SourceType.GROUP.equals(parsed.getType())) {
                 boltPlayer.getModifications().put(parsed, access.type());
             } else {
                 final String playerSource = source;

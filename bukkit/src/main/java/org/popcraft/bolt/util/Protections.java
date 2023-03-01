@@ -86,12 +86,12 @@ public final class Protections {
                     BukkitAdapter.lookupPlayerName(uuid);
                 }
                 subject = Optional.ofNullable(playerName).orElse(playerUuid);
-            } else if (SourceType.PERMISSION.equals(source.getType())) {
-                subject = source.getIdentifier();
-            } else {
+            } else if (source.getType().equals(source.getIdentifier())) {
                 subject = Strings.toTitleCase(source.getType());
+            } else {
+                subject = source.getIdentifier();
             }
-            lines.add("%s (%s)".formatted(subject, Strings.toTitleCase(access)));
+            lines.add("%s (%s: %s)".formatted(subject, Strings.toTitleCase(source.getType()), Strings.toTitleCase(access)));
         });
         return String.join("\n", lines);
     }

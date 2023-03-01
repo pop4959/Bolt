@@ -23,6 +23,8 @@ permissions:
     default: op
   bolt.command.edit:
     default: true
+  bolt.command.group:
+    default: true
   bolt.command.info:
     default: true
   bolt.command.lock:

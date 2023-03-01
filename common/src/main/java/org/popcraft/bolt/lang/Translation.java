@@ -24,6 +24,14 @@ public class Translation {
     public static final String EDIT_ACCESS_INVALID = "edit_access_invalid";
     public static final String EDIT_PASSWORD_INVALID = "edit_password_invalid";
     public static final String ENABLED = "enabled";
+    public static final String GROUP_CREATED = "group_created";
+    public static final String GROUP_ALREADY_EXISTS = "group_already_exists";
+    public static final String GROUP_DOESNT_EXIST = "group_doesnt_exist";
+    public static final String GROUP_NOT_OWNER = "group_not_owner";
+    public static final String GROUP_DELETED = "group_deleted";
+    public static final String GROUP_PLAYER_ADD = "group_player_add";
+    public static final String GROUP_PLAYER_REMOVE = "group_player_remove";
+    public static final String GROUP_LIST_MEMBERS = "group_list_members";
     public static final String MIGRATION_STARTED = "migration_started";
     public static final String MIGRATION_COMPLETED = "migration_completed";
     public static final String MODE_DISABLED = "mode_disabled";
