@@ -9,6 +9,12 @@ public enum Statements {
             "CREATE TABLE IF NOT EXISTS %sentities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created integer, accessed integer, access text, entity varchar(128));",
             "CREATE TABLE IF NOT EXISTS %sentities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created bigint, accessed bigint, access text, entity varchar(128));"
     ),
+    CREATE_TABLE_GROUPS(
+            "CREATE TABLE IF NOT EXISTS %sgroups (name varchar(128) PRIMARY KEY, owner varchar(36), members text);"
+    ),
+    CREATE_TABLE_ACCESS(
+            "CREATE TABLE IF NOT EXISTS %saccess (owner varchar(36) PRIMARY KEY, access text);"
+    ),
     CREATE_INDEX_BLOCK_OWNER(
             "CREATE INDEX IF NOT EXISTS block_owner ON %sblocks(owner);"
     ),
@@ -17,6 +23,9 @@ public enum Statements {
     ),
     CREATE_INDEX_ENTITY_OWNER(
             "CREATE INDEX IF NOT EXISTS entity_owner ON %sentities(owner);"
+    ),
+    CREATE_INDEX_GROUP_OWNER(
+            "CREATE INDEX IF NOT EXISTS group_owner ON %sgroups(owner);"
     ),
     SELECT_BLOCK_BY_LOCATION(
             "SELECT * FROM %sblocks WHERE world = ? AND x = ? AND y = ? AND z = ?;"

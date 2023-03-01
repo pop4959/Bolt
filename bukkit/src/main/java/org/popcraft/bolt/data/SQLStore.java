@@ -5,9 +5,9 @@ import com.google.gson.reflect.TypeToken;
 import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.util.AccessList;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
-import org.popcraft.bolt.util.AccessList;
 import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Metrics;
 
@@ -54,18 +54,24 @@ public class SQLStore implements Store {
                 "jdbc:sqlite:%s".formatted(configuration.path());
         reconnect();
         try (final PreparedStatement createBlocksTable = connection.prepareStatement(Statements.CREATE_TABLE_BLOCKS.get(configuration.type()).formatted(configuration.prefix()));
-             final PreparedStatement createEntitiesTable = connection.prepareStatement(Statements.CREATE_TABLE_ENTITIES.get(configuration.type()).formatted(configuration.prefix()))) {
+             final PreparedStatement createEntitiesTable = connection.prepareStatement(Statements.CREATE_TABLE_ENTITIES.get(configuration.type()).formatted(configuration.prefix()));
+             final PreparedStatement createGroupsTable = connection.prepareStatement(Statements.CREATE_TABLE_GROUPS.get(configuration.type()).formatted(configuration.prefix()));
+             final PreparedStatement createAccessTable = connection.prepareStatement(Statements.CREATE_TABLE_ACCESS.get(configuration.type()).formatted(configuration.prefix()))) {
             createBlocksTable.execute();
             createEntitiesTable.execute();
+            createGroupsTable.execute();
+            createAccessTable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         try (final PreparedStatement createBlocksOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_BLOCK_OWNER.get(configuration.type()).formatted(configuration.prefix()));
              final PreparedStatement createBlocksLocationIndex = connection.prepareStatement(Statements.CREATE_INDEX_BLOCK_LOCATION.get(configuration.type()).formatted(configuration.prefix()));
-             final PreparedStatement createEntitiesOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_ENTITY_OWNER.get(configuration.type()).formatted(configuration.prefix()))) {
+             final PreparedStatement createEntitiesOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_ENTITY_OWNER.get(configuration.type()).formatted(configuration.prefix()));
+             final PreparedStatement createGroupsOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_GROUP_OWNER.get(configuration.type()).formatted(configuration.prefix()))) {
             createBlocksOwnerIndex.execute();
             createBlocksLocationIndex.execute();
             createEntitiesOwnerIndex.execute();
+            createGroupsOwnerIndex.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
