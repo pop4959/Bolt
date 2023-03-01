@@ -7,6 +7,8 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.AccessList;
+import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Metrics;
 
 import java.sql.Connection;
@@ -36,6 +38,10 @@ public class SQLStore implements Store {
     private final Map<BlockLocation, BlockProtection> removeBlocks = new HashMap<>();
     private final Map<UUID, EntityProtection> saveEntities = new HashMap<>();
     private final Map<UUID, EntityProtection> removeEntities = new HashMap<>();
+    private final Map<String, Group> saveGroups = new HashMap<>();
+    private final Map<String, Group> removeGroups = new HashMap<>();
+    private final Map<UUID, AccessList> saveAccessLists = new HashMap<>();
+    private final Map<UUID, AccessList> removeAccessLists = new HashMap<>();
     private final Configuration configuration;
     private final String connectionUrl;
     private Connection connection;
@@ -283,6 +289,160 @@ public class SQLStore implements Store {
     }
 
     @Override
+    public CompletableFuture<Group> loadGroup(String group) {
+        final CompletableFuture<Group> future = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            try (final PreparedStatement selectGroup = connection.prepareStatement(Statements.SELECT_GROUP_BY_NAME.get(configuration.type()).formatted(configuration.prefix()))) {
+                selectGroup.setString(1, group);
+                final ResultSet groupResultSet = selectGroup.executeQuery();
+                if (groupResultSet.next()) {
+                    future.complete(groupFromResultSet(groupResultSet));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            future.complete(null);
+        }, executor);
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Collection<Group>> loadGroups() {
+        final CompletableFuture<Collection<Group>> future = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            try (final PreparedStatement selectGroups = connection.prepareStatement(Statements.SELECT_ALL_GROUPS.get(configuration.type()).formatted(configuration.prefix()))) {
+                final ResultSet groupResultSet = selectGroups.executeQuery();
+                final List<Group> groups = new ArrayList<>();
+                while (groupResultSet.next()) {
+                    groups.add(groupFromResultSet(groupResultSet));
+                }
+                future.complete(groups);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            future.complete(Collections.emptyList());
+        }, executor);
+        return future;
+    }
+
+    private Group groupFromResultSet(final ResultSet resultSet) throws SQLException {
+        final String name = resultSet.getString(1);
+        final String owner = resultSet.getString(2);
+        final String membersText = resultSet.getString(3);
+        final List<String> membersRaw = Objects.requireNonNullElse(GSON.fromJson(membersText, new TypeToken<List<String>>() {
+        }.getType()), new ArrayList<>());
+        final List<UUID> members = new ArrayList<>();
+        membersRaw.forEach(memberRaw -> members.add(UUID.fromString(memberRaw)));
+        return new Group(name, UUID.fromString(owner), members);
+    }
+
+    @Override
+    public void saveGroup(Group group) {
+        CompletableFuture.runAsync(() -> saveGroups.put(group.getName(), group), executor);
+    }
+
+    private void saveGroupNow(Group group) {
+        try (final PreparedStatement replaceGroup = connection.prepareStatement(Statements.REPLACE_GROUP.get(configuration.type()).formatted(configuration.prefix()))) {
+            replaceGroup.setString(1, group.getName());
+            replaceGroup.setString(2, group.getOwner().toString());
+            replaceGroup.setString(3, GSON.toJson(group.getMembers(), new TypeToken<List<String>>() {
+            }.getType()));
+            replaceGroup.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void removeGroup(Group group) {
+        CompletableFuture.runAsync(() -> removeGroups.put(group.getName(), group), executor);
+    }
+
+    private void removeGroupNow(Group group) {
+        try (final PreparedStatement deleteGroup = connection.prepareStatement(Statements.DELETE_GROUP.get(configuration.type()).formatted(configuration.prefix()))) {
+            deleteGroup.setString(1, group.getName());
+            deleteGroup.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public CompletableFuture<AccessList> loadAccessList(UUID owner) {
+        final CompletableFuture<AccessList> future = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            try (final PreparedStatement selectAccessList = connection.prepareStatement(Statements.SELECT_ACCESS_LIST_BY_UUID.get(configuration.type()).formatted(configuration.prefix()))) {
+                selectAccessList.setString(1, owner.toString());
+                final ResultSet accessListResultSet = selectAccessList.executeQuery();
+                if (accessListResultSet.next()) {
+                    future.complete(accessListFromResultSet(accessListResultSet));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            future.complete(null);
+        }, executor);
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Collection<AccessList>> loadAccessLists() {
+        final CompletableFuture<Collection<AccessList>> future = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            try (final PreparedStatement selectAccessLists = connection.prepareStatement(Statements.SELECT_ALL_ACCESS_LISTS.get(configuration.type()).formatted(configuration.prefix()))) {
+                final ResultSet accessListsResultSet = selectAccessLists.executeQuery();
+                final List<AccessList> accessLists = new ArrayList<>();
+                while (accessListsResultSet.next()) {
+                    accessLists.add(accessListFromResultSet(accessListsResultSet));
+                }
+                future.complete(accessLists);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            future.complete(Collections.emptyList());
+        }, executor);
+        return future;
+    }
+
+    private AccessList accessListFromResultSet(final ResultSet resultSet) throws SQLException {
+        final String owner = resultSet.getString(1);
+        final String accessListText = resultSet.getString(2);
+        final Map<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessListText, new TypeToken<HashMap<String, String>>() {
+        }.getType()), new HashMap<>());
+        return new AccessList(UUID.fromString(owner), access);
+    }
+
+    @Override
+    public void saveAccessList(AccessList accessList) {
+        CompletableFuture.runAsync(() -> saveAccessLists.put(accessList.getOwner(), accessList), executor);
+    }
+
+    private void saveAccessListNow(AccessList accessList) {
+        try (final PreparedStatement replaceAccessList = connection.prepareStatement(Statements.REPLACE_ACCESS_LIST.get(configuration.type()).formatted(configuration.prefix()))) {
+            replaceAccessList.setString(1, accessList.getOwner().toString());
+            replaceAccessList.setString(2, GSON.toJson(accessList.getAccess(), new TypeToken<Map<String, String>>() {
+            }.getType()));
+            replaceAccessList.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void removeAccessList(AccessList accessList) {
+        CompletableFuture.runAsync(() -> removeAccessLists.put(accessList.getOwner(), accessList), executor);
+    }
+
+    private void removeAccessListNow(AccessList accessList) {
+        try (final PreparedStatement deleteAccessList = connection.prepareStatement(Statements.DELETE_ACCESS_LIST.get(configuration.type()).formatted(configuration.prefix()))) {
+            deleteAccessList.setString(1, accessList.getOwner().toString());
+            deleteAccessList.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public long pendingSave() {
         return CompletableFuture.supplyAsync(() -> saveBlocks.size() + removeBlocks.size() + saveEntities.size() + removeEntities.size(), executor).join();
     }
@@ -325,6 +485,42 @@ public class SQLStore implements Store {
                     while (removeEntitiesIterator.hasNext()) {
                         removeEntityProtectionNow(removeEntitiesIterator.next());
                         removeEntitiesIterator.remove();
+                    }
+                    connection.setAutoCommit(true);
+                }
+                if (!saveGroups.isEmpty()) {
+                    connection.setAutoCommit(false);
+                    final Iterator<Group> saveGroupsIterator = saveGroups.values().iterator();
+                    while (saveGroupsIterator.hasNext()) {
+                        saveGroupNow(saveGroupsIterator.next());
+                        saveGroupsIterator.remove();
+                    }
+                    connection.setAutoCommit(true);
+                }
+                if (!removeGroups.isEmpty()) {
+                    connection.setAutoCommit(false);
+                    final Iterator<Group> removeGroupsIterator = removeGroups.values().iterator();
+                    while (removeGroupsIterator.hasNext()) {
+                        removeGroupNow(removeGroupsIterator.next());
+                        removeGroupsIterator.remove();
+                    }
+                    connection.setAutoCommit(true);
+                }
+                if (!saveAccessLists.isEmpty()) {
+                    connection.setAutoCommit(false);
+                    final Iterator<AccessList> saveAccessListsIterator = saveAccessLists.values().iterator();
+                    while (saveAccessListsIterator.hasNext()) {
+                        saveAccessListNow(saveAccessListsIterator.next());
+                        saveAccessListsIterator.remove();
+                    }
+                    connection.setAutoCommit(true);
+                }
+                if (!removeAccessLists.isEmpty()) {
+                    connection.setAutoCommit(false);
+                    final Iterator<AccessList> removeAccessListsIterator = removeAccessLists.values().iterator();
+                    while (removeAccessListsIterator.hasNext()) {
+                        removeAccessListNow(removeAccessListsIterator.next());
+                        removeAccessListsIterator.remove();
                     }
                     connection.setAutoCommit(true);
                 }

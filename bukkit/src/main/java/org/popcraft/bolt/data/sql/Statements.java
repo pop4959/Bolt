@@ -42,6 +42,30 @@ public enum Statements {
     DELETE_ENTITY(
             "DELETE FROM %sentities WHERE id = ?;"
     ),
+    SELECT_GROUP_BY_NAME(
+            "SELECT * FROM %sgroups WHERE name = ?;"
+    ),
+    SELECT_ALL_GROUPS(
+            "SELECT * FROM %sgroups;"
+    ),
+    REPLACE_GROUP(
+            "REPLACE INTO %sgroups VALUES (?, ?, ?);"
+    ),
+    DELETE_GROUP(
+            "DELETE FROM %sgroups WHERE name = ?;"
+    ),
+    SELECT_ACCESS_LIST_BY_UUID(
+            "SELECT * FROM %saccess WHERE owner = ?;"
+    ),
+    SELECT_ALL_ACCESS_LISTS(
+            "SELECT * FROM %saccess;"
+    ),
+    REPLACE_ACCESS_LIST(
+            "REPLACE INTO %saccess VALUES (?, ?);"
+    ),
+    DELETE_ACCESS_LIST(
+            "DELETE FROM %saccess WHERE owner = ?;"
+    ),
     LWC_SELECT_ALL_BLOCK_IDS(
             "SELECT * FROM %sblocks;"
     ),
