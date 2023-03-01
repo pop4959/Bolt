@@ -44,7 +44,7 @@ public class SQLStore implements Store {
         this.configuration = configuration;
         final boolean usingMySQL = "mysql".equals(configuration.type());
         this.connectionUrl = usingMySQL ?
-                "jdbc:mysql://%s:%s@%s/%s".formatted(configuration.username(), configuration.password(), configuration.hostname(), configuration.database()) :
+                "jdbc:mysql://%s/%s".formatted(configuration.hostname(), configuration.database()) :
                 "jdbc:sqlite:%s".formatted(configuration.path());
         reconnect();
         try (final PreparedStatement createBlocksTable = connection.prepareStatement(Statements.CREATE_TABLE_BLOCKS.get(configuration.type()).formatted(configuration.prefix()));
@@ -70,7 +70,7 @@ public class SQLStore implements Store {
     }
 
     public record Configuration(String type, String path, String hostname, String database, String username,
-                                String password, String prefix, List<String> properties) {
+                                String password, String prefix, Map<String, String> properties) {
     }
 
     private void reconnect() {
@@ -78,7 +78,7 @@ public class SQLStore implements Store {
             if (connection != null) {
                 connection.close();
             }
-            connection = DriverManager.getConnection(connectionUrl);
+            connection = DriverManager.getConnection(connectionUrl, configuration.username(), configuration.password());
         } catch (SQLException e) {
             e.printStackTrace();
         }

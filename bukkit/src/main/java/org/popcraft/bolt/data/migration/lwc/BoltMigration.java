@@ -53,12 +53,12 @@ public class BoltMigration {
                 lwcCoreConfig.getString("database.username", ""),
                 lwcCoreConfig.getString("database.password", ""),
                 lwcCoreConfig.getString("database.prefix", "lwc_"),
-                List.of("useSSL", lwcCoreConfig.getString("database.useSSL", "false"))
+                Map.of("useSSL", lwcCoreConfig.getString("database.useSSL", "false"))
         );
         final String connectionUrl = "mysql".equals(configuration.type()) ?
-                "jdbc:mysql://%s:%s@%s/%s".formatted(configuration.username(), configuration.password(), configuration.hostname(), configuration.database()) :
+                "jdbc:mysql://%s/%s".formatted(configuration.hostname(), configuration.database()) :
                 "jdbc:sqlite:%s".formatted(configuration.path());
-        try (final Connection connection = DriverManager.getConnection(connectionUrl);
+        try (final Connection connection = DriverManager.getConnection(connectionUrl, configuration.username(), configuration.password());
              final Statement statement = connection.createStatement();
              final PreparedStatement addBlock = connection.prepareStatement(Statements.LWC_INSERT_BLOCK_ID.get(configuration.type()).formatted(configuration.prefix()));
              final PreparedStatement addProtection = connection.prepareStatement(Statements.LWC_INSERT_OR_IGNORE_PROTECTION.get(configuration.type()).formatted(configuration.prefix()))) {

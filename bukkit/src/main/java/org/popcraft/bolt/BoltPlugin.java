@@ -124,6 +124,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class BoltPlugin extends JavaPlugin {
     public static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("boltDebug", "false"));
@@ -167,7 +168,10 @@ public class BoltPlugin extends JavaPlugin {
                 getConfig().getString("database.username", ""),
                 getConfig().getString("database.password", ""),
                 getConfig().getString("database.prefix", ""),
-                getConfig().getStringList("database.properties")
+                Optional.ofNullable(getConfig().getConfigurationSection("database.properties"))
+                        .map(section -> section.getKeys(false))
+                        .stream()
+                        .collect(Collectors.toMap(String::valueOf, key -> getConfig().getString("database.properties." + key, "")))
         );
         this.bolt = new Bolt(new SimpleProtectionCache(new SQLStore(databaseConfiguration)));
         reload();
