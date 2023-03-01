@@ -112,6 +112,7 @@ import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Source;
 import org.popcraft.bolt.util.SourceResolver;
+import org.popcraft.bolt.util.SourceType;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -152,6 +153,7 @@ public class BoltPlugin extends JavaPlugin {
     private final ProfileCache profileCache = new SimpleProfileCache(profileCachePath);
     private final Map<Material, Access> protectableBlocks = new EnumMap<>(Material.class);
     private final Map<EntityType, Access> protectableEntities = new EnumMap<>(EntityType.class);
+    private final Source ADMIN_PERMISSION_SOURCE = Source.of(SourceType.PERMISSION, "bolt.admin");
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
     private boolean useActionBar;
@@ -467,7 +469,7 @@ public class BoltPlugin extends JavaPlugin {
 
     public boolean canAccess(final Protection protection, final SourceResolver sourceResolver, String... permissions) {
         final Source ownerSource = Source.player(protection.getOwner());
-        if (sourceResolver.resolve(ownerSource)) {
+        if (sourceResolver.resolve(ownerSource) || sourceResolver.resolve(ADMIN_PERMISSION_SOURCE)) {
             return true;
         }
         final AccessRegistry accessRegistry = bolt.getAccessRegistry();

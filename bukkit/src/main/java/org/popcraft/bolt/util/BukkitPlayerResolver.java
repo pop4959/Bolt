@@ -16,12 +16,6 @@ public class BukkitPlayerResolver implements SourceResolver {
             return true;
         }
         final Player player = Bukkit.getPlayer(boltPlayer.getUuid());
-        if (player == null) {
-            return false;
-        }
-        if (SourceType.PERMISSION.equals(source.getType()) && player.hasPermission(source.getIdentifier())) {
-            return true;
-        }
-        return player.hasPermission("bolt.admin");
+        return player != null && SourceType.PERMISSION.equals(source.getType()) && player.hasPermission(source.getIdentifier());
     }
 }
