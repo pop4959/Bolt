@@ -16,14 +16,21 @@ import org.popcraft.bolt.util.BukkitMainThreadExecutor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AdminConvertCommand extends BoltCommand {
+    private final AtomicBoolean isConverting = new AtomicBoolean();
+
     public AdminConvertCommand(BoltPlugin plugin) {
         super(plugin);
     }
 
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
+        if (isConverting.get()) {
+            BoltComponents.sendMessage(sender, Translation.MIGRATION_IN_PROGRESS);
+            return;
+        }
         final boolean convertBack = arguments.remaining() > 0 && arguments.next().equals("back");
         if (convertBack) {
             if (!plugin.getServer().getPluginManager().isPluginEnabled("LWC")) {
@@ -32,10 +39,12 @@ public class AdminConvertCommand extends BoltCommand {
             }
             final BoltMigration migration = new BoltMigration(plugin);
             BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed("source", "Bolt"), Placeholder.unparsed("destination", "LWC"));
-            migration.convertAsync().thenRunAsync(() -> BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED), BukkitMainThreadExecutor.get());
+            isConverting.set(true);
+            migration.convertAsync().thenRunAsync(() -> BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED), BukkitMainThreadExecutor.get()).thenRun(() -> isConverting.set(false));
         } else {
             final LWCMigration migration = new LWCMigration(plugin);
             BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed("source", "LWC"), Placeholder.unparsed("destination", "Bolt"));
+            isConverting.set(true);
             migration.convertAsync().thenAcceptAsync(memoryStore -> {
                 final Store destination = plugin.getBolt().getStore();
                 for (final BlockProtection blockProtection : memoryStore.loadBlockProtections().join()) {
@@ -45,7 +54,7 @@ public class AdminConvertCommand extends BoltCommand {
                     destination.saveEntityProtection(entityProtection);
                 }
                 BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED);
-            }, BukkitMainThreadExecutor.get());
+            }, BukkitMainThreadExecutor.get()).thenRun(() -> isConverting.set(false));
         }
     }
 

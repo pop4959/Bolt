@@ -35,6 +35,7 @@ public class Translation {
     public static final String MIGRATION_STARTED = "migration_started";
     public static final String MIGRATION_COMPLETED = "migration_completed";
     public static final String MIGRATION_LWC_MISSING = "migration_lwc_missing";
+    public static final String MIGRATION_IN_PROGRESS = "migration_in_progress";
     public static final String MODE_DISABLED = "mode_disabled";
     public static final String MODE_ENABLED = "mode_enabled";
     public static final String MODE_INVALID = "mode_invalid";
