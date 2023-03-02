@@ -3,6 +3,9 @@ package org.popcraft.bolt.util;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.Bolt;
+import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceResolver;
+import org.popcraft.bolt.source.SourceType;
 
 import java.util.UUID;
 

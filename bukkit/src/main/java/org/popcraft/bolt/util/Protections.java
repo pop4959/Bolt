@@ -12,6 +12,8 @@ import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceType;
 
 import java.util.ArrayList;
 import java.util.List;

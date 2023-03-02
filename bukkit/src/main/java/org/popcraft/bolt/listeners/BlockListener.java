@@ -50,10 +50,10 @@ import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Protections;
-import org.popcraft.bolt.util.Source;
-import org.popcraft.bolt.util.SourceResolver;
-import org.popcraft.bolt.util.SourceType;
-import org.popcraft.bolt.util.SourceTypeResolver;
+import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceResolver;
+import org.popcraft.bolt.source.SourceType;
+import org.popcraft.bolt.source.SourceTypeResolver;
 
 import java.util.EnumSet;
 import java.util.List;

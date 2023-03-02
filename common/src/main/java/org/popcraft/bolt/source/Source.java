@@ -1,4 +1,4 @@
-package org.popcraft.bolt.util;
+package org.popcraft.bolt.source;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

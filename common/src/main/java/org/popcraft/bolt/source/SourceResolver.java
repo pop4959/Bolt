@@ -1,4 +1,4 @@
-package org.popcraft.bolt.util;
+package org.popcraft.bolt.source;
 
 @FunctionalInterface
 public interface SourceResolver {

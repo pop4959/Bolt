@@ -21,12 +21,12 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.util.SourceResolver;
-import org.popcraft.bolt.util.SourceTypeResolver;
+import org.popcraft.bolt.source.SourceResolver;
+import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Permission;
-import org.popcraft.bolt.util.Source;
-import org.popcraft.bolt.util.SourceType;
+import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceType;
 
 import java.util.EnumSet;
 import java.util.Map;

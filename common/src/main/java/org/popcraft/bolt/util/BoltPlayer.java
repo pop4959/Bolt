@@ -1,5 +1,7 @@
 package org.popcraft.bolt.util;
 
+import org.popcraft.bolt.source.Source;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

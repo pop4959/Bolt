@@ -111,9 +111,9 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
-import org.popcraft.bolt.util.Source;
-import org.popcraft.bolt.util.SourceResolver;
-import org.popcraft.bolt.util.SourceType;
+import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceResolver;
+import org.popcraft.bolt.source.SourceType;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

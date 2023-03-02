@@ -12,8 +12,8 @@ import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
-import org.popcraft.bolt.util.Source;
-import org.popcraft.bolt.util.SourceType;
+import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceType;
 
 import java.util.Collections;
 import java.util.HashSet;
