@@ -74,7 +74,7 @@ public final class BukkitAdapter {
 
     public static CompletableFuture<UUID> lookupPlayerUniqueId(final String name) {
         if (name == null || name.isEmpty() || NIL_UUID_STRING.equals(name)) {
-            return null;
+            return CompletableFuture.completedFuture(null);
         }
         final PlayerProfile playerProfile = Bukkit.createPlayerProfile(name);
         final CompletableFuture<PlayerProfile> updatedProfile = playerProfile.update();
