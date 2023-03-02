@@ -22,6 +22,7 @@ public class Translation {
     public static final String CLICK_TRANSFER_CONFIRM = "click_transfer_confirm";
     public static final String DISABLED = "disabled";
     public static final String EDIT_ACCESS_INVALID = "edit_access_invalid";
+    public static final String EDIT_SOURCE_INVALID = "edit_source_invalid";
     public static final String EDIT_PASSWORD_INVALID = "edit_password_invalid";
     public static final String ENABLED = "enabled";
     public static final String GROUP_CREATED = "group_created";

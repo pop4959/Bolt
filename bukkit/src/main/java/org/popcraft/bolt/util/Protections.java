@@ -88,7 +88,7 @@ public final class Protections {
                     BukkitAdapter.lookupPlayerName(uuid);
                 }
                 subject = Optional.ofNullable(playerName).orElse(playerUuid);
-            } else if (source.getType().equals(source.getIdentifier())) {
+            } else if (SourceType.PASSWORD.equals(source.getType()) || source.getType().equals(source.getIdentifier())) {
                 subject = Strings.toTitleCase(source.getType());
             } else {
                 subject = source.getIdentifier();

@@ -4,16 +4,16 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.lang.Translation;
-import org.popcraft.bolt.access.Access;
+import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceType;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
-import org.popcraft.bolt.source.Source;
-import org.popcraft.bolt.source.SourceType;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -46,24 +46,26 @@ public class EditCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, Translation.EDIT_ACCESS_INVALID, Placeholder.unparsed("access", accessType));
             return;
         }
-        String source;
-        while ((source = arguments.next()) != null) {
-            final Source parsed = Source.parse(source);
-            if (SourceType.REDSTONE.equals(parsed.getType()) || SourceType.BLOCK.equals(parsed.getType())) {
-                boltPlayer.getModifications().put(Source.of(parsed.getType()), access.type());
-            } else if (SourceType.PASSWORD.equals(parsed.getType())) {
-                boltPlayer.getModifications().put(Source.password(parsed.getIdentifier()), access.type());
-            } else if (SourceType.PERMISSION.equals(parsed.getType()) || SourceType.GROUP.equals(parsed.getType())) {
-                boltPlayer.getModifications().put(parsed, access.type());
-            } else {
-                final String playerSource = source;
-                BukkitAdapter.findOrLookupPlayerUniqueId(source).thenAccept(uuid -> {
+        final String sourceType = arguments.next();
+        if (sourceType == null || !plugin.getBolt().getSourceTypeRegistry().sourceTypes().contains(sourceType)) {
+            BoltComponents.sendMessage(sender, Translation.EDIT_SOURCE_INVALID, Placeholder.unparsed("source", sourceType));
+            return;
+        }
+        String identifier;
+        while ((identifier = arguments.next()) != null) {
+            if (SourceType.PLAYER.equals(sourceType)) {
+                String finalIdentifier = identifier;
+                BukkitAdapter.findOrLookupPlayerUniqueId(identifier).thenAccept(uuid -> {
                     if (uuid != null) {
                         boltPlayer.getModifications().put(Source.player(uuid), access.type());
                     } else {
-                        BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", playerSource));
+                        BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", finalIdentifier));
                     }
                 });
+            } else if (SourceType.PASSWORD.equals(sourceType)) {
+                boltPlayer.getModifications().put(Source.password(identifier), access.type());
+            } else {
+                boltPlayer.getModifications().put(Source.of(sourceType, identifier), access.type());
             }
         }
         BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.EDIT)));
@@ -81,6 +83,13 @@ public class EditCommand extends BoltCommand {
         arguments.next();
         if (arguments.remaining() == 0) {
             return plugin.getBolt().getAccessRegistry().accessTypes();
+        }
+        final String sourceType = arguments.next();
+        if (arguments.remaining() == 0) {
+            return plugin.getBolt().getSourceTypeRegistry().sourceTypes().stream().toList();
+        }
+        if (!SourceType.PLAYER.equals(sourceType)) {
+            return Collections.emptyList();
         }
         final Set<String> alreadyAdded = new HashSet<>();
         String added;
