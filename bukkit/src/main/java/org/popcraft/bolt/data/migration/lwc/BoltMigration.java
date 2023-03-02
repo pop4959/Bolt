@@ -37,7 +37,7 @@ public class BoltMigration {
     }
 
     public CompletableFuture<Void> convertAsync() {
-        return CompletableFuture.runAsync(this::convert).whenComplete((ignored, e) -> e.printStackTrace());
+        return CompletableFuture.runAsync(this::convert);
     }
 
     private void convert() {

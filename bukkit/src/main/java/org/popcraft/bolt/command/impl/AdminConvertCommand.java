@@ -40,12 +40,22 @@ public class AdminConvertCommand extends BoltCommand {
             final BoltMigration migration = new BoltMigration(plugin);
             BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed("source", "Bolt"), Placeholder.unparsed("destination", "LWC"));
             isConverting.set(true);
-            migration.convertAsync().thenRunAsync(() -> BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED), BukkitMainThreadExecutor.get()).thenRun(() -> isConverting.set(false));
+            migration.convertAsync().whenCompleteAsync((ignored, throwable) -> {
+                isConverting.set(false);
+                if (throwable != null) {
+                    throwable.printStackTrace();
+                }
+                BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED);
+            }, BukkitMainThreadExecutor.get());
         } else {
             final LWCMigration migration = new LWCMigration(plugin);
             BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed("source", "LWC"), Placeholder.unparsed("destination", "Bolt"));
             isConverting.set(true);
-            migration.convertAsync().thenAcceptAsync(memoryStore -> {
+            migration.convertAsync().whenCompleteAsync((memoryStore, throwable) -> {
+                isConverting.set(false);
+                if (throwable != null) {
+                    throwable.printStackTrace();
+                }
                 final Store destination = plugin.getBolt().getStore();
                 for (final BlockProtection blockProtection : memoryStore.loadBlockProtections().join()) {
                     destination.saveBlockProtection(blockProtection);
@@ -54,7 +64,7 @@ public class AdminConvertCommand extends BoltCommand {
                     destination.saveEntityProtection(entityProtection);
                 }
                 BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED);
-            }, BukkitMainThreadExecutor.get()).thenRun(() -> isConverting.set(false));
+            }, BukkitMainThreadExecutor.get());
         }
     }
 
