@@ -1,6 +1,4 @@
-package org.popcraft.bolt;
-
-import org.popcraft.bolt.util.Access;
+package org.popcraft.bolt.access;
 
 import java.util.ArrayList;
 import java.util.Collection;

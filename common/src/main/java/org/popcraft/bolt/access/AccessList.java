@@ -1,4 +1,4 @@
-package org.popcraft.bolt.util;
+package org.popcraft.bolt.access;
 
 import java.util.Map;
 import java.util.UUID;

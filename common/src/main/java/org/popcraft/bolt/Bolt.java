@@ -1,5 +1,6 @@
 package org.popcraft.bolt;
 
+import org.popcraft.bolt.access.AccessRegistry;
 import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.util.BoltPlayer;
 

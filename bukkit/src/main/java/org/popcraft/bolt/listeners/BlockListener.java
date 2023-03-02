@@ -42,7 +42,7 @@ import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.util.Access;
+import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;

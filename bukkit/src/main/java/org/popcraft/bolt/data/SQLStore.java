@@ -5,7 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
-import org.popcraft.bolt.util.AccessList;
+import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Group;
