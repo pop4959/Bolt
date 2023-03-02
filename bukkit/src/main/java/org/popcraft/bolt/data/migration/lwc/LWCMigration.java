@@ -41,7 +41,7 @@ public class LWCMigration {
     }
 
     public CompletableFuture<MemoryStore> convertAsync() {
-        return CompletableFuture.supplyAsync(this::convert);
+        return CompletableFuture.supplyAsync(this::convert).whenComplete((ignored, e) -> e.printStackTrace());
     }
 
     private MemoryStore convert() {
