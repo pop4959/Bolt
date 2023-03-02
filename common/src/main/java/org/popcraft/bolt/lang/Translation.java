@@ -34,6 +34,7 @@ public class Translation {
     public static final String GROUP_LIST_MEMBERS = "group_list_members";
     public static final String MIGRATION_STARTED = "migration_started";
     public static final String MIGRATION_COMPLETED = "migration_completed";
+    public static final String MIGRATION_LWC_MISSING = "migration_lwc_missing";
     public static final String MODE_DISABLED = "mode_disabled";
     public static final String MODE_ENABLED = "mode_enabled";
     public static final String MODE_INVALID = "mode_invalid";

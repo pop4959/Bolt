@@ -26,6 +26,10 @@ public class AdminConvertCommand extends BoltCommand {
     public void execute(CommandSender sender, Arguments arguments) {
         final boolean convertBack = arguments.remaining() > 0 && arguments.next().equals("back");
         if (convertBack) {
+            if (!plugin.getServer().getPluginManager().isPluginEnabled("LWC")) {
+                BoltComponents.sendMessage(sender, Translation.MIGRATION_LWC_MISSING);
+                return;
+            }
             final BoltMigration migration = new BoltMigration(plugin);
             BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed("source", "Bolt"), Placeholder.unparsed("destination", "LWC"));
             migration.convertAsync().thenRunAsync(() -> BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED), BukkitMainThreadExecutor.get());
