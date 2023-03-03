@@ -7,7 +7,11 @@ public interface ProfileCache {
 
     void add(final UUID uuid, final String name);
 
-    UUID getUniqueId(final String name);
+    Profile getProfile(final UUID uuid);
+
+    Profile getProfile(final String name);
 
     String getName(final UUID uuid);
+
+    UUID getUniqueId(final String name);
 }

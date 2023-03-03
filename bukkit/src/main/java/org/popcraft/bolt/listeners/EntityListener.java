@@ -173,9 +173,9 @@ public final class EntityListener implements Listener {
                 }
             }
             if (shouldSendMessage && hasNotifyPermission) {
-                BukkitAdapter.findOrLookupPlayerName(protection.getOwner()).thenAccept(name -> {
+                BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> {
                     final boolean isYou = player.getUniqueId().equals(protection.getOwner());
-                    final String owner = isYou ? translate(Translation.YOU) : name;
+                    final String owner = isYou ? translate(Translation.YOU) : profile.name();
                     if (owner == null) {
                         BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY_GENERIC, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)));
                     } else {
@@ -229,7 +229,7 @@ public final class EntityListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
-                    BukkitAdapter.findOrLookupPlayerName(protection.getOwner()).thenAccept(owner -> BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", owner), Placeholder.unparsed("access_count", String.valueOf(protection.getAccess().size())), Placeholder.unparsed("access_list", Protections.accessList(protection))));
+                    BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", profile.name()), Placeholder.unparsed("access_count", String.valueOf(protection.getAccess().size())), Placeholder.unparsed("access_list", Protections.accessList(protection))));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, plugin.isUseActionBar(), Placeholder.unparsed("type", Protections.displayType(entity)));
                 }
@@ -261,7 +261,7 @@ public final class EntityListener implements Listener {
                         final UUID uuid = UUID.fromString(action.getData());
                         protection.setOwner(uuid);
                         plugin.saveProtection(protection);
-                        BukkitAdapter.findOrLookupPlayerName(uuid).thenAccept(owner -> BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(owner).orElse(translate(Translation.UNKNOWN)))));
+                        BukkitAdapter.findOrLookupProfileByUniqueId(uuid).thenAccept(profile -> BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, plugin.isUseActionBar(), Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN)))));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER, plugin.isUseActionBar());
                     }

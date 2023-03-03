@@ -30,14 +30,14 @@ public class AdminPurgeCommand extends BoltCommand {
             return;
         }
         final String owner = arguments.next();
-        BukkitAdapter.findOrLookupPlayerUniqueId(owner).thenAccept(uuid -> {
-            if (uuid != null) {
+        BukkitAdapter.findOrLookupProfileByName(owner).thenAccept(profile -> {
+            if (profile.uuid() != null) {
                 final Store store = plugin.getBolt().getStore();
                 store.loadBlockProtections().join().stream()
-                        .filter(protection -> protection.getOwner().equals(uuid))
+                        .filter(protection -> protection.getOwner().equals(profile.uuid()))
                         .forEach(store::removeBlockProtection);
                 store.loadEntityProtections().join().stream()
-                        .filter(protection -> protection.getOwner().equals(uuid))
+                        .filter(protection -> protection.getOwner().equals(profile.uuid()))
                         .forEach(store::removeEntityProtection);
                 BoltComponents.sendMessage(player, Translation.PURGE, Placeholder.unparsed("player", owner));
             } else {

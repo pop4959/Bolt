@@ -123,9 +123,9 @@ public final class Protections {
             if (SourceType.PLAYER.equals(source.getType())) {
                 final String playerUuid = source.getIdentifier();
                 final UUID uuid = UUID.fromString(playerUuid);
-                final String playerName = BukkitAdapter.findPlayerName(uuid);
+                final String playerName = BukkitAdapter.findProfileByUniqueId(uuid).name();
                 if (playerName == null) {
-                    BukkitAdapter.lookupPlayerName(uuid);
+                    BukkitAdapter.lookupProfileByUniqueId(uuid);
                 }
                 subject = Optional.ofNullable(playerName).orElse(playerUuid);
             } else if (SourceType.PASSWORD.equals(source.getType()) || source.getType().equals(source.getIdentifier())) {

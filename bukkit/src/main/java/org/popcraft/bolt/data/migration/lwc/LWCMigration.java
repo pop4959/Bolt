@@ -5,6 +5,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.data.MemoryStore;
+import org.popcraft.bolt.data.Profile;
 import org.popcraft.bolt.data.SQLStore;
 import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
@@ -118,9 +119,9 @@ public class LWCMigration {
                     if (rights.getType() == Permission.Type.GROUP.ordinal()) {
                         access.put(Source.of(SourceType.GROUP, rights.getName()).toString(), accessType);
                     } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
-                        final UUID uuid = BukkitAdapter.findOrLookupPlayerUniqueId(rights.getName()).join();
-                        if (uuid != null) {
-                            access.put(Source.player(uuid).toString(), accessType);
+                        final Profile profile = BukkitAdapter.findOrLookupProfileByName(rights.getName()).join();
+                        if (profile.uuid() != null) {
+                            access.put(Source.player(profile.uuid()).toString(), accessType);
                         }
                     } else if (rights.getType() == Permission.Type.TOWN.ordinal()) {
                         access.put(Source.of(SourceType.TOWN, rights.getName()).toString(), accessType);
@@ -135,10 +136,10 @@ public class LWCMigration {
                     access.put(passwordSource.toString(), DEFAULT_ACCESS_NORMAL);
                 }
             }
-            final UUID ownerUUID = BukkitAdapter.findOrLookupPlayerUniqueId(protection.owner()).join();
+            final Profile ownerProfile = BukkitAdapter.findOrLookupProfileByName(protection.owner()).join();
             store.saveBlockProtection(new BlockProtection(
                     UUID.randomUUID(),
-                    Objects.requireNonNullElse(ownerUUID, BukkitAdapter.NIL_UUID),
+                    Objects.requireNonNullElse(ownerProfile.uuid(), BukkitAdapter.NIL_UUID),
                     protectionType,
                     protection.date().getTime(),
                     TimeUnit.MILLISECONDS.convert(protection.lastAccessed(), TimeUnit.SECONDS),

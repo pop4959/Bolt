@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SimpleProfileCache implements ProfileCache {
+    public static final Profile EMPTY_PROFILE = new Profile(null, null);
     private final Path path;
     private final Map<UUID, String> uuidName = new ConcurrentHashMap<>();
     private final Map<String, UUID> nameUuid = new ConcurrentHashMap<>();
@@ -59,12 +60,22 @@ public class SimpleProfileCache implements ProfileCache {
     }
 
     @Override
-    public UUID getUniqueId(final String name) {
-        return nameUuid.get(name);
+    public Profile getProfile(final UUID uuid) {
+        return new Profile(uuid, getName(uuid));
+    }
+
+    @Override
+    public Profile getProfile(final String name) {
+        return new Profile(getUniqueId(name), name);
     }
 
     @Override
     public String getName(final UUID uuid) {
         return uuidName.get(uuid);
+    }
+
+    @Override
+    public UUID getUniqueId(final String name) {
+        return nameUuid.get(name);
     }
 }

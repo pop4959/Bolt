@@ -30,9 +30,9 @@ public class TransferCommand extends BoltCommand {
             return;
         }
         final String owner = arguments.next();
-        BukkitAdapter.findOrLookupPlayerUniqueId(owner).thenAccept(uuid -> {
-            if (uuid != null) {
-                plugin.player(player).setAction(new Action(Action.Type.TRANSFER, uuid.toString()));
+        BukkitAdapter.findOrLookupProfileByName(owner).thenAccept(profile -> {
+            if (profile.uuid() != null) {
+                plugin.player(player).setAction(new Action(Action.Type.TRANSFER, profile.uuid().toString()));
                 BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER);
             } else {
                 BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", owner));

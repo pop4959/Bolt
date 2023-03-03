@@ -55,9 +55,9 @@ public class EditCommand extends BoltCommand {
         while ((identifier = arguments.next()) != null) {
             if (SourceType.PLAYER.equals(sourceType)) {
                 String finalIdentifier = identifier;
-                BukkitAdapter.findOrLookupPlayerUniqueId(identifier).thenAccept(uuid -> {
-                    if (uuid != null) {
-                        boltPlayer.getModifications().put(Source.player(uuid), access.type());
+                BukkitAdapter.findOrLookupProfileByName(identifier).thenAccept(profile -> {
+                    if (profile.uuid() != null) {
+                        boltPlayer.getModifications().put(Source.player(profile.uuid()), access.type());
                     } else {
                         BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", finalIdentifier));
                     }

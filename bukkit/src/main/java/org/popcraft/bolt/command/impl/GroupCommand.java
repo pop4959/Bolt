@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.data.Profile;
 import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.BoltComponents;
@@ -37,18 +38,21 @@ public class GroupCommand extends BoltCommand {
         }
         final String action = arguments.next().toLowerCase();
         final String group = arguments.next();
-        final List<CompletableFuture<UUID>> memberFutures = new ArrayList<>();
+        final List<CompletableFuture<Profile>> memberFutures = new ArrayList<>();
         final List<String> memberNames = new ArrayList<>();
         String member;
         while ((member = arguments.next()) != null) {
-            memberFutures.add(BukkitAdapter.findOrLookupPlayerUniqueId(member));
+            memberFutures.add(BukkitAdapter.findOrLookupProfileByName(member));
             memberNames.add(member);
         }
         CompletableFuture.allOf(memberFutures.toArray(new CompletableFuture[0])).thenRun(() -> {
             final List<UUID> members = new ArrayList<>();
             memberFutures.forEach(memberFuture -> {
                 if (memberFuture != null) {
-                    members.add(memberFuture.join());
+                    final Profile memberProfile = memberFuture.join();
+                    if (memberProfile.uuid() != null) {
+                        members.add(memberProfile.uuid());
+                    }
                 }
             });
             final Store store = plugin.getBolt().getStore();
@@ -99,13 +103,16 @@ public class GroupCommand extends BoltCommand {
                     if (existingGroup == null) {
                         BoltComponents.sendMessage(player, Translation.GROUP_DOESNT_EXIST, Placeholder.unparsed("group", group));
                     } else {
-                        final List<CompletableFuture<String>> existingMemberFutures = new ArrayList<>();
-                        existingGroup.getMembers().forEach(existingMember -> existingMemberFutures.add(BukkitAdapter.findOrLookupPlayerName(existingMember)));
+                        final List<CompletableFuture<Profile>> existingMemberFutures = new ArrayList<>();
+                        existingGroup.getMembers().forEach(existingMember -> existingMemberFutures.add(BukkitAdapter.findOrLookupProfileByUniqueId(existingMember)));
                         CompletableFuture.allOf(existingMemberFutures.toArray(new CompletableFuture[0])).thenRun(() -> {
                             final List<String> existingMemberNames = new ArrayList<>();
                             existingMemberFutures.forEach(existingMemberFuture -> {
                                 if (existingMemberFuture != null) {
-                                    existingMemberNames.add(existingMemberFuture.join());
+                                    final Profile existingMemberProfile = existingMemberFuture.join();
+                                    if (existingMemberProfile.name() != null) {
+                                        existingMemberNames.add(existingMemberProfile.name());
+                                    }
                                 }
                             });
                             final String memberList = String.join(", ", existingMemberNames);

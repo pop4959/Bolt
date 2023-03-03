@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.data.Profile;
 import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.Action;
@@ -34,37 +35,37 @@ public class AdminTransferCommand extends BoltCommand {
         }
         final String owner = arguments.next();
         final String newOwner = arguments.next();
-        final CompletableFuture<UUID> ownerUuidFuture = BukkitAdapter.findOrLookupPlayerUniqueId(owner);
-        final CompletableFuture<UUID> newOwnerUuidFuture = BukkitAdapter.findOrLookupPlayerUniqueId(newOwner);
+        final CompletableFuture<Profile> ownerProfileFuture = BukkitAdapter.findOrLookupProfileByName(owner);
+        final CompletableFuture<Profile> newOwnerProfileFuture = BukkitAdapter.findOrLookupProfileByName(newOwner);
         if (newOwner != null) {
-            CompletableFuture.allOf(ownerUuidFuture, newOwnerUuidFuture).thenRun(() -> {
-                final UUID ownerUuid = ownerUuidFuture.join();
-                final UUID newOwnerUuid = newOwnerUuidFuture.join();
-                if (ownerUuid == null) {
+            CompletableFuture.allOf(ownerProfileFuture, newOwnerProfileFuture).thenRun(() -> {
+                final Profile ownerProfile = ownerProfileFuture.join();
+                final Profile newOwnerProfile = newOwnerProfileFuture.join();
+                if (ownerProfile.uuid() == null) {
                     BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", owner));
-                } else if (newOwnerUuid == null) {
+                } else if (newOwnerProfile.uuid() == null) {
                     BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", newOwner));
                 } else {
                     final Store store = plugin.getBolt().getStore();
                     store.loadBlockProtections().join().stream()
-                            .filter(protection -> protection.getOwner().equals(ownerUuid))
+                            .filter(protection -> protection.getOwner().equals(ownerProfile.uuid()))
                             .forEach(protection -> {
-                                protection.setOwner(newOwnerUuid);
+                                protection.setOwner(newOwnerProfile.uuid());
                                 store.saveBlockProtection(protection);
                             });
                     store.loadEntityProtections().join().stream()
-                            .filter(protection -> protection.getOwner().equals(ownerUuid))
+                            .filter(protection -> protection.getOwner().equals(ownerProfile.uuid()))
                             .forEach(protection -> {
-                                protection.setOwner(newOwnerUuid);
+                                protection.setOwner(newOwnerProfile.uuid());
                                 store.saveEntityProtection(protection);
                             });
                     BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_ALL, Placeholder.unparsed("old", owner), Placeholder.unparsed("new", newOwner));
                 }
             });
         } else {
-            ownerUuidFuture.thenAccept(uuid -> {
-                if (uuid != null) {
-                    plugin.player(player).setAction(new Action(Action.Type.TRANSFER, uuid.toString(), true));
+            ownerProfileFuture.thenAccept(profile -> {
+                if (profile.uuid() != null) {
+                    plugin.player(player).setAction(new Action(Action.Type.TRANSFER, profile.uuid().toString(), true));
                     BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER);
                 } else {
                     BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", owner));
