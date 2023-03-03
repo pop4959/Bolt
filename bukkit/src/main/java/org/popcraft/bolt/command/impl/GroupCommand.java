@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class GroupCommand extends BoltCommand {
     public GroupCommand(BoltPlugin plugin) {
@@ -38,31 +37,23 @@ public class GroupCommand extends BoltCommand {
         }
         final String action = arguments.next().toLowerCase();
         final String group = arguments.next();
-        final List<CompletableFuture<Profile>> memberFutures = new ArrayList<>();
-        final List<String> memberNames = new ArrayList<>();
+        final List<String> members = new ArrayList<>();
         String member;
         while ((member = arguments.next()) != null) {
-            memberFutures.add(BukkitAdapter.findOrLookupProfileByName(member));
-            memberNames.add(member);
+            members.add(member);
         }
-        CompletableFuture.allOf(memberFutures.toArray(new CompletableFuture[0])).thenRun(() -> {
-            final List<UUID> members = new ArrayList<>();
-            memberFutures.forEach(memberFuture -> {
-                if (memberFuture != null) {
-                    final Profile memberProfile = memberFuture.join();
-                    if (memberProfile.uuid() != null) {
-                        members.add(memberProfile.uuid());
-                    }
-                }
-            });
+        BukkitAdapter.findOrLookupProfilesByNames(members).thenAccept(profiles -> {
             final Store store = plugin.getBolt().getStore();
             final Group existingGroup = store.loadGroup(group).join();
+            final List<Profile> completeProfiles = profiles.stream().filter(Profile::complete).toList();
+            final List<UUID> uuids = new ArrayList<>(completeProfiles.stream().map(Profile::uuid).toList());
+            final List<String> names = new ArrayList<>(completeProfiles.stream().map(Profile::name).toList());
             switch (action) {
                 case "create":
                     if (existingGroup != null) {
                         BoltComponents.sendMessage(player, Translation.GROUP_ALREADY_EXISTS, Placeholder.unparsed("group", group));
                     } else {
-                        store.saveGroup(new Group(group, player.getUniqueId(), members));
+                        store.saveGroup(new Group(group, player.getUniqueId(), uuids));
                         BoltComponents.sendMessage(player, Translation.GROUP_CREATED, Placeholder.unparsed("group", group));
                     }
                     break;
@@ -76,16 +67,15 @@ public class GroupCommand extends BoltCommand {
                         BoltComponents.sendMessage(player, Translation.GROUP_DELETED, Placeholder.unparsed("group", group));
                     }
                     break;
-
                 case "add":
                     if (existingGroup == null) {
                         BoltComponents.sendMessage(player, Translation.GROUP_DOESNT_EXIST, Placeholder.unparsed("group", group));
                     } else if (!existingGroup.getOwner().equals(player.getUniqueId())) {
                         BoltComponents.sendMessage(player, Translation.GROUP_NOT_OWNER, Placeholder.unparsed("group", group));
                     } else {
-                        existingGroup.getMembers().addAll(members);
+                        existingGroup.getMembers().addAll(uuids);
                         store.saveGroup(existingGroup);
-                        memberNames.forEach(memberName -> BoltComponents.sendMessage(player, Translation.GROUP_PLAYER_ADD, Placeholder.unparsed("player", memberName), Placeholder.unparsed("group", group)));
+                        names.forEach(name -> BoltComponents.sendMessage(player, Translation.GROUP_PLAYER_ADD, Placeholder.unparsed("player", name), Placeholder.unparsed("group", group)));
                     }
                     break;
                 case "remove":
@@ -94,28 +84,18 @@ public class GroupCommand extends BoltCommand {
                     } else if (!existingGroup.getOwner().equals(player.getUniqueId())) {
                         BoltComponents.sendMessage(player, Translation.GROUP_NOT_OWNER, Placeholder.unparsed("group", group));
                     } else {
-                        existingGroup.getMembers().removeAll(members);
+                        existingGroup.getMembers().removeAll(uuids);
                         store.saveGroup(existingGroup);
-                        memberNames.forEach(memberName -> BoltComponents.sendMessage(player, Translation.GROUP_PLAYER_REMOVE, Placeholder.unparsed("player", memberName), Placeholder.unparsed("group", group)));
+                        names.forEach(name -> BoltComponents.sendMessage(player, Translation.GROUP_PLAYER_REMOVE, Placeholder.unparsed("player", name), Placeholder.unparsed("group", group)));
                     }
                     break;
                 case "list":
                     if (existingGroup == null) {
                         BoltComponents.sendMessage(player, Translation.GROUP_DOESNT_EXIST, Placeholder.unparsed("group", group));
                     } else {
-                        final List<CompletableFuture<Profile>> existingMemberFutures = new ArrayList<>();
-                        existingGroup.getMembers().forEach(existingMember -> existingMemberFutures.add(BukkitAdapter.findOrLookupProfileByUniqueId(existingMember)));
-                        CompletableFuture.allOf(existingMemberFutures.toArray(new CompletableFuture[0])).thenRun(() -> {
-                            final List<String> existingMemberNames = new ArrayList<>();
-                            existingMemberFutures.forEach(existingMemberFuture -> {
-                                if (existingMemberFuture != null) {
-                                    final Profile existingMemberProfile = existingMemberFuture.join();
-                                    if (existingMemberProfile.name() != null) {
-                                        existingMemberNames.add(existingMemberProfile.name());
-                                    }
-                                }
-                            });
-                            final String memberList = String.join(", ", existingMemberNames);
+                        BukkitAdapter.findOrLookupProfilesByUniqueIds(existingGroup.getMembers()).thenAccept(existingProfiles -> {
+                            final List<String> memberNames = existingProfiles.stream().filter(Profile::complete).map(Profile::name).toList();
+                            final String memberList = String.join(", ", memberNames);
                             BoltComponents.sendMessage(player, Translation.GROUP_LIST_MEMBERS, Placeholder.unparsed("group", group), Placeholder.unparsed("members", memberList));
                         });
                     }
