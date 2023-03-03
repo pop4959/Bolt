@@ -275,12 +275,12 @@ public class BoltPlugin extends JavaPlugin {
                 if (key.startsWith("#")) {
                     final Tag<Material> tag = resolveTagProtectableAccess(Tag.REGISTRY_BLOCKS, Material.class, key.substring(1));
                     if (tag == null) {
-                        getLogger().warning(() -> "Invalid block tag defined: %s. Skipping.".formatted(key));
+                        getLogger().warning(() -> "Invalid block tag defined in config: %s. Skipping.".formatted(key));
                         continue;
                     }
                     tag.getValues().forEach(block -> protectableBlocks.put(block, defaultAccess));
                 } else {
-                    EnumUtil.valueOf(Material.class, key.toUpperCase()).filter(Material::isBlock).ifPresentOrElse(block -> protectableBlocks.put(block, defaultAccess), () -> getLogger().warning(() -> "Invalid block defined: %s. Skipping.".formatted(key)));
+                    EnumUtil.valueOf(Material.class, key.toUpperCase()).filter(Material::isBlock).ifPresentOrElse(block -> protectableBlocks.put(block, defaultAccess), () -> getLogger().warning(() -> "Invalid block defined in config: %s. Skipping.".formatted(key)));
                 }
             }
         }
@@ -292,12 +292,12 @@ public class BoltPlugin extends JavaPlugin {
                 if (key.startsWith("#")) {
                     final Tag<EntityType> tag = resolveTagProtectableAccess(Tag.REGISTRY_ENTITY_TYPES, EntityType.class, key.substring(1));
                     if (tag == null) {
-                        getLogger().warning(() -> "Invalid entity tag defined: %s. Skipping.".formatted(key));
+                        getLogger().warning(() -> "Invalid entity tag defined in config: %s. Skipping.".formatted(key));
                         continue;
                     }
                     tag.getValues().forEach(entity -> protectableEntities.put(entity, defaultAccess));
                 } else {
-                    EnumUtil.valueOf(EntityType.class, key.toUpperCase()).ifPresentOrElse(entity -> protectableEntities.put(entity, defaultAccess), () -> getLogger().warning(() -> "Invalid entity defined: %s. Skipping.".formatted(key)));
+                    EnumUtil.valueOf(EntityType.class, key.toUpperCase()).ifPresentOrElse(entity -> protectableEntities.put(entity, defaultAccess), () -> getLogger().warning(() -> "Invalid entity defined in config: %s. Skipping.".formatted(key)));
                 }
             }
         }
