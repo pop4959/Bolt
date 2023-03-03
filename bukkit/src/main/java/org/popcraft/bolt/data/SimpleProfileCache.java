@@ -61,21 +61,11 @@ public class SimpleProfileCache implements ProfileCache {
 
     @Override
     public Profile getProfile(final UUID uuid) {
-        return new Profile(uuid, getName(uuid));
+        return new Profile(uuid, uuidName.get(uuid));
     }
 
     @Override
     public Profile getProfile(final String name) {
-        return new Profile(getUniqueId(name), name);
-    }
-
-    @Override
-    public String getName(final UUID uuid) {
-        return uuidName.get(uuid);
-    }
-
-    @Override
-    public UUID getUniqueId(final String name) {
-        return nameUuid.get(name);
+        return new Profile(nameUuid.get(name), name);
     }
 }
