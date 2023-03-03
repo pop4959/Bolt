@@ -5,17 +5,24 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
+import org.popcraft.bolt.util.EnumUtil;
 
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
 public class FrogspawnMatcher implements BlockMatcher {
+    private static final Material FROGSPAWN = EnumUtil.valueOf(Material.class, "FROGSPAWN").orElse(null);
     private boolean enabled;
 
     @Override
     public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
-        enabled = protectableBlocks.contains(Material.FROGSPAWN);
+        // Future: Replace with Material.FROGSPAWN
+        if (FROGSPAWN == null) {
+            enabled = false;
+        } else {
+            enabled = protectableBlocks.contains(FROGSPAWN);
+        }
     }
 
     @Override
@@ -31,7 +38,7 @@ public class FrogspawnMatcher implements BlockMatcher {
     @Override
     public Optional<Match> findMatch(Block block) {
         final Block above = block.getRelative(BlockFace.UP);
-        if (Material.FROGSPAWN.equals(above.getType())) {
+        if (above.getType().equals(FROGSPAWN)) {
             return Optional.of(Match.ofBlocks(Collections.singleton(above)));
         }
         return Optional.empty();

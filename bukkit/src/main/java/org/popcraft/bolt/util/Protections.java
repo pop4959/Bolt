@@ -24,6 +24,18 @@ import java.util.UUID;
 import static org.popcraft.bolt.lang.Translator.translate;
 
 public final class Protections {
+    // Future: Remove when support for lower than 1.19.3 is dropped
+    private static boolean translatableSupport;
+
+    static {
+        try {
+            Class.forName("org.bukkit.Translatable");
+            translatableSupport = true;
+        } catch (ClassNotFoundException e) {
+            translatableSupport = false;
+        }
+    }
+
     private Protections() {
     }
 
@@ -37,14 +49,22 @@ public final class Protections {
                 return Strings.toTitleCase(blockProtection.getBlock());
             } else {
                 final Block block = world.getBlockAt(x, y, z);
-                return displayType(block);
+                if (translatableSupport) {
+                    return displayType(block);
+                } else {
+                    return displayTypeFromData(block);
+                }
             }
         } else if (protection instanceof final EntityProtection entityProtection) {
             final Entity entity = Bukkit.getServer().getEntity(entityProtection.getId());
             if (entity == null) {
                 return Strings.toTitleCase(entityProtection.getEntity());
             } else {
-                return displayType(entity);
+                if (translatableSupport) {
+                    return displayType(entity);
+                } else {
+                    return displayTypeFromData(entity);
+                }
             }
         } else {
             return translate(Translation.UNKNOWN);
@@ -69,6 +89,26 @@ public final class Protections {
         }
         final Component translatable = Component.translatable(entity.getType().getTranslationKey());
         return BukkitComponentSerializer.legacy().serialize(translatable);
+    }
+
+    public static String displayTypeFromData(final Block block) {
+        if (block.getState() instanceof final Nameable nameable && nameable.getCustomName() != null && !nameable.getCustomName().isEmpty()) {
+            return nameable.getCustomName();
+        }
+        final String blockDataString = block.getBlockData().getAsString().replace(':', '.');
+        final int nbtIndex = blockDataString.indexOf('[');
+        final String key;
+        if (nbtIndex > -1) {
+            key = blockDataString.substring(0, nbtIndex);
+        } else {
+            key = blockDataString;
+        }
+        final Component translatable = Component.translatable("block.%s".formatted(key));
+        return BukkitComponentSerializer.legacy().serialize(translatable);
+    }
+
+    public static String displayTypeFromData(final Entity entity) {
+        return entity.getName();
     }
 
     public static String accessList(final Protection protection) {
