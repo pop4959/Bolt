@@ -29,7 +29,7 @@ public class AdminReportCommand extends BoltCommand {
     public void execute(CommandSender sender, Arguments arguments) {
         if (!Metrics.isEnabled()) {
             Metrics.setEnabled(true);
-            BoltComponents.sendMessage(sender, "Enabling reports. This will have a performance impact. Type '/bolt report disable' to turn off reports. Type '/bolt report' again to generate an updated report.");
+            BoltComponents.sendMessage(sender, "Enabling reports. This will have a performance impact. Type '/bolt admin report disable' to turn off reports. Type '/bolt admin report' again to generate an updated report.");
             return;
         }
         final boolean disable = arguments.next() != null;
