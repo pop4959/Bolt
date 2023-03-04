@@ -47,6 +47,7 @@ public class Translation {
     public static final String RELOAD = "reload";
     public static final String LOCKED = "locked";
     public static final String INFO = "info";
+    public static final String INFO_SELF = "info_self";
     public static final String UNKNOWN = "unknown";
     public static final String EMPTY = "empty";
     public static final String YOU = "you";

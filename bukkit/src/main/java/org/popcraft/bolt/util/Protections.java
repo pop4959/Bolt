@@ -111,8 +111,7 @@ public final class Protections {
         return entity.getName();
     }
 
-    public static String accessList(final Protection protection) {
-        final Map<String, String> accessMap = protection.getAccess();
+    public static String accessList(final Map<String, String> accessMap) {
         if (accessMap == null || accessMap.isEmpty()) {
             return "";
         }

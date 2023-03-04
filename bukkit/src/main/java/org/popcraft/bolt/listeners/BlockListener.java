@@ -169,7 +169,7 @@ public final class BlockListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
-                    BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", profile.name()), Placeholder.unparsed("access_count", String.valueOf(protection.getAccess().size())), Placeholder.unparsed("access_list", Protections.accessList(protection))));
+                    BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed("access", Strings.toTitleCase(protection.getType())), Placeholder.unparsed("type", Protections.displayType(protection)), Placeholder.unparsed("owner", profile.name()), Placeholder.unparsed("access_count", String.valueOf(protection.getAccess().size())), Placeholder.unparsed("access_list", Protections.accessList(protection.getAccess()))));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, plugin.isUseActionBar(), Placeholder.unparsed("type", Protections.displayType(block)));
                 }
