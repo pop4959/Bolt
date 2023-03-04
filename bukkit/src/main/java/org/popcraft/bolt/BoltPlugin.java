@@ -31,6 +31,7 @@ import org.popcraft.bolt.command.impl.LockCommand;
 import org.popcraft.bolt.command.impl.ModeCommand;
 import org.popcraft.bolt.command.impl.PasswordCommand;
 import org.popcraft.bolt.command.impl.TransferCommand;
+import org.popcraft.bolt.command.impl.TrustCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
 import org.popcraft.bolt.data.ProfileCache;
 import org.popcraft.bolt.data.SQLStore;
@@ -347,6 +348,7 @@ public class BoltPlugin extends JavaPlugin {
         commands.put("mode", new ModeCommand(this));
         commands.put("password", new PasswordCommand(this));
         commands.put("transfer", new TransferCommand(this));
+        commands.put("trust", new TrustCommand(this));
         commands.put("unlock", new UnlockCommand(this));
     }
 

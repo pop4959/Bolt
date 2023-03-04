@@ -35,6 +35,8 @@ permissions:
     default: true
   bolt.command.transfer:
     default: true
+  bolt.command.trust:
+    default: true
   bolt.command.unlock:
     default: true
   bolt.protection.notify:

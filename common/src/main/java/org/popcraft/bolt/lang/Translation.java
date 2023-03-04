@@ -45,6 +45,9 @@ public class Translation {
     public static final String PROTECTION_NOTIFY_GENERIC = "protection_notify_generic";
     public static final String PURGE = "purge";
     public static final String RELOAD = "reload";
+    public static final String TRUST_CONFIRM = "trust_confirm";
+    public static final String TRUST_EDITED = "trust_edited";
+    public static final String TRUST_EDITED_FAILED = "trust_edited_failed";
     public static final String LOCKED = "locked";
     public static final String INFO = "info";
     public static final String INFO_SELF = "info_self";
