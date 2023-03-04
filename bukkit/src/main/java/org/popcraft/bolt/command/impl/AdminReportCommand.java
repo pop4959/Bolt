@@ -17,9 +17,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AdminReportCommand extends BoltCommand {
+    private final Map<Metrics.ProtectionAccess, Long> previousExecutionCounts = new HashMap<>();
     private long previousHits;
     private long previousMisses;
-    private Map<Metrics.ProtectionAccess, Long> previousExecutionCounts;
 
     public AdminReportCommand(BoltPlugin plugin) {
         super(plugin);
@@ -53,14 +53,15 @@ public class AdminReportCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, "<type>", Placeholder.unparsed("type", type));
             list.forEach(protectionAccess -> {
                 final long count = protectionAccessCounts.get(protectionAccess);
-                final long previousCount = previousExecutionCounts == null ? 0 : previousExecutionCounts.getOrDefault(protectionAccess, 0L);
+                final long previousCount = previousExecutionCounts.getOrDefault(protectionAccess, 0L);
                 final boolean countChanged = count != previousCount;
                 BoltComponents.sendMessage(sender, "<consumer>: <count>", Placeholder.unparsed("consumer", protectionAccess.consumer()), Placeholder.component("count", changeComponent(countChanged, previousCount, count)));
             });
         });
         this.previousHits = hits;
         this.previousMisses = misses;
-        this.previousExecutionCounts = new HashMap<>(protectionAccessCounts);
+        this.previousExecutionCounts.clear();
+        this.previousExecutionCounts.putAll(protectionAccessCounts);
     }
 
     private Component changeComponent(final boolean changed, final long before, final long after) {
