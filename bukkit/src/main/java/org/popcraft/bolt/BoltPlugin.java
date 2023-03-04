@@ -486,6 +486,11 @@ public class BoltPlugin extends JavaPlugin {
                 accessRegistry.getAccessByType(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
             }
         });
+        bolt.getStore().loadAccessList(protection.getOwner()).join().getAccess().forEach((source, accessType) -> {
+            if (sourceResolver.resolve(Source.parse(source))) {
+                accessRegistry.getAccessByType(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
+            }
+        });
         for (final String permission : permissions) {
             if (!heldPermissions.contains(permission)) {
                 return false;
