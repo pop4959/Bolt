@@ -19,6 +19,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.access.AccessRegistry;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
@@ -35,6 +36,7 @@ import org.popcraft.bolt.data.ProfileCache;
 import org.popcraft.bolt.data.SQLStore;
 import org.popcraft.bolt.data.SimpleProfileCache;
 import org.popcraft.bolt.data.SimpleProtectionCache;
+import org.popcraft.bolt.data.migration.lwc.TrustMigration;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.lang.Translator;
 import org.popcraft.bolt.listeners.BlockListener;
@@ -106,15 +108,14 @@ import org.popcraft.bolt.matcher.entity.EntityMatcher;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.access.Access;
+import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceResolver;
+import org.popcraft.bolt.source.SourceType;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
-import org.popcraft.bolt.source.Source;
-import org.popcraft.bolt.source.SourceResolver;
-import org.popcraft.bolt.source.SourceType;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -185,6 +186,8 @@ public class BoltPlugin extends JavaPlugin {
         profileCache.load();
         final Metrics metrics = new Metrics(this, 17711);
         registerCustomCharts(metrics);
+        // Future: Move this into LWC Migration
+        new TrustMigration(this).convert();
     }
 
     @Override
