@@ -20,6 +20,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.popcraft.bolt.access.Access;
+import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.access.AccessRegistry;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
@@ -488,11 +489,14 @@ public class BoltPlugin extends JavaPlugin {
                 accessRegistry.getAccessByType(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
             }
         });
-        bolt.getStore().loadAccessList(protection.getOwner()).join().getAccess().forEach((source, accessType) -> {
-            if (sourceResolver.resolve(Source.parse(source))) {
-                accessRegistry.getAccessByType(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
-            }
-        });
+        final AccessList accessList = bolt.getStore().loadAccessList(protection.getOwner()).join();
+        if (accessList != null) {
+            accessList.getAccess().forEach((source, accessType) -> {
+                if (sourceResolver.resolve(Source.parse(source))) {
+                    accessRegistry.getAccessByType(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
+                }
+            });
+        }
         for (final String permission : permissions) {
             if (!heldPermissions.contains(permission)) {
                 return false;
