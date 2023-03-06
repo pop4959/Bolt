@@ -27,8 +27,11 @@ public class BukkitPlayerResolver implements SourceResolver {
         if (boltPlayer.sources().contains(source)) {
             return true;
         }
-        if (SourceType.GROUP.equals(source.getType()) && bolt.getStore().loadGroup(source.getIdentifier()).join().getMembers().contains(uuid)) {
-            return true;
+        if (SourceType.GROUP.equals(source.getType())) {
+            final Group group = bolt.getStore().loadGroup(source.getIdentifier()).join();
+            if (group != null && group.getMembers().contains(uuid)) {
+                return true;
+            }
         }
         return player != null && SourceType.PERMISSION.equals(source.getType()) && player.hasPermission(source.getIdentifier());
     }
