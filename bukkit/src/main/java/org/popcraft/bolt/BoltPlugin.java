@@ -69,6 +69,7 @@ import org.popcraft.bolt.matcher.block.FrogspawnMatcher;
 import org.popcraft.bolt.matcher.block.GlowLichenMatcher;
 import org.popcraft.bolt.matcher.block.GrassMatcher;
 import org.popcraft.bolt.matcher.block.HangingRootsMatcher;
+import org.popcraft.bolt.matcher.block.HangingSignMatcher;
 import org.popcraft.bolt.matcher.block.HangingVineMatcher;
 import org.popcraft.bolt.matcher.block.ItemFrameMatcher;
 import org.popcraft.bolt.matcher.block.LadderMatcher;
@@ -80,6 +81,7 @@ import org.popcraft.bolt.matcher.block.MossCarpetMatcher;
 import org.popcraft.bolt.matcher.block.MushroomMatcher;
 import org.popcraft.bolt.matcher.block.NetherWartMatcher;
 import org.popcraft.bolt.matcher.block.PaintingMatcher;
+import org.popcraft.bolt.matcher.block.PinkPetalsMatcher;
 import org.popcraft.bolt.matcher.block.PointedDripstoneMatcher;
 import org.popcraft.bolt.matcher.block.PortalMatcher;
 import org.popcraft.bolt.matcher.block.PressurePlateMatcher;
@@ -149,7 +151,8 @@ public class BoltPlugin extends JavaPlugin {
             new SweetBerryBushMatcher(), new ChorusMatcher(), new GrassMatcher(), new TallGrassMatcher(),
             new DeadBushMatcher(), new HangingRootsMatcher(), new PointedDripstoneMatcher(), new FireMatcher(),
             new GlowLichenMatcher(), new LilyPadMatcher(), new RepeaterMatcher(), new SporeBlossomMatcher(),
-            new SoulFireMatcher(), new FrogspawnMatcher(), new MangrovePropaguleMatcher(), new SkulkVeinMatcher());
+            new SoulFireMatcher(), new FrogspawnMatcher(), new MangrovePropaguleMatcher(), new SkulkVeinMatcher(),
+            new HangingSignMatcher(), new PinkPetalsMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private final List<BlockMatcher> enabledBlockMatchers = new ArrayList<>();
     private final List<EntityMatcher> enabledEntityMatchers = new ArrayList<>();
@@ -316,6 +319,13 @@ public class BoltPlugin extends JavaPlugin {
     private void initializeMatchers() {
         enabledBlockMatchers.clear();
         enabledEntityMatchers.clear();
+        if (DEBUG) {
+            for (final Material material : Material.values()) {
+                if (material.isBlock()) {
+                    protectableBlocks.put(material, bolt.getAccessRegistry().getProtectionByType(defaultAccessType).orElse(null));
+                }
+            }
+        }
         BLOCK_MATCHERS.forEach(blockMatcher -> blockMatcher.initialize(protectableBlocks.keySet(), protectableEntities.keySet()));
         ENTITY_MATCHERS.forEach(entityMatcher -> entityMatcher.initialize(protectableBlocks.keySet(), protectableEntities.keySet()));
         for (final BlockMatcher blockMatcher : BLOCK_MATCHERS) {
