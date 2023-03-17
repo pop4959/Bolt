@@ -9,9 +9,9 @@ import org.popcraft.bolt.data.Profile;
 import org.popcraft.bolt.data.SQLStore;
 import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
-import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceType;
+import org.popcraft.bolt.util.BukkitAdapter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -107,26 +107,32 @@ public class LWCMigration {
             final Map<String, String> access = new HashMap<>();
             final Data data = gson.fromJson(protection.data(), Data.class);
             if (data != null) {
-                for (DataFlag flag : data.getFlags()) {
-                    if (flag.getId() == ProtectionFlag.REDSTONE.ordinal()) {
-                        access.put(Source.of(SourceType.REDSTONE).toString(), DEFAULT_ACCESS_ADMIN);
-                    } else if (flag.getId() == ProtectionFlag.HOPPER.ordinal()) {
-                        access.put(Source.of(SourceType.BLOCK).toString(), DEFAULT_ACCESS_ADMIN);
+                final List<DataFlag> dataFlags = data.getFlags();
+                if (dataFlags != null) {
+                    for (DataFlag flag : dataFlags) {
+                        if (flag.getId() == ProtectionFlag.REDSTONE.ordinal()) {
+                            access.put(Source.of(SourceType.REDSTONE).toString(), DEFAULT_ACCESS_ADMIN);
+                        } else if (flag.getId() == ProtectionFlag.HOPPER.ordinal()) {
+                            access.put(Source.of(SourceType.BLOCK).toString(), DEFAULT_ACCESS_ADMIN);
+                        }
                     }
                 }
-                for (DataRights rights : data.getRights()) {
-                    final String accessType = rights.getRights() == Permission.Access.ADMIN.ordinal() ? DEFAULT_ACCESS_ADMIN : DEFAULT_ACCESS_NORMAL;
-                    if (rights.getType() == Permission.Type.GROUP.ordinal()) {
-                        access.put(Source.of(SourceType.GROUP, rights.getName()).toString(), accessType);
-                    } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
-                        final Profile profile = BukkitAdapter.findOrLookupProfileByName(rights.getName()).join();
-                        if (profile.uuid() != null) {
-                            access.put(Source.player(profile.uuid()).toString(), accessType);
+                final List<DataRights> dataRights = data.getRights();
+                if (dataRights != null) {
+                    for (DataRights rights : data.getRights()) {
+                        final String accessType = rights.getRights() == Permission.Access.ADMIN.ordinal() ? DEFAULT_ACCESS_ADMIN : DEFAULT_ACCESS_NORMAL;
+                        if (rights.getType() == Permission.Type.GROUP.ordinal()) {
+                            access.put(Source.of(SourceType.GROUP, rights.getName()).toString(), accessType);
+                        } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
+                            final Profile profile = BukkitAdapter.findOrLookupProfileByName(rights.getName()).join();
+                            if (profile.uuid() != null) {
+                                access.put(Source.player(profile.uuid()).toString(), accessType);
+                            }
+                        } else if (rights.getType() == Permission.Type.TOWN.ordinal()) {
+                            access.put(Source.of(SourceType.TOWN, rights.getName()).toString(), accessType);
+                        } else if (rights.getType() == Permission.Type.REGION.ordinal()) {
+                            access.put(Source.of(SourceType.REGION, rights.getName()).toString(), accessType);
                         }
-                    } else if (rights.getType() == Permission.Type.TOWN.ordinal()) {
-                        access.put(Source.of(SourceType.TOWN, rights.getName()).toString(), accessType);
-                    } else if (rights.getType() == Permission.Type.REGION.ordinal()) {
-                        access.put(Source.of(SourceType.REGION, rights.getName()).toString(), accessType);
                     }
                 }
             }
