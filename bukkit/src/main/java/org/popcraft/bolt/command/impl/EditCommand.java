@@ -43,12 +43,12 @@ public class EditCommand extends BoltCommand {
         final String accessType = arguments.next();
         final Access access = plugin.getBolt().getAccessRegistry().getAccessByType(accessType).orElse(null);
         if (access == null) {
-            BoltComponents.sendMessage(sender, Translation.EDIT_ACCESS_INVALID, Placeholder.unparsed("access", accessType));
+            BoltComponents.sendMessage(sender, Translation.EDIT_ACCESS_INVALID, Placeholder.unparsed(Translation.Placeholder.ACCESS_TYPE, accessType));
             return;
         }
         final String sourceType = arguments.next();
         if (sourceType == null || !plugin.getBolt().getSourceTypeRegistry().sourceTypes().contains(sourceType)) {
-            BoltComponents.sendMessage(sender, Translation.EDIT_SOURCE_INVALID, Placeholder.unparsed("source", sourceType));
+            BoltComponents.sendMessage(sender, Translation.EDIT_SOURCE_INVALID, Placeholder.unparsed(Translation.Placeholder.SOURCE_TYPE, sourceType));
             return;
         }
         String identifier;
@@ -59,7 +59,7 @@ public class EditCommand extends BoltCommand {
                     if (profile.uuid() != null) {
                         boltPlayer.getModifications().put(Source.player(profile.uuid()), access.type());
                     } else {
-                        BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", finalIdentifier));
+                        BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, finalIdentifier));
                     }
                 });
             } else if (SourceType.PASSWORD.equals(sourceType)) {
@@ -68,7 +68,7 @@ public class EditCommand extends BoltCommand {
                 boltPlayer.getModifications().put(Source.of(sourceType, identifier), access.type());
             }
         }
-        BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.EDIT)));
+        BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed(Translation.Placeholder.ACTION, translate(Translation.EDIT)));
     }
 
     @Override

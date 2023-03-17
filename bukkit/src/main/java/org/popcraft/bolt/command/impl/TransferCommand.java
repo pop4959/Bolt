@@ -35,7 +35,7 @@ public class TransferCommand extends BoltCommand {
                 plugin.player(player).setAction(new Action(Action.Type.TRANSFER, profile.uuid().toString()));
                 BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER);
             } else {
-                BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", owner));
+                BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner));
             }
         });
     }

@@ -51,52 +51,52 @@ public class GroupCommand extends BoltCommand {
             switch (action) {
                 case "create":
                     if (existingGroup != null) {
-                        BoltComponents.sendMessage(player, Translation.GROUP_ALREADY_EXISTS, Placeholder.unparsed("group", group));
+                        BoltComponents.sendMessage(player, Translation.GROUP_ALREADY_EXISTS, Placeholder.unparsed(Translation.Placeholder.GROUP, group));
                     } else {
                         store.saveGroup(new Group(group, player.getUniqueId(), uuids));
-                        BoltComponents.sendMessage(player, Translation.GROUP_CREATED, Placeholder.unparsed("group", group));
+                        BoltComponents.sendMessage(player, Translation.GROUP_CREATED, Placeholder.unparsed(Translation.Placeholder.GROUP, group));
                     }
                     break;
                 case "delete":
                     if (existingGroup == null) {
-                        BoltComponents.sendMessage(player, Translation.GROUP_DOESNT_EXIST, Placeholder.unparsed("group", group));
+                        BoltComponents.sendMessage(player, Translation.GROUP_DOESNT_EXIST, Placeholder.unparsed(Translation.Placeholder.GROUP, group));
                     } else if (!existingGroup.getOwner().equals(player.getUniqueId())) {
-                        BoltComponents.sendMessage(player, Translation.GROUP_NOT_OWNER, Placeholder.unparsed("group", group));
+                        BoltComponents.sendMessage(player, Translation.GROUP_NOT_OWNER, Placeholder.unparsed(Translation.Placeholder.GROUP, group));
                     } else {
                         store.removeGroup(existingGroup);
-                        BoltComponents.sendMessage(player, Translation.GROUP_DELETED, Placeholder.unparsed("group", group));
+                        BoltComponents.sendMessage(player, Translation.GROUP_DELETED, Placeholder.unparsed(Translation.Placeholder.GROUP, group));
                     }
                     break;
                 case "add":
                     if (existingGroup == null) {
-                        BoltComponents.sendMessage(player, Translation.GROUP_DOESNT_EXIST, Placeholder.unparsed("group", group));
+                        BoltComponents.sendMessage(player, Translation.GROUP_DOESNT_EXIST, Placeholder.unparsed(Translation.Placeholder.GROUP, group));
                     } else if (!existingGroup.getOwner().equals(player.getUniqueId())) {
-                        BoltComponents.sendMessage(player, Translation.GROUP_NOT_OWNER, Placeholder.unparsed("group", group));
+                        BoltComponents.sendMessage(player, Translation.GROUP_NOT_OWNER, Placeholder.unparsed(Translation.Placeholder.GROUP, group));
                     } else {
                         existingGroup.getMembers().addAll(uuids);
                         store.saveGroup(existingGroup);
-                        names.forEach(name -> BoltComponents.sendMessage(player, Translation.GROUP_PLAYER_ADD, Placeholder.unparsed("player", name), Placeholder.unparsed("group", group)));
+                        names.forEach(name -> BoltComponents.sendMessage(player, Translation.GROUP_PLAYER_ADD, Placeholder.unparsed(Translation.Placeholder.PLAYER, name), Placeholder.unparsed(Translation.Placeholder.GROUP, group)));
                     }
                     break;
                 case "remove":
                     if (existingGroup == null) {
-                        BoltComponents.sendMessage(player, Translation.GROUP_DOESNT_EXIST, Placeholder.unparsed("group", group));
+                        BoltComponents.sendMessage(player, Translation.GROUP_DOESNT_EXIST, Placeholder.unparsed(Translation.Placeholder.GROUP, group));
                     } else if (!existingGroup.getOwner().equals(player.getUniqueId())) {
-                        BoltComponents.sendMessage(player, Translation.GROUP_NOT_OWNER, Placeholder.unparsed("group", group));
+                        BoltComponents.sendMessage(player, Translation.GROUP_NOT_OWNER, Placeholder.unparsed(Translation.Placeholder.GROUP, group));
                     } else {
                         existingGroup.getMembers().removeAll(uuids);
                         store.saveGroup(existingGroup);
-                        names.forEach(name -> BoltComponents.sendMessage(player, Translation.GROUP_PLAYER_REMOVE, Placeholder.unparsed("player", name), Placeholder.unparsed("group", group)));
+                        names.forEach(name -> BoltComponents.sendMessage(player, Translation.GROUP_PLAYER_REMOVE, Placeholder.unparsed(Translation.Placeholder.PLAYER, name), Placeholder.unparsed(Translation.Placeholder.GROUP, group)));
                     }
                     break;
                 case "list":
                     if (existingGroup == null) {
-                        BoltComponents.sendMessage(player, Translation.GROUP_DOESNT_EXIST, Placeholder.unparsed("group", group));
+                        BoltComponents.sendMessage(player, Translation.GROUP_DOESNT_EXIST, Placeholder.unparsed(Translation.Placeholder.GROUP, group));
                     } else {
                         BukkitAdapter.findOrLookupProfilesByUniqueIds(existingGroup.getMembers()).thenAccept(existingProfiles -> {
                             final List<String> memberNames = existingProfiles.stream().filter(Profile::complete).map(Profile::name).toList();
                             final String memberList = String.join(", ", memberNames);
-                            BoltComponents.sendMessage(player, Translation.GROUP_LIST_MEMBERS, Placeholder.unparsed("group", group), Placeholder.unparsed("members", memberList));
+                            BoltComponents.sendMessage(player, Translation.GROUP_LIST_MEMBERS, Placeholder.unparsed(Translation.Placeholder.GROUP, group), Placeholder.unparsed(Translation.Placeholder.GROUP_MEMBERS, memberList));
                         });
                     }
                     break;

@@ -56,4 +56,26 @@ public class Translation {
 
     private Translation() {
     }
+
+    public static final class Placeholder {
+        public static final String ACCESS_LIST = "access_list";
+        public static final String ACCESS_LIST_SIZE = "access_list_size";
+        public static final String ACCESS_TYPE = "access_type";
+        public static final String ACTION = "action";
+        public static final String COMMAND = "command";
+        public static final String GROUP = "group";
+        public static final String GROUP_MEMBERS = "group_members";
+        public static final String MODE = "mode";
+        public static final String NEW_PLAYER = "new_player";
+        public static final String NEW_PLUGIN = "new_plugin";
+        public static final String OLD_PLAYER = "old_player";
+        public static final String OLD_PLUGIN = "old_plugin";
+        public static final String PLAYER = "player";
+        public static final String PROTECTION = "protection";
+        public static final String PROTECTION_TYPE = "protection_type";
+        public static final String SOURCE_TYPE = "source_type";
+
+        private Placeholder() {
+        }
+    }
 }

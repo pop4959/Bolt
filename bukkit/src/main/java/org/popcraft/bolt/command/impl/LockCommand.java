@@ -29,7 +29,7 @@ public class LockCommand extends BoltCommand {
             if (BoltPlugin.DEBUG && arguments.remaining() > 0) {
                 boltPlayer.setLockNil(true);
             }
-            BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed("action", translate(Translation.LOCK)));
+            BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed(Translation.Placeholder.ACTION, translate(Translation.LOCK)));
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
         }

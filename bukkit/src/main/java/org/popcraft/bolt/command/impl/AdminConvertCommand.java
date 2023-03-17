@@ -38,7 +38,7 @@ public class AdminConvertCommand extends BoltCommand {
                 return;
             }
             final BoltMigration migration = new BoltMigration(plugin);
-            BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed("source", "Bolt"), Placeholder.unparsed("destination", "LWC"));
+            BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "Bolt"), Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "LWC"));
             isConverting.set(true);
             migration.convertAsync().whenCompleteAsync((ignored, throwable) -> {
                 isConverting.set(false);
@@ -49,7 +49,7 @@ public class AdminConvertCommand extends BoltCommand {
             }, BukkitMainThreadExecutor.get());
         } else {
             final LWCMigration migration = new LWCMigration(plugin);
-            BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed("source", "LWC"), Placeholder.unparsed("destination", "Bolt"));
+            BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "LWC"), Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "Bolt"));
             isConverting.set(true);
             migration.convertAsync().whenCompleteAsync((memoryStore, throwable) -> {
                 isConverting.set(false);

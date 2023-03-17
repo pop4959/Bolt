@@ -39,9 +39,9 @@ public class AdminPurgeCommand extends BoltCommand {
                 store.loadEntityProtections().join().stream()
                         .filter(protection -> protection.getOwner().equals(profile.uuid()))
                         .forEach(store::removeEntityProtection);
-                BoltComponents.sendMessage(player, Translation.PURGE, Placeholder.unparsed("player", owner));
+                BoltComponents.sendMessage(player, Translation.PURGE, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner));
             } else {
-                BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed("player", owner));
+                BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner));
             }
         });
     }

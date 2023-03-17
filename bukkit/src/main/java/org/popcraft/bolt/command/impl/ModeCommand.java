@@ -38,7 +38,7 @@ public class ModeCommand extends BoltCommand {
                 return;
             }
             boltPlayer.toggleMode(mode);
-            BoltComponents.sendMessage(player, boltPlayer.hasMode(mode) ? Translation.MODE_ENABLED : Translation.MODE_DISABLED, Placeholder.unparsed("mode", Strings.toTitleCase(mode.name().toLowerCase())));
+            BoltComponents.sendMessage(player, boltPlayer.hasMode(mode) ? Translation.MODE_ENABLED : Translation.MODE_DISABLED, Placeholder.unparsed(Translation.Placeholder.MODE, Strings.toTitleCase(mode.name().toLowerCase())));
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
         }

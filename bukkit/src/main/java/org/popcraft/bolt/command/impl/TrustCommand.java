@@ -37,16 +37,16 @@ public class TrustCommand extends BoltCommand {
         if ("list".equals(action)) {
             final AccessList accessList = plugin.getBolt().getStore().loadAccessList(player.getUniqueId()).join();
             final Map<String, String> accessMap = accessList == null ? new HashMap<>() : accessList.getAccess();
-            BukkitAdapter.findOrLookupProfileByUniqueId(player.getUniqueId()).thenAccept(profile -> BoltComponents.sendMessage(player, Translation.INFO_SELF, Placeholder.unparsed("access_count", String.valueOf(accessMap.size())), Placeholder.unparsed("access_list", Protections.accessList(accessMap))));
+            BukkitAdapter.findOrLookupProfileByUniqueId(player.getUniqueId()).thenAccept(profile -> BoltComponents.sendMessage(player, Translation.INFO_SELF, Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST_SIZE, String.valueOf(accessMap.size())), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST, Protections.accessList(accessMap))));
         } else if (!"confirm".equals(action)) {
-            BoltComponents.sendMessage(sender, Translation.TRUST_CONFIRM);
+            BoltComponents.sendMessage(sender, Translation.TRUST_CONFIRM, Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt trust confirm"));
         } else {
             final BoltPlayer boltPlayer = plugin.player(player);
             final Action editAction = Optional.ofNullable(boltPlayer.getAction())
                     .filter(a -> Action.Type.EDIT.equals(a.getType()))
                     .orElse(null);
             if (editAction == null) {
-                BoltComponents.sendMessage(sender, Translation.TRUST_EDITED_FAILED);
+                BoltComponents.sendMessage(sender, Translation.TRUST_EDITED_FAILED, Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt edit"));
                 return;
             }
             final UUID uuid = player.getUniqueId();
