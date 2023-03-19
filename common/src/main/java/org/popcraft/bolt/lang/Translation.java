@@ -36,6 +36,7 @@ public class Translation {
     public static final String LOCK = "lock";
     public static final String LOCKED = "locked";
     public static final String MIGRATION_COMPLETED = "migration_completed";
+    public static final String MIGRATION_COMPLETED_FOUND_ENTITIES = "migration_completed_found_entities";
     public static final String MIGRATION_IN_PROGRESS = "migration_in_progress";
     public static final String MIGRATION_LWC_MISSING = "migration_lwc_missing";
     public static final String MIGRATION_STARTED = "migration_started";

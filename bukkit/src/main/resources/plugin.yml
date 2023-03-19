@@ -2,6 +2,7 @@ name: ${name}
 version: ${version}
 main: ${group}.bolt.BoltPlugin
 api-version: 1.13
+softdepend: [Chunky]
 authors: [${author}]
 description: ${description}
 commands:
