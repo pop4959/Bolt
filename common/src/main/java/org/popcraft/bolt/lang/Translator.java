@@ -7,9 +7,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 
 public final class Translator {
+    private static final String TRANSLATION_FILE_FORMAT = "lang/%s.properties";
+    private static final String DEFAULT_LOCALE_FORMAT = "%s_%s";
     private static final Properties fallback = loadTranslation("en");
     private static Properties translations = loadTranslation("en");
 
@@ -36,7 +39,9 @@ public final class Translator {
 
     private static Properties loadTranslation(final String language) {
         final Properties properties = new Properties();
-        final InputStream input = Translator.class.getClassLoader().getResourceAsStream("lang/" + language + ".properties");
+        final ClassLoader classLoader = Translator.class.getClassLoader();
+        final InputStream input = Optional.ofNullable(classLoader.getResourceAsStream(TRANSLATION_FILE_FORMAT.formatted(language)))
+                .orElse(classLoader.getResourceAsStream(TRANSLATION_FILE_FORMAT.formatted(DEFAULT_LOCALE_FORMAT.formatted(language.toLowerCase(), language.toUpperCase()))));
         if (input != null) {
             try {
                 properties.load(input);
