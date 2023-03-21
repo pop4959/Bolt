@@ -16,6 +16,7 @@ public class SimpleProfileCache implements ProfileCache {
     private final Path path;
     private final Map<UUID, String> uuidName = new ConcurrentHashMap<>();
     private final Map<String, UUID> nameUuid = new ConcurrentHashMap<>();
+    private final Map<String, UUID> lowercaseNameUuid = new ConcurrentHashMap<>();
 
     public SimpleProfileCache(final Path path) {
         this.path = path;
@@ -33,6 +34,7 @@ public class SimpleProfileCache implements ProfileCache {
                 final String name = split[1];
                 uuidName.put(uuid, name);
                 nameUuid.put(name, uuid);
+                lowercaseNameUuid.put(name.toLowerCase(), uuid);
             });
         } catch (final IOException e) {
             e.printStackTrace();
@@ -48,6 +50,7 @@ public class SimpleProfileCache implements ProfileCache {
         }
         uuidName.put(uuid, name);
         nameUuid.put(name, uuid);
+        lowercaseNameUuid.put(name.toLowerCase(), uuid);
         CompletableFuture.runAsync(() -> save(uuid, name));
     }
 
@@ -66,6 +69,6 @@ public class SimpleProfileCache implements ProfileCache {
 
     @Override
     public Profile getProfile(final String name) {
-        return new Profile(nameUuid.get(name), name);
+        return new Profile(lowercaseNameUuid.get(name.toLowerCase()), name);
     }
 }
