@@ -64,11 +64,17 @@ public class SimpleProfileCache implements ProfileCache {
 
     @Override
     public Profile getProfile(final UUID uuid) {
+        if (uuid == null) {
+            return EMPTY_PROFILE;
+        }
         return new Profile(uuid, uuidName.get(uuid));
     }
 
     @Override
     public Profile getProfile(final String name) {
+        if (name == null) {
+            return EMPTY_PROFILE;
+        }
         return new Profile(lowercaseNameUuid.get(name.toLowerCase()), name);
     }
 }

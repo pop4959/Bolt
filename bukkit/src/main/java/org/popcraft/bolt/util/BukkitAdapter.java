@@ -20,10 +20,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class BukkitAdapter {
+    private static final Set<UUID> KNOWN_NULL_LOOKUPS_BY_UUID = ConcurrentHashMap.newKeySet();
+    private static final Set<String> KNOWN_NULL_LOOKUPS_BY_NAME = ConcurrentHashMap.newKeySet();
     private static final String NIL_UUID_STRING = "00000000-0000-0000-0000-000000000000";
     public static final UUID NIL_UUID = UUID.fromString(NIL_UUID_STRING);
 
@@ -66,19 +70,19 @@ public final class BukkitAdapter {
             return profileCache.getProfile(UUID.fromString(name));
         } catch (final IllegalArgumentException e) {
             final Profile cached = profileCache.getProfile(name);
-            if (cached != null) {
+            if (cached.complete()) {
                 return cached;
             }
             final OfflinePlayer offlinePlayer = PaperUtil.getOfflinePlayer(name);
             if (offlinePlayer != null) {
                 profileCache.add(offlinePlayer.getUniqueId(), offlinePlayer.getName());
             }
-            return offlinePlayer == null ? null : profileCache.getProfile(name);
+            return profileCache.getProfile(name);
         }
     }
 
     public static CompletableFuture<Profile> lookupProfileByName(final String name) {
-        if (name == null || name.isEmpty() || NIL_UUID_STRING.equals(name)) {
+        if (name == null || name.isEmpty() || NIL_UUID_STRING.equals(name) || KNOWN_NULL_LOOKUPS_BY_NAME.contains(name)) {
             return CompletableFuture.completedFuture(SimpleProfileCache.EMPTY_PROFILE);
         }
         final PlayerProfile playerProfile = Bukkit.createPlayerProfile(name);
@@ -87,6 +91,8 @@ public final class BukkitAdapter {
         updatedProfile.thenAccept(profile -> {
             if (profile.isComplete()) {
                 profileCache.add(profile.getUniqueId(), profile.getName());
+            } else {
+                KNOWN_NULL_LOOKUPS_BY_NAME.add(name);
             }
         });
         return updatedProfile.thenApplyAsync(PlayerProfile::getUniqueId, BukkitMainThreadExecutor.get()).thenApply(profileCache::getProfile);
@@ -94,7 +100,7 @@ public final class BukkitAdapter {
 
     public static CompletableFuture<Profile> findOrLookupProfileByName(final String name) {
         final Profile found = BukkitAdapter.findProfileByName(name);
-        if (found != null) {
+        if (found.complete()) {
             return CompletableFuture.completedFuture(found);
         }
         return lookupProfileByName(name);
@@ -121,7 +127,7 @@ public final class BukkitAdapter {
     }
 
     public static CompletableFuture<Profile> lookupProfileByUniqueId(final UUID uuid) {
-        if (uuid == null || NIL_UUID.equals(uuid)) {
+        if (uuid == null || NIL_UUID.equals(uuid) || KNOWN_NULL_LOOKUPS_BY_UUID.contains(uuid)) {
             return CompletableFuture.completedFuture(SimpleProfileCache.EMPTY_PROFILE);
         }
         final PlayerProfile playerProfile = Bukkit.createPlayerProfile(uuid);
@@ -130,6 +136,8 @@ public final class BukkitAdapter {
         updatedProfile.thenAccept(profile -> {
             if (profile.isComplete()) {
                 profileCache.add(profile.getUniqueId(), profile.getName());
+            } else {
+                KNOWN_NULL_LOOKUPS_BY_UUID.add(uuid);
             }
         });
         return updatedProfile.thenApplyAsync(PlayerProfile::getName, BukkitMainThreadExecutor.get()).thenApply(profileCache::getProfile);
@@ -137,7 +145,7 @@ public final class BukkitAdapter {
 
     public static CompletableFuture<Profile> findOrLookupProfileByUniqueId(final UUID uuid) {
         final Profile found = BukkitAdapter.findProfileByUniqueId(uuid);
-        if (found != null) {
+        if (found.complete()) {
             return CompletableFuture.completedFuture(found);
         }
         return lookupProfileByUniqueId(uuid);
