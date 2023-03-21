@@ -169,7 +169,7 @@ public final class BlockListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
-                    BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType())), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection)), Placeholder.unparsed(Translation.Placeholder.PLAYER, profile.name()), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST_SIZE, String.valueOf(protection.getAccess().size())), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST, Protections.accessList(protection.getAccess()))));
+                    BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType())), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection)), Placeholder.unparsed(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN))), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST_SIZE, String.valueOf(protection.getAccess().size())), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST, Protections.accessList(protection.getAccess()))));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(block)));
                 }
