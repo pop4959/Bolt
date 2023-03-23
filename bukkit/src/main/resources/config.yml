@@ -26,6 +26,8 @@ blocks:
     autoProtect: private
   trapped_chest:
     autoProtect: private
+  ender_chest:
+    autoProtect: private
   furnace:
     autoProtect: private
   blast_furnace:
@@ -38,15 +40,31 @@ blocks:
     autoProtect: private
   barrel:
     autoProtect: private
+  brewing_stand:
+    autoProtect: private
   composter:
     autoProtect: private
+  beacon:
+    autoProtect: private
+  jukebox:
+    autoProtect: private
+  note_block:
+    autoProtect: private
   lectern:
+    autoProtect: private
+  chiseled_bookshelf:
     autoProtect: private
   hopper:
     autoProtect: private
   '#shulker_boxes':
     autoProtect: private
-  '#signs':
+  '#anvil':
+    autoProtect: private
+  '#cauldrons':
+    autoProtect: private
+  '#standing_signs':
+    autoProtect: false
+  '#wall_signs':
     autoProtect: false
   '#doors':
     autoProtect: false
