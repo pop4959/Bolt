@@ -275,6 +275,16 @@ public class BoltPlugin extends JavaPlugin {
     private void registerProtectableAccess() {
         protectableBlocks.clear();
         protectableEntities.clear();
+        if (DEBUG) {
+            for (final Material material : Material.values()) {
+                if (material.isBlock()) {
+                    protectableBlocks.put(material, bolt.getAccessRegistry().getProtectionByType(defaultAccessType).orElse(null));
+                }
+            }
+            for (final EntityType entity : EntityType.values()) {
+                protectableEntities.put(entity, bolt.getAccessRegistry().getProtectionByType(defaultAccessType).orElse(null));
+            }
+        }
         final ConfigurationSection blocks = getConfig().getConfigurationSection("blocks");
         if (blocks != null) {
             for (final String key : blocks.getKeys(false)) {
@@ -319,13 +329,6 @@ public class BoltPlugin extends JavaPlugin {
     private void initializeMatchers() {
         enabledBlockMatchers.clear();
         enabledEntityMatchers.clear();
-        if (DEBUG) {
-            for (final Material material : Material.values()) {
-                if (material.isBlock()) {
-                    protectableBlocks.put(material, bolt.getAccessRegistry().getProtectionByType(defaultAccessType).orElse(null));
-                }
-            }
-        }
         BLOCK_MATCHERS.forEach(blockMatcher -> blockMatcher.initialize(protectableBlocks.keySet(), protectableEntities.keySet()));
         ENTITY_MATCHERS.forEach(entityMatcher -> entityMatcher.initialize(protectableBlocks.keySet(), protectableEntities.keySet()));
         for (final BlockMatcher blockMatcher : BLOCK_MATCHERS) {
