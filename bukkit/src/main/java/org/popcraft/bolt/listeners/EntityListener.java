@@ -1,6 +1,7 @@
 package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -9,6 +10,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockShearEntityEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustByBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -30,6 +32,7 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBucketEntityEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
@@ -37,11 +40,11 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
@@ -51,6 +54,8 @@ import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Protections;
 import org.spigotmc.event.entity.EntityMountEvent;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,10 +63,42 @@ import static org.popcraft.bolt.lang.Translator.translate;
 import static org.popcraft.bolt.util.BukkitAdapter.NIL_UUID;
 
 public final class EntityListener implements Listener {
+    private final Map<NamespacedKey, UUID> spawnEggPlayers = new HashMap<>();
     private final BoltPlugin plugin;
 
     public EntityListener(final BoltPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onPlayerInteract(final PlayerInteractEvent e) {
+        if (!org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK.equals(e.getAction())) {
+            return;
+        }
+        final NamespacedKey spawnEggKey = e.getMaterial().getKey();
+        if (!spawnEggKey.getKey().endsWith("_spawn_egg")) {
+            return;
+        }
+        final NamespacedKey entityKey = NamespacedKey.minecraft(spawnEggKey.getKey().replace("_spawn_egg", ""));
+        final UUID uuid = e.getPlayer().getUniqueId();
+        spawnEggPlayers.put(entityKey, uuid);
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> spawnEggPlayers.remove(entityKey));
+    }
+
+    @EventHandler
+    public void onCreatureSpawn(final CreatureSpawnEvent e) {
+        if (!CreatureSpawnEvent.SpawnReason.SPAWNER_EGG.equals(e.getSpawnReason())) {
+            return;
+        }
+        final Entity entity = e.getEntity();
+        final UUID uuid = spawnEggPlayers.remove(entity.getType().getKey());
+        if (uuid == null) {
+            return;
+        }
+        final Player player = plugin.getServer().getPlayer(uuid);
+        if (player != null) {
+            handleEntityPlacementByPlayer(entity, player);
+        }
     }
 
     @EventHandler
