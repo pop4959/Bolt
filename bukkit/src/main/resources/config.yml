@@ -63,11 +63,19 @@ entities:
     autoProtect: private
   glow_item_frame:
     autoProtect: private
+  painting:
+    autoProtect: private
+  leash_hitch:
+    autoProtect: private
+  boat:
+    autoProtect: private
   chest_boat:
-    autoProtect: false
+    autoProtect: private
+  minecart:
+    autoProtect: private
   minecart_chest:
-    autoProtect: false
+    autoProtect: private
   minecart_furnace:
-    autoProtect: false
+    autoProtect: private
   minecart_hopper:
-    autoProtect: false
+    autoProtect: private
