@@ -16,6 +16,7 @@ public class AdminCommand extends BoltCommand {
     public AdminCommand(BoltPlugin plugin) {
         super(plugin);
         subcommands.putAll(Map.of(
+                "cleanup", new AdminCleanup(plugin),
                 "convert", new AdminConvertCommand(plugin),
                 "debug", new AdminDebugCommand(plugin),
                 "purge", new AdminPurgeCommand(plugin),

@@ -1,6 +1,9 @@
 package org.popcraft.bolt.lang;
 
 public class Translation {
+    public static final String CLEANUP_START = "cleanup_start";
+    public static final String CLEANUP_REMOVE = "cleanup_remove";
+    public static final String CLEANUP_COMPLETE = "cleanup_complete";
     public static final String CLICK_ACTION = "click_action";
     public static final String CLICK_EDITED = "click_edited";
     public static final String CLICK_EDITED_NO_OWNER = "click_edited_no_owner";
@@ -75,6 +78,9 @@ public class Translation {
         public static final String PROTECTION = "protection";
         public static final String PROTECTION_TYPE = "protection_type";
         public static final String SOURCE_TYPE = "source_type";
+        public static final String RAW_PROTECTION = "raw_protection";
+        public static final String COUNT = "count";
+        public static final String SECONDS = "seconds";
 
         private Placeholder() {
         }
