@@ -2,15 +2,18 @@ package org.popcraft.bolt.data;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
-import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Metrics;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -48,6 +51,13 @@ public class SQLStore implements Store {
 
     public SQLStore(final Configuration configuration) {
         this.configuration = configuration;
+        if ("sqlite".equals(configuration.type())) {
+            try {
+                Files.createDirectories(Path.of(".").resolve(configuration.path()).getParent());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         final boolean usingMySQL = "mysql".equals(configuration.type());
         this.connectionUrl = usingMySQL ?
                 "jdbc:mysql://%s/%s".formatted(configuration.hostname(), configuration.database()) :
