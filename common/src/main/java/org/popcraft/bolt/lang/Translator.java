@@ -3,6 +3,7 @@ package org.popcraft.bolt.lang;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,8 +44,8 @@ public final class Translator {
         final InputStream input = Optional.ofNullable(classLoader.getResourceAsStream(TRANSLATION_FILE_FORMAT.formatted(language)))
                 .orElse(classLoader.getResourceAsStream(TRANSLATION_FILE_FORMAT.formatted(DEFAULT_LOCALE_FORMAT.formatted(language.toLowerCase(), language.toUpperCase()))));
         if (input != null) {
-            try {
-                properties.load(input);
+            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
+                properties.load(reader);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -54,8 +55,8 @@ public final class Translator {
 
     private static Properties loadTranslationFromFile(final Path path) {
         final Properties properties = new Properties();
-        try (final BufferedReader input = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-            properties.load(input);
+        try (final BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            properties.load(reader);
         } catch (IOException e) {
             e.printStackTrace();
         }
