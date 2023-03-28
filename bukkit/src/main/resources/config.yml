@@ -12,15 +12,14 @@ database:
   prefix: ""
   properties: [ ]
 protections:
-  private: [ ]
-  redstone: [ "redstone" ]
-  display: [ "interact", "open" ]
-  deposit: [ "interact", "open", "deposit" ]
-  withdrawal: [ "interact", "open", "withdraw" ]
-  public: [ "interact", "open", "deposit", "withdraw", "mount" ]
+  private: [ "redstone" ]
+  display: [ "redstone", "interact", "open" ]
+  deposit: [ "redstone", "interact", "open", "deposit" ]
+  withdrawal: [ "redstone", "interact", "open", "withdraw" ]
+  public: [ "redstone", "interact", "open", "deposit", "withdraw", "mount" ]
 access:
-  normal: [ "interact", "open", "deposit", "withdraw", "mount" ]
-  admin: [ "interact", "open", "deposit", "withdraw", "mount", "edit" ]
+  normal: [ "redstone", "interact", "open", "deposit", "withdraw", "mount" ]
+  admin: [ "redstone", "interact", "open", "deposit", "withdraw", "mount", "edit" ]
 blocks:
   chest:
     autoProtect: private
