@@ -14,6 +14,7 @@ import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -59,7 +60,7 @@ public class EditCommand extends BoltCommand {
                     if (profile.uuid() != null) {
                         boltPlayer.getModifications().put(Source.player(profile.uuid()), access.type());
                     } else {
-                        BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, finalIdentifier));
+                        SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, finalIdentifier)));
                     }
                 });
             } else if (SourceType.PASSWORD.equals(sourceType)) {

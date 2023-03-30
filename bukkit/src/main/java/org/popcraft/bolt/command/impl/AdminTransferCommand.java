@@ -12,6 +12,7 @@ import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,9 +43,9 @@ public class AdminTransferCommand extends BoltCommand {
                 final Profile ownerProfile = ownerProfileFuture.join();
                 final Profile newOwnerProfile = newOwnerProfileFuture.join();
                 if (ownerProfile.uuid() == null) {
-                    BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner));
+                    SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner)));
                 } else if (newOwnerProfile.uuid() == null) {
-                    BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, newOwner));
+                    SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, newOwner)));
                 } else {
                     final Store store = plugin.getBolt().getStore();
                     store.loadBlockProtections().join().stream()
@@ -59,7 +60,7 @@ public class AdminTransferCommand extends BoltCommand {
                                 protection.setOwner(newOwnerProfile.uuid());
                                 store.saveEntityProtection(protection);
                             });
-                    BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_ALL, Placeholder.unparsed(Translation.Placeholder.OLD_PLAYER, owner), Placeholder.unparsed(Translation.Placeholder.NEW_PLAYER, newOwner));
+                    SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_ALL, Placeholder.unparsed(Translation.Placeholder.OLD_PLAYER, owner), Placeholder.unparsed(Translation.Placeholder.NEW_PLAYER, newOwner)));
                 }
             });
         } else {

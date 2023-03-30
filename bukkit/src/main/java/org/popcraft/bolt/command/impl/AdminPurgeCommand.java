@@ -10,6 +10,7 @@ import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,9 +40,9 @@ public class AdminPurgeCommand extends BoltCommand {
                 store.loadEntityProtections().join().stream()
                         .filter(protection -> protection.getOwner().equals(profile.uuid()))
                         .forEach(store::removeEntityProtection);
-                BoltComponents.sendMessage(player, Translation.PURGE, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner));
+                SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.PURGE, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner)));
             } else {
-                BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner));
+                SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner)));
             }
         });
     }

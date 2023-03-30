@@ -12,7 +12,7 @@ import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.BukkitMainThreadExecutor;
+import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,7 +48,7 @@ public class AdminConvertCommand extends BoltCommand {
                     destination.saveEntityProtection(entityProtection);
                 }
                 BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED);
-            }, BukkitMainThreadExecutor.get());
+            }, SchedulerUtil.executor(plugin, sender));
             lastMigration = null;
             return;
         }
@@ -67,7 +67,7 @@ public class AdminConvertCommand extends BoltCommand {
                     throwable.printStackTrace();
                 }
                 BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED);
-            }, BukkitMainThreadExecutor.get());
+            }, SchedulerUtil.executor(plugin, sender));
         } else {
             final LWCMigration migration = new LWCMigration(plugin);
             BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "LWC"), Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "Bolt"));
@@ -89,7 +89,7 @@ public class AdminConvertCommand extends BoltCommand {
                     lastMigration = migration;
                     BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED_FOUND_ENTITIES, Placeholder.unparsed("command", "/bolt admin convert entities"));
                 }
-            }, BukkitMainThreadExecutor.get());
+            }, SchedulerUtil.executor(plugin, sender));
         }
     }
 

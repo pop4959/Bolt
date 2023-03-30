@@ -2,6 +2,7 @@ name: ${name}
 version: ${version}
 main: ${group}.bolt.BoltPlugin
 api-version: 1.13
+folia-supported: true
 softdepend: [Chunky]
 authors: [${author}]
 description: ${description}

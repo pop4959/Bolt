@@ -54,6 +54,7 @@ import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceType;
 import org.popcraft.bolt.source.SourceTypeResolver;
+import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -90,7 +91,7 @@ public final class BlockListener implements Listener {
         final Protection protection = plugin.findProtection(clicked).orElse(null);
         if (triggerActions(player, protection, clicked)) {
             boltPlayer.setInteracted();
-            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, boltPlayer::clearInteraction);
+            SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
             e.setCancelled(true);
         } else if (protection != null) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
@@ -105,9 +106,9 @@ public final class BlockListener implements Listener {
                     final boolean isYou = player.getUniqueId().equals(protection.getOwner());
                     final String owner = isYou ? translate(Translation.YOU) : profile.name();
                     if (owner == null) {
-                        BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY_GENERIC, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType())), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection)));
+                        SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY_GENERIC, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType())), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection))));
                     } else {
-                        BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType())), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection)), Placeholder.unparsed(Translation.Placeholder.PLAYER, owner));
+                        SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.PROTECTION_NOTIFY, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType())), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection)), Placeholder.unparsed(Translation.Placeholder.PLAYER, owner)));
                     }
                 });
             }
@@ -121,7 +122,7 @@ public final class BlockListener implements Listener {
                 }
             }
             boltPlayer.setInteracted();
-            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, boltPlayer::clearInteraction);
+            SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
         }
     }
 
@@ -169,7 +170,7 @@ public final class BlockListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
-                    BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType())), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection)), Placeholder.unparsed(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN))), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST_SIZE, String.valueOf(protection.getAccess().size())), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST, Protections.accessList(protection.getAccess()))));
+                    BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.INFO, Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType())), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection)), Placeholder.unparsed(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN))), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST_SIZE, String.valueOf(protection.getAccess().size())), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST, Protections.accessList(protection.getAccess())))));
                 } else {
                     BoltComponents.sendMessage(player, Translation.CLICK_NOT_LOCKED, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(block)));
                 }
@@ -201,7 +202,7 @@ public final class BlockListener implements Listener {
                         final UUID uuid = UUID.fromString(action.getData());
                         protection.setOwner(uuid);
                         plugin.saveProtection(protection);
-                        BukkitAdapter.findOrLookupProfileByUniqueId(uuid).thenAccept(profile -> BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType())), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection)), Placeholder.unparsed(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN)))));
+                        BukkitAdapter.findOrLookupProfileByUniqueId(uuid).thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_CONFIRM, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType())), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection)), Placeholder.unparsed(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN))))));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER, plugin.isUseActionBar());
                     }

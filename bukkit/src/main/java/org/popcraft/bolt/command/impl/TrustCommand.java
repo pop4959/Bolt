@@ -13,6 +13,7 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Protections;
+import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,7 +38,7 @@ public class TrustCommand extends BoltCommand {
         if ("list".equals(action)) {
             final AccessList accessList = plugin.getBolt().getStore().loadAccessList(player.getUniqueId()).join();
             final Map<String, String> accessMap = accessList == null ? new HashMap<>() : accessList.getAccess();
-            BukkitAdapter.findOrLookupProfileByUniqueId(player.getUniqueId()).thenAccept(profile -> BoltComponents.sendMessage(player, Translation.INFO_SELF, Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST_SIZE, String.valueOf(accessMap.size())), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST, Protections.accessList(accessMap))));
+            BukkitAdapter.findOrLookupProfileByUniqueId(player.getUniqueId()).thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.INFO_SELF, Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST_SIZE, String.valueOf(accessMap.size())), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST, Protections.accessList(accessMap)))));
         } else if (!"confirm".equals(action)) {
             BoltComponents.sendMessage(sender, Translation.TRUST_CONFIRM, Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt trust confirm"));
         } else {

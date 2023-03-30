@@ -14,6 +14,7 @@ dependencies {
     implementation(group = "org.bstats", name = "bstats-bukkit", version = "3.0.1")
     implementation(project(":bolt-common"))
     implementation(project(":bolt-paper"))
+    implementation(project(":bolt-folia"))
 }
 
 tasks {
@@ -31,9 +32,9 @@ tasks {
     shadowJar {
         minimize {
             exclude(project(":bolt-common"))
+            exclude(project(":bolt-paper"))
+            exclude(project(":bolt-folia"))
         }
-        relocate("org.yaml", "${project.group}.${rootProject.name}.lib.org.yaml")
-        relocate("io.leangen", "${project.group}.${rootProject.name}.lib.io.leangen")
         relocate("net.kyori", "${project.group}.${rootProject.name}.lib.net.kyori")
         relocate("org.bstats", "${project.group}.${rootProject.name}.lib.org.bstats")
     }

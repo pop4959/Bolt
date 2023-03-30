@@ -95,7 +95,7 @@ public final class BukkitAdapter {
                 KNOWN_NULL_LOOKUPS_BY_NAME.add(name);
             }
         });
-        return updatedProfile.thenApplyAsync(PlayerProfile::getUniqueId, BukkitMainThreadExecutor.get()).thenApply(profileCache::getProfile);
+        return updatedProfile.thenApply(PlayerProfile::getUniqueId).thenApply(profileCache::getProfile);
     }
 
     public static CompletableFuture<Profile> findOrLookupProfileByName(final String name) {
@@ -140,7 +140,7 @@ public final class BukkitAdapter {
                 KNOWN_NULL_LOOKUPS_BY_UUID.add(uuid);
             }
         });
-        return updatedProfile.thenApplyAsync(PlayerProfile::getName, BukkitMainThreadExecutor.get()).thenApply(profileCache::getProfile);
+        return updatedProfile.thenApply(PlayerProfile::getName).thenApply(profileCache::getProfile);
     }
 
     public static CompletableFuture<Profile> findOrLookupProfileByUniqueId(final UUID uuid) {

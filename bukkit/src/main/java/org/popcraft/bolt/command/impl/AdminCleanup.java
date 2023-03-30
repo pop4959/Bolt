@@ -11,9 +11,9 @@ import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.BukkitMainThreadExecutor;
 import org.popcraft.bolt.util.ChunkPos;
 import org.popcraft.bolt.util.PaperUtil;
+import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,7 +75,7 @@ public class AdminCleanup extends BoltCommand {
                                 if (!blockProtection.getBlock().equals(block.getType().name())) {
                                     store.removeBlockProtection(blockProtection);
                                     removed.incrementAndGet();
-                                    BukkitMainThreadExecutor.get().execute(() -> BoltComponents.sendMessage(sender, Translation.CLEANUP_REMOVE, Placeholder.unparsed(Translation.Placeholder.RAW_PROTECTION, blockProtection.toString())));
+                                    SchedulerUtil.schedule(plugin, sender, () -> BoltComponents.sendMessage(sender, Translation.CLEANUP_REMOVE, Placeholder.unparsed(Translation.Placeholder.RAW_PROTECTION, blockProtection.toString())));
                                 }
                             }
                         })
@@ -86,7 +86,7 @@ public class AdminCleanup extends BoltCommand {
             final long finish = System.currentTimeMillis();
             final long seconds = (finish - start) / 1000;
             BoltComponents.sendMessage(sender, Translation.CLEANUP_COMPLETE, Placeholder.unparsed(Translation.Placeholder.COUNT, String.valueOf(removed.get())), Placeholder.unparsed(Translation.Placeholder.SECONDS, String.valueOf(seconds)));
-        }, BukkitMainThreadExecutor.get());
+        }, SchedulerUtil.executor(plugin, sender));
     }
 
     @Override
