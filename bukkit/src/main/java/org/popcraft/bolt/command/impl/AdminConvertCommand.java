@@ -33,7 +33,8 @@ public class AdminConvertCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, Translation.MIGRATION_IN_PROGRESS);
             return;
         }
-        final boolean convertEntities = arguments.remaining() > 0 && arguments.next().equals("entities");
+        final String arg = arguments.next();
+        final boolean convertEntities = "entities".equalsIgnoreCase(arg);
         if (lastMigration != null && convertEntities) {
             BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "LWC"), Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "Bolt"));
             isConverting.set(true);
@@ -51,7 +52,7 @@ public class AdminConvertCommand extends BoltCommand {
             lastMigration = null;
             return;
         }
-        final boolean convertBack = arguments.remaining() > 0 && arguments.next().equals("back");
+        final boolean convertBack = "back".equalsIgnoreCase(arg);
         if (convertBack) {
             if (!plugin.getServer().getPluginManager().isPluginEnabled("LWC")) {
                 BoltComponents.sendMessage(sender, Translation.MIGRATION_LWC_MISSING);
