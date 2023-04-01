@@ -36,7 +36,12 @@ public class AdminConvertCommand extends BoltCommand {
         final String arg = arguments.next();
         final boolean convertEntities = "entities".equalsIgnoreCase(arg);
         if (lastMigration != null && convertEntities) {
-            BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "LWC"), Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "Bolt"));
+            BoltComponents.sendMessage(
+                    sender,
+                    Translation.MIGRATION_STARTED,
+                    Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "LWC"),
+                    Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "Bolt")
+            );
             isConverting.set(true);
             lastMigration.convertEntityBlocks().whenCompleteAsync((memoryStore, throwable) -> {
                 isConverting.set(false);
@@ -59,7 +64,12 @@ public class AdminConvertCommand extends BoltCommand {
                 return;
             }
             final BoltMigration migration = new BoltMigration(plugin);
-            BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "Bolt"), Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "LWC"));
+            BoltComponents.sendMessage(
+                    sender,
+                    Translation.MIGRATION_STARTED,
+                    Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "Bolt"),
+                    Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "LWC")
+            );
             isConverting.set(true);
             migration.convertAsync().whenCompleteAsync((ignored, throwable) -> {
                 isConverting.set(false);
@@ -70,7 +80,12 @@ public class AdminConvertCommand extends BoltCommand {
             }, SchedulerUtil.executor(plugin, sender));
         } else {
             final LWCMigration migration = new LWCMigration(plugin);
-            BoltComponents.sendMessage(sender, Translation.MIGRATION_STARTED, Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "LWC"), Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "Bolt"));
+            BoltComponents.sendMessage(
+                    sender,
+                    Translation.MIGRATION_STARTED,
+                    Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "LWC"),
+                    Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "Bolt")
+            );
             isConverting.set(true);
             migration.convertAsync().whenCompleteAsync((memoryStore, throwable) -> {
                 isConverting.set(false);
@@ -87,7 +102,11 @@ public class AdminConvertCommand extends BoltCommand {
                 BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED);
                 if (migration.hasEntityBlocks()) {
                     lastMigration = migration;
-                    BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED_FOUND_ENTITIES, Placeholder.unparsed("command", "/bolt admin convert entities"));
+                    BoltComponents.sendMessage(
+                            sender,
+                            Translation.MIGRATION_COMPLETED_FOUND_ENTITIES,
+                            Placeholder.unparsed("command", "/bolt admin convert entities")
+                    );
                 }
             }, SchedulerUtil.executor(plugin, sender));
         }

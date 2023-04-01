@@ -7,10 +7,10 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.data.SQLStore;
 import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
-import org.popcraft.bolt.util.BlockLocation;
-import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceType;
+import org.popcraft.bolt.util.BlockLocation;
+import org.popcraft.bolt.util.BukkitAdapter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

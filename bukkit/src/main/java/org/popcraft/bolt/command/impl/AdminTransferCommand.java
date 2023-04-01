@@ -16,7 +16,6 @@ import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class AdminTransferCommand extends BoltCommand {
@@ -43,9 +42,17 @@ public class AdminTransferCommand extends BoltCommand {
                 final Profile ownerProfile = ownerProfileFuture.join();
                 final Profile newOwnerProfile = newOwnerProfileFuture.join();
                 if (ownerProfile.uuid() == null) {
-                    SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner)));
+                    SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
+                            player,
+                            Translation.PLAYER_NOT_FOUND,
+                            Placeholder.unparsed(Translation.Placeholder.PLAYER, owner)
+                    ));
                 } else if (newOwnerProfile.uuid() == null) {
-                    SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, newOwner)));
+                    SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
+                            player,
+                            Translation.PLAYER_NOT_FOUND,
+                            Placeholder.unparsed(Translation.Placeholder.PLAYER, newOwner)
+                    ));
                 } else {
                     final Store store = plugin.getBolt().getStore();
                     store.loadBlockProtections().join().stream()
@@ -60,7 +67,12 @@ public class AdminTransferCommand extends BoltCommand {
                                 protection.setOwner(newOwnerProfile.uuid());
                                 store.saveEntityProtection(protection);
                             });
-                    SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER_ALL, Placeholder.unparsed(Translation.Placeholder.OLD_PLAYER, owner), Placeholder.unparsed(Translation.Placeholder.NEW_PLAYER, newOwner)));
+                    SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
+                            player,
+                            Translation.CLICK_TRANSFER_ALL,
+                            Placeholder.unparsed(Translation.Placeholder.OLD_PLAYER, owner),
+                            Placeholder.unparsed(Translation.Placeholder.NEW_PLAYER, newOwner)
+                    ));
                 }
             });
         } else {
@@ -69,7 +81,11 @@ public class AdminTransferCommand extends BoltCommand {
                     plugin.player(player).setAction(new Action(Action.Type.TRANSFER, profile.uuid().toString(), true));
                     BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER);
                 } else {
-                    BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner));
+                    BoltComponents.sendMessage(
+                            player,
+                            Translation.PLAYER_NOT_FOUND,
+                            Placeholder.unparsed(Translation.Placeholder.PLAYER, owner)
+                    );
                 }
             });
         }

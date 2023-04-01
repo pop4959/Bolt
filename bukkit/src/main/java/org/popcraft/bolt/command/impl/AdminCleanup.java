@@ -38,7 +38,11 @@ public class AdminCleanup extends BoltCommand {
         final Store store = plugin.getBolt().getStore();
         final Collection<BlockProtection> protections = store.loadBlockProtections().join();
         final long count = protections.size();
-        BoltComponents.sendMessage(sender, Translation.CLEANUP_START, Placeholder.unparsed(Translation.Placeholder.COUNT, String.valueOf(count)));
+        BoltComponents.sendMessage(
+                sender,
+                Translation.CLEANUP_START,
+                Placeholder.unparsed(Translation.Placeholder.COUNT, String.valueOf(count))
+        );
         final Map<String, World> worlds = new HashMap<>();
         final Map<ChunkPos, List<BlockProtection>> blockProtectionsByChunk = new HashMap<>();
         final long start = System.currentTimeMillis();
@@ -75,7 +79,11 @@ public class AdminCleanup extends BoltCommand {
                                 if (!blockProtection.getBlock().equals(block.getType().name())) {
                                     store.removeBlockProtection(blockProtection);
                                     removed.incrementAndGet();
-                                    SchedulerUtil.schedule(plugin, sender, () -> BoltComponents.sendMessage(sender, Translation.CLEANUP_REMOVE, Placeholder.unparsed(Translation.Placeholder.RAW_PROTECTION, blockProtection.toString())));
+                                    SchedulerUtil.schedule(plugin, sender, () -> BoltComponents.sendMessage(
+                                            sender,
+                                            Translation.CLEANUP_REMOVE,
+                                            Placeholder.unparsed(Translation.Placeholder.RAW_PROTECTION, blockProtection.toString())
+                                    ));
                                 }
                             }
                         })
@@ -85,7 +93,12 @@ public class AdminCleanup extends BoltCommand {
         }).thenRunAsync(() -> {
             final long finish = System.currentTimeMillis();
             final long seconds = (finish - start) / 1000;
-            BoltComponents.sendMessage(sender, Translation.CLEANUP_COMPLETE, Placeholder.unparsed(Translation.Placeholder.COUNT, String.valueOf(removed.get())), Placeholder.unparsed(Translation.Placeholder.SECONDS, String.valueOf(seconds)));
+            BoltComponents.sendMessage(
+                    sender,
+                    Translation.CLEANUP_COMPLETE,
+                    Placeholder.unparsed(Translation.Placeholder.COUNT, String.valueOf(removed.get())),
+                    Placeholder.unparsed(Translation.Placeholder.SECONDS, String.valueOf(seconds))
+            );
         }, SchedulerUtil.executor(plugin, sender));
     }
 

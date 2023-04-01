@@ -29,7 +29,10 @@ public class AdminReportCommand extends BoltCommand {
     public void execute(CommandSender sender, Arguments arguments) {
         if (!Metrics.isEnabled()) {
             Metrics.setEnabled(true);
-            BoltComponents.sendMessage(sender, "Enabling reports. This will have a performance impact. Type '/bolt admin report disable' to turn off reports. Type '/bolt admin report' again to generate an updated report.");
+            BoltComponents.sendMessage(
+                    sender,
+                    "Enabling reports. This will have a performance impact. Type '/bolt admin report disable' to turn off reports. Type '/bolt admin report' again to generate an updated report."
+            );
             return;
         }
         final boolean disable = arguments.next() != null;
@@ -45,8 +48,16 @@ public class AdminReportCommand extends BoltCommand {
         final long misses = Metrics.getProtectionMisses();
         final boolean hitsChanged = hits != previousHits;
         final boolean missesChanged = misses != previousMisses;
-        BoltComponents.sendMessage(sender, "Hits: <hits>", Placeholder.component("hits", changeComponent(hitsChanged, previousHits, hits)));
-        BoltComponents.sendMessage(sender, "Misses: <misses>", Placeholder.component("misses", changeComponent(missesChanged, previousMisses, misses)));
+        BoltComponents.sendMessage(
+                sender,
+                "Hits: <hits>",
+                Placeholder.component("hits", changeComponent(hitsChanged, previousHits, hits))
+        );
+        BoltComponents.sendMessage(
+                sender,
+                "Misses: <misses>",
+                Placeholder.component("misses", changeComponent(missesChanged, previousMisses, misses))
+        );
         final Map<Metrics.ProtectionAccess, Long> protectionAccessCounts = Metrics.getProtectionAccessCounts();
         final Map<String, List<Metrics.ProtectionAccess>> protectionAccessListByType = protectionAccessCounts.keySet().stream().collect(Collectors.groupingBy(Metrics.ProtectionAccess::type, Collectors.toList()));
         protectionAccessListByType.forEach((type, list) -> {
@@ -55,7 +66,12 @@ public class AdminReportCommand extends BoltCommand {
                 final long count = protectionAccessCounts.get(protectionAccess);
                 final long previousCount = previousExecutionCounts.getOrDefault(protectionAccess, 0L);
                 final boolean countChanged = count != previousCount;
-                BoltComponents.sendMessage(sender, "<consumer>: <count>", Placeholder.unparsed("consumer", protectionAccess.consumer()), Placeholder.component("count", changeComponent(countChanged, previousCount, count)));
+                BoltComponents.sendMessage(
+                        sender,
+                        "<consumer>: <count>",
+                        Placeholder.unparsed("consumer", protectionAccess.consumer()),
+                        Placeholder.component("count", changeComponent(countChanged, previousCount, count))
+                );
             });
         });
         this.previousHits = hits;

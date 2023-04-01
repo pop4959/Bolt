@@ -1,10 +1,10 @@
 package org.popcraft.bolt.data;
 
+import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
-import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Metrics;
 

@@ -34,9 +34,16 @@ public class TransferCommand extends BoltCommand {
         BukkitAdapter.findOrLookupProfileByName(owner).thenAccept(profile -> {
             if (profile.uuid() != null) {
                 plugin.player(player).setAction(new Action(Action.Type.TRANSFER, profile.uuid().toString()));
-                SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER));
+                SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
+                        player,
+                        Translation.CLICK_TRANSFER
+                ));
             } else {
-                SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, owner)));
+                SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
+                        player,
+                        Translation.PLAYER_NOT_FOUND,
+                        Placeholder.unparsed(Translation.Placeholder.PLAYER, owner)
+                ));
             }
         });
     }

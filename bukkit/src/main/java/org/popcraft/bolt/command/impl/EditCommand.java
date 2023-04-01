@@ -45,12 +45,20 @@ public class EditCommand extends BoltCommand {
         final String accessType = arguments.next();
         final Access access = plugin.getBolt().getAccessRegistry().getAccessByType(accessType).orElse(null);
         if (access == null) {
-            BoltComponents.sendMessage(sender, Translation.EDIT_ACCESS_INVALID, Placeholder.unparsed(Translation.Placeholder.ACCESS_TYPE, accessType));
+            BoltComponents.sendMessage(
+                    sender,
+                    Translation.EDIT_ACCESS_INVALID,
+                    Placeholder.unparsed(Translation.Placeholder.ACCESS_TYPE, accessType)
+            );
             return;
         }
         final String sourceType = arguments.next();
         if (sourceType == null || !plugin.getBolt().getSourceTypeRegistry().sourceTypes().contains(sourceType)) {
-            BoltComponents.sendMessage(sender, Translation.EDIT_SOURCE_INVALID, Placeholder.unparsed(Translation.Placeholder.SOURCE_TYPE, String.valueOf(sourceType)));
+            BoltComponents.sendMessage(
+                    sender,
+                    Translation.EDIT_SOURCE_INVALID,
+                    Placeholder.unparsed(Translation.Placeholder.SOURCE_TYPE, String.valueOf(sourceType))
+            );
             return;
         }
         String identifier;
@@ -62,7 +70,11 @@ public class EditCommand extends BoltCommand {
                     if (profile.uuid() != null) {
                         return Source.player(profile.uuid());
                     } else {
-                        SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.PLAYER_NOT_FOUND, Placeholder.unparsed(Translation.Placeholder.PLAYER, finalIdentifier)));
+                        SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
+                                player,
+                                Translation.PLAYER_NOT_FOUND,
+                                Placeholder.unparsed(Translation.Placeholder.PLAYER, finalIdentifier)
+                        ));
                         return null;
                     }
                 });
@@ -75,13 +87,22 @@ public class EditCommand extends BoltCommand {
                 if (source != null) {
                     boltPlayer.getModifications().put(source, access.type());
                     if (boltPlayer.isTrusting() && !boltPlayer.isTrustingSilently()) {
-                        BoltComponents.sendMessage(player, adding ? Translation.TRUST_ADD : Translation.TRUST_REMOVE, Placeholder.unparsed(Translation.Placeholder.SOURCE_TYPE, source.getType()), Placeholder.unparsed(Translation.Placeholder.SOURCE_IDENTIFIER, finalIdentifier));
+                        BoltComponents.sendMessage(
+                                player,
+                                adding ? Translation.TRUST_ADD : Translation.TRUST_REMOVE,
+                                Placeholder.unparsed(Translation.Placeholder.SOURCE_TYPE, source.getType()),
+                                Placeholder.unparsed(Translation.Placeholder.SOURCE_IDENTIFIER, finalIdentifier)
+                        );
                     }
                 }
             }));
         }
         if (!boltPlayer.isTrusting()) {
-            BoltComponents.sendMessage(player, Translation.CLICK_ACTION, Placeholder.unparsed(Translation.Placeholder.ACTION, translate(Translation.EDIT)));
+            BoltComponents.sendMessage(
+                    player,
+                    Translation.CLICK_ACTION,
+                    Placeholder.unparsed(Translation.Placeholder.ACTION, translate(Translation.EDIT))
+            );
         }
     }
 
