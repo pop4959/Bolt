@@ -12,15 +12,23 @@ public class SchedulerUtil {
     }
 
     public static void schedule(final Plugin plugin, final CommandSender sender, final Runnable runnable) {
+        schedule(plugin, sender, runnable, 0);
+    }
+
+    public static void schedule(final Plugin plugin, final CommandSender sender, final Runnable runnable, final long delay) {
         if (FoliaUtil.isFolia()) {
             if (sender instanceof final Player player) {
                 player.getScheduler().execute(plugin, runnable, () -> {
-                }, 0);
+                }, delay);
             } else {
-                Bukkit.getGlobalRegionScheduler().execute(plugin, runnable);
+                if (delay <= 0) {
+                    Bukkit.getGlobalRegionScheduler().execute(plugin, runnable);
+                } else {
+                    Bukkit.getGlobalRegionScheduler().runDelayed(plugin, scheduledTask -> runnable.run(), delay);
+                }
             }
         } else {
-            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, runnable);
+            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, runnable, delay);
         }
     }
 

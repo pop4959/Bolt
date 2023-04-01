@@ -38,22 +38,23 @@ import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.util.BoundingBox;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
-import org.popcraft.bolt.access.Access;
-import org.popcraft.bolt.util.Action;
-import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.BoltPlayer;
-import org.popcraft.bolt.util.BukkitAdapter;
-import org.popcraft.bolt.util.Mode;
-import org.popcraft.bolt.util.Permission;
-import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceType;
 import org.popcraft.bolt.source.SourceTypeResolver;
+import org.popcraft.bolt.util.Action;
+import org.popcraft.bolt.util.BoltComponents;
+import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Doors;
+import org.popcraft.bolt.util.Mode;
+import org.popcraft.bolt.util.Permission;
+import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.EnumSet;
@@ -95,11 +96,15 @@ public final class BlockListener implements Listener {
             e.setCancelled(true);
         } else if (protection != null) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
-            if (!plugin.canAccess(protection, player, Permission.INTERACT)) {
+            final boolean canInteract = plugin.canAccess(protection, player, Permission.INTERACT);
+            if (!canInteract) {
                 e.setCancelled(true);
                 if (!hasNotifyPermission) {
                     BoltComponents.sendMessage(player, Translation.LOCKED, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection)));
                 }
+            }
+            if (plugin.isDoors() && canInteract) {
+                Doors.handlePlayerInteract(plugin, player, clicked);
             }
             if (hasNotifyPermission) {
                 BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> {

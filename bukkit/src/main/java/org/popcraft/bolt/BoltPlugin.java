@@ -165,6 +165,10 @@ public class BoltPlugin extends JavaPlugin {
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
     private boolean useActionBar;
+    private boolean doors;
+    private boolean doorsOpenIron;
+    private boolean doorsOpenDouble;
+    private int doorsCloseAfter;
     private Bolt bolt;
 
     @Override
@@ -208,6 +212,10 @@ public class BoltPlugin extends JavaPlugin {
         reloadConfig();
         Translator.load(getDataFolder().toPath(), getConfig().getString("language", "en"));
         this.useActionBar = getConfig().getBoolean("settings.use-action-bar", false);
+        this.doors = getConfig().getConfigurationSection("doors") != null;
+        this.doorsOpenIron = getConfig().getBoolean("doors.open-iron", false);
+        this.doorsOpenDouble = getConfig().getBoolean("doors.open-double", false);
+        this.doorsCloseAfter = getConfig().getInt("doors.close-after", 0);
         registerAccessTypes();
         registerProtectableAccess();
         initializeMatchers();
@@ -407,6 +415,22 @@ public class BoltPlugin extends JavaPlugin {
 
     public boolean isUseActionBar() {
         return useActionBar;
+    }
+
+    public boolean isDoors() {
+        return doors;
+    }
+
+    public boolean isDoorsOpenIron() {
+        return doorsOpenIron;
+    }
+
+    public boolean isDoorsOpenDouble() {
+        return doorsOpenDouble;
+    }
+
+    public int getDoorsCloseAfter() {
+        return doorsCloseAfter;
     }
 
     public ProfileCache getProfileCache() {
