@@ -245,7 +245,7 @@ public final class EntityListener implements Listener {
                     if (protection.getOwner().equals(player.getUniqueId()) && !protection.getType().equals(protectionType)) {
                         protection.setType(protectionType);
                         plugin.saveProtection(protection);
-                        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_CHANGED, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, protectionType));
+                        BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_CHANGED, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType())));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_LOCKED_ALREADY, plugin.isUseActionBar(), Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(protection)));
                     }
