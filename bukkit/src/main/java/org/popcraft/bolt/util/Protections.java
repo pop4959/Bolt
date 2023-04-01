@@ -3,7 +3,6 @@ package org.popcraft.bolt.util;
 import net.kyori.adventure.platform.bukkit.BukkitComponentSerializer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.Nameable;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -72,29 +71,16 @@ public final class Protections {
     }
 
     public static String displayType(final Block block) {
-        if (block.getState() instanceof final Nameable nameable) {
-            final String customName = nameable.getCustomName();
-            if (customName != null && !customName.isEmpty()) {
-                return customName;
-            }
-        }
         final Component translatable = Component.translatable(block.getTranslationKey());
         return BukkitComponentSerializer.legacy().serialize(translatable);
     }
 
     public static String displayType(final Entity entity) {
-        final String customName = entity.getCustomName();
-        if (customName != null && !customName.isEmpty()) {
-            return customName;
-        }
         final Component translatable = Component.translatable(entity.getType().getTranslationKey());
         return BukkitComponentSerializer.legacy().serialize(translatable);
     }
 
     public static String displayTypeFromData(final Block block) {
-        if (block.getState() instanceof final Nameable nameable && nameable.getCustomName() != null && !nameable.getCustomName().isEmpty()) {
-            return nameable.getCustomName();
-        }
         final String blockDataString = block.getBlockData().getAsString().replace(':', '.');
         final int nbtIndex = blockDataString.indexOf('[');
         final String key;
