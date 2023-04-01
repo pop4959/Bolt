@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Properties;
 
 public final class Translator {
@@ -16,6 +15,7 @@ public final class Translator {
     private static final String DEFAULT_LOCALE_FORMAT = "%s_%s";
     private static final Properties fallback = loadTranslation("en");
     private static Properties translations = loadTranslation("en");
+    private static String selected = "en";
 
     private Translator() {
     }
@@ -38,14 +38,23 @@ public final class Translator {
         translations = loadTranslation(language);
     }
 
+    public static String selected() {
+        return selected;
+    }
+
     private static Properties loadTranslation(final String language) {
         final Properties properties = new Properties();
         final ClassLoader classLoader = Translator.class.getClassLoader();
-        final InputStream input = Optional.ofNullable(classLoader.getResourceAsStream(TRANSLATION_FILE_FORMAT.formatted(language)))
-                .orElse(classLoader.getResourceAsStream(TRANSLATION_FILE_FORMAT.formatted(DEFAULT_LOCALE_FORMAT.formatted(language.toLowerCase(), language.toUpperCase()))));
+        String newSelected = language;
+        InputStream input = classLoader.getResourceAsStream(TRANSLATION_FILE_FORMAT.formatted(language));
+        if (input == null) {
+            newSelected = DEFAULT_LOCALE_FORMAT.formatted(language.toLowerCase(), language.toUpperCase());
+            input = classLoader.getResourceAsStream(TRANSLATION_FILE_FORMAT.formatted(newSelected));
+        }
         if (input != null) {
             try (final BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
                 properties.load(reader);
+                selected = newSelected;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -57,6 +66,7 @@ public final class Translator {
         final Properties properties = new Properties();
         try (final BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             properties.load(reader);
+            selected = "custom";
         } catch (IOException e) {
             e.printStackTrace();
         }

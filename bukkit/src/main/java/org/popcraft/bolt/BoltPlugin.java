@@ -222,7 +222,7 @@ public class BoltPlugin extends JavaPlugin {
     }
 
     private void registerCustomCharts(final Metrics metrics) {
-        metrics.addCustomChart(new SimplePie("config_language", () -> getConfig().getString("language", "en")));
+        metrics.addCustomChart(new SimplePie("config_language", Translator::selected));
         metrics.addCustomChart(new SimplePie("config_database", () -> getConfig().getString("database.type", "sqlite")));
         metrics.addCustomChart(new AdvancedPie("config_protections", () -> {
             final Map<String, Integer> map = new HashMap<>();
