@@ -4,7 +4,6 @@ settings:
   use-action-bar: false
 database:
   type: sqlite
-  path: plugins/Bolt/bolt.db
   hostname: ""
   database: ""
   username: ""
