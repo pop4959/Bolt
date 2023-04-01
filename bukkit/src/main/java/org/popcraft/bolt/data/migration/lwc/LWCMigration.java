@@ -69,10 +69,10 @@ public class LWCMigration {
         final MemoryStore store = new MemoryStore();
         final Map<Integer, Block> blocks = new HashMap<>();
         final List<Protection> protections = new ArrayList<>();
-        final FileConfiguration lwcCoreConfig = YamlConfiguration.loadConfiguration(plugin.getDataFolder().toPath().resolve("../LWC/core.yml").toFile());
+        final FileConfiguration lwcCoreConfig = YamlConfiguration.loadConfiguration(plugin.getPluginsPath().resolve("LWC/core.yml").toFile());
         final SQLStore.Configuration configuration = new SQLStore.Configuration(
                 lwcCoreConfig.getString("database.adapter", "sqlite"),
-                lwcCoreConfig.getString("database.path", "plugins/LWC/lwc.db"),
+                lwcCoreConfig.getString("database.path", "%s/LWC/lwc.db".formatted(plugin.getPluginsPath().toFile().getName())),
                 lwcCoreConfig.getString("database.host", ""),
                 lwcCoreConfig.getString("database.database", ""),
                 lwcCoreConfig.getString("database.username", ""),

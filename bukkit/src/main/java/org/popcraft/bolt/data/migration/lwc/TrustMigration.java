@@ -27,7 +27,7 @@ public class TrustMigration {
         if (!plugin.getBolt().getStore().loadAccessLists().join().isEmpty()) {
             return;
         }
-        final Path lwcTrustDirectory = plugin.getDataFolder().toPath().resolve("../LWCTrust");
+        final Path lwcTrustDirectory = plugin.getPluginsPath().resolve("LWCTrust");
         if (!Files.exists(lwcTrustDirectory)) {
             return;
         }

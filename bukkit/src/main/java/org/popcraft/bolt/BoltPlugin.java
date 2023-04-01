@@ -157,7 +157,7 @@ public class BoltPlugin extends JavaPlugin {
     private final List<BlockMatcher> enabledBlockMatchers = new ArrayList<>();
     private final List<EntityMatcher> enabledEntityMatchers = new ArrayList<>();
     private final Map<String, BoltCommand> commands = new HashMap<>();
-    private final Path profileCachePath = getDataFolder().toPath().resolve("profiles");
+    private final Path profileCachePath = getDataPath().resolve("profiles");
     private final ProfileCache profileCache = new SimpleProfileCache(profileCachePath);
     private final Map<Material, Access> protectableBlocks = new EnumMap<>(Material.class);
     private final Map<EntityType, Access> protectableEntities = new EnumMap<>(EntityType.class);
@@ -176,7 +176,7 @@ public class BoltPlugin extends JavaPlugin {
         saveDefaultConfig();
         final SQLStore.Configuration databaseConfiguration = new SQLStore.Configuration(
                 getConfig().getString("database.type", "sqlite"),
-                getConfig().getString("database.path", "plugins/Bolt/bolt.db"),
+                getConfig().getString("database.path", "%s/Bolt/bolt.db".formatted(getPluginsPath().toFile().getName())),
                 getConfig().getString("database.hostname", ""),
                 getConfig().getString("database.database", ""),
                 getConfig().getString("database.username", ""),
@@ -210,7 +210,7 @@ public class BoltPlugin extends JavaPlugin {
 
     public void reload() {
         reloadConfig();
-        Translator.load(getDataFolder().toPath(), getConfig().getString("language", "en"));
+        Translator.load(getDataPath(), getConfig().getString("language", "en"));
         this.useActionBar = getConfig().getBoolean("settings.use-action-bar", false);
         this.doors = getConfig().getConfigurationSection("doors") != null;
         this.doorsOpenIron = getConfig().getBoolean("doors.open-iron", false);
@@ -411,6 +411,14 @@ public class BoltPlugin extends JavaPlugin {
 
     public Bolt getBolt() {
         return bolt;
+    }
+
+    public Path getDataPath() {
+        return getDataFolder().toPath();
+    }
+
+    public Path getPluginsPath() {
+        return getDataPath().getParent();
     }
 
     public boolean isUseActionBar() {
