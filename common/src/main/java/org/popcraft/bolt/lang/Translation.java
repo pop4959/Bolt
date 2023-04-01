@@ -51,6 +51,9 @@ public class Translation {
     public static final String PROTECTION_NOTIFY_GENERIC = "protection_notify_generic";
     public static final String PURGE = "purge";
     public static final String RELOAD = "reload";
+    public static final String TRUST = "trust";
+    public static final String TRUST_ADD = "trust_add";
+    public static final String TRUST_REMOVE = "trust_remove";
     public static final String TRUST_CONFIRM = "trust_confirm";
     public static final String TRUST_EDITED = "trust_edited";
     public static final String TRUST_EDITED_FAILED = "trust_edited_failed";
@@ -67,6 +70,7 @@ public class Translation {
         public static final String ACCESS_TYPE = "access_type";
         public static final String ACTION = "action";
         public static final String COMMAND = "command";
+        public static final String COMMAND_2 = "command_2";
         public static final String GROUP = "group";
         public static final String GROUP_MEMBERS = "group_members";
         public static final String MODE = "mode";
@@ -78,6 +82,7 @@ public class Translation {
         public static final String PROTECTION = "protection";
         public static final String PROTECTION_TYPE = "protection_type";
         public static final String SOURCE_TYPE = "source_type";
+        public static final String SOURCE_IDENTIFIER = "source_identifier";
         public static final String RAW_PROTECTION = "raw_protection";
         public static final String COUNT = "count";
         public static final String SECONDS = "seconds";

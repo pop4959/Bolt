@@ -16,6 +16,8 @@ public class BoltPlayer {
     private Action action;
     private Action lastAction;
     private boolean interacted;
+    private boolean trusting;
+    private boolean trustingSilently;
     private boolean lockNil;
 
     public BoltPlayer(UUID uuid) {
@@ -85,6 +87,22 @@ public class BoltPlayer {
             modifications.clear();
         }
         return modificationsCopy;
+    }
+
+    public boolean isTrusting() {
+        return trusting;
+    }
+
+    public void setTrusting(boolean trusting) {
+        this.trusting = trusting;
+    }
+
+    public boolean isTrustingSilently() {
+        return trustingSilently;
+    }
+
+    public void setTrustingSilently(boolean trustingSilently) {
+        this.trustingSilently = trustingSilently;
     }
 
     public boolean isLockNil() {

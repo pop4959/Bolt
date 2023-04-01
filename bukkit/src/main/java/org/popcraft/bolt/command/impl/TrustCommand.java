@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 public class TrustCommand extends BoltCommand {
@@ -40,20 +39,26 @@ public class TrustCommand extends BoltCommand {
             final Map<String, String> accessMap = accessList == null ? new HashMap<>() : accessList.getAccess();
             BukkitAdapter.findOrLookupProfileByUniqueId(player.getUniqueId()).thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(player, Translation.INFO_SELF, Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST_SIZE, String.valueOf(accessMap.size())), Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST, Protections.accessList(accessMap)))));
         } else if (!"confirm".equals(action)) {
-            BoltComponents.sendMessage(sender, Translation.TRUST_CONFIRM, Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt trust confirm"));
+            final boolean silent = "silent".equals(action);
+            final BoltPlayer boltPlayer = plugin.player(player);
+            boltPlayer.setTrusting(true);
+            boltPlayer.setTrustingSilently(silent);
+            if (!silent) {
+                BoltComponents.sendMessage(sender, Translation.TRUST, Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt edit"), Placeholder.unparsed(Translation.Placeholder.COMMAND_2, "/bolt trust confirm"));
+            }
         } else {
             final BoltPlayer boltPlayer = plugin.player(player);
-            final Action editAction = Optional.ofNullable(boltPlayer.getAction())
-                    .filter(a -> Action.Type.EDIT.equals(a.getType()))
-                    .orElse(null);
-            if (editAction == null) {
-                BoltComponents.sendMessage(sender, Translation.TRUST_EDITED_FAILED, Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt edit"));
+            final Action playerAction = boltPlayer.getAction();
+            final boolean trusting = boltPlayer.isTrusting();
+            if (playerAction == null || !Action.Type.EDIT.equals(playerAction.getType()) || !trusting) {
+                final String command = trusting ? "/bolt edit" : "/bolt trust";
+                BoltComponents.sendMessage(sender, Translation.TRUST_EDITED_FAILED, Placeholder.unparsed(Translation.Placeholder.COMMAND, command));
                 return;
             }
             final UUID uuid = player.getUniqueId();
             final AccessList accessList = Objects.requireNonNullElse(plugin.getBolt().getStore().loadAccessList(uuid).join(), new AccessList(uuid, new HashMap<>()));
             boltPlayer.consumeModifications().forEach((source, type) -> {
-                if (Boolean.parseBoolean(editAction.getData())) {
+                if (Boolean.parseBoolean(playerAction.getData())) {
                     accessList.getAccess().put(source.toString(), type);
                 } else {
                     accessList.getAccess().remove(source.toString());
@@ -62,6 +67,8 @@ public class TrustCommand extends BoltCommand {
             plugin.getBolt().getStore().saveAccessList(accessList);
             BoltComponents.sendMessage(sender, Translation.TRUST_EDITED);
             boltPlayer.clearAction();
+            boltPlayer.setTrusting(false);
+            boltPlayer.setTrustingSilently(false);
         }
     }
 
@@ -72,7 +79,7 @@ public class TrustCommand extends BoltCommand {
         }
         arguments.next();
         if (arguments.remaining() == 0) {
-            return List.of("list");
+            return List.of("list", "confirm");
         }
         return Collections.emptyList();
     }
