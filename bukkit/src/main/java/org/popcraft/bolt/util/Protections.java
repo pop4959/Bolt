@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
@@ -17,6 +18,7 @@ import org.popcraft.bolt.source.SourceTypes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,14 +47,18 @@ public final class Protections {
             final int y = blockProtection.getY();
             final int z = blockProtection.getZ();
             if (world == null || !world.isChunkLoaded(x >> 4, z >> 4)) {
-                return Component.text(Strings.toTitleCase(blockProtection.getBlock()));
+                return displayType(Objects.requireNonNullElse(Material.getMaterial(blockProtection.getBlock().toUpperCase()), Material.AIR));
             } else {
                 return displayType(world.getBlockAt(x, y, z));
             }
         } else if (protection instanceof final EntityProtection entityProtection) {
             final Entity entity = Bukkit.getServer().getEntity(entityProtection.getId());
             if (entity == null) {
-                return Component.text(Strings.toTitleCase(entityProtection.getEntity()));
+                try {
+                    return displayType(EntityType.valueOf(entityProtection.getEntity().toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    return displayType(EntityType.PIG);
+                }
             } else {
                 return displayType(entity);
             }
@@ -62,16 +68,26 @@ public final class Protections {
     }
 
     public static Component displayType(final Block block) {
-        final Material materal = block.getType();
+        final Material material = block.getType();
         if (translatableSupport) {
-            return displayType(materal);
+            return displayType(material);
         } else {
-            return displayTypeFromData(materal);
+            return displayTypeFromData(material);
         }
     }
 
     private static Component displayType(final Material material) {
-        return Component.translatable(material.getTranslationKey());
+        final String materialNameLower = material.name().toLowerCase();
+        final String blockTranslationKey = "block_%s".formatted(materialNameLower);
+        final String blockTranslation = translate(blockTranslationKey);
+        if (!blockTranslationKey.equals(blockTranslation)) {
+            return Component.text(blockTranslation);
+        }
+        if (translatableSupport) {
+            return Component.translatable(material.getTranslationKey());
+        } else {
+            return Component.text(Strings.toTitleCase(materialNameLower));
+        }
     }
 
     private static Component displayTypeFromData(final Material material) {
@@ -88,9 +104,23 @@ public final class Protections {
 
     public static Component displayType(final Entity entity) {
         if (translatableSupport) {
-            return Component.translatable(entity.getType().getTranslationKey());
+            return displayType(entity.getType());
         } else {
             return Component.text(entity.getName());
+        }
+    }
+
+    private static Component displayType(final EntityType entityType) {
+        final String entityTypeLower = entityType.name().toLowerCase();
+        final String entityTranslationKey = "entity_%s".formatted(entityTypeLower);
+        final String entityTranslation = translate(entityTranslationKey);
+        if (!entityTranslationKey.equals(entityTranslation)) {
+            return Component.text(entityTranslation);
+        }
+        if (translatableSupport) {
+            return Component.translatable(entityType.getTranslationKey());
+        } else {
+            return Component.text(Strings.toTitleCase(entityTypeLower));
         }
     }
 
