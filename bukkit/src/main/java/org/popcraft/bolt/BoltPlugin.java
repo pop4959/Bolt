@@ -121,6 +121,7 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
+import org.popcraft.bolt.util.Group;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -621,5 +622,12 @@ public class BoltPlugin extends JavaPlugin {
             }
         }
         return null;
+    }
+
+    public List<String> getPlayersOwnedGroups(final Player player) {
+        return bolt.getStore().loadGroups().join().stream()
+                .filter(group -> group.getOwner().equals(player.getUniqueId()))
+                .map(Group::getName)
+                .toList();
     }
 }

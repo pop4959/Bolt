@@ -170,6 +170,13 @@ public class GroupCommand extends BoltCommand {
             return List.of("create", "delete", "add", "remove", "list");
         }
         arguments.next();
+        if (arguments.remaining() == 0) {
+            if (sender instanceof final Player player) {
+                return plugin.getPlayersOwnedGroups(player);
+            } else {
+                return Collections.emptyList();
+            }
+        }
         final Set<String> alreadyAdded = new HashSet<>();
         String added;
         while ((added = arguments.next()) != null) {

@@ -140,14 +140,16 @@ public class EditCommand extends BoltCommand {
                     .map(SourceType::name)
                     .toList();
         }
-        if (!SourceTypes.PLAYER.equals(sourceType)) {
-            return Collections.emptyList();
-        }
         final Set<String> alreadyAdded = new HashSet<>();
         String added;
         while ((added = arguments.next()) != null) {
             alreadyAdded.add(added);
         }
-        return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).filter(name -> !alreadyAdded.contains(name)).toList();
+        if (SourceTypes.PLAYER.equals(sourceType)) {
+            return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).filter(name -> !alreadyAdded.contains(name)).toList();
+        } else if (SourceTypes.GROUP.equals(sourceType) && sender instanceof final Player player) {
+            return plugin.getPlayersOwnedGroups(player).stream().filter(name -> !alreadyAdded.contains(name)).toList();
+        }
+        return Collections.emptyList();
     }
 }
