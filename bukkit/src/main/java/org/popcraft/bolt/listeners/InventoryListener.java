@@ -23,7 +23,7 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
-import org.popcraft.bolt.source.SourceType;
+import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Permission;
@@ -32,7 +32,7 @@ import java.util.EnumSet;
 import java.util.Map;
 
 public final class InventoryListener implements Listener {
-    private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceType.BLOCK));
+    private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
     private static final Map<InventoryType, EnumSet<Material>> INVENTORY_TYPE_BLOCKS = Map.of(
             InventoryType.BARREL, EnumSet.of(Material.BARREL),
             InventoryType.BLAST_FURNACE, EnumSet.of(Material.BLAST_FURNACE),

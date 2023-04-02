@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.popcraft.bolt.Bolt;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
-import org.popcraft.bolt.source.SourceType;
+import org.popcraft.bolt.source.SourceTypes;
 
 import java.util.UUID;
 
@@ -27,12 +27,12 @@ public class BukkitPlayerResolver implements SourceResolver {
         if (boltPlayer.sources().contains(source)) {
             return true;
         }
-        if (SourceType.GROUP.equals(source.getType())) {
+        if (SourceTypes.GROUP.equals(source.getType())) {
             final Group group = bolt.getStore().loadGroup(source.getIdentifier()).join();
             if (group != null && group.getMembers().contains(uuid)) {
                 return true;
             }
         }
-        return player != null && SourceType.PERMISSION.equals(source.getType()) && player.hasPermission(source.getIdentifier());
+        return player != null && SourceTypes.PERMISSION.equals(source.getType()) && player.hasPermission(source.getIdentifier());
     }
 }

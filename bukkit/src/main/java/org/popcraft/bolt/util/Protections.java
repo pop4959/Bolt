@@ -12,7 +12,7 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
-import org.popcraft.bolt.source.SourceType;
+import org.popcraft.bolt.source.SourceTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,12 +105,12 @@ public final class Protections {
         accessMap.forEach((entry, access) -> {
             final Source source = Source.parse(entry);
             final String subject;
-            if (SourceType.PLAYER.equals(source.getType())) {
+            if (SourceTypes.PLAYER.equals(source.getType())) {
                 final String playerUuid = source.getIdentifier();
                 final UUID uuid = UUID.fromString(playerUuid);
                 final String playerName = BukkitAdapter.findProfileByUniqueId(uuid).name();
                 subject = Optional.ofNullable(playerName).orElse(playerUuid);
-            } else if (SourceType.PASSWORD.equals(source.getType()) || source.getType().equals(source.getIdentifier())) {
+            } else if (SourceTypes.PASSWORD.equals(source.getType()) || source.getType().equals(source.getIdentifier())) {
                 subject = Strings.toTitleCase(source.getType());
             } else {
                 subject = source.getIdentifier();

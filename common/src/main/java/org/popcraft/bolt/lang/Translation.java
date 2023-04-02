@@ -10,6 +10,8 @@ public class Translation {
     public static final String CLICK_EDITED_NO_PERMISSION = "click_edited_no_permission";
     public static final String CLICK_INFO = "click_info";
     public static final String CLICK_LOCKED = "click_locked";
+    public static final String CLICK_LOCKED_NO_EXIST = "click_locked_no_exist";
+    public static final String CLICK_LOCKED_NO_PERMISSION = "click_locked_no_permission";
     public static final String CLICK_LOCKED_ALREADY = "click_locked_already";
     public static final String CLICK_LOCKED_CHANGED = "click_locked_changed";
     public static final String CLICK_NOT_LOCKED = "click_not_locked";
@@ -23,7 +25,9 @@ public class Translation {
     public static final String COMMAND_PLAYER_ONLY = "command_player_only";
     public static final String EDIT = "edit";
     public static final String EDIT_ACCESS_INVALID = "edit_access_invalid";
+    public static final String EDIT_ACCESS_NO_PERMISSION = "edit_access_no_permission";
     public static final String EDIT_SOURCE_INVALID = "edit_source_invalid";
+    public static final String EDIT_SOURCE_NO_PERMISSION = "edit_source_no_permission";
     public static final String ENTER_PASSWORD = "enter_password";
     public static final String ENTER_PASSWORD_NONE = "enter_password_none";
     public static final String GROUP_ALREADY_EXISTS = "group_already_exists";

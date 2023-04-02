@@ -11,7 +11,7 @@ import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.source.Source;
-import org.popcraft.bolt.source.SourceType;
+import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.chunky.ChunkyProvider;
 import org.popcraft.chunky.nbt.CompoundTag;
@@ -131,9 +131,9 @@ public class LWCMigration {
                 if (dataFlags != null) {
                     for (DataFlag flag : dataFlags) {
                         if (flag.getId() == ProtectionFlag.REDSTONE.ordinal()) {
-                            access.put(Source.of(SourceType.REDSTONE).toString(), DEFAULT_ACCESS_ADMIN);
+                            access.put(Source.of(SourceTypes.REDSTONE).toString(), DEFAULT_ACCESS_ADMIN);
                         } else if (flag.getId() == ProtectionFlag.HOPPER.ordinal()) {
-                            access.put(Source.of(SourceType.BLOCK).toString(), DEFAULT_ACCESS_ADMIN);
+                            access.put(Source.of(SourceTypes.BLOCK).toString(), DEFAULT_ACCESS_ADMIN);
                         }
                     }
                 }
@@ -142,7 +142,7 @@ public class LWCMigration {
                     for (DataRights rights : data.getRights()) {
                         final String accessType = rights.getRights() == Permission.Access.ADMIN.ordinal() ? DEFAULT_ACCESS_ADMIN : DEFAULT_ACCESS_NORMAL;
                         if (rights.getType() == Permission.Type.GROUP.ordinal()) {
-                            access.put(Source.of(SourceType.PERMISSION, "group.%s".formatted(rights.getName())).toString(), accessType);
+                            access.put(Source.of(SourceTypes.PERMISSION, "group.%s".formatted(rights.getName())).toString(), accessType);
                         } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
                             final UUID uuid = Optional.ofNullable(BukkitAdapter.findProfileByName(rights.getName()).uuid())
                                     .orElseGet(() -> BukkitAdapter.lookupProfileByName(rights.getName()).join().uuid());
@@ -150,11 +150,11 @@ public class LWCMigration {
                                 access.put(Source.player(uuid).toString(), accessType);
                             }
                         } else if (rights.getType() == Permission.Type.TOWN.ordinal()) {
-                            access.put(Source.of(SourceType.TOWN, rights.getName()).toString(), accessType);
+                            access.put(Source.of(SourceTypes.TOWN, rights.getName()).toString(), accessType);
                         } else if (rights.getType() == Permission.Type.REGION.ordinal()) {
-                            access.put(Source.of(SourceType.REGION, rights.getName()).toString(), accessType);
+                            access.put(Source.of(SourceTypes.REGION, rights.getName()).toString(), accessType);
                         } else if (rights.getType() == Permission.Type.FACTION.ordinal()) {
-                            access.put(Source.of(SourceType.FACTION, rights.getName()).toString(), accessType);
+                            access.put(Source.of(SourceTypes.FACTION, rights.getName()).toString(), accessType);
                         }
                     }
                 }

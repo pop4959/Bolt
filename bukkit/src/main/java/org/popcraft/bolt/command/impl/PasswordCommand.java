@@ -32,7 +32,7 @@ public class PasswordCommand extends BoltCommand {
     }
 
     @Override
-    public List<String> suggestions(Arguments arguments) {
+    public List<String> suggestions(CommandSender sender, Arguments arguments) {
         return Collections.emptyList();
     }
 }

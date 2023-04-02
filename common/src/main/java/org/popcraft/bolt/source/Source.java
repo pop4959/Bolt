@@ -29,7 +29,7 @@ public final class Source {
     }
 
     public static Source player(final UUID uuid) {
-        return new Source(SourceType.PLAYER, uuid.toString());
+        return new Source(SourceTypes.PLAYER, uuid.toString());
     }
 
     public static Source password(final String password) {
@@ -40,7 +40,7 @@ public final class Source {
             for (final byte b : messageDigest.digest()) {
                 hash.append("%02x".formatted(b));
             }
-            return new Source(SourceType.PASSWORD, hash.toString());
+            return new Source(SourceTypes.PASSWORD, hash.toString());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return null;

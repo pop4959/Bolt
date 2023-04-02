@@ -45,7 +45,7 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
-import org.popcraft.bolt.source.SourceType;
+import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
@@ -66,7 +66,7 @@ import static org.popcraft.bolt.lang.Translator.translate;
 import static org.popcraft.bolt.util.BukkitAdapter.NIL_UUID;
 
 public final class BlockListener implements Listener {
-    private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceType.REDSTONE));
+    private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     private final BoltPlugin plugin;
 

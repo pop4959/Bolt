@@ -8,7 +8,7 @@ import org.popcraft.bolt.data.SQLStore;
 import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.source.Source;
-import org.popcraft.bolt.source.SourceType;
+import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BukkitAdapter;
 
@@ -123,7 +123,7 @@ public class BoltMigration {
             return ProtectionType.DISPLAY.ordinal();
         }
         final boolean password = blockProtection.getAccess().entrySet().stream()
-                .anyMatch(entry -> SourceType.PASSWORD.equals(Source.parse(entry.getKey()).getType()));
+                .anyMatch(entry -> SourceTypes.PASSWORD.equals(Source.parse(entry.getKey()).getType()));
         if (password) {
             return ProtectionType.PASSWORD.ordinal();
         } else {
@@ -143,7 +143,7 @@ public class BoltMigration {
         for (final Map.Entry<String, String> entry : blockProtection.getAccess().entrySet()) {
             final Source source = Source.parse(entry.getKey());
             final String access = entry.getValue();
-            if (SourceType.BLOCK.equals(source.getType())) {
+            if (SourceTypes.BLOCK.equals(source.getType())) {
                 final DataFlag dataFlag = new DataFlag();
                 dataFlag.setId(ProtectionFlag.HOPPER.ordinal());
                 flags.add(dataFlag);
@@ -153,19 +153,19 @@ public class BoltMigration {
                 case "admin" -> Permission.Access.ADMIN;
                 default -> null;
             };
-            if (SourceType.PERMISSION.equals(source.getType()) && !source.getIdentifier().startsWith("group.")) {
+            if (SourceTypes.PERMISSION.equals(source.getType()) && !source.getIdentifier().startsWith("group.")) {
                 continue;
             }
             final Permission.Type permissionType = switch (source.getType()) {
-                case SourceType.PERMISSION -> Permission.Type.GROUP;
-                case SourceType.PLAYER -> Permission.Type.PLAYER;
-                case SourceType.TOWN -> Permission.Type.TOWN;
-                case SourceType.REGION -> Permission.Type.REGION;
-                case SourceType.FACTION -> Permission.Type.FACTION;
+                case SourceTypes.PERMISSION -> Permission.Type.GROUP;
+                case SourceTypes.PLAYER -> Permission.Type.PLAYER;
+                case SourceTypes.TOWN -> Permission.Type.TOWN;
+                case SourceTypes.REGION -> Permission.Type.REGION;
+                case SourceTypes.FACTION -> Permission.Type.FACTION;
                 default -> null;
             };
             final String name;
-            if (SourceType.PERMISSION.equals(source.getType())) {
+            if (SourceTypes.PERMISSION.equals(source.getType())) {
                 name = source.getIdentifier().substring(source.getIdentifier().indexOf('.') + 1);
             } else {
                 name = source.getIdentifier();
@@ -189,7 +189,7 @@ public class BoltMigration {
         }
         return blockProtection.getAccess().keySet().stream()
                 .map(Source::parse)
-                .filter(source -> SourceType.PASSWORD.equals(source.getType()))
+                .filter(source -> SourceTypes.PASSWORD.equals(source.getType()))
                 .map(Source::getIdentifier)
                 .findFirst()
                 .orElse("");

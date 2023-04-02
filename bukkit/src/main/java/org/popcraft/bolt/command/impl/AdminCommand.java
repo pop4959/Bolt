@@ -36,11 +36,11 @@ public class AdminCommand extends BoltCommand {
     }
 
     @Override
-    public List<String> suggestions(Arguments arguments) {
+    public List<String> suggestions(CommandSender sender, Arguments arguments) {
         final String subcommand = arguments.next();
         if (!subcommands.containsKey(subcommand)) {
             return new ArrayList<>(subcommands.keySet());
         }
-        return subcommands.get(subcommand).suggestions(arguments);
+        return subcommands.get(subcommand).suggestions(sender, arguments);
     }
 }

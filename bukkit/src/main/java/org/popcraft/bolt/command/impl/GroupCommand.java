@@ -161,7 +161,7 @@ public class GroupCommand extends BoltCommand {
     }
 
     @Override
-    public List<String> suggestions(Arguments arguments) {
+    public List<String> suggestions(CommandSender sender, Arguments arguments) {
         if (arguments.remaining() == 0) {
             return Collections.emptyList();
         }

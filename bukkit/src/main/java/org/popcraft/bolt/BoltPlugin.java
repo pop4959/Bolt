@@ -114,7 +114,8 @@ import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
-import org.popcraft.bolt.source.SourceType;
+import org.popcraft.bolt.source.SourceTypeRegistry;
+import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
@@ -161,7 +162,7 @@ public class BoltPlugin extends JavaPlugin {
     private final ProfileCache profileCache = new SimpleProfileCache(profileCachePath);
     private final Map<Material, Access> protectableBlocks = new EnumMap<>(Material.class);
     private final Map<EntityType, Access> protectableEntities = new EnumMap<>(EntityType.class);
-    private final Source ADMIN_PERMISSION_SOURCE = Source.of(SourceType.PERMISSION, "bolt.admin");
+    private final Source ADMIN_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.admin");
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
     private boolean useActionBar;
@@ -218,6 +219,7 @@ public class BoltPlugin extends JavaPlugin {
         this.doorsCloseAfter = getConfig().getInt("doors.close-after", 0);
         registerAccessTypes();
         registerProtectableAccess();
+        registerAccessSources();
         initializeMatchers();
     }
 
@@ -261,8 +263,10 @@ public class BoltPlugin extends JavaPlugin {
         final ConfigurationSection protections = getConfig().getConfigurationSection("protections");
         if (protections != null) {
             for (final String type : protections.getKeys(false)) {
-                final List<String> permissions = protections.getStringList(type);
-                bolt.getAccessRegistry().registerProtectionType(type, new HashSet<>(permissions));
+                final boolean requirePermission = protections.getBoolean("%s.require-permission".formatted(type), false);
+                final List<String> allows = protections.getStringList("%s.allows".formatted(type));
+                final List<String> permissions = allows.isEmpty() ? protections.getStringList(type) : allows;
+                bolt.getAccessRegistry().registerProtectionType(type, requirePermission, new HashSet<>(permissions));
                 if (defaultProtectionType == null || permissions.size() < bolt.getAccessRegistry().getProtectionByType(defaultProtectionType).map(Access::permissions).map(Set::size).orElse(0)) {
                     defaultProtectionType = type;
                 }
@@ -271,8 +275,10 @@ public class BoltPlugin extends JavaPlugin {
         final ConfigurationSection access = getConfig().getConfigurationSection("access");
         if (access != null) {
             for (final String type : access.getKeys(false)) {
-                final List<String> permissions = access.getStringList(type);
-                bolt.getAccessRegistry().registerAccessType(type, new HashSet<>(permissions));
+                final boolean requirePermission = access.getBoolean("%s.require-permission".formatted(type), false);
+                final List<String> allows = access.getStringList("%s.allows".formatted(type));
+                final List<String> permissions = allows.isEmpty() ? access.getStringList(type) : allows;
+                bolt.getAccessRegistry().registerAccessType(type, requirePermission, new HashSet<>(permissions));
                 if (defaultAccessType == null || permissions.size() < bolt.getAccessRegistry().getAccessByType(defaultAccessType).map(Access::permissions).map(Set::size).orElse(0)) {
                     defaultAccessType = type;
                 }
@@ -326,6 +332,25 @@ public class BoltPlugin extends JavaPlugin {
                     EnumUtil.valueOf(EntityType.class, key.toUpperCase()).ifPresentOrElse(entity -> protectableEntities.put(entity, defaultAccess), () -> getLogger().warning(() -> "Invalid entity defined in config: %s. Skipping.".formatted(key)));
                 }
             }
+        }
+    }
+
+    private void registerAccessSources() {
+        final SourceTypeRegistry sourceTypeRegistry = bolt.getSourceTypeRegistry();
+        sourceTypeRegistry.unregisterAll();
+        final ConfigurationSection sources = getConfig().getConfigurationSection("sources");
+        if (sources == null) {
+            return;
+        }
+        for (final String source : sources.getKeys(false)) {
+            final boolean requirePermission = sources.getBoolean("%s.require-permission".formatted(source), false);
+            sourceTypeRegistry.registerSourceType(source, requirePermission);
+        }
+        if (sourceTypeRegistry.sourceTypes().isEmpty()) {
+            sourceTypeRegistry.registerSourceType(SourceTypes.PLAYER, false);
+            sourceTypeRegistry.registerSourceType(SourceTypes.PASSWORD, false);
+            sourceTypeRegistry.registerSourceType(SourceTypes.GROUP, false);
+            sourceTypeRegistry.registerSourceType(SourceTypes.PERMISSION, true);
         }
     }
 
@@ -402,7 +427,7 @@ public class BoltPlugin extends JavaPlugin {
         if (args.length == commandStart) {
             commands.keySet().stream().filter(name -> sender.hasPermission(COMMAND_PERMISSION_KEY + name)).forEach(suggestions::add);
         } else if (commands.containsKey(commandKey) && sender.hasPermission(COMMAND_PERMISSION_KEY + commandKey)) {
-            suggestions.addAll(commands.get(commandKey).suggestions(new Arguments(Arrays.copyOfRange(args, commandStart, args.length))));
+            suggestions.addAll(commands.get(commandKey).suggestions(sender, new Arguments(Arrays.copyOfRange(args, commandStart, args.length))));
         }
         return suggestions.stream()
                 .filter(s -> s.toLowerCase().contains(args[args.length - 1].toLowerCase()))

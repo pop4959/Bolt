@@ -12,12 +12,12 @@ public class AccessRegistry {
     private final Map<String, Access> protections = new HashMap<>();
     private final Map<String, Access> access = new HashMap<>();
 
-    public void registerProtectionType(final String type, final Set<String> permissions) {
-        protections.put(type, new Access(type, permissions));
+    public void registerProtectionType(final String type, final boolean restricted, final Set<String> permissions) {
+        protections.put(type, new Access(type, restricted, permissions));
     }
 
-    public void registerAccessType(final String type, final Set<String> permissions) {
-        access.put(type, new Access(type, permissions));
+    public void registerAccessType(final String type, final boolean restricted, final Set<String> permissions) {
+        access.put(type, new Access(type, restricted, permissions));
     }
 
     public void unregisterAll() {

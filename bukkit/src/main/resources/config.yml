@@ -11,14 +11,37 @@ database:
   prefix: ""
   properties: [ ]
 protections:
-  private: [ "redstone" ]
-  display: [ "redstone", "interact", "open" ]
-  deposit: [ "redstone", "interact", "open", "deposit" ]
-  withdrawal: [ "redstone", "interact", "open", "withdraw" ]
-  public: [ "redstone", "interact", "open", "deposit", "withdraw", "mount" ]
+  private:
+    require-permission: false
+    allows: [ "redstone" ]
+  display:
+    require-permission: false
+    allows: [ "redstone", "interact", "open" ]
+  deposit:
+    require-permission: false
+    allows: [ "redstone", "interact", "open", "deposit" ]
+  withdrawal:
+    require-permission: false
+    allows: [ "redstone", "interact", "open", "withdraw" ]
+  public:
+    require-permission: false
+    allows: [ "redstone", "interact", "open", "deposit", "withdraw", "mount" ]
 access:
-  normal: [ "redstone", "interact", "open", "deposit", "withdraw", "mount" ]
-  admin: [ "redstone", "interact", "open", "deposit", "withdraw", "mount", "edit" ]
+  normal:
+    require-permission: false
+    allows: [ "redstone", "interact", "open", "deposit", "withdraw", "mount" ]
+  admin:
+    require-permission: true
+    allows: [ "redstone", "interact", "open", "deposit", "withdraw", "mount", "edit" ]
+sources:
+  player:
+    require-permission: false
+  group:
+    require-permission: false
+  password:
+    require-permission: false
+  permission:
+    require-permission: true
 blocks:
   chest:
     autoProtect: private
