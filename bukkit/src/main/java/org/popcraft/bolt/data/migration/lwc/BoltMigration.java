@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.access.AccessRegistry;
+import org.popcraft.bolt.access.DefaultAccess;
 import org.popcraft.bolt.data.SQLStore;
 import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
@@ -31,9 +33,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class BoltMigration {
     private final BoltPlugin plugin;
+    private final String defaultProtectionDisplay;
+    private final String defaultProtectionDeposit;
+    private final String defaultProtectionWithdrawal;
+    private final String defaultProtectionPublic;
 
     public BoltMigration(final BoltPlugin plugin) {
         this.plugin = plugin;
+        final AccessRegistry accessRegistry = plugin.getBolt().getAccessRegistry();
+        defaultProtectionDisplay = accessRegistry.findProtectionTypeWithExactPermissions(DefaultAccess.DISPLAY).orElse("display");
+        defaultProtectionDeposit = accessRegistry.findProtectionTypeWithExactPermissions(DefaultAccess.DEPOSIT).orElse("deposit");
+        defaultProtectionWithdrawal = accessRegistry.findProtectionTypeWithExactPermissions(DefaultAccess.WITHDRAWAL).orElse("withdrawal");
+        defaultProtectionPublic = accessRegistry.findProtectionTypeWithExactPermissions(DefaultAccess.PUBLIC).orElse("public");
     }
 
     public CompletableFuture<Void> convertAsync() {
@@ -115,13 +126,13 @@ public class BoltMigration {
     }
 
     private int convertProtectionType(final BlockProtection blockProtection) {
-        if ("public".equals(blockProtection.getType())) {
+        if (defaultProtectionPublic.equals(blockProtection.getType())) {
             return ProtectionType.PUBLIC.ordinal();
-        } else if ("deposit".equals(blockProtection.getType())) {
+        } else if (defaultProtectionDeposit.equals(blockProtection.getType())) {
             return ProtectionType.DONATION.ordinal();
-        } else if ("display".equals(blockProtection.getType())) {
+        } else if (defaultProtectionDisplay.equals(blockProtection.getType())) {
             return ProtectionType.DISPLAY.ordinal();
-        } else if ("withdrawal".equals(blockProtection.getType())) {
+        } else if (defaultProtectionWithdrawal.equals(blockProtection.getType())) {
             return ProtectionType.SUPPLY.ordinal();
         }
         final boolean password = blockProtection.getAccess().entrySet().stream()

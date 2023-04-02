@@ -5,6 +5,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.access.AccessRegistry;
+import org.popcraft.bolt.access.DefaultAccess;
 import org.popcraft.bolt.data.MemoryStore;
 import org.popcraft.bolt.data.SQLStore;
 import org.popcraft.bolt.data.sql.Statements;
@@ -45,21 +47,29 @@ import java.util.stream.Stream;
 
 public class LWCMigration {
     private static final Block BLOCK_AIR = new Block(-1, "AIR");
-    private static final String DEFAULT_PROTECTION_PUBLIC = "public";
-    private static final String DEFAULT_PROTECTION_DEPOSIT = "deposit";
-    private static final String DEFAULT_PROTECTION_DISPLAY = "display";
-    private static final String DEFAULT_PROTECTION_WITHDRAWAL = "withdrawal";
-    private static final String DEFAULT_PROTECTION_PRIVATE = "private";
-    private static final String DEFAULT_ACCESS_NORMAL = "normal";
-    private static final String DEFAULT_ACCESS_ADMIN = "admin";
     private static final Map<String, EntityType> ENTITY_TYPE_KEYS = Arrays.stream(EntityType.values())
             .filter(entityType -> !EntityType.UNKNOWN.equals(entityType))
             .collect(Collectors.toMap(entityType -> entityType.getKey().toString(), entityType -> entityType));
     private final BoltPlugin plugin;
     private final Map<Integer, BlockProtection> entityBlocks = new ConcurrentHashMap<>();
+    private final String defaultProtectionPrivate;
+    private final String defaultProtectionDisplay;
+    private final String defaultProtectionDeposit;
+    private final String defaultProtectionWithdrawal;
+    private final String defaultProtectionPublic;
+    private final String defaultAccessNormal;
+    private final String defaultAccessAdmin;
 
     public LWCMigration(final BoltPlugin plugin) {
         this.plugin = plugin;
+        final AccessRegistry accessRegistry = plugin.getBolt().getAccessRegistry();
+        defaultProtectionPrivate = accessRegistry.findProtectionTypeWithExactPermissions(DefaultAccess.PRIVATE).orElse("private");
+        defaultProtectionDisplay = accessRegistry.findProtectionTypeWithExactPermissions(DefaultAccess.DISPLAY).orElse("display");
+        defaultProtectionDeposit = accessRegistry.findProtectionTypeWithExactPermissions(DefaultAccess.DEPOSIT).orElse("deposit");
+        defaultProtectionWithdrawal = accessRegistry.findProtectionTypeWithExactPermissions(DefaultAccess.WITHDRAWAL).orElse("withdrawal");
+        defaultProtectionPublic = accessRegistry.findProtectionTypeWithExactPermissions(DefaultAccess.PUBLIC).orElse("public");
+        defaultAccessNormal = accessRegistry.findAccessTypeWithExactPermissions(DefaultAccess.NORMAL).orElse("normal");
+        defaultAccessAdmin = accessRegistry.findAccessTypeWithExactPermissions(DefaultAccess.ADMIN).orElse("admin");
     }
 
     public CompletableFuture<MemoryStore> convertAsync() {
@@ -117,15 +127,15 @@ public class LWCMigration {
         for (final Protection protection : protections) {
             final String protectionType;
             if (protection.type() == ProtectionType.PUBLIC.ordinal()) {
-                protectionType = DEFAULT_PROTECTION_PUBLIC;
+                protectionType = defaultProtectionPublic;
             } else if (protection.type() == ProtectionType.DONATION.ordinal()) {
-                protectionType = DEFAULT_PROTECTION_DEPOSIT;
+                protectionType = defaultProtectionDeposit;
             } else if (protection.type() == ProtectionType.DISPLAY.ordinal()) {
-                protectionType = DEFAULT_PROTECTION_DISPLAY;
+                protectionType = defaultProtectionDisplay;
             } else if (protection.type() == ProtectionType.SUPPLY.ordinal()) {
-                protectionType = DEFAULT_PROTECTION_WITHDRAWAL;
+                protectionType = defaultProtectionWithdrawal;
             } else {
-                protectionType = DEFAULT_PROTECTION_PRIVATE;
+                protectionType = defaultProtectionPrivate;
             }
             final Map<String, String> access = new HashMap<>();
             final Data data = gson.fromJson(protection.data(), Data.class);
@@ -134,16 +144,16 @@ public class LWCMigration {
                 if (dataFlags != null) {
                     for (DataFlag flag : dataFlags) {
                         if (flag.getId() == ProtectionFlag.REDSTONE.ordinal()) {
-                            access.put(Source.of(SourceTypes.REDSTONE).toString(), DEFAULT_ACCESS_ADMIN);
+                            access.put(Source.of(SourceTypes.REDSTONE).toString(), defaultAccessAdmin);
                         } else if (flag.getId() == ProtectionFlag.HOPPER.ordinal()) {
-                            access.put(Source.of(SourceTypes.BLOCK).toString(), DEFAULT_ACCESS_ADMIN);
+                            access.put(Source.of(SourceTypes.BLOCK).toString(), defaultAccessAdmin);
                         }
                     }
                 }
                 final List<DataRights> dataRights = data.getRights();
                 if (dataRights != null) {
                     for (DataRights rights : data.getRights()) {
-                        final String accessType = rights.getRights() == Permission.Access.ADMIN.ordinal() ? DEFAULT_ACCESS_ADMIN : DEFAULT_ACCESS_NORMAL;
+                        final String accessType = rights.getRights() == Permission.Access.ADMIN.ordinal() ? defaultAccessAdmin : defaultAccessNormal;
                         if (rights.getType() == Permission.Type.GROUP.ordinal()) {
                             access.put(Source.of(SourceTypes.PERMISSION, "group.%s".formatted(rights.getName())).toString(), accessType);
                         } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
@@ -165,7 +175,7 @@ public class LWCMigration {
             if (protection.password() != null && !protection.password().isEmpty()) {
                 final Source passwordSource = Source.password(protection.password());
                 if (passwordSource != null) {
-                    access.put(passwordSource.toString(), DEFAULT_ACCESS_NORMAL);
+                    access.put(passwordSource.toString(), defaultAccessNormal);
                 }
             }
             final UUID ownerUuid = Optional.ofNullable(BukkitAdapter.findProfileByName(protection.owner()).uuid())

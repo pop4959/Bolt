@@ -48,4 +48,18 @@ public class AccessRegistry {
     public Collection<Access> access() {
         return new ArrayList<>(access.values());
     }
+
+    public Optional<String> findProtectionTypeWithExactPermissions(final Set<String> permissions) {
+        return protections.values().stream()
+                .filter(a -> permissions.containsAll(a.permissions()) && a.permissions().containsAll(permissions))
+                .map(Access::type)
+                .findFirst();
+    }
+
+    public Optional<String> findAccessTypeWithExactPermissions(final Set<String> permissions) {
+        return access.values().stream()
+                .filter(a -> permissions.containsAll(a.permissions()) && a.permissions().containsAll(permissions))
+                .map(Access::type)
+                .findFirst();
+    }
 }
