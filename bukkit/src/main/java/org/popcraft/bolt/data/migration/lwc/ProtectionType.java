@@ -8,5 +8,6 @@ public enum ProtectionType {
     RESERVED1,
     RESERVED2,
     DONATION,
-    DISPLAY
+    DISPLAY,
+    SUPPLY
 }

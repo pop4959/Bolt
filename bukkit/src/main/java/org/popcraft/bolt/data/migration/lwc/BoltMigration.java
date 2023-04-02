@@ -121,6 +121,8 @@ public class BoltMigration {
             return ProtectionType.DONATION.ordinal();
         } else if ("display".equals(blockProtection.getType())) {
             return ProtectionType.DISPLAY.ordinal();
+        } else if ("withdrawal".equals(blockProtection.getType())) {
+            return ProtectionType.SUPPLY.ordinal();
         }
         final boolean password = blockProtection.getAccess().entrySet().stream()
                 .anyMatch(entry -> SourceTypes.PASSWORD.equals(Source.parse(entry.getKey()).getType()));

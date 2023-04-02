@@ -48,6 +48,7 @@ public class LWCMigration {
     private static final String DEFAULT_PROTECTION_PUBLIC = "public";
     private static final String DEFAULT_PROTECTION_DEPOSIT = "deposit";
     private static final String DEFAULT_PROTECTION_DISPLAY = "display";
+    private static final String DEFAULT_PROTECTION_WITHDRAWAL = "withdrawal";
     private static final String DEFAULT_PROTECTION_PRIVATE = "private";
     private static final String DEFAULT_ACCESS_NORMAL = "normal";
     private static final String DEFAULT_ACCESS_ADMIN = "admin";
@@ -121,6 +122,8 @@ public class LWCMigration {
                 protectionType = DEFAULT_PROTECTION_DEPOSIT;
             } else if (protection.type() == ProtectionType.DISPLAY.ordinal()) {
                 protectionType = DEFAULT_PROTECTION_DISPLAY;
+            } else if (protection.type() == ProtectionType.SUPPLY.ordinal()) {
+                protectionType = DEFAULT_PROTECTION_WITHDRAWAL;
             } else {
                 protectionType = DEFAULT_PROTECTION_PRIVATE;
             }
