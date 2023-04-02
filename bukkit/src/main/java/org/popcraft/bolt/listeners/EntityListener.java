@@ -11,11 +11,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockShearEntityEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityCombustByBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
@@ -45,6 +47,10 @@ import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceResolver;
+import org.popcraft.bolt.source.SourceTypeResolver;
+import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
@@ -64,6 +70,7 @@ import static org.popcraft.bolt.lang.Translator.translate;
 import static org.popcraft.bolt.util.BukkitAdapter.NIL_UUID;
 
 public final class EntityListener implements Listener {
+    private static final SourceResolver ENTITY_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.ENTITY));
     private final Map<NamespacedKey, UUID> spawnEggPlayers = new HashMap<>();
     private final BoltPlugin plugin;
 
@@ -606,6 +613,30 @@ public final class EntityListener implements Listener {
         if (plugin.findProtection(e.getEntity()).isPresent()) {
             e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void entityInteract(final EntityInteractEvent e) {
+        if (e.getEntity() instanceof Player) {
+            return;
+        }
+        plugin.findProtection(e.getBlock()).ifPresent(protection -> {
+            if (!plugin.canAccess(protection, ENTITY_SOURCE_RESOLVER, Permission.ENTITY_INTERACT)) {
+                e.setCancelled(true);
+            }
+        });
+    }
+
+    @EventHandler
+    public void onEntityBreakDoor(final EntityBreakDoorEvent e) {
+        if (e.getEntity() instanceof Player) {
+            return;
+        }
+        plugin.findProtection(e.getBlock()).ifPresent(protection -> {
+            if (!plugin.canAccess(protection, ENTITY_SOURCE_RESOLVER, Permission.ENTITY_BREAK_DOOR)) {
+                e.setCancelled(true);
+            }
+        });
     }
 
     private Entity getDamagerSource(final Entity damager) {

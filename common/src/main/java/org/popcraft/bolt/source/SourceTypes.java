@@ -13,4 +13,5 @@ public final class SourceTypes {
     public static final String REGION = "region";
     public static final String TOWN = "town";
     public static final String FACTION = "faction";
+    public static final String ENTITY = "entity";
 }

@@ -10,6 +10,8 @@ public final class Permission {
     public static final String EDIT = "edit";
     public static final String DESTROY = "destroy";
     public static final String REDSTONE = "redstone";
+    public static final String ENTITY_INTERACT = "entity_interact";
+    public static final String ENTITY_BREAK_DOOR = "entity_break_door";
 
     private Permission() {
     }

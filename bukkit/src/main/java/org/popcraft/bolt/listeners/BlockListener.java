@@ -27,7 +27,6 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
-import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -45,8 +44,8 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
-import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.source.SourceTypeResolver;
+import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
@@ -424,13 +423,6 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockFade(final BlockFadeEvent e) {
-        if (plugin.findProtection(e.getBlock()).isPresent()) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onEntityBreakDoor(final EntityBreakDoorEvent e) {
         if (plugin.findProtection(e.getBlock()).isPresent()) {
             e.setCancelled(true);
         }
