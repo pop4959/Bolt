@@ -142,7 +142,7 @@ public class LWCMigration {
                     for (DataRights rights : data.getRights()) {
                         final String accessType = rights.getRights() == Permission.Access.ADMIN.ordinal() ? DEFAULT_ACCESS_ADMIN : DEFAULT_ACCESS_NORMAL;
                         if (rights.getType() == Permission.Type.GROUP.ordinal()) {
-                            access.put(Source.of(SourceType.GROUP, rights.getName()).toString(), accessType);
+                            access.put(Source.of(SourceType.PERMISSION, "group.%s".formatted(rights.getName())).toString(), accessType);
                         } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
                             final UUID uuid = Optional.ofNullable(BukkitAdapter.findProfileByName(rights.getName()).uuid())
                                     .orElseGet(() -> BukkitAdapter.lookupProfileByName(rights.getName()).join().uuid());

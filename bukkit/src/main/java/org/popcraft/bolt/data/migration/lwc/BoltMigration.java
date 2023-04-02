@@ -140,8 +140,9 @@ public class BoltMigration {
             data.setRights(rights);
             return data;
         }
-        blockProtection.getAccess().forEach((entry, access) -> {
-            final Source source = Source.parse(entry);
+        for (final Map.Entry<String, String> entry : blockProtection.getAccess().entrySet()) {
+            final Source source = Source.parse(entry.getKey());
+            final String access = entry.getValue();
             if (SourceType.BLOCK.equals(source.getType())) {
                 final DataFlag dataFlag = new DataFlag();
                 dataFlag.setId(ProtectionFlag.HOPPER.ordinal());
@@ -152,21 +153,30 @@ public class BoltMigration {
                 case "admin" -> Permission.Access.ADMIN;
                 default -> null;
             };
+            if (SourceType.PERMISSION.equals(source.getType()) && !source.getIdentifier().startsWith("group.")) {
+                continue;
+            }
             final Permission.Type permissionType = switch (source.getType()) {
-                case SourceType.GROUP -> Permission.Type.GROUP;
+                case SourceType.PERMISSION -> Permission.Type.GROUP;
                 case SourceType.PLAYER -> Permission.Type.PLAYER;
                 case SourceType.TOWN -> Permission.Type.TOWN;
                 case SourceType.REGION -> Permission.Type.REGION;
                 default -> null;
             };
+            final String name;
+            if (SourceType.PERMISSION.equals(source.getType())) {
+                name = source.getIdentifier().substring(source.getIdentifier().indexOf('.') + 1);
+            } else {
+                name = source.getIdentifier();
+            }
             if (permissionAccess != null && permissionType != null) {
                 final DataRights dataRights = new DataRights();
                 dataRights.setRights(permissionAccess.ordinal());
                 dataRights.setType(permissionType.ordinal());
-                dataRights.setName(source.getIdentifier());
+                dataRights.setName(name);
                 rights.add(dataRights);
             }
-        });
+        }
         data.setFlags(flags);
         data.setRights(rights);
         return data;
