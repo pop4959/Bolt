@@ -170,7 +170,7 @@ public final class BlockListener implements Listener {
                                 player,
                                 Translation.CLICK_LOCKED_CHANGED,
                                 plugin.isUseActionBar(),
-                                Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(protection.getType()))
+                                Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, translate("protection_type_%s".formatted(protection.getType())))
                         );
                     } else {
                         BoltComponents.sendMessage(
@@ -188,7 +188,7 @@ public final class BlockListener implements Listener {
                             player,
                             Translation.CLICK_LOCKED,
                             plugin.isUseActionBar(),
-                            Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Strings.toTitleCase(newProtection.getType())),
+                            Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, translate("protection_type_%s".formatted(newProtection.getType()))),
                             Placeholder.unparsed(Translation.Placeholder.PROTECTION, Protections.displayType(block))
                     );
                 } else {
