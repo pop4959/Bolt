@@ -38,6 +38,7 @@ import org.popcraft.bolt.data.ProfileCache;
 import org.popcraft.bolt.data.SQLStore;
 import org.popcraft.bolt.data.SimpleProfileCache;
 import org.popcraft.bolt.data.SimpleProtectionCache;
+import org.popcraft.bolt.data.migration.lwc.ConfigMigration;
 import org.popcraft.bolt.data.migration.lwc.TrustMigration;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.lang.Translator;
@@ -197,6 +198,7 @@ public class BoltPlugin extends JavaPlugin {
         profileCache.load();
         final Metrics metrics = new Metrics(this, 17711);
         registerCustomCharts(metrics);
+        new ConfigMigration(this).convert(protectableBlocks);
         // Future: Move this into LWC Migration
         new TrustMigration(this).convert();
     }
