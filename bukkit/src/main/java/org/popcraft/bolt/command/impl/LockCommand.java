@@ -32,6 +32,7 @@ public class LockCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     player,
                     Translation.CLICK_ACTION,
+                    plugin.isUseActionBar(),
                     Placeholder.unparsed(Translation.Placeholder.ACTION, translate(Translation.LOCK))
             );
         } else {
