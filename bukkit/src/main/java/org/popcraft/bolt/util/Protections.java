@@ -1,8 +1,8 @@
 package org.popcraft.bolt.util;
 
-import net.kyori.adventure.platform.bukkit.BukkitComponentSerializer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -38,50 +38,44 @@ public final class Protections {
     private Protections() {
     }
 
-    public static String displayType(final Protection protection) {
+    public static Component displayType(final Protection protection) {
         if (protection instanceof final BlockProtection blockProtection) {
             final World world = Bukkit.getWorld(blockProtection.getWorld());
             final int x = blockProtection.getX();
             final int y = blockProtection.getY();
             final int z = blockProtection.getZ();
             if (world == null || !world.isChunkLoaded(x >> 4, z >> 4)) {
-                return Strings.toTitleCase(blockProtection.getBlock());
+                return Component.text(Strings.toTitleCase(blockProtection.getBlock()));
             } else {
-                final Block block = world.getBlockAt(x, y, z);
-                if (translatableSupport) {
-                    return displayType(block);
-                } else {
-                    return displayTypeFromData(block);
-                }
+                return displayType(world.getBlockAt(x, y, z));
             }
         } else if (protection instanceof final EntityProtection entityProtection) {
             final Entity entity = Bukkit.getServer().getEntity(entityProtection.getId());
             if (entity == null) {
-                return Strings.toTitleCase(entityProtection.getEntity());
+                return Component.text(Strings.toTitleCase(entityProtection.getEntity()));
             } else {
-                if (translatableSupport) {
-                    return displayType(entity);
-                } else {
-                    return displayTypeFromData(entity);
-                }
+                return displayType(entity);
             }
         } else {
-            return translate(Translation.UNKNOWN);
+            return Component.text(translate(Translation.UNKNOWN));
         }
     }
 
-    public static String displayType(final Block block) {
-        final Component translatable = Component.translatable(block.getTranslationKey());
-        return BukkitComponentSerializer.legacy().serialize(translatable);
+    public static Component displayType(final Block block) {
+        final Material materal = block.getType();
+        if (translatableSupport) {
+            return displayType(materal);
+        } else {
+            return displayTypeFromData(materal);
+        }
     }
 
-    public static String displayType(final Entity entity) {
-        final Component translatable = Component.translatable(entity.getType().getTranslationKey());
-        return BukkitComponentSerializer.legacy().serialize(translatable);
+    private static Component displayType(final Material material) {
+        return Component.translatable(material.getTranslationKey());
     }
 
-    public static String displayTypeFromData(final Block block) {
-        final String blockDataString = block.getBlockData().getAsString().replace(':', '.');
+    private static Component displayTypeFromData(final Material material) {
+        final String blockDataString = material.createBlockData().getAsString().replace(':', '.');
         final int nbtIndex = blockDataString.indexOf('[');
         final String key;
         if (nbtIndex > -1) {
@@ -89,12 +83,15 @@ public final class Protections {
         } else {
             key = blockDataString;
         }
-        final Component translatable = Component.translatable("block.%s".formatted(key));
-        return BukkitComponentSerializer.legacy().serialize(translatable);
+        return Component.translatable("block.%s".formatted(key));
     }
 
-    public static String displayTypeFromData(final Entity entity) {
-        return entity.getName();
+    public static Component displayType(final Entity entity) {
+        if (translatableSupport) {
+            return Component.translatable(entity.getType().getTranslationKey());
+        } else {
+            return Component.text(entity.getName());
+        }
     }
 
     public static String accessList(final Map<String, String> accessMap) {
