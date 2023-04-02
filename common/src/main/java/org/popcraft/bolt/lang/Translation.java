@@ -31,6 +31,8 @@ public class Translation {
     public static final String EDIT_SOURCE_NO_PERMISSION = "edit_source_no_permission";
     public static final String ENTER_PASSWORD = "enter_password";
     public static final String ENTER_PASSWORD_NONE = "enter_password_none";
+    public static final String FIND_HEADER = "find_header";
+    public static final String FIND_RESULT = "find_result";
     public static final String GROUP_ALREADY_EXISTS = "group_already_exists";
     public static final String GROUP_CREATED = "group_created";
     public static final String GROUP_DELETED = "group_deleted";
@@ -69,6 +71,7 @@ public class Translation {
     public static final String HELP_COMMAND_SHORT_ADMIN = "help_command_short_admin";
     public static final String HELP_COMMAND_SHORT_ADMIN_CONVERT = "help_command_short_admin_convert";
     public static final String HELP_COMMAND_SHORT_ADMIN_DEBUG = "help_command_short_admin_debug";
+    public static final String HELP_COMMAND_SHORT_ADMIN_FIND = "help_command_short_admin_find";
     public static final String HELP_COMMAND_SHORT_ADMIN_PURGE = "help_command_short_admin_purge";
     public static final String HELP_COMMAND_SHORT_ADMIN_RELOAD = "help_command_short_admin_reload";
     public static final String HELP_COMMAND_SHORT_ADMIN_REPORT = "help_command_short_admin_report";
@@ -87,6 +90,7 @@ public class Translation {
     public static final String HELP_COMMAND_LONG_ADMIN = "help_command_long_admin";
     public static final String HELP_COMMAND_LONG_ADMIN_CONVERT = "help_command_long_admin_convert";
     public static final String HELP_COMMAND_LONG_ADMIN_DEBUG = "help_command_long_admin_debug";
+    public static final String HELP_COMMAND_LONG_ADMIN_FIND = "help_command_long_admin_find";
     public static final String HELP_COMMAND_LONG_ADMIN_PURGE = "help_command_long_admin_purge";
     public static final String HELP_COMMAND_LONG_ADMIN_RELOAD = "help_command_long_admin_reload";
     public static final String HELP_COMMAND_LONG_ADMIN_REPORT = "help_command_long_admin_report";
@@ -128,6 +132,11 @@ public class Translation {
         public static final String RAW_PROTECTION = "raw_protection";
         public static final String COUNT = "count";
         public static final String SECONDS = "seconds";
+        public static final String WORLD = "world";
+        public static final String X = "x";
+        public static final String Y = "y";
+        public static final String Z = "z";
+        public static final String TIME = "time";
 
         private Placeholder() {
         }
