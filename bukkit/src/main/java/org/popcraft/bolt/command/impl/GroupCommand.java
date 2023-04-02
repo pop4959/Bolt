@@ -184,4 +184,19 @@ public class GroupCommand extends BoltCommand {
         }
         return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).filter(name -> !alreadyAdded.contains(name)).toList();
     }
+
+    @Override
+    public void shortHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(
+                sender,
+                Translation.HELP_COMMAND_SHORT_GROUP,
+                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt group"),
+                Placeholder.unparsed(Translation.Placeholder.LITERAL, "(create|delete|add|remove|list)")
+        );
+    }
+
+    @Override
+    public void longHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(sender, Translation.HELP_COMMAND_LONG_GROUP);
+    }
 }

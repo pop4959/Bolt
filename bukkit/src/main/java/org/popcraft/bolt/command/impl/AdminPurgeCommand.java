@@ -59,4 +59,18 @@ public class AdminPurgeCommand extends BoltCommand {
     public List<String> suggestions(CommandSender sender, Arguments arguments) {
         return Collections.emptyList();
     }
+
+    @Override
+    public void shortHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(
+                sender,
+                Translation.HELP_COMMAND_SHORT_ADMIN_PURGE,
+                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt admin purge")
+        );
+    }
+
+    @Override
+    public void longHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(sender, Translation.HELP_COMMAND_LONG_ADMIN_PURGE);
+    }
 }

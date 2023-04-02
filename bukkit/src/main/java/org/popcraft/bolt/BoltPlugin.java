@@ -27,6 +27,7 @@ import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.command.impl.AdminCommand;
 import org.popcraft.bolt.command.impl.EditCommand;
 import org.popcraft.bolt.command.impl.GroupCommand;
+import org.popcraft.bolt.command.impl.HelpCommand;
 import org.popcraft.bolt.command.impl.InfoCommand;
 import org.popcraft.bolt.command.impl.LockCommand;
 import org.popcraft.bolt.command.impl.ModeCommand;
@@ -393,6 +394,7 @@ public class BoltPlugin extends JavaPlugin {
         commands.put("admin", new AdminCommand(this));
         commands.put("edit", new EditCommand(this));
         commands.put("group", new GroupCommand(this));
+        commands.put("help", new HelpCommand(this));
         commands.put("info", new InfoCommand(this));
         commands.put("lock", new LockCommand(this));
         commands.put("mode", new ModeCommand(this));
@@ -400,6 +402,10 @@ public class BoltPlugin extends JavaPlugin {
         commands.put("transfer", new TransferCommand(this));
         commands.put("trust", new TrustCommand(this));
         commands.put("unlock", new UnlockCommand(this));
+    }
+
+    public Map<String, BoltCommand> commands() {
+        return commands;
     }
 
     @Override

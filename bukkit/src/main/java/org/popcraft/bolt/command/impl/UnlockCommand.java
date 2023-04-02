@@ -39,4 +39,18 @@ public class UnlockCommand extends BoltCommand {
     public List<String> suggestions(CommandSender sender, Arguments arguments) {
         return Collections.emptyList();
     }
+
+    @Override
+    public void shortHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(
+                sender,
+                Translation.HELP_COMMAND_SHORT_UNLOCK,
+                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt unlock")
+        );
+    }
+
+    @Override
+    public void longHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(sender, Translation.HELP_COMMAND_LONG_UNLOCK);
+    }
 }

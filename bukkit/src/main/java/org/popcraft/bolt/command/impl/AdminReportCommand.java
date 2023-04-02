@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.Metrics;
 
@@ -87,5 +88,20 @@ public class AdminReportCommand extends BoltCommand {
     @Override
     public List<String> suggestions(CommandSender sender, Arguments arguments) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public void shortHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(
+                sender,
+                Translation.HELP_COMMAND_SHORT_ADMIN_REPORT,
+                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt admin report"),
+                Placeholder.unparsed(Translation.Placeholder.LITERAL, "[disable]")
+        );
+    }
+
+    @Override
+    public void longHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(sender, Translation.HELP_COMMAND_LONG_ADMIN_REPORT);
     }
 }

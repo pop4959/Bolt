@@ -27,6 +27,8 @@ permissions:
     default: true
   bolt.command.group:
     default: true
+  bolt.command.help:
+    default: true
   bolt.command.info:
     default: true
   bolt.command.lock:

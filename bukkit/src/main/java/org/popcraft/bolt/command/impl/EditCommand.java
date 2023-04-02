@@ -152,4 +152,19 @@ public class EditCommand extends BoltCommand {
         }
         return Collections.emptyList();
     }
+
+    @Override
+    public void shortHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(
+                sender,
+                Translation.HELP_COMMAND_SHORT_EDIT,
+                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt edit"),
+                Placeholder.unparsed(Translation.Placeholder.LITERAL, "(add|remove)")
+        );
+    }
+
+    @Override
+    public void longHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(sender, Translation.HELP_COMMAND_LONG_EDIT);
+    }
 }

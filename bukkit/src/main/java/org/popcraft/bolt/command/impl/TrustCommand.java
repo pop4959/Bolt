@@ -98,4 +98,19 @@ public class TrustCommand extends BoltCommand {
         }
         return Collections.emptyList();
     }
+
+    @Override
+    public void shortHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(
+                sender,
+                Translation.HELP_COMMAND_SHORT_TRUST,
+                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt trust"),
+                Placeholder.unparsed(Translation.Placeholder.LITERAL, "[list|confirm]")
+        );
+    }
+
+    @Override
+    public void longHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(sender, Translation.HELP_COMMAND_LONG_TRUST);
+    }
 }

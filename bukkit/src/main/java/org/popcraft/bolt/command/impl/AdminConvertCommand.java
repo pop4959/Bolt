@@ -127,4 +127,18 @@ public class AdminConvertCommand extends BoltCommand {
         }
         return Collections.emptyList();
     }
+
+    @Override
+    public void shortHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(
+                sender,
+                Translation.HELP_COMMAND_SHORT_ADMIN_CONVERT,
+                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt admin convert")
+        );
+    }
+
+    @Override
+    public void longHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(sender, Translation.HELP_COMMAND_LONG_ADMIN_CONVERT);
+    }
 }

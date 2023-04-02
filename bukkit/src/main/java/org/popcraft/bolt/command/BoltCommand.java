@@ -15,4 +15,8 @@ public abstract class BoltCommand {
     public abstract void execute(CommandSender sender, Arguments arguments);
 
     public abstract List<String> suggestions(CommandSender sender, Arguments arguments);
+
+    public abstract void shortHelp(CommandSender sender, Arguments arguments);
+
+    public abstract void longHelp(CommandSender sender, Arguments arguments);
 }

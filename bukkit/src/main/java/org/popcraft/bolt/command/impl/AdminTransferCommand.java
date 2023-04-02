@@ -103,4 +103,18 @@ public class AdminTransferCommand extends BoltCommand {
         }
         return Collections.emptyList();
     }
+
+    @Override
+    public void shortHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(
+                sender,
+                Translation.HELP_COMMAND_SHORT_ADMIN_TRANSFER,
+                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt admin transfer")
+        );
+    }
+
+    @Override
+    public void longHelp(CommandSender sender, Arguments arguments) {
+        BoltComponents.sendMessage(sender, Translation.HELP_COMMAND_LONG_ADMIN_TRANSFER);
+    }
 }

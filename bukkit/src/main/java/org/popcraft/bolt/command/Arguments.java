@@ -11,6 +11,10 @@ public class Arguments {
         remaining.addAll(Arrays.asList(args));
     }
 
+    public Arguments copy() {
+        return new Arguments(new LinkedList<>(remaining).toArray(new String[0]));
+    }
+
     public String next() {
         return remaining.poll();
     }

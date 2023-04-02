@@ -20,6 +20,7 @@ public class Translation {
     public static final String CLICK_TRANSFER_CONFIRM = "click_transfer_confirm";
     public static final String CLICK_UNLOCKED = "click_unlocked";
     public static final String CLICK_UNLOCKED_NO_PERMISSION = "click_unlocked_no_permission";
+    public static final String COMMAND_INVALID = "command_invalid";
     public static final String COMMAND_NOT_ENOUGH_ARGS = "command_not_enough_args";
     public static final String COMMAND_NO_PERMISSION = "command_no_permission";
     public static final String COMMAND_PLAYER_ONLY = "command_player_only";
@@ -64,6 +65,42 @@ public class Translation {
     public static final String UNKNOWN = "unknown";
     public static final String UNLOCK = "unlock";
     public static final String YOU = "you";
+    public static final String HELP_COMMAND_SHORT_ADMIN_CLEANUP = "help_command_short_admin_cleanup";
+    public static final String HELP_COMMAND_SHORT_ADMIN = "help_command_short_admin";
+    public static final String HELP_COMMAND_SHORT_ADMIN_CONVERT = "help_command_short_admin_convert";
+    public static final String HELP_COMMAND_SHORT_ADMIN_DEBUG = "help_command_short_admin_debug";
+    public static final String HELP_COMMAND_SHORT_ADMIN_PURGE = "help_command_short_admin_purge";
+    public static final String HELP_COMMAND_SHORT_ADMIN_RELOAD = "help_command_short_admin_reload";
+    public static final String HELP_COMMAND_SHORT_ADMIN_REPORT = "help_command_short_admin_report";
+    public static final String HELP_COMMAND_SHORT_ADMIN_TRANSFER = "help_command_short_admin_transfer";
+    public static final String HELP_COMMAND_SHORT_EDIT = "help_command_short_edit";
+    public static final String HELP_COMMAND_SHORT_GROUP = "help_command_short_group";
+    public static final String HELP_COMMAND_SHORT_HELP = "help_command_short_help";
+    public static final String HELP_COMMAND_SHORT_INFO = "help_command_short_info";
+    public static final String HELP_COMMAND_SHORT_LOCK = "help_command_short_lock";
+    public static final String HELP_COMMAND_SHORT_MODE = "help_command_short_mode";
+    public static final String HELP_COMMAND_SHORT_PASSWORD = "help_command_short_password";
+    public static final String HELP_COMMAND_SHORT_TRANSFER = "help_command_short_transfer";
+    public static final String HELP_COMMAND_SHORT_TRUST = "help_command_short_trust";
+    public static final String HELP_COMMAND_SHORT_UNLOCK = "help_command_short_unlock";
+    public static final String HELP_COMMAND_LONG_ADMIN_CLEANUP = "help_command_long_admin_cleanup";
+    public static final String HELP_COMMAND_LONG_ADMIN = "help_command_long_admin";
+    public static final String HELP_COMMAND_LONG_ADMIN_CONVERT = "help_command_long_admin_convert";
+    public static final String HELP_COMMAND_LONG_ADMIN_DEBUG = "help_command_long_admin_debug";
+    public static final String HELP_COMMAND_LONG_ADMIN_PURGE = "help_command_long_admin_purge";
+    public static final String HELP_COMMAND_LONG_ADMIN_RELOAD = "help_command_long_admin_reload";
+    public static final String HELP_COMMAND_LONG_ADMIN_REPORT = "help_command_long_admin_report";
+    public static final String HELP_COMMAND_LONG_ADMIN_TRANSFER = "help_command_long_admin_transfer";
+    public static final String HELP_COMMAND_LONG_EDIT = "help_command_long_edit";
+    public static final String HELP_COMMAND_LONG_GROUP = "help_command_long_group";
+    public static final String HELP_COMMAND_LONG_HELP = "help_command_long_help";
+    public static final String HELP_COMMAND_LONG_INFO = "help_command_long_info";
+    public static final String HELP_COMMAND_LONG_LOCK = "help_command_long_lock";
+    public static final String HELP_COMMAND_LONG_MODE = "help_command_long_mode";
+    public static final String HELP_COMMAND_LONG_PASSWORD = "help_command_long_password";
+    public static final String HELP_COMMAND_LONG_TRANSFER = "help_command_long_transfer";
+    public static final String HELP_COMMAND_LONG_TRUST = "help_command_long_trust";
+    public static final String HELP_COMMAND_LONG_UNLOCK = "help_command_long_unlock";
 
     private Translation() {
     }
@@ -75,6 +112,7 @@ public class Translation {
         public static final String ACTION = "action";
         public static final String COMMAND = "command";
         public static final String COMMAND_2 = "command_2";
+        public static final String LITERAL = "literal";
         public static final String GROUP = "group";
         public static final String GROUP_MEMBERS = "group_members";
         public static final String MODE = "mode";

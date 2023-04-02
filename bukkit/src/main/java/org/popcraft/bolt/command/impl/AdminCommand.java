@@ -1,9 +1,12 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.util.BoltComponents;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,11 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 public class AdminCommand extends BoltCommand {
-    private final Map<String, BoltCommand> subcommands = new HashMap<>();
+    public static final Map<String, BoltCommand> SUB_COMMANDS = new HashMap<>();
 
     public AdminCommand(BoltPlugin plugin) {
         super(plugin);
-        subcommands.putAll(Map.of(
+        SUB_COMMANDS.clear();
+        SUB_COMMANDS.putAll(Map.of(
                 "cleanup", new AdminCleanup(plugin),
                 "convert", new AdminConvertCommand(plugin),
                 "debug", new AdminDebugCommand(plugin),
@@ -29,18 +33,42 @@ public class AdminCommand extends BoltCommand {
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
         final String subcommand = arguments.next();
-        if (!subcommands.containsKey(subcommand)) {
+        if (!SUB_COMMANDS.containsKey(subcommand)) {
             return;
         }
-        subcommands.get(subcommand).execute(sender, arguments);
+        SUB_COMMANDS.get(subcommand).execute(sender, arguments);
     }
 
     @Override
     public List<String> suggestions(CommandSender sender, Arguments arguments) {
         final String subcommand = arguments.next();
-        if (!subcommands.containsKey(subcommand)) {
-            return new ArrayList<>(subcommands.keySet());
+        if (!SUB_COMMANDS.containsKey(subcommand)) {
+            return new ArrayList<>(SUB_COMMANDS.keySet());
         }
-        return subcommands.get(subcommand).suggestions(sender, arguments);
+        return SUB_COMMANDS.get(subcommand).suggestions(sender, arguments);
+    }
+
+    @Override
+    public void shortHelp(CommandSender sender, Arguments arguments) {
+        final String subcommand = arguments.next();
+        if (!SUB_COMMANDS.containsKey(subcommand)) {
+            BoltComponents.sendMessage(
+                    sender,
+                    Translation.HELP_COMMAND_SHORT_ADMIN,
+                    Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt admin")
+            );
+            return;
+        }
+        SUB_COMMANDS.get(subcommand).shortHelp(sender, arguments);
+    }
+
+    @Override
+    public void longHelp(CommandSender sender, Arguments arguments) {
+        final String subcommand = arguments.next();
+        if (!SUB_COMMANDS.containsKey(subcommand)) {
+            BoltComponents.sendMessage(sender, Translation.HELP_COMMAND_LONG_ADMIN);
+            return;
+        }
+        SUB_COMMANDS.get(subcommand).longHelp(sender, arguments);
     }
 }
