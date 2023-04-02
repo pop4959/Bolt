@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
-import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
@@ -15,6 +14,8 @@ import org.popcraft.bolt.util.Mode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.popcraft.bolt.lang.Translator.translate;
 
 public class ModeCommand extends BoltCommand {
     public ModeCommand(BoltPlugin plugin) {
@@ -41,7 +42,7 @@ public class ModeCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     player,
                     boltPlayer.hasMode(mode) ? Translation.MODE_ENABLED : Translation.MODE_DISABLED,
-                    Placeholder.unparsed(Translation.Placeholder.MODE, Strings.toTitleCase(mode.name().toLowerCase()))
+                    Placeholder.unparsed(Translation.Placeholder.MODE, translate("mode_%s".formatted(mode.name().toLowerCase())))
             );
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
