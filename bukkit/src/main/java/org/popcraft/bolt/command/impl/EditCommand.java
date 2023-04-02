@@ -37,7 +37,7 @@ public class EditCommand extends BoltCommand {
             return;
         }
         if (arguments.remaining() < 3) {
-            BoltComponents.sendMessage(sender, Translation.COMMAND_NOT_ENOUGH_ARGS);
+            shortHelp(sender, arguments);
             return;
         }
         final BoltPlayer boltPlayer = plugin.player(player);

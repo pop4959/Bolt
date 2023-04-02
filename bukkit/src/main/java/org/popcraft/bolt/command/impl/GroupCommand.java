@@ -33,7 +33,7 @@ public class GroupCommand extends BoltCommand {
             return;
         }
         if (arguments.remaining() < 2) {
-            BoltComponents.sendMessage(sender, Translation.COMMAND_NOT_ENOUGH_ARGS);
+            shortHelp(sender, arguments);
             return;
         }
         final String action = arguments.next().toLowerCase();

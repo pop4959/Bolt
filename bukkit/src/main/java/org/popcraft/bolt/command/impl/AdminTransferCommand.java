@@ -30,7 +30,7 @@ public class AdminTransferCommand extends BoltCommand {
             return;
         }
         if (arguments.remaining() < 1) {
-            BoltComponents.sendMessage(sender, Translation.COMMAND_NOT_ENOUGH_ARGS);
+            shortHelp(sender, arguments);
             return;
         }
         final String owner = arguments.next();

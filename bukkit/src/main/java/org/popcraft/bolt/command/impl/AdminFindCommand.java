@@ -32,7 +32,7 @@ public class AdminFindCommand extends BoltCommand {
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
         if (arguments.remaining() < 1) {
-            BoltComponents.sendMessage(sender, Translation.COMMAND_NOT_ENOUGH_ARGS);
+            shortHelp(sender, arguments);
             return;
         }
         final String player = arguments.next();
