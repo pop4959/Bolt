@@ -153,6 +153,8 @@ public class LWCMigration {
                             access.put(Source.of(SourceType.TOWN, rights.getName()).toString(), accessType);
                         } else if (rights.getType() == Permission.Type.REGION.ordinal()) {
                             access.put(Source.of(SourceType.REGION, rights.getName()).toString(), accessType);
+                        } else if (rights.getType() == Permission.Type.FACTION.ordinal()) {
+                            access.put(Source.of(SourceType.FACTION, rights.getName()).toString(), accessType);
                         }
                     }
                 }

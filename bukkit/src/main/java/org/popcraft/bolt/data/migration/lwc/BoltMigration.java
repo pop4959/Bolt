@@ -161,6 +161,7 @@ public class BoltMigration {
                 case SourceType.PLAYER -> Permission.Type.PLAYER;
                 case SourceType.TOWN -> Permission.Type.TOWN;
                 case SourceType.REGION -> Permission.Type.REGION;
+                case SourceType.FACTION -> Permission.Type.FACTION;
                 default -> null;
             };
             final String name;
