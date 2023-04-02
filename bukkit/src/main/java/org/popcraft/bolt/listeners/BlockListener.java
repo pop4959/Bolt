@@ -96,6 +96,10 @@ public final class BlockListener implements Listener {
         } else if (protection != null) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
             final boolean canInteract = plugin.canAccess(protection, player, Permission.INTERACT);
+            if (canInteract && protection instanceof final BlockProtection blockProtection) {
+                protection.setAccessed(System.currentTimeMillis());
+                plugin.getBolt().getStore().saveBlockProtection(blockProtection);
+            }
             if (!canInteract) {
                 e.setCancelled(true);
                 if (!hasNotifyPermission) {

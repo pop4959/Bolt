@@ -230,7 +230,13 @@ public final class EntityListener implements Listener {
             shouldCancel = true;
         } else if (protection != null) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
-            if (!plugin.canAccess(protection, player, permission)) {
+            final boolean canAccess = plugin.canAccess(protection, player, permission);
+            final boolean canInteract = canAccess && Permission.INTERACT.equals(permission);
+            if (canInteract && protection instanceof final EntityProtection entityProtection) {
+                protection.setAccessed(System.currentTimeMillis());
+                plugin.getBolt().getStore().saveEntityProtection(entityProtection);
+            }
+            if (!canAccess) {
                 shouldCancel = true;
                 if (shouldSendMessage && !hasNotifyPermission) {
                     BoltComponents.sendMessage(
