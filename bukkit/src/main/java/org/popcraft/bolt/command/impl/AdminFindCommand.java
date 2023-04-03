@@ -59,7 +59,7 @@ public class AdminFindCommand extends BoltCommand {
         blockProtectionsFromPlayer.stream().limit(RESULTS_PER_PAGE).forEach(blockProtection -> {
             final long elapsed = now - blockProtection.getCreated();
             final Duration duration = Duration.of(elapsed, ChronoUnit.MILLIS);
-            final String time = "%d:%02d".formatted(duration.toDaysPart(), duration.toMinutesPart());
+            final String time = "%d:%02d".formatted(duration.toHours(), duration.toMinutesPart());
             BoltComponents.sendMessage(
                     sender,
                     Translation.FIND_RESULT,
