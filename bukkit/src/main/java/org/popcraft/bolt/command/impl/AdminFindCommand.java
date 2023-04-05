@@ -63,7 +63,7 @@ public class AdminFindCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     sender,
                     Translation.FIND_RESULT,
-                    Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, translate("protection_type_%s".formatted(blockProtection.getType()))),
+                    Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(blockProtection)),
                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(blockProtection)),
                     Placeholder.unparsed(Translation.Placeholder.PLAYER, playerProfile.name()),
                     Placeholder.unparsed(Translation.Placeholder.TIME, time),

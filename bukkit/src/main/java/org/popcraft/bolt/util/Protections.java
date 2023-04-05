@@ -40,6 +40,10 @@ public final class Protections {
     private Protections() {
     }
 
+    public static String protectionType(final Protection protection) {
+        return translate("protection_type_%s".formatted(protection.getType()));
+    }
+
     public static Component displayType(final Protection protection) {
         if (protection instanceof final BlockProtection blockProtection) {
             final World world = Bukkit.getWorld(blockProtection.getWorld());
