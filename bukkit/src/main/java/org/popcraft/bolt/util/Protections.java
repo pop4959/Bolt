@@ -41,7 +41,13 @@ public final class Protections {
     }
 
     public static String protectionType(final Protection protection) {
-        return translate("protection_type_%s".formatted(protection.getType()));
+        final String protectionType = protection.getType();
+        final String translationKey = "protection_type_%s".formatted(protectionType);
+        final String translation = translate(translationKey);
+        if (!translationKey.equals(translation)) {
+            return translation;
+        }
+        return Strings.toTitleCase(protectionType);
     }
 
     public static Component displayType(final Protection protection) {
