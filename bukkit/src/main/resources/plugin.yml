@@ -18,7 +18,7 @@ commands:
     permission: bolt.command.unlock
 permissions:
   bolt.admin:
-    default: false
+    default: op
   bolt.command:
     default: true
   bolt.command.admin:
@@ -44,4 +44,4 @@ permissions:
   bolt.command.unlock:
     default: true
   bolt.protection.notify:
-    default: false
+    default: op
