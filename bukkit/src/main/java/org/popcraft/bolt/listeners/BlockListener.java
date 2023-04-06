@@ -416,6 +416,9 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onEntityChangeBlock(final EntityChangeBlockEvent e) {
+        if (Tag.DOORS.isTagged(e.getBlock().getType())) {
+            return;
+        }
         if (plugin.findProtection(e.getBlock()).isPresent()) {
             e.setCancelled(true);
         }
