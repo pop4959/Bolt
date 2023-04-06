@@ -42,6 +42,7 @@ public class Translation {
     public static final String GROUP_PLAYER_ADD = "group_player_add";
     public static final String GROUP_PLAYER_REMOVE = "group_player_remove";
     public static final String INFO = "info";
+    public static final String INFO_FULL = "info_full";
     public static final String INFO_SELF = "info_self";
     public static final String LOCK = "lock";
     public static final String LOCKED = "locked";

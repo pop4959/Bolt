@@ -348,7 +348,7 @@ public final class EntityListener implements Listener {
                     BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner())
                             .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                     player,
-                                    Translation.INFO,
+                                    player.hasPermission("bolt.command.info.full") ? Translation.INFO_FULL : Translation.INFO,
                                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
                                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection)),
                                     Placeholder.component(Translation.Placeholder.PLAYER, Component.text(Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN)))),
