@@ -413,10 +413,12 @@ public class BoltPlugin extends JavaPlugin {
         final boolean isBoltCommand = "bolt".equalsIgnoreCase(command.getName());
         final int commandStart = isBoltCommand ? 1 : 0;
         if (args.length < commandStart) {
+            commands.get("help").execute(sender, new Arguments());
             return true;
         }
         final String commandKey = (isBoltCommand ? args[0] : command.getName()).toLowerCase();
         if (!commands.containsKey(commandKey)) {
+            BoltComponents.sendMessage(sender, Translation.COMMAND_INVALID);
             return true;
         }
         if (!sender.hasPermission(COMMAND_PERMISSION_KEY + commandKey)) {
