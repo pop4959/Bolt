@@ -37,7 +37,8 @@ public class TransferCommand extends BoltCommand {
                 plugin.player(player).setAction(new Action(Action.Type.TRANSFER, profile.uuid().toString()));
                 SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                         player,
-                        Translation.CLICK_TRANSFER
+                        Translation.CLICK_TRANSFER,
+                        plugin.isUseActionBar()
                 ));
             } else {
                 SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(

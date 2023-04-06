@@ -80,7 +80,7 @@ public class AdminTransferCommand extends BoltCommand {
             ownerProfileFuture.thenAccept(profile -> {
                 if (profile.uuid() != null) {
                     plugin.player(player).setAction(new Action(Action.Type.TRANSFER, profile.uuid().toString(), true));
-                    BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER);
+                    BoltComponents.sendMessage(player, Translation.CLICK_TRANSFER, plugin.isUseActionBar());
                 } else {
                     BoltComponents.sendMessage(
                             player,
