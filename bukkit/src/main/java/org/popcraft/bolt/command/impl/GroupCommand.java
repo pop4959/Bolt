@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -55,14 +56,14 @@ public class GroupCommand extends BoltCommand {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_ALREADY_EXISTS,
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     } else {
                         store.saveGroup(new Group(group, player.getUniqueId(), uuids));
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_CREATED,
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     }
                     break;
@@ -71,20 +72,20 @@ public class GroupCommand extends BoltCommand {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_DOESNT_EXIST,
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     } else if (!existingGroup.getOwner().equals(player.getUniqueId())) {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_NOT_OWNER,
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     } else {
                         store.removeGroup(existingGroup);
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_DELETED,
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     }
                     break;
@@ -93,13 +94,13 @@ public class GroupCommand extends BoltCommand {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_DOESNT_EXIST,
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     } else if (!existingGroup.getOwner().equals(player.getUniqueId())) {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_NOT_OWNER,
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     } else {
                         existingGroup.getMembers().addAll(uuids);
@@ -107,8 +108,8 @@ public class GroupCommand extends BoltCommand {
                         names.forEach(name -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_PLAYER_ADD,
-                                Placeholder.unparsed(Translation.Placeholder.PLAYER, name),
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.PLAYER, Component.text(name)),
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         )));
                     }
                     break;
@@ -117,13 +118,13 @@ public class GroupCommand extends BoltCommand {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_DOESNT_EXIST,
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     } else if (!existingGroup.getOwner().equals(player.getUniqueId())) {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_NOT_OWNER,
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     } else {
                         existingGroup.getMembers().removeAll(uuids);
@@ -131,8 +132,8 @@ public class GroupCommand extends BoltCommand {
                         names.forEach(name -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_PLAYER_REMOVE,
-                                Placeholder.unparsed(Translation.Placeholder.PLAYER, name),
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.PLAYER, Component.text(name)),
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         )));
                     }
                     break;
@@ -141,7 +142,7 @@ public class GroupCommand extends BoltCommand {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.GROUP_DOESNT_EXIST,
-                                Placeholder.unparsed(Translation.Placeholder.GROUP, group)
+                                Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     } else {
                         BukkitAdapter.findOrLookupProfilesByUniqueIds(existingGroup.getMembers()).thenAccept(existingProfiles -> {
@@ -150,8 +151,8 @@ public class GroupCommand extends BoltCommand {
                             SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                     player,
                                     Translation.GROUP_LIST_MEMBERS,
-                                    Placeholder.unparsed(Translation.Placeholder.GROUP, group),
-                                    Placeholder.unparsed(Translation.Placeholder.GROUP_MEMBERS, memberList)
+                                    Placeholder.component(Translation.Placeholder.GROUP, Component.text(group)),
+                                    Placeholder.component(Translation.Placeholder.GROUP_MEMBERS, Component.text(memberList))
                             ));
                         });
                     }
@@ -190,8 +191,8 @@ public class GroupCommand extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_GROUP,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt group"),
-                Placeholder.unparsed(Translation.Placeholder.LITERAL, "(create|delete|add|remove|list)")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt group")),
+                Placeholder.component(Translation.Placeholder.LITERAL, Component.text("(create|delete|add|remove|list)"))
         );
     }
 

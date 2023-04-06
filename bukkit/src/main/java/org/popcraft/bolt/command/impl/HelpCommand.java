@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.popcraft.bolt.BoltPlugin;
@@ -59,7 +60,7 @@ public class HelpCommand extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_HELP,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt help")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt help"))
         );
     }
 

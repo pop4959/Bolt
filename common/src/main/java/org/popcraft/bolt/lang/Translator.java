@@ -20,6 +20,10 @@ public final class Translator {
     private Translator() {
     }
 
+    public static boolean isTranslatable(final String key) {
+        return customTranslation.containsKey(key) || translation.containsKey(key) || fallback.containsKey(key);
+    }
+
     public static String translate(final String key) {
         return Objects.requireNonNullElseGet(customTranslation.getProperty(key), () -> Objects.requireNonNullElseGet(translation.getProperty(key), () -> Objects.requireNonNullElse(fallback.getProperty(key), key)));
     }

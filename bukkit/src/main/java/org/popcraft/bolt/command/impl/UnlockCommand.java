@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -28,7 +29,7 @@ public class UnlockCommand extends BoltCommand {
                     player,
                     Translation.CLICK_ACTION,
                     plugin.isUseActionBar(),
-                    Placeholder.unparsed(Translation.Placeholder.ACTION, translate(Translation.UNLOCK))
+                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.UNLOCK))
             );
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
@@ -45,7 +46,7 @@ public class UnlockCommand extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_UNLOCK,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt unlock")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt unlock"))
         );
     }
 

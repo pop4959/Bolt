@@ -43,7 +43,7 @@ public final class BoltComponents {
         }
     }
 
-    private static Component resolveTranslation(String key, TagResolver... placeholders) {
+    public static Component resolveTranslation(String key, TagResolver... placeholders) {
         return miniMessage.deserialize(translate(key), placeholders);
     }
 }

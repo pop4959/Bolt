@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -41,7 +42,7 @@ public class AdminFindCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     sender,
                     Translation.PLAYER_NOT_FOUND,
-                    Placeholder.unparsed(Translation.Placeholder.PLAYER, player)
+                    Placeholder.component(Translation.Placeholder.PLAYER, Component.text(player))
             );
             return;
         }
@@ -63,14 +64,14 @@ public class AdminFindCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     sender,
                     Translation.FIND_RESULT,
-                    Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(blockProtection)),
+                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(blockProtection)),
                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(blockProtection)),
-                    Placeholder.unparsed(Translation.Placeholder.PLAYER, playerProfile.name()),
-                    Placeholder.unparsed(Translation.Placeholder.TIME, time),
-                    Placeholder.unparsed(Translation.Placeholder.WORLD, blockProtection.getWorld()),
-                    Placeholder.unparsed(Translation.Placeholder.X, String.valueOf(blockProtection.getX())),
-                    Placeholder.unparsed(Translation.Placeholder.Y, String.valueOf(blockProtection.getY())),
-                    Placeholder.unparsed(Translation.Placeholder.Z, String.valueOf(blockProtection.getZ()))
+                    Placeholder.component(Translation.Placeholder.PLAYER, Component.text(playerProfile.name())),
+                    Placeholder.component(Translation.Placeholder.TIME, Component.text(time)),
+                    Placeholder.component(Translation.Placeholder.WORLD, Component.text(blockProtection.getWorld())),
+                    Placeholder.component(Translation.Placeholder.X, Component.text(blockProtection.getX())),
+                    Placeholder.component(Translation.Placeholder.Y, Component.text(blockProtection.getY())),
+                    Placeholder.component(Translation.Placeholder.Z, Component.text(blockProtection.getZ()))
             );
         });
     }
@@ -92,7 +93,7 @@ public class AdminFindCommand extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_ADMIN_FIND,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt admin find")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt admin find"))
         );
     }
 

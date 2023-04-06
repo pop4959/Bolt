@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.popcraft.bolt.BoltPlugin;
@@ -56,7 +57,7 @@ public class AdminCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     sender,
                     Translation.HELP_COMMAND_SHORT_ADMIN,
-                    Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt admin")
+                    Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt admin"))
             );
             return;
         }

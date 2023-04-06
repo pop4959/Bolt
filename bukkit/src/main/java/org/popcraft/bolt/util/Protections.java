@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.popcraft.bolt.lang.Translator.isTranslatable;
 import static org.popcraft.bolt.lang.Translator.translate;
 
 public final class Protections {
@@ -40,14 +41,17 @@ public final class Protections {
     private Protections() {
     }
 
-    public static String protectionType(final Protection protection) {
+    public static Component raw(final Protection protection) {
+        return Component.text(protection.toString());
+    }
+
+    public static Component protectionType(final Protection protection) {
         final String protectionType = protection.getType();
         final String translationKey = "protection_type_%s".formatted(protectionType);
-        final String translation = translate(translationKey);
-        if (!translationKey.equals(translation)) {
-            return translation;
+        if (!isTranslatable(translationKey)) {
+            return Component.text(Strings.toTitleCase(protectionType));
         }
-        return Strings.toTitleCase(protectionType);
+        return BoltComponents.resolveTranslation(translationKey);
     }
 
     public static Component displayType(final Protection protection) {

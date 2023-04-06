@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -41,8 +42,8 @@ public class TrustCommand extends BoltCommand {
                     .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                             player,
                             Translation.INFO_SELF,
-                            Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST_SIZE, String.valueOf(accessMap.size())),
-                            Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST, Protections.accessList(accessMap))
+                            Placeholder.component(Translation.Placeholder.ACCESS_LIST_SIZE, Component.text(accessMap.size())),
+                            Placeholder.component(Translation.Placeholder.ACCESS_LIST, Component.text(Protections.accessList(accessMap)))
                     )));
         } else if (!"confirm".equals(action)) {
             final boolean silent = "silent".equals(action);
@@ -53,8 +54,8 @@ public class TrustCommand extends BoltCommand {
                 BoltComponents.sendMessage(
                         sender,
                         Translation.TRUST,
-                        Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt edit"),
-                        Placeholder.unparsed(Translation.Placeholder.COMMAND_2, "/bolt trust confirm")
+                        Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt edit")),
+                        Placeholder.component(Translation.Placeholder.COMMAND_2, Component.text("/bolt trust confirm"))
                 );
             }
         } else {
@@ -66,7 +67,7 @@ public class TrustCommand extends BoltCommand {
                 BoltComponents.sendMessage(
                         sender,
                         Translation.TRUST_EDITED_FAILED,
-                        Placeholder.unparsed(Translation.Placeholder.COMMAND, command)
+                        Placeholder.component(Translation.Placeholder.COMMAND, Component.text(command))
                 );
                 return;
             }
@@ -104,8 +105,8 @@ public class TrustCommand extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_TRUST,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt trust"),
-                Placeholder.unparsed(Translation.Placeholder.LITERAL, "[list|confirm]")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt trust")),
+                Placeholder.component(Translation.Placeholder.LITERAL, Component.text("[list|confirm]"))
         );
     }
 

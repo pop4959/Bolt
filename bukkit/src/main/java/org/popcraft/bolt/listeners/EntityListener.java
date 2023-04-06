@@ -1,5 +1,6 @@
 package org.popcraft.bolt.listeners;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -144,7 +145,7 @@ public final class EntityListener implements Listener {
                     player,
                     Translation.CLICK_LOCKED,
                     plugin.isUseActionBar(),
-                    Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(newProtection)),
+                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(newProtection)),
                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(entity))
             );
         }
@@ -160,7 +161,7 @@ public final class EntityListener implements Listener {
                         player,
                         Translation.CLICK_UNLOCKED,
                         plugin.isUseActionBar(),
-                        Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
                         Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
                 );
             }
@@ -206,7 +207,7 @@ public final class EntityListener implements Listener {
                                 player,
                                 Translation.CLICK_UNLOCKED,
                                 plugin.isUseActionBar(),
-                                Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
                                 Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
                         );
                     }
@@ -256,7 +257,7 @@ public final class EntityListener implements Listener {
                                 player,
                                 Translation.PROTECTION_NOTIFY_GENERIC,
                                 plugin.isUseActionBar(),
-                                Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
                                 Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
                         ));
                     } else {
@@ -264,9 +265,9 @@ public final class EntityListener implements Listener {
                                 player,
                                 Translation.PROTECTION_NOTIFY,
                                 plugin.isUseActionBar(),
-                                Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
                                 Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection)),
-                                Placeholder.unparsed(Translation.Placeholder.PLAYER, owner)
+                                Placeholder.component(Translation.Placeholder.PLAYER, Component.text(owner))
                         ));
                     }
                 });
@@ -298,7 +299,7 @@ public final class EntityListener implements Listener {
                                 player,
                                 Translation.CLICK_LOCKED_CHANGED,
                                 plugin.isUseActionBar(),
-                                Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection))
+                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection))
                         );
                     } else {
                         BoltComponents.sendMessage(
@@ -316,7 +317,7 @@ public final class EntityListener implements Listener {
                             player,
                             Translation.CLICK_LOCKED,
                             plugin.isUseActionBar(),
-                            Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(newProtection)),
+                            Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(newProtection)),
                             Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(entity))
                     );
                 } else {
@@ -330,7 +331,7 @@ public final class EntityListener implements Listener {
                             player,
                             Translation.CLICK_UNLOCKED,
                             plugin.isUseActionBar(),
-                            Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                            Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
                             Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
                     );
                 } else {
@@ -348,11 +349,11 @@ public final class EntityListener implements Listener {
                             .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                     player,
                                     Translation.INFO,
-                                    Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
                                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection)),
-                                    Placeholder.unparsed(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN))),
-                                    Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST_SIZE, String.valueOf(protection.getAccess().size())),
-                                    Placeholder.unparsed(Translation.Placeholder.ACCESS_LIST, Protections.accessList(protection.getAccess()))
+                                    Placeholder.component(Translation.Placeholder.PLAYER, Component.text(Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN)))),
+                                    Placeholder.component(Translation.Placeholder.ACCESS_LIST_SIZE, Component.text(protection.getAccess().size())),
+                                    Placeholder.component(Translation.Placeholder.ACCESS_LIST, Component.text(Protections.accessList(protection.getAccess())))
                             )));
                 } else {
                     BoltComponents.sendMessage(
@@ -378,7 +379,7 @@ public final class EntityListener implements Listener {
                                 player,
                                 Translation.CLICK_EDITED,
                                 plugin.isUseActionBar(),
-                                Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
                                 Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
                         );
                     } else {
@@ -412,9 +413,9 @@ public final class EntityListener implements Listener {
                                         player,
                                         Translation.CLICK_TRANSFER_CONFIRM,
                                         plugin.isUseActionBar(),
-                                        Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
                                         Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection)),
-                                        Placeholder.unparsed(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN)))
+                                        Placeholder.component(Translation.Placeholder.PLAYER, Component.text(Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN))))
                                 )));
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER, plugin.isUseActionBar());
@@ -447,7 +448,7 @@ public final class EntityListener implements Listener {
                         player,
                         Translation.CLICK_UNLOCKED,
                         plugin.isUseActionBar(),
-                        Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
                         Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
                 );
             }

@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.popcraft.bolt.BoltPlugin;
@@ -39,8 +40,8 @@ public class AdminConvertCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     sender,
                     Translation.MIGRATION_STARTED,
-                    Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "LWC"),
-                    Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "Bolt")
+                    Placeholder.component(Translation.Placeholder.OLD_PLUGIN, Component.text("LWC")),
+                    Placeholder.component(Translation.Placeholder.NEW_PLUGIN, Component.text("Bolt"))
             );
             isConverting.set(true);
             lastMigration.convertEntityBlocks().whenCompleteAsync((memoryStore, throwable) -> {
@@ -67,8 +68,8 @@ public class AdminConvertCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     sender,
                     Translation.MIGRATION_STARTED,
-                    Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "Bolt"),
-                    Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "LWC")
+                    Placeholder.component(Translation.Placeholder.OLD_PLUGIN, Component.text("Bolt")),
+                    Placeholder.component(Translation.Placeholder.NEW_PLUGIN, Component.text("LWC"))
             );
             isConverting.set(true);
             migration.convertAsync().whenCompleteAsync((ignored, throwable) -> {
@@ -83,8 +84,8 @@ public class AdminConvertCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     sender,
                     Translation.MIGRATION_STARTED,
-                    Placeholder.unparsed(Translation.Placeholder.OLD_PLUGIN, "LWC"),
-                    Placeholder.unparsed(Translation.Placeholder.NEW_PLUGIN, "Bolt")
+                    Placeholder.component(Translation.Placeholder.OLD_PLUGIN, Component.text("LWC")),
+                    Placeholder.component(Translation.Placeholder.NEW_PLUGIN, Component.text("Bolt"))
             );
             isConverting.set(true);
             migration.convertAsync().whenCompleteAsync((memoryStore, throwable) -> {
@@ -105,7 +106,7 @@ public class AdminConvertCommand extends BoltCommand {
                     BoltComponents.sendMessage(
                             sender,
                             Translation.MIGRATION_COMPLETED_FOUND_ENTITIES,
-                            Placeholder.unparsed("command", "/bolt admin convert entities")
+                            Placeholder.component("command", Component.text("/bolt admin convert entities"))
                     );
                 }
             }, SchedulerUtil.executor(plugin, sender));
@@ -133,7 +134,7 @@ public class AdminConvertCommand extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_ADMIN_CONVERT,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt admin convert")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt admin convert"))
         );
     }
 

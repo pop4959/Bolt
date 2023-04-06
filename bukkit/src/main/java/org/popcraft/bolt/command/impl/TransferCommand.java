@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -42,7 +43,7 @@ public class TransferCommand extends BoltCommand {
                 SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                         player,
                         Translation.PLAYER_NOT_FOUND,
-                        Placeholder.unparsed(Translation.Placeholder.PLAYER, owner)
+                        Placeholder.component(Translation.Placeholder.PLAYER, Component.text(owner))
                 ));
             }
         });
@@ -65,7 +66,7 @@ public class TransferCommand extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_TRANSFER,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt transfer")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt transfer"))
         );
     }
 

@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -13,6 +14,7 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.ChunkPos;
 import org.popcraft.bolt.util.PaperUtil;
+import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.ArrayList;
@@ -41,7 +43,7 @@ public class AdminCleanup extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.CLEANUP_START,
-                Placeholder.unparsed(Translation.Placeholder.COUNT, String.valueOf(count))
+                Placeholder.component(Translation.Placeholder.COUNT, Component.text(count))
         );
         final Map<String, World> worlds = new HashMap<>();
         final Map<ChunkPos, List<BlockProtection>> blockProtectionsByChunk = new HashMap<>();
@@ -82,7 +84,7 @@ public class AdminCleanup extends BoltCommand {
                                     SchedulerUtil.schedule(plugin, sender, () -> BoltComponents.sendMessage(
                                             sender,
                                             Translation.CLEANUP_REMOVE,
-                                            Placeholder.unparsed(Translation.Placeholder.RAW_PROTECTION, blockProtection.toString())
+                                            Placeholder.component(Translation.Placeholder.RAW_PROTECTION, Protections.raw(blockProtection))
                                     ));
                                 }
                             }
@@ -96,8 +98,8 @@ public class AdminCleanup extends BoltCommand {
             BoltComponents.sendMessage(
                     sender,
                     Translation.CLEANUP_COMPLETE,
-                    Placeholder.unparsed(Translation.Placeholder.COUNT, String.valueOf(removed.get())),
-                    Placeholder.unparsed(Translation.Placeholder.SECONDS, String.valueOf(seconds))
+                    Placeholder.component(Translation.Placeholder.COUNT, Component.text(removed.get())),
+                    Placeholder.component(Translation.Placeholder.SECONDS, Component.text(seconds))
             );
         }, SchedulerUtil.executor(plugin, sender));
     }
@@ -112,7 +114,7 @@ public class AdminCleanup extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_ADMIN_CLEANUP,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt admin cleanup")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt admin cleanup"))
         );
     }
 

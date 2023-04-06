@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -32,7 +33,7 @@ public class LockCommand extends BoltCommand {
                 BoltComponents.sendMessage(
                         sender,
                         Translation.CLICK_LOCKED_NO_EXIST,
-                        Placeholder.unparsed(Translation.Placeholder.PROTECTION_TYPE, type)
+                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Component.text(type))
                 );
                 return;
             }
@@ -48,7 +49,7 @@ public class LockCommand extends BoltCommand {
                     player,
                     Translation.CLICK_ACTION,
                     plugin.isUseActionBar(),
-                    Placeholder.unparsed(Translation.Placeholder.ACTION, translate(Translation.LOCK))
+                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.LOCK))
             );
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
@@ -75,7 +76,7 @@ public class LockCommand extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_LOCK,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt lock")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt lock"))
         );
     }
 

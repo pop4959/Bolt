@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -49,7 +50,7 @@ public class EditCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     sender,
                     Translation.EDIT_ACCESS_INVALID,
-                    Placeholder.unparsed(Translation.Placeholder.ACCESS_TYPE, accessType)
+                    Placeholder.component(Translation.Placeholder.ACCESS_TYPE, Component.text(accessType))
             );
             return;
         }
@@ -63,7 +64,7 @@ public class EditCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     sender,
                     Translation.EDIT_SOURCE_INVALID,
-                    Placeholder.unparsed(Translation.Placeholder.SOURCE_TYPE, String.valueOf(sourceTypeName))
+                    Placeholder.component(Translation.Placeholder.SOURCE_TYPE, Component.text(sourceTypeName))
             );
             return;
         }
@@ -83,7 +84,7 @@ public class EditCommand extends BoltCommand {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.PLAYER_NOT_FOUND,
-                                Placeholder.unparsed(Translation.Placeholder.PLAYER, finalIdentifier)
+                                Placeholder.component(Translation.Placeholder.PLAYER, Component.text(finalIdentifier))
                         ));
                         return null;
                     }
@@ -100,8 +101,8 @@ public class EditCommand extends BoltCommand {
                         BoltComponents.sendMessage(
                                 player,
                                 adding ? Translation.TRUST_ADD : Translation.TRUST_REMOVE,
-                                Placeholder.unparsed(Translation.Placeholder.SOURCE_TYPE, source.getType()),
-                                Placeholder.unparsed(Translation.Placeholder.SOURCE_IDENTIFIER, finalIdentifier)
+                                Placeholder.component(Translation.Placeholder.SOURCE_TYPE, Component.text(source.getType())),
+                                Placeholder.component(Translation.Placeholder.SOURCE_IDENTIFIER, Component.text(finalIdentifier))
                         );
                     }
                 }
@@ -112,7 +113,7 @@ public class EditCommand extends BoltCommand {
                     player,
                     Translation.CLICK_ACTION,
                     plugin.isUseActionBar(),
-                    Placeholder.unparsed(Translation.Placeholder.ACTION, translate(Translation.EDIT))
+                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.EDIT))
             );
         }
     }
@@ -158,8 +159,8 @@ public class EditCommand extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_EDIT,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt edit"),
-                Placeholder.unparsed(Translation.Placeholder.LITERAL, "(add|remove)")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt edit")),
+                Placeholder.component(Translation.Placeholder.LITERAL, Component.text("(add|remove)"))
         );
     }
 

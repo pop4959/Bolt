@@ -62,7 +62,7 @@ public class AdminReportCommand extends BoltCommand {
         final Map<Metrics.ProtectionAccess, Long> protectionAccessCounts = Metrics.getProtectionAccessCounts();
         final Map<String, List<Metrics.ProtectionAccess>> protectionAccessListByType = protectionAccessCounts.keySet().stream().collect(Collectors.groupingBy(Metrics.ProtectionAccess::type, Collectors.toList()));
         protectionAccessListByType.forEach((type, list) -> {
-            BoltComponents.sendMessage(sender, "<type>", Placeholder.unparsed("type", type));
+            BoltComponents.sendMessage(sender, "<type>", Placeholder.component("type", Component.text(type)));
             list.forEach(protectionAccess -> {
                 final long count = protectionAccessCounts.get(protectionAccess);
                 final long previousCount = previousExecutionCounts.getOrDefault(protectionAccess, 0L);
@@ -70,7 +70,7 @@ public class AdminReportCommand extends BoltCommand {
                 BoltComponents.sendMessage(
                         sender,
                         "<consumer>: <count>",
-                        Placeholder.unparsed("consumer", protectionAccess.consumer()),
+                        Placeholder.component("consumer", Component.text(protectionAccess.consumer())),
                         Placeholder.component("count", changeComponent(countChanged, previousCount, count))
                 );
             });
@@ -95,8 +95,8 @@ public class AdminReportCommand extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_ADMIN_REPORT,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt admin report"),
-                Placeholder.unparsed(Translation.Placeholder.LITERAL, "[disable]")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt admin report")),
+                Placeholder.component(Translation.Placeholder.LITERAL, Component.text("[disable]"))
         );
     }
 

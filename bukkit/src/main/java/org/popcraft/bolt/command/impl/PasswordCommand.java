@@ -1,5 +1,6 @@
 package org.popcraft.bolt.command.impl;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -42,7 +43,7 @@ public class PasswordCommand extends BoltCommand {
         BoltComponents.sendMessage(
                 sender,
                 Translation.HELP_COMMAND_SHORT_PASSWORD,
-                Placeholder.unparsed(Translation.Placeholder.COMMAND, "/bolt password")
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt password"))
         );
     }
 
