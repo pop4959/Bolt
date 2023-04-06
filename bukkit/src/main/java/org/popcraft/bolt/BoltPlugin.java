@@ -537,6 +537,15 @@ public class BoltPlugin extends JavaPlugin {
         }
     }
 
+    public boolean isProtected(final Protection protection) {
+        if (protection instanceof final BlockProtection blockProtection) {
+            return bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(blockProtection)).join() != null;
+        } else if (protection instanceof final EntityProtection entityProtection) {
+            return bolt.getStore().loadEntityProtection(entityProtection.getId()).join() != null;
+        }
+        return false;
+    }
+
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canAccess(final Block block, final Player player, final String... permissions) {
         return findProtection(block).map(protection -> canAccess(protection, player.getUniqueId(), permissions)).orElse(true);

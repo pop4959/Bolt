@@ -117,25 +117,38 @@ public final class BlockListener implements Listener {
             }
             if (hasNotifyPermission) {
                 BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> {
+                    if (!plugin.isProtected(protection)) {
+                        return;
+                    }
                     final boolean isYou = player.getUniqueId().equals(protection.getOwner());
                     final String owner = isYou ? translate(Translation.YOU) : profile.name();
                     if (owner == null) {
-                        SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
-                                player,
-                                Translation.PROTECTION_NOTIFY_GENERIC,
-                                plugin.isUseActionBar(),
-                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
-                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
-                        ));
+                        SchedulerUtil.schedule(plugin, player, () -> {
+                            if (!plugin.isProtected(protection)) {
+                                return;
+                            }
+                            BoltComponents.sendMessage(
+                                    player,
+                                    Translation.PROTECTION_NOTIFY_GENERIC,
+                                    plugin.isUseActionBar(),
+                                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
+                            );
+                        });
                     } else {
-                        SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
-                                player,
-                                Translation.PROTECTION_NOTIFY,
-                                plugin.isUseActionBar(),
-                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
-                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection)),
-                                Placeholder.component(Translation.Placeholder.PLAYER, Component.text(owner))
-                        ));
+                        SchedulerUtil.schedule(plugin, player, () -> {
+                            if (!plugin.isProtected(protection)) {
+                                return;
+                            }
+                            BoltComponents.sendMessage(
+                                    player,
+                                    Translation.PROTECTION_NOTIFY,
+                                    plugin.isUseActionBar(),
+                                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection)),
+                                    Placeholder.component(Translation.Placeholder.PLAYER, Component.text(owner))
+                            );
+                        });
                     }
                 });
             }
