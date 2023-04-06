@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.popcraft.bolt.lang.Translator.translate;
-
 public class AdminFindCommand extends BoltCommand {
     private static final int RESULTS_PER_PAGE = 4;
 

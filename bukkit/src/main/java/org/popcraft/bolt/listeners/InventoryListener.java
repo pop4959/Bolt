@@ -23,8 +23,8 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
-import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.source.SourceTypeResolver;
+import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Permission;
 

@@ -44,7 +44,6 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
-import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;

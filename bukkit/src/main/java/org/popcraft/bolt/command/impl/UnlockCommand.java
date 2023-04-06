@@ -14,8 +14,6 @@ import org.popcraft.bolt.util.BoltComponents;
 import java.util.Collections;
 import java.util.List;
 
-import static org.popcraft.bolt.lang.Translator.translate;
-
 public class UnlockCommand extends BoltCommand {
     public UnlockCommand(BoltPlugin plugin) {
         super(plugin);

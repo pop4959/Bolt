@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static org.popcraft.bolt.lang.Translator.translate;
-
 public class ModeCommand extends BoltCommand {
     public ModeCommand(BoltPlugin plugin) {
         super(plugin);

@@ -16,8 +16,6 @@ import org.popcraft.bolt.util.BoltPlayer;
 import java.util.Collections;
 import java.util.List;
 
-import static org.popcraft.bolt.lang.Translator.translate;
-
 public class LockCommand extends BoltCommand {
     public LockCommand(BoltPlugin plugin) {
         super(plugin);

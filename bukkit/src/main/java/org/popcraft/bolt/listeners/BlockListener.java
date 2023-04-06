@@ -39,7 +39,6 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.util.BoundingBox;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
-import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
