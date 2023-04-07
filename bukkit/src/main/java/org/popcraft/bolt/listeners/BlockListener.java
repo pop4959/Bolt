@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -329,7 +330,7 @@ public final class BlockListener implements Listener {
         return true;
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBlockPlace(final BlockPlaceEvent e) {
         final Player player = e.getPlayer();
         if (plugin.player(player.getUniqueId()).hasMode(Mode.NOLOCK)) {
