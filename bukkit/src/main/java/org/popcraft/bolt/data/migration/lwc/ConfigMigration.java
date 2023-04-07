@@ -34,6 +34,11 @@ public class ConfigMigration {
         if (!plugin.getBolt().getStore().loadBlockProtections().join().isEmpty()) {
             return;
         }
+        convertCore(protectableBlocks);
+        convertDoors();
+    }
+
+    private void convertCore(final Map<Material, Access> protectableBlocks) {
         final FileConfiguration lwcCoreConfig = YamlConfiguration.loadConfiguration(plugin.getPluginsPath().resolve("LWC/core.yml").toFile());
         final ConfigurationSection blocks = lwcCoreConfig.getConfigurationSection("protections.blocks");
         if (blocks == null) {
@@ -68,5 +73,28 @@ public class ConfigMigration {
             plugin.saveConfig();
             plugin.reload();
         }
+    }
+
+    private void convertDoors() {
+        final FileConfiguration lwcDoorsConfig = YamlConfiguration.loadConfiguration(plugin.getPluginsPath().resolve("LWC/doors.yml").toFile());
+        final ConfigurationSection doors = lwcDoorsConfig.getConfigurationSection("doors");
+        if (doors == null) {
+            return;
+        }
+        final boolean enabled = doors.getBoolean("enabled", false);
+        final boolean doubleDoors = doors.getBoolean("doubleDoors", false);
+        final String action = doors.getString("action", "toggle");
+        final int interval = doors.getInt("interval", 3);
+        final boolean isOpenAndClose = "openAndClose".equals(action);
+        if (!enabled && !doubleDoors && !isOpenAndClose) {
+            return;
+        }
+        plugin.getConfig().set("doors.open-iron", enabled);
+        plugin.getConfig().set("doors.open-double", doubleDoors);
+        if (isOpenAndClose) {
+            plugin.getConfig().set("doors.close-after", interval);
+        }
+        plugin.saveConfig();
+        plugin.reload();
     }
 }
