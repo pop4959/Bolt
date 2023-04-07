@@ -19,6 +19,18 @@ public class Arguments {
         return remaining.poll();
     }
 
+    public Integer nextAsInteger() {
+        final String next = remaining.poll();
+        if (next == null) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(next);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     public int remaining() {
         return remaining.size();
     }

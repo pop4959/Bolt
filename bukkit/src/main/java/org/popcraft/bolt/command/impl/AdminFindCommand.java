@@ -1,6 +1,7 @@
 package org.popcraft.bolt.command.impl;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -20,6 +21,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AdminFindCommand extends BoltCommand {
     private static final int RESULTS_PER_PAGE = 4;
@@ -35,6 +37,7 @@ public class AdminFindCommand extends BoltCommand {
             return;
         }
         final String player = arguments.next();
+        final Integer page = arguments.nextAsInteger();
         final Profile playerProfile = BukkitAdapter.findOrLookupProfileByName(player).join();
         if (!playerProfile.complete()) {
             BoltComponents.sendMessage(
@@ -49,13 +52,15 @@ public class AdminFindCommand extends BoltCommand {
                 .filter(blockProtection -> playerProfile.uuid().equals(blockProtection.getOwner()))
                 .sorted(Comparator.comparingLong(BlockProtection::getCreated).reversed())
                 .toList();
-        runPage(sender, playerProfile, blockProtectionsFromPlayer);
+        runPage(sender, playerProfile, blockProtectionsFromPlayer, page == null ? 0 : page);
     }
 
-    private void runPage(final CommandSender sender, final Profile playerProfile, final List<BlockProtection> blockProtectionsFromPlayer) {
+    private void runPage(final CommandSender sender, final Profile playerProfile, final List<BlockProtection> blockProtectionsFromPlayer, final int page) {
+        final int skip = RESULTS_PER_PAGE * page;
         BoltComponents.sendMessage(sender, Translation.FIND_HEADER);
         final long now = System.currentTimeMillis();
-        blockProtectionsFromPlayer.stream().limit(RESULTS_PER_PAGE).forEach(blockProtection -> {
+        final AtomicInteger displayed = new AtomicInteger();
+        blockProtectionsFromPlayer.stream().skip(skip).limit(RESULTS_PER_PAGE).forEach(blockProtection -> {
             final long elapsed = now - blockProtection.getCreated();
             final Duration duration = Duration.of(elapsed, ChronoUnit.MILLIS);
             final String time = "%d:%02d".formatted(duration.toHours(), duration.toMinutesPart());
@@ -71,7 +76,18 @@ public class AdminFindCommand extends BoltCommand {
                     Placeholder.component(Translation.Placeholder.Y, Component.text(blockProtection.getY())),
                     Placeholder.component(Translation.Placeholder.Z, Component.text(blockProtection.getZ()))
             );
+            displayed.incrementAndGet();
         });
+        final int numberDisplayed = displayed.get();
+        if (numberDisplayed == 0) {
+            BoltComponents.sendMessage(sender, Translation.FIND_NONE);
+        } else if (numberDisplayed == RESULTS_PER_PAGE) {
+            BoltComponents.sendClickableMessage(
+                    sender,
+                    Translation.FIND_NEXT,
+                    ClickEvent.runCommand("/bolt admin find %s %s".formatted(playerProfile.name(), page + 1))
+            );
+        }
     }
 
     @Override

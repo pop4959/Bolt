@@ -33,6 +33,8 @@ public class Translation {
     public static final String ENTER_PASSWORD_NONE = "enter_password_none";
     public static final String FIND_HEADER = "find_header";
     public static final String FIND_RESULT = "find_result";
+    public static final String FIND_NEXT = "find_next";
+    public static final String FIND_NONE = "find_none";
     public static final String GROUP_ALREADY_EXISTS = "group_already_exists";
     public static final String GROUP_CREATED = "group_created";
     public static final String GROUP_DELETED = "group_deleted";
