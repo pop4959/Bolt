@@ -17,9 +17,13 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class Doors {
+    private static final Map<BlockLocation, Integer> CLOSING = new ConcurrentHashMap<>();
+
     private Doors() {
     }
 
@@ -45,7 +49,17 @@ public final class Doors {
         final int doorsCloseAfter = plugin.getDoorsCloseAfter();
         if (doorsCloseAfter > 0) {
             doors.add(block);
-            SchedulerUtil.schedule(plugin, player, () -> doors.forEach(door -> toggleDoor(door, false)), doorsCloseAfter * 20L);
+            doors.forEach(door -> {
+                final BlockLocation doorBlockLocation = BukkitAdapter.blockLocation(door);
+                CLOSING.compute(doorBlockLocation, ((blockLocation, counter) -> counter == null ? 1 : counter + 1));
+                SchedulerUtil.schedule(plugin, player, () -> {
+                    final int count = CLOSING.compute(doorBlockLocation, (blockLocation, counter) -> counter == null ? 0 : counter - 1);
+                    if (count <= 0) {
+                        CLOSING.remove(doorBlockLocation);
+                        toggleDoor(door, false);
+                    }
+                }, doorsCloseAfter * 20L);
+            });
         }
     }
 
