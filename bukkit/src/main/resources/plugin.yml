@@ -32,7 +32,7 @@ permissions:
   bolt.command.info:
     default: true
   bolt.command.info.full:
-    default: true
+    default: op
   bolt.command.lock:
     default: true
   bolt.command.mode:
