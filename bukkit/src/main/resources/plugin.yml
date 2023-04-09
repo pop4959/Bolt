@@ -31,6 +31,8 @@ permissions:
     default: true
   bolt.command.info:
     default: true
+  bolt.command.info.full:
+    default: true
   bolt.command.lock:
     default: true
   bolt.command.mode:
