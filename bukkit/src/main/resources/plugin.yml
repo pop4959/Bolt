@@ -47,3 +47,5 @@ permissions:
     default: true
   bolt.protection.notify:
     default: op
+  bolt.protection.notify.self:
+    default: false

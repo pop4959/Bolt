@@ -135,7 +135,7 @@ public final class BlockListener implements Listener {
                                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
                             );
                         });
-                    } else {
+                    } else if (!isYou || player.hasPermission("bolt.protection.notify.self")) {
                         SchedulerUtil.schedule(plugin, player, () -> {
                             if (!plugin.isProtected(protection)) {
                                 return;
