@@ -252,6 +252,10 @@ public final class EntityListener implements Listener {
                     if (!plugin.isProtected(protection)) {
                         return;
                     }
+                    final boolean noSpam = plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM);
+                    if (noSpam) {
+                        return;
+                    }
                     final boolean isYou = player.getUniqueId().equals(protection.getOwner());
                     final String owner = isYou ? translate(Translation.YOU) : profile.name();
                     if (owner == null) {
