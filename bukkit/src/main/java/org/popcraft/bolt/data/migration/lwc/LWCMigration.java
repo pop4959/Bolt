@@ -14,7 +14,7 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceTypes;
-import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Profiles;
 import org.popcraft.chunky.ChunkyProvider;
 import org.popcraft.chunky.nbt.CompoundTag;
 import org.popcraft.chunky.nbt.IntArrayTag;
@@ -157,8 +157,8 @@ public class LWCMigration {
                         if (rights.getType() == Permission.Type.GROUP.ordinal()) {
                             access.put(Source.of(SourceTypes.PERMISSION, "group.%s".formatted(rights.getName())).toString(), accessType);
                         } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
-                            final UUID uuid = Optional.ofNullable(BukkitAdapter.findProfileByName(rights.getName()).uuid())
-                                    .orElseGet(() -> BukkitAdapter.lookupProfileByName(rights.getName()).join().uuid());
+                            final UUID uuid = Optional.ofNullable(Profiles.findProfileByName(rights.getName()).uuid())
+                                    .orElseGet(() -> Profiles.lookupProfileByName(rights.getName()).join().uuid());
                             if (uuid != null) {
                                 access.put(Source.player(uuid).toString(), accessType);
                             }
@@ -178,11 +178,11 @@ public class LWCMigration {
                     access.put(passwordSource.toString(), defaultAccessNormal);
                 }
             }
-            final UUID ownerUuid = Optional.ofNullable(BukkitAdapter.findProfileByName(protection.owner()).uuid())
-                    .orElseGet(() -> BukkitAdapter.lookupProfileByName(protection.owner()).join().uuid());
+            final UUID ownerUuid = Optional.ofNullable(Profiles.findProfileByName(protection.owner()).uuid())
+                    .orElseGet(() -> Profiles.lookupProfileByName(protection.owner()).join().uuid());
             final BlockProtection blockProtection = new BlockProtection(
                     UUID.randomUUID(),
-                    Objects.requireNonNullElse(ownerUuid, BukkitAdapter.NIL_UUID),
+                    Objects.requireNonNullElse(ownerUuid, Profiles.NIL_UUID),
                     protectionType,
                     protection.date().getTime(),
                     TimeUnit.MILLISECONDS.convert(protection.lastAccessed(), TimeUnit.SECONDS),

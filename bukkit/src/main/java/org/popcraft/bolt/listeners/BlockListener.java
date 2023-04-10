@@ -53,10 +53,10 @@ import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
-import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Doors;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
+import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 
@@ -66,7 +66,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.popcraft.bolt.lang.Translator.translate;
-import static org.popcraft.bolt.util.BukkitAdapter.NIL_UUID;
+import static org.popcraft.bolt.util.Profiles.NIL_UUID;
 
 public final class BlockListener implements Listener {
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
@@ -119,7 +119,7 @@ public final class BlockListener implements Listener {
                 Doors.handlePlayerInteract(plugin, player, clicked);
             }
             if (hasNotifyPermission) {
-                BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> {
+                Profiles.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> {
                     final boolean noSpam = plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM);
                     if (noSpam) {
                         return;
@@ -245,7 +245,7 @@ public final class BlockListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
-                    BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner())
+                    Profiles.findOrLookupProfileByUniqueId(protection.getOwner())
                             .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                     player,
                                     player.hasPermission("bolt.command.info.full") ? Translation.INFO_FULL : Translation.INFO,
@@ -308,7 +308,7 @@ public final class BlockListener implements Listener {
                         final UUID uuid = UUID.fromString(action.getData());
                         protection.setOwner(uuid);
                         plugin.saveProtection(protection);
-                        BukkitAdapter.findOrLookupProfileByUniqueId(uuid)
+                        Profiles.findOrLookupProfileByUniqueId(uuid)
                                 .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                         player,
                                         Translation.CLICK_TRANSFER_CONFIRM,

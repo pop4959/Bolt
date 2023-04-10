@@ -12,7 +12,7 @@ import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
-import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 
@@ -38,7 +38,7 @@ public class TrustCommand extends BoltCommand {
         if ("list".equals(action)) {
             final AccessList accessList = plugin.getBolt().getStore().loadAccessList(player.getUniqueId()).join();
             final Map<String, String> accessMap = accessList == null ? new HashMap<>() : accessList.getAccess();
-            BukkitAdapter.findOrLookupProfileByUniqueId(player.getUniqueId())
+            Profiles.findOrLookupProfileByUniqueId(player.getUniqueId())
                     .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                             player,
                             Translation.INFO_SELF,

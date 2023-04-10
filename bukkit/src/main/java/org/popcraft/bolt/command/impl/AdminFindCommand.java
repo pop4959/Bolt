@@ -13,7 +13,7 @@ import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.Protections;
 
 import java.time.Duration;
@@ -38,7 +38,7 @@ public class AdminFindCommand extends BoltCommand {
         }
         final String player = arguments.next();
         final Integer page = arguments.nextAsInteger();
-        final Profile playerProfile = BukkitAdapter.findOrLookupProfileByName(player).join();
+        final Profile playerProfile = Profiles.findOrLookupProfileByName(player).join();
         if (!playerProfile.complete()) {
             BoltComponents.sendMessage(
                     sender,

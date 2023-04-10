@@ -10,7 +10,7 @@ import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
@@ -32,7 +32,7 @@ public class TransferCommand extends BoltCommand {
             return;
         }
         final String owner = arguments.next();
-        BukkitAdapter.findOrLookupProfileByName(owner).thenAccept(profile -> {
+        Profiles.findOrLookupProfileByName(owner).thenAccept(profile -> {
             if (profile.uuid() != null) {
                 plugin.player(player).setAction(new Action(Action.Type.TRANSFER, profile.uuid().toString()));
                 SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(

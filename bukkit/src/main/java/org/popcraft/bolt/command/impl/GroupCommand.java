@@ -11,8 +11,8 @@ import org.popcraft.bolt.data.Profile;
 import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Group;
+import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class GroupCommand extends BoltCommand {
         while ((member = arguments.next()) != null) {
             members.add(member);
         }
-        BukkitAdapter.findOrLookupProfilesByNames(members).thenAccept(profiles -> {
+        Profiles.findOrLookupProfilesByNames(members).thenAccept(profiles -> {
             final Store store = plugin.getBolt().getStore();
             final Group existingGroup = store.loadGroup(group).join();
             final List<Profile> completeProfiles = profiles.stream().filter(Profile::complete).toList();
@@ -145,7 +145,7 @@ public class GroupCommand extends BoltCommand {
                                 Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     } else {
-                        BukkitAdapter.findOrLookupProfilesByUniqueIds(existingGroup.getMembers()).thenAccept(existingProfiles -> {
+                        Profiles.findOrLookupProfilesByUniqueIds(existingGroup.getMembers()).thenAccept(existingProfiles -> {
                             final List<String> memberNames = existingProfiles.stream().filter(Profile::complete).map(Profile::name).toList();
                             final String memberList = String.join(", ", memberNames);
                             SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(

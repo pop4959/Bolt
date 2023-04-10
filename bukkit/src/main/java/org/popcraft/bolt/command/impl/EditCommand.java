@@ -15,7 +15,7 @@ import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
-import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
@@ -75,7 +75,7 @@ public class EditCommand extends BoltCommand {
             final CompletableFuture<Source> editFuture;
             final String finalIdentifier = identifier;
             if (SourceTypes.PLAYER.equals(sourceType.name())) {
-                editFuture = BukkitAdapter.findOrLookupProfileByName(identifier).thenApply(profile -> {
+                editFuture = Profiles.findOrLookupProfileByName(identifier).thenApply(profile -> {
                     if (profile.uuid() != null) {
                         return Source.player(profile.uuid());
                     } else {

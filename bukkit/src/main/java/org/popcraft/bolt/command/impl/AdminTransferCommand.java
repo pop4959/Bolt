@@ -12,7 +12,7 @@ import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.BukkitAdapter;
+import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
@@ -36,8 +36,8 @@ public class AdminTransferCommand extends BoltCommand {
         }
         final String owner = arguments.next();
         final String newOwner = arguments.next();
-        final CompletableFuture<Profile> ownerProfileFuture = BukkitAdapter.findOrLookupProfileByName(owner);
-        final CompletableFuture<Profile> newOwnerProfileFuture = BukkitAdapter.findOrLookupProfileByName(newOwner);
+        final CompletableFuture<Profile> ownerProfileFuture = Profiles.findOrLookupProfileByName(owner);
+        final CompletableFuture<Profile> newOwnerProfileFuture = Profiles.findOrLookupProfileByName(newOwner);
         if (newOwner != null) {
             CompletableFuture.allOf(ownerProfileFuture, newOwnerProfileFuture).thenRun(() -> {
                 final Profile ownerProfile = ownerProfileFuture.join();

@@ -17,13 +17,13 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class BukkitAdapter {
+public final class Profiles {
     private static final Set<UUID> KNOWN_NULL_LOOKUPS_BY_UUID = ConcurrentHashMap.newKeySet();
     private static final Set<String> KNOWN_NULL_LOOKUPS_BY_NAME = ConcurrentHashMap.newKeySet();
     private static final String NIL_UUID_STRING = "00000000-0000-0000-0000-000000000000";
     public static final UUID NIL_UUID = UUID.fromString(NIL_UUID_STRING);
 
-    private BukkitAdapter() {
+    private Profiles() {
     }
 
     public static Profile findProfileByName(final String name) {
@@ -64,7 +64,7 @@ public final class BukkitAdapter {
     }
 
     public static CompletableFuture<Profile> findOrLookupProfileByName(final String name) {
-        final Profile found = BukkitAdapter.findProfileByName(name);
+        final Profile found = Profiles.findProfileByName(name);
         if (found.complete()) {
             return CompletableFuture.completedFuture(found);
         }
@@ -74,7 +74,7 @@ public final class BukkitAdapter {
     public static CompletableFuture<Collection<Profile>> findOrLookupProfilesByNames(final Collection<String> names) {
         final CompletableFuture<Collection<Profile>> profilesFuture = new CompletableFuture<>();
         final List<CompletableFuture<Profile>> profileFutures = new ArrayList<>();
-        names.forEach(name -> profileFutures.add(BukkitAdapter.findOrLookupProfileByName(name)));
+        names.forEach(name -> profileFutures.add(Profiles.findOrLookupProfileByName(name)));
         CompletableFuture.allOf(profileFutures.toArray(new CompletableFuture[0])).thenRun(() -> {
             final List<Profile> profiles = new ArrayList<>();
             profileFutures.forEach(profileFuture -> profiles.add(profileFuture.join()));
@@ -109,7 +109,7 @@ public final class BukkitAdapter {
     }
 
     public static CompletableFuture<Profile> findOrLookupProfileByUniqueId(final UUID uuid) {
-        final Profile found = BukkitAdapter.findProfileByUniqueId(uuid);
+        final Profile found = Profiles.findProfileByUniqueId(uuid);
         if (found.complete()) {
             return CompletableFuture.completedFuture(found);
         }
@@ -119,7 +119,7 @@ public final class BukkitAdapter {
     public static CompletableFuture<Collection<Profile>> findOrLookupProfilesByUniqueIds(final Collection<UUID> uuids) {
         final CompletableFuture<Collection<Profile>> profilesFuture = new CompletableFuture<>();
         final List<CompletableFuture<Profile>> profileFutures = new ArrayList<>();
-        uuids.forEach(uuid -> profileFutures.add(BukkitAdapter.findOrLookupProfileByUniqueId(uuid)));
+        uuids.forEach(uuid -> profileFutures.add(Profiles.findOrLookupProfileByUniqueId(uuid)));
         CompletableFuture.allOf(profileFutures.toArray(new CompletableFuture[0])).thenRun(() -> {
             final List<Profile> profiles = new ArrayList<>();
             profileFutures.forEach(profileFuture -> profiles.add(profileFuture.join()));
