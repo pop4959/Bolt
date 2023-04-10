@@ -489,14 +489,6 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return bolt.getBoltPlayer(uuid);
     }
 
-    public boolean isProtectable(final Block block) {
-        return DEBUG || protectableBlocks.containsKey(block.getType());
-    }
-
-    public boolean isProtectable(final Entity entity) {
-        return DEBUG || protectableEntities.containsKey(entity.getType());
-    }
-
     public Access getDefaultAccess(final Block block) {
         return protectableBlocks.get(block.getType());
     }
@@ -511,6 +503,14 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public String getDefaultAccessType() {
         return defaultAccessType;
+    }
+
+    public boolean isProtectable(final Block block) {
+        return DEBUG || protectableBlocks.containsKey(block.getType());
+    }
+
+    public boolean isProtectable(final Entity entity) {
+        return DEBUG || protectableEntities.containsKey(entity.getType());
     }
 
     public Protection findProtection(final Block block) {
