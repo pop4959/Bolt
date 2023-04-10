@@ -537,43 +537,31 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return protection != null ? protection : matchProtection(entity);
     }
 
-    public void saveProtection(final Protection protection) {
-        if (protection instanceof final BlockProtection blockProtection) {
-            bolt.getStore().saveBlockProtection(blockProtection);
-        } else if (protection instanceof final EntityProtection entityProtection) {
-            bolt.getStore().saveEntityProtection(entityProtection);
-        }
-    }
-
-    public void removeProtection(final Protection protection) {
-        if (protection instanceof final BlockProtection blockProtection) {
-            bolt.getStore().removeBlockProtection(blockProtection);
-        } else if (protection instanceof final EntityProtection entityProtection) {
-            bolt.getStore().removeEntityProtection(entityProtection);
-        }
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    @Override
     public boolean canAccess(final Block block, final Player player, final String... permissions) {
-        final Protection protection = findProtection(block);
-        return protection == null || canAccess(protection, player.getUniqueId(), permissions);
+        return canAccess(findProtection(block), player.getUniqueId(), permissions);
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    @Override
     public boolean canAccess(final Entity entity, final Player player, final String... permissions) {
-        final Protection protection = findProtection(entity);
-        return protection == null || canAccess(protection, player.getUniqueId(), permissions);
+        return canAccess(findProtection(entity), player.getUniqueId(), permissions);
     }
 
+    @Override
     public boolean canAccess(final Protection protection, final Player player, final String... permissions) {
         return canAccess(protection, player.getUniqueId(), permissions);
     }
 
+    @Override
     public boolean canAccess(final Protection protection, final UUID uuid, final String... permissions) {
         return canAccess(protection, new BukkitPlayerResolver(bolt, uuid), permissions);
     }
 
+    @Override
     public boolean canAccess(final Protection protection, final SourceResolver sourceResolver, String... permissions) {
+        if (protection == null) {
+            return true;
+        }
         final Source ownerSource = Source.player(protection.getOwner());
         if (sourceResolver.resolve(ownerSource) || sourceResolver.resolve(ADMIN_PERMISSION_SOURCE)) {
             return true;
@@ -600,6 +588,22 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             }
         }
         return true;
+    }
+
+    public void saveProtection(final Protection protection) {
+        if (protection instanceof final BlockProtection blockProtection) {
+            bolt.getStore().saveBlockProtection(blockProtection);
+        } else if (protection instanceof final EntityProtection entityProtection) {
+            bolt.getStore().saveEntityProtection(entityProtection);
+        }
+    }
+
+    public void removeProtection(final Protection protection) {
+        if (protection instanceof final BlockProtection blockProtection) {
+            bolt.getStore().removeBlockProtection(blockProtection);
+        } else if (protection instanceof final EntityProtection entityProtection) {
+            bolt.getStore().removeEntityProtection(entityProtection);
+        }
     }
 
     private Protection matchProtection(final Block block) {
