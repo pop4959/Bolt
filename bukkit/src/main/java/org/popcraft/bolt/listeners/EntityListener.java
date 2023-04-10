@@ -153,18 +153,20 @@ public final class EntityListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityDeath(final EntityDeathEvent e) {
         final Entity entity = e.getEntity();
-        plugin.findProtection(entity).ifPresent(protection -> {
-            plugin.removeProtection(protection);
-            if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent entityDamageByEntityEvent && getDamagerSource(entityDamageByEntityEvent.getDamager()) instanceof final Player player && plugin.canAccess(protection, player, Permission.DESTROY)) {
-                BoltComponents.sendMessage(
-                        player,
-                        Translation.CLICK_UNLOCKED,
-                        plugin.isUseActionBar(),
-                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
-                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
-                );
-            }
-        });
+        final Protection protection = plugin.findProtection(entity);
+        if (protection == null) {
+            return;
+        }
+        plugin.removeProtection(protection);
+        if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent entityDamageByEntityEvent && getDamagerSource(entityDamageByEntityEvent.getDamager()) instanceof final Player player && plugin.canAccess(protection, player, Permission.DESTROY)) {
+            BoltComponents.sendMessage(
+                    player,
+                    Translation.CLICK_UNLOCKED,
+                    plugin.isUseActionBar(),
+                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
+            );
+        }
     }
 
     @EventHandler
@@ -178,7 +180,7 @@ public final class EntityListener implements Listener {
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
         final Entity damager = getDamagerSource(e.getDamager());
         final Entity entity = e.getEntity();
-        if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) || (!(damager instanceof Player) && plugin.findProtection(entity).isPresent())) {
+        if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) || (!(damager instanceof Player) && plugin.findProtection(entity) != null)) {
             e.setCancelled(true);
         }
     }
@@ -199,20 +201,22 @@ public final class EntityListener implements Listener {
             if (handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) {
                 e.setCancelled(true);
             } else {
-                plugin.findProtection(entity).ifPresent(protection -> {
-                    plugin.removeProtection(protection);
-                    if (plugin.canAccess(protection, player, Permission.DESTROY)) {
-                        BoltComponents.sendMessage(
-                                player,
-                                Translation.CLICK_UNLOCKED,
-                                plugin.isUseActionBar(),
-                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
-                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
-                        );
-                    }
-                });
+                final Protection protection = plugin.findProtection(entity);
+                if (protection == null) {
+                    return;
+                }
+                plugin.removeProtection(protection);
+                if (plugin.canAccess(protection, player, Permission.DESTROY)) {
+                    BoltComponents.sendMessage(
+                            player,
+                            Translation.CLICK_UNLOCKED,
+                            plugin.isUseActionBar(),
+                            Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
+                    );
+                }
             }
-        } else if (plugin.findProtection(entity).isPresent()) {
+        } else if (plugin.findProtection(entity) != null) {
             e.setCancelled(true);
         }
     }
@@ -223,7 +227,7 @@ public final class EntityListener implements Listener {
             return true;
         }
         boolean shouldCancel = false;
-        final Protection protection = plugin.findProtection(entity).orElse(null);
+        final Protection protection = plugin.findProtection(entity);
         if (triggerActions(player, protection, entity)) {
             boltPlayer.setInteracted();
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
@@ -453,31 +457,33 @@ public final class EntityListener implements Listener {
     @EventHandler
     public void onVehicleDestroy(final VehicleDestroyEvent e) {
         final Entity vehicle = e.getVehicle();
-        final Optional<Protection> optionalProtection = plugin.findProtection(vehicle);
-        if (optionalProtection.isPresent()) {
-            final Protection protection = optionalProtection.get();
-            if (!(getDamagerSource(e.getAttacker()) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY)) {
-                e.setCancelled(true);
-            } else {
-                plugin.removeProtection(protection);
-                BoltComponents.sendMessage(
-                        player,
-                        Translation.CLICK_UNLOCKED,
-                        plugin.isUseActionBar(),
-                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
-                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
-                );
-            }
+        final Protection protection = plugin.findProtection(vehicle);
+        if (protection == null) {
+            return;
+        }
+        if (!(getDamagerSource(e.getAttacker()) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY)) {
+            e.setCancelled(true);
+        } else {
+            plugin.removeProtection(protection);
+            BoltComponents.sendMessage(
+                    player,
+                    Translation.CLICK_UNLOCKED,
+                    plugin.isUseActionBar(),
+                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
+            );
         }
     }
 
     @EventHandler
     public void onVehicleEnter(final VehicleEnterEvent e) {
-        plugin.findProtection(e.getEntered()).ifPresent(entityProtection -> {
-            if (plugin.findProtection(e.getVehicle()).map(vehicleProtection -> !plugin.canAccess(vehicleProtection, entityProtection.getOwner(), Permission.MOUNT)).orElse(true)) {
-                e.setCancelled(true);
-            }
-        });
+        final Protection protection = plugin.findProtection(e.getEntered());
+        if (protection == null) {
+            return;
+        }
+        if (!plugin.canAccess(protection, e.getEntered().getUniqueId(), Permission.MOUNT)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -504,7 +510,7 @@ public final class EntityListener implements Listener {
         if (HangingBreakEvent.RemoveCause.ENTITY.equals(e.getCause())) {
             return;
         }
-        if (plugin.findProtection(e.getEntity()).isPresent()) {
+        if (plugin.findProtection(e.getEntity()) != null) {
             e.setCancelled(true);
         }
     }
@@ -514,7 +520,7 @@ public final class EntityListener implements Listener {
         if (EntityDamageEvent.DamageCause.ENTITY_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.PROJECTILE.equals(e.getCause()) || EntityDamageEvent.DamageCause.ENTITY_EXPLOSION.equals(e.getCause())) {
             return;
         }
-        if (plugin.findProtection(e.getEntity()).isPresent()) {
+        if (plugin.findProtection(e.getEntity()) != null) {
             e.setCancelled(true);
         }
     }
@@ -531,12 +537,12 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onSheepDyeWool(final SheepDyeWoolEvent e) {
-        final Optional<Protection> protection = plugin.findProtection(e.getEntity());
-        if (protection.isEmpty()) {
+        final Protection protection = plugin.findProtection(e.getEntity());
+        if (protection == null) {
             return;
         }
         final Player player = e.getPlayer();
-        if (player == null || !plugin.canAccess(protection.get(), player, Permission.INTERACT)) {
+        if (player == null || !plugin.canAccess(protection, player, Permission.INTERACT)) {
             e.setCancelled(true);
         }
     }
@@ -550,7 +556,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onBlockShearEntity(final BlockShearEntityEvent e) {
-        if (plugin.findProtection(e.getEntity()).isPresent()) {
+        if (plugin.findProtection(e.getEntity()) != null) {
             e.setCancelled(true);
         }
     }
@@ -571,7 +577,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onEntityTransform(final EntityTransformEvent e) {
-        if (plugin.findProtection(e.getTransformedEntity()).isPresent()) {
+        if (plugin.findProtection(e.getTransformedEntity()) != null) {
             e.setCancelled(true);
         }
     }
@@ -585,27 +591,31 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onEntityCombustByBlock(final EntityCombustByBlockEvent e) {
-        if (plugin.findProtection(e.getEntity()).isPresent()) {
+        if (plugin.findProtection(e.getEntity()) != null) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onEntityCombustByEntity(final EntityCombustByEntityEvent e) {
-        plugin.findProtection(e.getEntity()).ifPresent(protection -> {
-            if (!(getDamagerSource(e.getCombuster()) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY)) {
-                e.setCancelled(true);
-            }
-        });
+        final Protection protection = plugin.findProtection(e.getEntity());
+        if (protection == null) {
+            return;
+        }
+        if (!(getDamagerSource(e.getCombuster()) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onPlayerBucketEntity(final PlayerBucketEntityEvent e) {
-        plugin.findProtection(e.getEntity()).ifPresent(protection -> {
-            if (!plugin.canAccess(protection, e.getPlayer(), Permission.DESTROY)) {
-                e.setCancelled(true);
-            }
-        });
+        final Protection protection = plugin.findProtection(e.getEntity());
+        if (protection == null) {
+            return;
+        }
+        if (!plugin.canAccess(protection, e.getPlayer(), Permission.DESTROY)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -614,26 +624,40 @@ public final class EntityListener implements Listener {
         if (hitEntity == null) {
             return;
         }
-        plugin.findProtection(hitEntity).ifPresent(protection -> {
-            if (!(getDamagerSource(e.getEntity()) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY)) {
-                e.setCancelled(true);
-            }
-        });
+        final Protection protection = plugin.findProtection(hitEntity);
+        if (protection == null) {
+            return;
+        }
+        if (!(getDamagerSource(e.getEntity()) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onPotionSplash(final PotionSplashEvent e) {
-        e.getAffectedEntities().removeIf(livingEntity -> plugin.findProtection(livingEntity).map(protection -> !(getDamagerSource(e.getEntity()) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY)).orElse(false));
+        e.getAffectedEntities().removeIf(livingEntity -> {
+            final Protection protection = plugin.findProtection(livingEntity);
+            if (protection == null) {
+                return false;
+            }
+            return !(getDamagerSource(e.getEntity()) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY);
+        });
     }
 
     @EventHandler
     public void onAreaEffectCloudApply(final AreaEffectCloudApplyEvent e) {
-        e.getAffectedEntities().removeIf(livingEntity -> plugin.findProtection(livingEntity).map(protection -> !(e.getEntity().getSource() instanceof final Entity entity) || !(getDamagerSource(entity) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY)).orElse(false));
+        e.getAffectedEntities().removeIf(livingEntity -> {
+            final Protection protection = plugin.findProtection(livingEntity);
+            if (protection == null) {
+                return false;
+            }
+            return !(e.getEntity().getSource() instanceof final Entity entity) || !(getDamagerSource(entity) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY);
+        });
     }
 
     @EventHandler
     public void onExplosionPrime(final ExplosionPrimeEvent e) {
-        if (plugin.findProtection(e.getEntity()).isPresent()) {
+        if (plugin.findProtection(e.getEntity()) != null) {
             e.setCancelled(true);
         }
     }
@@ -643,11 +667,13 @@ public final class EntityListener implements Listener {
         if (e.getEntity() instanceof Player) {
             return;
         }
-        plugin.findProtection(e.getBlock()).ifPresent(protection -> {
-            if (!plugin.canAccess(protection, ENTITY_SOURCE_RESOLVER, Permission.ENTITY_INTERACT)) {
-                e.setCancelled(true);
-            }
-        });
+        final Protection protection = plugin.findProtection(e.getBlock());
+        if (protection == null) {
+            return;
+        }
+        if (!plugin.canAccess(protection, ENTITY_SOURCE_RESOLVER, Permission.ENTITY_INTERACT)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -655,11 +681,13 @@ public final class EntityListener implements Listener {
         if (e.getEntity() instanceof Player) {
             return;
         }
-        plugin.findProtection(e.getBlock()).ifPresent(protection -> {
-            if (!plugin.canAccess(protection, ENTITY_SOURCE_RESOLVER, Permission.ENTITY_BREAK_DOOR)) {
-                e.setCancelled(true);
-            }
-        });
+        final Protection protection = plugin.findProtection(e.getBlock());
+        if (protection == null) {
+            return;
+        }
+        if (!plugin.canAccess(protection, ENTITY_SOURCE_RESOLVER, Permission.ENTITY_BREAK_DOOR)) {
+            e.setCancelled(true);
+        }
     }
 
     private Entity getDamagerSource(final Entity damager) {

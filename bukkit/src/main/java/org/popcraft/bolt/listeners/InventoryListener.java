@@ -169,7 +169,7 @@ public final class InventoryListener implements Listener {
             if (inventoryLocation != null) {
                 final Block block = inventoryLocation.getBlock();
                 if (blockTypes.contains(block.getType())) {
-                    return plugin.findProtection(block).orElse(null);
+                    return plugin.findProtection(block);
                 }
             }
         }
@@ -178,11 +178,11 @@ public final class InventoryListener implements Listener {
 
     private Protection getHolderProtection(final InventoryHolder inventoryHolder) {
         if (inventoryHolder instanceof final Entity entity) {
-            return plugin.findProtection(entity).orElse(null);
+            return plugin.findProtection(entity);
         } else if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
-            return plugin.findProtection(blockInventoryHolder.getBlock()).orElse(null);
+            return plugin.findProtection(blockInventoryHolder.getBlock());
         } else if (inventoryHolder instanceof final DoubleChest doubleChest) {
-            return plugin.findProtection(doubleChest.getLocation().getBlock()).orElse(null);
+            return plugin.findProtection(doubleChest.getLocation().getBlock());
         } else {
             return null;
         }

@@ -92,7 +92,7 @@ public final class BlockListener implements Listener {
             e.setCancelled(true);
             return;
         }
-        final Protection protection = plugin.findProtection(clicked).orElse(null);
+        final Protection protection = plugin.findProtection(clicked);
         if (triggerActions(player, protection, clicked)) {
             boltPlayer.setInteracted();
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
@@ -351,7 +351,7 @@ public final class BlockListener implements Listener {
         if (defaultAccess == null) {
             return;
         }
-        if (plugin.findProtection(block).isPresent()) {
+        if (plugin.findProtection(block) != null) {
             return;
         }
         final BlockProtection newProtection = BukkitAdapter.createBlockProtection(block, player.getUniqueId(), defaultAccess.type());
@@ -370,24 +370,24 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockBreak(final BlockBreakEvent e) {
         final Block block = e.getBlock();
-        final Optional<Protection> optionalProtection = plugin.findProtection(block);
+        final Protection protection = plugin.findProtection(block);
         final Player player = e.getPlayer();
-        if (optionalProtection.isPresent()) {
-            final Protection protection = optionalProtection.get();
-            if (plugin.canAccess(protection, player, Permission.DESTROY)) {
-                if (protection instanceof BlockProtection) {
-                    plugin.removeProtection(protection);
-                    BoltComponents.sendMessage(
-                            player,
-                            Translation.CLICK_UNLOCKED,
-                            plugin.isUseActionBar(),
-                            Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
-                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
-                    );
-                }
-            } else {
-                e.setCancelled(true);
+        if (protection == null) {
+            return;
+        }
+        if (plugin.canAccess(protection, player, Permission.DESTROY)) {
+            if (protection instanceof BlockProtection) {
+                plugin.removeProtection(protection);
+                BoltComponents.sendMessage(
+                        player,
+                        Translation.CLICK_UNLOCKED,
+                        plugin.isUseActionBar(),
+                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
+                );
             }
+        } else {
+            e.setCancelled(true);
         }
     }
 
@@ -415,11 +415,11 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onStructureGrow(final StructureGrowEvent e) {
         final Block growingBlock = e.getLocation().getBlock();
-        if (plugin.findProtection(growingBlock).isPresent()) {
+        if (plugin.findProtection(growingBlock) != null) {
             e.setCancelled(true);
             return;
         }
-        e.getBlocks().removeIf(blockState -> plugin.findProtection(blockState.getBlock()).isPresent());
+        e.getBlocks().removeIf(blockState -> plugin.findProtection(blockState.getBlock()) != null);
     }
 
     @EventHandler
@@ -427,7 +427,7 @@ public final class BlockListener implements Listener {
         if (Tag.DOORS.isTagged(e.getBlock().getType())) {
             return;
         }
-        if (plugin.findProtection(e.getBlock()).isPresent()) {
+        if (plugin.findProtection(e.getBlock()) != null) {
             e.setCancelled(true);
         }
     }
@@ -435,7 +435,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockMultiPlace(final BlockMultiPlaceEvent e) {
         for (final BlockState blockState : e.getReplacedBlockStates()) {
-            if (plugin.findProtection(blockState.getBlock()).isPresent()) {
+            if (plugin.findProtection(blockState.getBlock()) != null) {
                 e.setCancelled(true);
                 return;
             }
@@ -444,14 +444,14 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockFromTo(final BlockFromToEvent e) {
-        if (plugin.findProtection(e.getToBlock()).isPresent()) {
+        if (plugin.findProtection(e.getToBlock()) != null) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onBlockFade(final BlockFadeEvent e) {
-        if (plugin.findProtection(e.getBlock()).isPresent()) {
+        if (plugin.findProtection(e.getBlock()) != null) {
             e.setCancelled(true);
         }
     }
@@ -459,7 +459,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockPistonRetract(final BlockPistonRetractEvent e) {
         for (final Block block : e.getBlocks()) {
-            if (plugin.findProtection(block).isPresent()) {
+            if (plugin.findProtection(block) != null) {
                 e.setCancelled(true);
                 return;
             }
@@ -470,12 +470,12 @@ public final class BlockListener implements Listener {
     public void onBlockPistonExtend(final BlockPistonExtendEvent e) {
         final List<Block> blocks = e.getBlocks();
         for (final Block block : blocks) {
-            if (plugin.findProtection(block).isPresent()) {
+            if (plugin.findProtection(block) != null) {
                 e.setCancelled(true);
                 return;
             }
             final BoundingBox moveArea = block.getBoundingBox().shift(e.getDirection().getDirection());
-            if (!block.getWorld().getNearbyEntities(moveArea, entity -> plugin.findProtection(entity).isPresent()).isEmpty()) {
+            if (!block.getWorld().getNearbyEntities(moveArea, entity -> plugin.findProtection(entity) != null).isEmpty()) {
                 e.setCancelled(true);
                 return;
             }
@@ -483,7 +483,7 @@ public final class BlockListener implements Listener {
         if (blocks.isEmpty()) {
             final Block piston = e.getBlock();
             final BoundingBox moveArea = piston.getBoundingBox().shift(e.getDirection().getDirection());
-            if (!piston.getWorld().getNearbyEntities(moveArea, entity -> plugin.findProtection(entity).isPresent()).isEmpty()) {
+            if (!piston.getWorld().getNearbyEntities(moveArea, entity -> plugin.findProtection(entity) != null).isEmpty()) {
                 e.setCancelled(true);
             }
         }
@@ -491,31 +491,33 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockExplode(final BlockExplodeEvent e) {
-        e.blockList().removeIf(block -> plugin.findProtection(block).isPresent());
+        e.blockList().removeIf(block -> plugin.findProtection(block) != null);
     }
 
     @EventHandler
     public void onEntityExplode(final EntityExplodeEvent e) {
-        e.blockList().removeIf(block -> plugin.findProtection(block).isPresent());
+        e.blockList().removeIf(block -> plugin.findProtection(block) != null);
     }
 
     @EventHandler
     public void onSpongeAbsorb(final SpongeAbsorbEvent e) {
-        if (plugin.findProtection(e.getBlock()).isPresent()) {
+        if (plugin.findProtection(e.getBlock()) != null) {
             e.setCancelled(true);
             return;
         }
-        e.getBlocks().removeIf(blockState -> plugin.findProtection(blockState.getBlock()).isPresent());
+        e.getBlocks().removeIf(blockState -> plugin.findProtection(blockState.getBlock()) != null);
     }
 
     @EventHandler
     public void onBlockIgnite(final BlockIgniteEvent e) {
-        plugin.findProtection(e.getBlock()).ifPresent(protection -> {
-            final Player player = e.getPlayer();
-            if (player == null || !plugin.canAccess(protection, player, Permission.INTERACT)) {
-                e.setCancelled(true);
-            }
-        });
+        final Protection protection = plugin.findProtection(e.getBlock());
+        if (protection == null) {
+            return;
+        }
+        final Player player = e.getPlayer();
+        if (player == null || !plugin.canAccess(protection, player, Permission.INTERACT)) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -536,14 +538,14 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockForm(final BlockFormEvent e) {
-        if (plugin.findProtection(e.getBlock()).isPresent()) {
+        if (plugin.findProtection(e.getBlock()) != null) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onBlockSpread(final BlockSpreadEvent e) {
-        if (plugin.findProtection(e.getBlock()).isPresent()) {
+        if (plugin.findProtection(e.getBlock()) != null) {
             e.setCancelled(true);
         }
     }
@@ -551,7 +553,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onLeavesDecay(final LeavesDecayEvent e) {
         final Block block = e.getBlock();
-        if (plugin.findProtection(e.getBlock()).isPresent()) {
+        if (plugin.findProtection(e.getBlock()) != null) {
             if (block.getBlockData() instanceof final Leaves leaves) {
                 leaves.setPersistent(true);
             }
@@ -561,11 +563,13 @@ public final class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockRedstone(final BlockRedstoneEvent e) {
-        plugin.findProtection(e.getBlock()).ifPresent(protection -> {
-            if (!plugin.canAccess(protection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
-                e.setNewCurrent(e.getOldCurrent());
-            }
-        });
+        final Protection protection = plugin.findProtection(e.getBlock());
+        if (protection == null) {
+            return;
+        }
+        if (!plugin.canAccess(protection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
+            e.setNewCurrent(e.getOldCurrent());
+        }
     }
 
     @EventHandler
@@ -589,7 +593,7 @@ public final class BlockListener implements Listener {
     @EventHandler
     public void onBlockDispense(final BlockDispenseEvent e) {
         final Block block = e.getBlock();
-        final Protection existingProtection = plugin.findProtection(block).orElse(null);
+        final Protection existingProtection = plugin.findProtection(block);
         if (existingProtection == null) {
             return;
         }

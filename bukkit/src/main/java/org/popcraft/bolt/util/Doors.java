@@ -39,7 +39,7 @@ public final class Doors {
         if (plugin.isDoorsOpenDouble()) {
             final Block hingedBlock = getHingedBlock(block);
             if (hingedBlock != null && isDoor(hingedBlock) && isDoorOpenable(hingedBlock, openIron)) {
-                final Protection hungedProtection = plugin.findProtection(hingedBlock).orElse(null);
+                final Protection hungedProtection = plugin.findProtection(hingedBlock);
                 if (hungedProtection != null && plugin.canAccess(hungedProtection, player, Permission.INTERACT)) {
                     doors.add(hingedBlock);
                 }

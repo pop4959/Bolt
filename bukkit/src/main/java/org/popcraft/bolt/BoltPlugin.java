@@ -138,7 +138,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class BoltPlugin extends JavaPlugin {
+public class BoltPlugin extends JavaPlugin implements BoltAPI {
     public static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("boltDebug", "false"));
     private static final String COMMAND_PERMISSION_KEY = "bolt.command.";
     private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new ArmorStandMatcher(), new BannerMatcher(),
@@ -513,14 +513,14 @@ public class BoltPlugin extends JavaPlugin {
         return defaultAccessType;
     }
 
-    public Optional<Protection> findProtection(final Block block) {
+    public Protection findProtection(final Block block) {
         final Protection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(block)).join();
-        return Optional.ofNullable(protection != null ? protection : matchProtection(block));
+        return protection != null ? protection : matchProtection(block);
     }
 
-    public Optional<Protection> findProtection(final Entity entity) {
+    public Protection findProtection(final Entity entity) {
         final Protection protection = bolt.getStore().loadEntityProtection(entity.getUniqueId()).join();
-        return Optional.ofNullable(protection != null ? protection : matchProtection(entity));
+        return protection != null ? protection : matchProtection(entity);
     }
 
     public void saveProtection(final Protection protection) {
@@ -550,12 +550,14 @@ public class BoltPlugin extends JavaPlugin {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canAccess(final Block block, final Player player, final String... permissions) {
-        return findProtection(block).map(protection -> canAccess(protection, player.getUniqueId(), permissions)).orElse(true);
+        final Protection protection = findProtection(block);
+        return protection == null || canAccess(protection, player.getUniqueId(), permissions);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canAccess(final Entity entity, final Player player, final String... permissions) {
-        return findProtection(entity).map(protection -> canAccess(protection, player.getUniqueId(), permissions)).orElse(true);
+        final Protection protection = findProtection(entity);
+        return protection == null || canAccess(protection, player.getUniqueId(), permissions);
     }
 
     public boolean canAccess(final Protection protection, final Player player, final String... permissions) {
