@@ -17,6 +17,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.popcraft.bolt.access.Access;
@@ -203,6 +204,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         new ConfigMigration(this).convert(protectableBlocks);
         // Future: Move this into LWC Migration
         new TrustMigration(this).convert();
+        getServer().getServicesManager().register(BoltAPI.class, this, this, ServicePriority.Normal);
     }
 
     @Override
@@ -212,6 +214,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         commands.clear();
         getLogger().info(() -> "Flushing protection updates (%d)".formatted(bolt.getStore().pendingSave()));
         bolt.getStore().flush().join();
+        getServer().getServicesManager().unregisterAll(this);
     }
 
     public void reload() {
