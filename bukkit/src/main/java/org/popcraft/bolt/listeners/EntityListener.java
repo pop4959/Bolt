@@ -137,7 +137,7 @@ public final class EntityListener implements Listener {
         if (defaultAccess == null) {
             return;
         }
-        final EntityProtection newProtection = plugin.createEntityProtection(entity, player.getUniqueId(), defaultAccess.type());
+        final EntityProtection newProtection = plugin.createProtection(entity, player.getUniqueId(), defaultAccess.type());
         plugin.saveProtection(newProtection);
         if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
             BoltComponents.sendMessage(
@@ -327,7 +327,7 @@ public final class EntityListener implements Listener {
                         );
                     }
                 } else if (plugin.isProtectable(entity)) {
-                    final EntityProtection newProtection = plugin.createEntityProtection(entity, boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
+                    final EntityProtection newProtection = plugin.createProtection(entity, boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
                     plugin.saveProtection(newProtection);
                     boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(
