@@ -525,15 +525,6 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return findProtection(entity) != null;
     }
 
-    public boolean isProtected(final Protection protection) {
-        if (protection instanceof final BlockProtection blockProtection) {
-            return bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(blockProtection)).join() != null;
-        } else if (protection instanceof final EntityProtection entityProtection) {
-            return bolt.getStore().loadEntityProtection(entityProtection.getId()).join() != null;
-        }
-        return false;
-    }
-
     @Override
     public Protection findProtection(final Block block) {
         final Protection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(block)).join();

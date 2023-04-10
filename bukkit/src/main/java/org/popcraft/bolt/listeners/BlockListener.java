@@ -120,9 +120,6 @@ public final class BlockListener implements Listener {
             }
             if (hasNotifyPermission) {
                 BukkitAdapter.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> {
-                    if (!plugin.isProtected(protection)) {
-                        return;
-                    }
                     final boolean noSpam = plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM);
                     if (noSpam) {
                         return;
@@ -131,7 +128,7 @@ public final class BlockListener implements Listener {
                     final String owner = isYou ? translate(Translation.YOU) : profile.name();
                     if (owner == null) {
                         SchedulerUtil.schedule(plugin, player, () -> {
-                            if (!plugin.isProtected(protection)) {
+                            if (!plugin.isProtected(clicked)) {
                                 return;
                             }
                             BoltComponents.sendMessage(
@@ -144,7 +141,7 @@ public final class BlockListener implements Listener {
                         });
                     } else if (!isYou || player.hasPermission("bolt.protection.notify.self")) {
                         SchedulerUtil.schedule(plugin, player, () -> {
-                            if (!plugin.isProtected(protection)) {
+                            if (!plugin.isProtected(clicked)) {
                                 return;
                             }
                             BoltComponents.sendMessage(
