@@ -490,6 +490,13 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return bolt.getBoltPlayer(uuid);
     }
 
+    public List<String> getPlayersOwnedGroups(final Player player) {
+        return bolt.getStore().loadGroups().join().stream()
+                .filter(group -> group.getOwner().equals(player.getUniqueId()))
+                .map(Group::getName)
+                .toList();
+    }
+
     public Access getDefaultAccess(final Block block) {
         return protectableBlocks.get(block.getType());
     }
@@ -667,12 +674,5 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             }
         }
         return null;
-    }
-
-    public List<String> getPlayersOwnedGroups(final Player player) {
-        return bolt.getStore().loadGroups().join().stream()
-                .filter(group -> group.getOwner().equals(player.getUniqueId()))
-                .map(Group::getName)
-                .toList();
     }
 }
