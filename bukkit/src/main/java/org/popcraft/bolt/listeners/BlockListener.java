@@ -102,7 +102,7 @@ public final class BlockListener implements Listener {
             final boolean canInteract = plugin.canAccess(protection, player, Permission.INTERACT);
             if (canInteract && protection instanceof final BlockProtection blockProtection) {
                 protection.setAccessed(System.currentTimeMillis());
-                plugin.getBolt().getStore().saveBlockProtection(blockProtection);
+                plugin.saveProtection(blockProtection);
             }
             if (!canInteract) {
                 e.setCancelled(true);
@@ -203,7 +203,7 @@ public final class BlockListener implements Listener {
                     }
                 } else if (plugin.isProtectable(block)) {
                     final BlockProtection newProtection = BukkitAdapter.createBlockProtection(block, boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
-                    plugin.getBolt().getStore().saveBlockProtection(newProtection);
+                    plugin.saveProtection(newProtection);
                     boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(
                             player,
@@ -352,7 +352,7 @@ public final class BlockListener implements Listener {
             return;
         }
         final BlockProtection newProtection = BukkitAdapter.createBlockProtection(block, player.getUniqueId(), defaultAccess.type());
-        plugin.getBolt().getStore().saveBlockProtection(newProtection);
+        plugin.saveProtection(newProtection);
         if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
             BoltComponents.sendMessage(
                     player,
@@ -612,7 +612,7 @@ public final class BlockListener implements Listener {
                 return;
             }
             final BlockProtection newProtection = BukkitAdapter.createBlockProtection(placed, existingProtection.getOwner(), existingProtection.getType());
-            plugin.getBolt().getStore().saveBlockProtection(newProtection);
+            plugin.saveProtection(newProtection);
         });
     }
 }

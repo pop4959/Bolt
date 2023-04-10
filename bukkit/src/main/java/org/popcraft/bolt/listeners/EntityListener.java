@@ -138,7 +138,7 @@ public final class EntityListener implements Listener {
             return;
         }
         final EntityProtection newProtection = BukkitAdapter.createEntityProtection(entity, player.getUniqueId(), defaultAccess.type());
-        plugin.getBolt().getStore().saveEntityProtection(newProtection);
+        plugin.saveProtection(newProtection);
         if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
             BoltComponents.sendMessage(
                     player,
@@ -238,7 +238,7 @@ public final class EntityListener implements Listener {
             final boolean canInteract = canAccess && Permission.INTERACT.equals(permission);
             if (canInteract && protection instanceof final EntityProtection entityProtection) {
                 protection.setAccessed(System.currentTimeMillis());
-                plugin.getBolt().getStore().saveEntityProtection(entityProtection);
+                plugin.saveProtection(entityProtection);
             }
             if (!canAccess) {
                 shouldCancel = true;
@@ -328,7 +328,7 @@ public final class EntityListener implements Listener {
                     }
                 } else if (plugin.isProtectable(entity)) {
                     final EntityProtection newProtection = BukkitAdapter.createEntityProtection(entity, boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
-                    plugin.getBolt().getStore().saveEntityProtection(newProtection);
+                    plugin.saveProtection(newProtection);
                     boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(
                             player,

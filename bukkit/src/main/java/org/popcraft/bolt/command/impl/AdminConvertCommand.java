@@ -49,9 +49,8 @@ public class AdminConvertCommand extends BoltCommand {
                 if (throwable != null) {
                     throwable.printStackTrace();
                 }
-                final Store destination = plugin.getBolt().getStore();
                 for (final EntityProtection entityProtection : memoryStore.loadEntityProtections().join()) {
-                    destination.saveEntityProtection(entityProtection);
+                    plugin.saveProtection(entityProtection);
                 }
                 BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED);
             }, SchedulerUtil.executor(plugin, sender));
@@ -93,12 +92,11 @@ public class AdminConvertCommand extends BoltCommand {
                 if (throwable != null) {
                     throwable.printStackTrace();
                 }
-                final Store destination = plugin.getBolt().getStore();
                 for (final BlockProtection blockProtection : memoryStore.loadBlockProtections().join()) {
-                    destination.saveBlockProtection(blockProtection);
+                    plugin.saveProtection(blockProtection);
                 }
                 for (final EntityProtection entityProtection : memoryStore.loadEntityProtections().join()) {
-                    destination.saveEntityProtection(entityProtection);
+                    plugin.saveProtection(entityProtection);
                 }
                 BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED);
                 if (migration.hasEntityBlocks()) {

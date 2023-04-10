@@ -3,6 +3,8 @@ package org.popcraft.bolt;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.SourceResolver;
 
@@ -16,6 +18,14 @@ public interface BoltAPI {
     boolean isProtected(final Block block);
 
     boolean isProtected(final Entity entity);
+
+    BlockProtection loadProtection(final Block block);
+
+    EntityProtection loadProtection(final Entity entity);
+
+    void saveProtection(final Protection protection);
+
+    void removeProtection(final Protection protection);
 
     Protection findProtection(final Block block);
 

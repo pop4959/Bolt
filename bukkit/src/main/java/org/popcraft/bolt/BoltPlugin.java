@@ -118,6 +118,7 @@ import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypeRegistry;
 import org.popcraft.bolt.source.SourceTypes;
+import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitAdapter;
@@ -526,14 +527,44 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     }
 
     @Override
+    public BlockProtection loadProtection(Block block) {
+        final BlockLocation blockLocation = BukkitAdapter.blockLocation(block);
+        return bolt.getStore().loadBlockProtection(blockLocation).join();
+    }
+
+    @Override
+    public EntityProtection loadProtection(Entity entity) {
+        final UUID uuid = entity.getUniqueId();
+        return bolt.getStore().loadEntityProtection(uuid).join();
+    }
+
+    @Override
+    public void saveProtection(final Protection protection) {
+        if (protection instanceof final BlockProtection blockProtection) {
+            bolt.getStore().saveBlockProtection(blockProtection);
+        } else if (protection instanceof final EntityProtection entityProtection) {
+            bolt.getStore().saveEntityProtection(entityProtection);
+        }
+    }
+
+    @Override
+    public void removeProtection(final Protection protection) {
+        if (protection instanceof final BlockProtection blockProtection) {
+            bolt.getStore().removeBlockProtection(blockProtection);
+        } else if (protection instanceof final EntityProtection entityProtection) {
+            bolt.getStore().removeEntityProtection(entityProtection);
+        }
+    }
+
+    @Override
     public Protection findProtection(final Block block) {
-        final Protection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(block)).join();
+        final Protection protection = loadProtection(block);
         return protection != null ? protection : matchProtection(block);
     }
 
     @Override
     public Protection findProtection(final Entity entity) {
-        final Protection protection = bolt.getStore().loadEntityProtection(entity.getUniqueId()).join();
+        final Protection protection = loadProtection(entity);
         return protection != null ? protection : matchProtection(entity);
     }
 
@@ -590,22 +621,6 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return true;
     }
 
-    public void saveProtection(final Protection protection) {
-        if (protection instanceof final BlockProtection blockProtection) {
-            bolt.getStore().saveBlockProtection(blockProtection);
-        } else if (protection instanceof final EntityProtection entityProtection) {
-            bolt.getStore().saveEntityProtection(entityProtection);
-        }
-    }
-
-    public void removeProtection(final Protection protection) {
-        if (protection instanceof final BlockProtection blockProtection) {
-            bolt.getStore().removeBlockProtection(blockProtection);
-        } else if (protection instanceof final EntityProtection entityProtection) {
-            bolt.getStore().removeEntityProtection(entityProtection);
-        }
-    }
-
     private Protection matchProtection(final Block block) {
         for (final BlockMatcher blockMatcher : enabledBlockMatchers) {
             if (blockMatcher.canMatch(block)) {
@@ -613,13 +628,13 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
                 if (optionalMatch.isPresent()) {
                     final Match match = optionalMatch.get();
                     for (final Block matchBlock : match.blocks()) {
-                        final BlockProtection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(matchBlock)).join();
+                        final BlockProtection protection = loadProtection(matchBlock);
                         if (protection != null) {
                             return protection;
                         }
                     }
                     for (final Entity matchEntity : match.entities()) {
-                        final EntityProtection protection = bolt.getStore().loadEntityProtection(matchEntity.getUniqueId()).join();
+                        final EntityProtection protection = loadProtection(matchEntity);
                         if (protection != null) {
                             return protection;
                         }
@@ -637,13 +652,13 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
                 if (optionalMatch.isPresent()) {
                     final Match match = optionalMatch.get();
                     for (final Block matchBlock : match.blocks()) {
-                        final BlockProtection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(matchBlock)).join();
+                        final BlockProtection protection = loadProtection(matchBlock);
                         if (protection != null) {
                             return protection;
                         }
                     }
                     for (final Entity matchEntity : match.entities()) {
-                        final EntityProtection protection = bolt.getStore().loadEntityProtection(matchEntity.getUniqueId()).join();
+                        final EntityProtection protection = loadProtection(matchEntity);
                         if (protection != null) {
                             return protection;
                         }
