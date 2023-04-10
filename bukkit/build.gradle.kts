@@ -8,8 +8,8 @@ repositories {
 dependencies {
     compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.19.4-R0.1-SNAPSHOT")
     compileOnly(group = "org.popcraft", name = "chunky-common", version = "1.3.67")
-    implementation(group = "net.kyori", name = "adventure-api", version = "4.13.0")
-    implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.13.0")
+    implementation(group = "net.kyori", name = "adventure-api", version = "4.13.1")
+    implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.13.1")
     implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.3.0")
     implementation(group = "org.bstats", name = "bstats-bukkit", version = "3.0.1")
     implementation(project(":bolt-common"))
