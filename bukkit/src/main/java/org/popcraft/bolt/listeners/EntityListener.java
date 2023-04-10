@@ -180,7 +180,7 @@ public final class EntityListener implements Listener {
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
         final Entity damager = getDamagerSource(e.getDamager());
         final Entity entity = e.getEntity();
-        if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) || (!(damager instanceof Player) && plugin.findProtection(entity) != null)) {
+        if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) || (!(damager instanceof Player) && plugin.isProtected(entity))) {
             e.setCancelled(true);
         }
     }
@@ -216,7 +216,7 @@ public final class EntityListener implements Listener {
                     );
                 }
             }
-        } else if (plugin.findProtection(entity) != null) {
+        } else if (plugin.isProtected(entity)) {
             e.setCancelled(true);
         }
     }
@@ -510,7 +510,7 @@ public final class EntityListener implements Listener {
         if (HangingBreakEvent.RemoveCause.ENTITY.equals(e.getCause())) {
             return;
         }
-        if (plugin.findProtection(e.getEntity()) != null) {
+        if (plugin.isProtected(e.getEntity())) {
             e.setCancelled(true);
         }
     }
@@ -520,7 +520,7 @@ public final class EntityListener implements Listener {
         if (EntityDamageEvent.DamageCause.ENTITY_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.PROJECTILE.equals(e.getCause()) || EntityDamageEvent.DamageCause.ENTITY_EXPLOSION.equals(e.getCause())) {
             return;
         }
-        if (plugin.findProtection(e.getEntity()) != null) {
+        if (plugin.isProtected(e.getEntity())) {
             e.setCancelled(true);
         }
     }
@@ -556,7 +556,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onBlockShearEntity(final BlockShearEntityEvent e) {
-        if (plugin.findProtection(e.getEntity()) != null) {
+        if (plugin.isProtected(e.getEntity())) {
             e.setCancelled(true);
         }
     }
@@ -577,7 +577,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onEntityTransform(final EntityTransformEvent e) {
-        if (plugin.findProtection(e.getTransformedEntity()) != null) {
+        if (plugin.isProtected(e.getTransformedEntity())) {
             e.setCancelled(true);
         }
     }
@@ -591,7 +591,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onEntityCombustByBlock(final EntityCombustByBlockEvent e) {
-        if (plugin.findProtection(e.getEntity()) != null) {
+        if (plugin.isProtected(e.getEntity())) {
             e.setCancelled(true);
         }
     }
@@ -657,7 +657,7 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onExplosionPrime(final ExplosionPrimeEvent e) {
-        if (plugin.findProtection(e.getEntity()) != null) {
+        if (plugin.isProtected(e.getEntity())) {
             e.setCancelled(true);
         }
     }

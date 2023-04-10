@@ -9,6 +9,10 @@ public interface BoltAPI {
 
     boolean isProtectable(final Entity entity);
 
+    boolean isProtected(final Block block);
+
+    boolean isProtected(final Entity entity);
+
     Protection findProtection(final Block block);
 
     Protection findProtection(final Entity entity);
