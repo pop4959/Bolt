@@ -2,14 +2,12 @@ package org.popcraft.bolt.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.profile.PlayerProfile;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.data.Profile;
 import org.popcraft.bolt.data.ProfileCache;
 import org.popcraft.bolt.data.SimpleProfileCache;
-import org.popcraft.bolt.protection.BlockProtection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,14 +24,6 @@ public final class BukkitAdapter {
     public static final UUID NIL_UUID = UUID.fromString(NIL_UUID_STRING);
 
     private BukkitAdapter() {
-    }
-
-    public static BlockLocation blockLocation(final Block block) {
-        return new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
-    }
-
-    public static BlockLocation blockLocation(final BlockProtection blockProtection) {
-        return new BlockLocation(blockProtection.getWorld(), blockProtection.getX(), blockProtection.getY(), blockProtection.getZ());
     }
 
     public static Profile findProfileByName(final String name) {

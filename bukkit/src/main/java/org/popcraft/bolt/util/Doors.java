@@ -50,7 +50,7 @@ public final class Doors {
         if (doorsCloseAfter > 0) {
             doors.add(block);
             doors.forEach(door -> {
-                final BlockLocation doorBlockLocation = BukkitAdapter.blockLocation(door);
+                final BlockLocation doorBlockLocation = new BlockLocation(door.getWorld().getName(), door.getX(), door.getY(), door.getZ());
                 CLOSING.compute(doorBlockLocation, ((blockLocation, counter) -> counter == null ? 1 : counter + 1));
                 SchedulerUtil.schedule(plugin, player, () -> {
                     final int count = CLOSING.compute(doorBlockLocation, (blockLocation, counter) -> counter == null ? 0 : counter - 1);

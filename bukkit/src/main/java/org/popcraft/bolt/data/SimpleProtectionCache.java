@@ -4,7 +4,6 @@ import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
-import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Metrics;
 
@@ -23,7 +22,7 @@ public class SimpleProtectionCache implements Store {
 
     public SimpleProtectionCache(final Store backingStore) {
         this.backingStore = backingStore;
-        backingStore.loadBlockProtections().join().forEach(blockProtection -> cachedBlocks.putIfAbsent(BukkitAdapter.blockLocation(blockProtection), blockProtection));
+        backingStore.loadBlockProtections().join().forEach(blockProtection -> cachedBlocks.putIfAbsent(BlockLocation.fromProtection(blockProtection), blockProtection));
         backingStore.loadEntityProtections().join().forEach(entityProtection -> cachedEntities.putIfAbsent(entityProtection.getId(), entityProtection));
         backingStore.loadGroups().join().forEach(group -> cachedGroups.putIfAbsent(group.getName(), group));
         backingStore.loadAccessLists().join().forEach(accessList -> cachedAccessLists.putIfAbsent(accessList.getOwner(), accessList));
@@ -43,13 +42,13 @@ public class SimpleProtectionCache implements Store {
 
     @Override
     public void saveBlockProtection(BlockProtection protection) {
-        cachedBlocks.put(BukkitAdapter.blockLocation(protection), protection);
+        cachedBlocks.put(BlockLocation.fromProtection(protection), protection);
         backingStore.saveBlockProtection(protection);
     }
 
     @Override
     public void removeBlockProtection(BlockProtection protection) {
-        cachedBlocks.remove(BukkitAdapter.blockLocation(protection));
+        cachedBlocks.remove(BlockLocation.fromProtection(protection));
         backingStore.removeBlockProtection(protection);
     }
 

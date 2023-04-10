@@ -12,7 +12,6 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BlockLocation;
-import org.popcraft.bolt.util.BukkitAdapter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -95,7 +94,7 @@ public class BoltMigration {
             connection.setAutoCommit(false);
             for (final BlockProtection blockProtection : plugin.getBolt().getStore().loadBlockProtections().join()) {
                 final String protectionBlock = blockProtection.getBlock();
-                if (existing.contains(BukkitAdapter.blockLocation(blockProtection))) {
+                if (existing.contains(BlockLocation.fromProtection(blockProtection))) {
                     continue;
                 }
                 if (!blockIds.containsKey(protectionBlock)) {

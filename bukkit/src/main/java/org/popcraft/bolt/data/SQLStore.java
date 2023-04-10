@@ -7,7 +7,6 @@ import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.util.BlockLocation;
-import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Metrics;
 
@@ -172,7 +171,7 @@ public class SQLStore implements Store {
 
     @Override
     public void saveBlockProtection(BlockProtection protection) {
-        CompletableFuture.runAsync(() -> saveBlocks.put(BukkitAdapter.blockLocation(protection), protection), executor);
+        CompletableFuture.runAsync(() -> saveBlocks.put(BlockLocation.fromProtection(protection), protection), executor);
     }
 
     private void saveBlockProtectionNow(BlockProtection protection) {
@@ -197,7 +196,7 @@ public class SQLStore implements Store {
 
     @Override
     public void removeBlockProtection(BlockProtection protection) {
-        CompletableFuture.runAsync(() -> removeBlocks.put(BukkitAdapter.blockLocation(protection), protection), executor);
+        CompletableFuture.runAsync(() -> removeBlocks.put(BlockLocation.fromProtection(protection), protection), executor);
     }
 
     private void removeBlockProtectionNow(BlockProtection protection) {

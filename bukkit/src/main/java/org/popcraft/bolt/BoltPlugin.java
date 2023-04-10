@@ -122,7 +122,6 @@ import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
-import org.popcraft.bolt.util.BukkitAdapter;
 import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Group;
@@ -550,7 +549,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     @Override
     public BlockProtection loadProtection(Block block) {
-        final BlockLocation blockLocation = BukkitAdapter.blockLocation(block);
+        final BlockLocation blockLocation = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
         return bolt.getStore().loadBlockProtection(blockLocation).join();
     }
 
