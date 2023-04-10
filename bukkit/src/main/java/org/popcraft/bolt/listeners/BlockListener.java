@@ -7,6 +7,8 @@ import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Leaves;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -15,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
@@ -581,5 +584,34 @@ public final class BlockListener implements Listener {
         if (location != null && !plugin.canAccess(location.getBlock(), player, Permission.DEPOSIT, Permission.WITHDRAW)) {
             cancellable.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onBlockDispense(final BlockDispenseEvent e) {
+        final Block block = e.getBlock();
+        final Protection existingProtection = plugin.findProtection(block).orElse(null);
+        if (existingProtection == null) {
+            return;
+        }
+        final BlockData blockData = block.getBlockData();
+        if (!(blockData instanceof final Directional directional)) {
+            return;
+        }
+        final Block placing = block.getRelative(directional.getFacing());
+        if (!Material.AIR.equals(placing.getType())) {
+            return;
+        }
+        final Material placingType = e.getItem().getType();
+        SchedulerUtil.schedule(plugin, block.getLocation(), () -> {
+            final Block placed = placing.getWorld().getBlockAt(placing.getLocation());
+            if (!placed.getType().equals(placingType)) {
+                return;
+            }
+            if (!plugin.isProtectable(placed)) {
+                return;
+            }
+            final BlockProtection newProtection = BukkitAdapter.createBlockProtection(placed, existingProtection.getOwner(), existingProtection.getType());
+            plugin.getBolt().getStore().saveBlockProtection(newProtection);
+        });
     }
 }
