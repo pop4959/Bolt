@@ -19,6 +19,10 @@ public interface BoltAPI {
 
     boolean isProtected(final Entity entity);
 
+    BlockProtection createBlockProtection(final Block block, final UUID owner, final String type);
+
+    EntityProtection createEntityProtection(final Entity entity, final UUID owner, final String type);
+
     BlockProtection loadProtection(final Block block);
 
     EntityProtection loadProtection(final Entity entity);

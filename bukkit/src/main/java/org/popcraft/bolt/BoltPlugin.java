@@ -537,6 +537,18 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     }
 
     @Override
+    public BlockProtection createBlockProtection(final Block block, final UUID owner, final String type) {
+        final long now = System.currentTimeMillis();
+        return new BlockProtection(UUID.randomUUID(), owner, type, now, now, new HashMap<>(), block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), block.getType().name());
+    }
+
+    @Override
+    public EntityProtection createEntityProtection(final Entity entity, final UUID owner, final String type) {
+        final long now = System.currentTimeMillis();
+        return new EntityProtection(entity.getUniqueId(), owner, type, now, now, new HashMap<>(), entity.getType().name());
+    }
+
+    @Override
     public BlockProtection loadProtection(Block block) {
         final BlockLocation blockLocation = BukkitAdapter.blockLocation(block);
         return bolt.getStore().loadBlockProtection(blockLocation).join();

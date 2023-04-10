@@ -6,7 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
-import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.data.migration.lwc.BoltMigration;
 import org.popcraft.bolt.data.migration.lwc.LWCMigration;
 import org.popcraft.bolt.lang.Translation;

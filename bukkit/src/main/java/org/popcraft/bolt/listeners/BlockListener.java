@@ -202,7 +202,7 @@ public final class BlockListener implements Listener {
                         );
                     }
                 } else if (plugin.isProtectable(block)) {
-                    final BlockProtection newProtection = BukkitAdapter.createBlockProtection(block, boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
+                    final BlockProtection newProtection = plugin.createBlockProtection(block, boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
                     plugin.saveProtection(newProtection);
                     boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(
@@ -351,7 +351,7 @@ public final class BlockListener implements Listener {
         if (plugin.isProtected(block)) {
             return;
         }
-        final BlockProtection newProtection = BukkitAdapter.createBlockProtection(block, player.getUniqueId(), defaultAccess.type());
+        final BlockProtection newProtection = plugin.createBlockProtection(block, player.getUniqueId(), defaultAccess.type());
         plugin.saveProtection(newProtection);
         if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
             BoltComponents.sendMessage(
@@ -611,7 +611,7 @@ public final class BlockListener implements Listener {
             if (!plugin.isProtectable(placed)) {
                 return;
             }
-            final BlockProtection newProtection = BukkitAdapter.createBlockProtection(placed, existingProtection.getOwner(), existingProtection.getType());
+            final BlockProtection newProtection = plugin.createBlockProtection(placed, existingProtection.getOwner(), existingProtection.getType());
             plugin.saveProtection(newProtection);
         });
     }
