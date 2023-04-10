@@ -505,10 +505,12 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return defaultAccessType;
     }
 
+    @Override
     public boolean isProtectable(final Block block) {
         return DEBUG || protectableBlocks.containsKey(block.getType());
     }
 
+    @Override
     public boolean isProtectable(final Entity entity) {
         return DEBUG || protectableEntities.containsKey(entity.getType());
     }
@@ -532,11 +534,13 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return false;
     }
 
+    @Override
     public Protection findProtection(final Block block) {
         final Protection protection = bolt.getStore().loadBlockProtection(BukkitAdapter.blockLocation(block)).join();
         return protection != null ? protection : matchProtection(block);
     }
 
+    @Override
     public Protection findProtection(final Entity entity) {
         final Protection protection = bolt.getStore().loadEntityProtection(entity.getUniqueId()).join();
         return protection != null ? protection : matchProtection(entity);
