@@ -31,7 +31,7 @@ public class ConfigMigration {
     }
 
     public void convert(final Map<Material, Access> protectableBlocks) {
-        if (!plugin.getBolt().getStore().loadBlockProtections().join().isEmpty()) {
+        if (!plugin.loadProtections().isEmpty()) {
             return;
         }
         convertCore(protectableBlocks);

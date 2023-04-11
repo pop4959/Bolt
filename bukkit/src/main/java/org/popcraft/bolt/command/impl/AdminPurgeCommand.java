@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
-import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.Profiles;
@@ -34,13 +33,9 @@ public class AdminPurgeCommand extends BoltCommand {
         final String owner = arguments.next();
         Profiles.findOrLookupProfileByName(owner).thenAccept(profile -> {
             if (profile.uuid() != null) {
-                final Store store = plugin.getBolt().getStore();
-                store.loadBlockProtections().join().stream()
+                plugin.loadProtections().stream()
                         .filter(protection -> protection.getOwner().equals(profile.uuid()))
-                        .forEach(store::removeBlockProtection);
-                store.loadEntityProtections().join().stream()
-                        .filter(protection -> protection.getOwner().equals(profile.uuid()))
-                        .forEach(store::removeEntityProtection);
+                        .forEach(plugin::removeProtection);
                 SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                         player,
                         Translation.PURGE,

@@ -8,6 +8,7 @@ import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.SourceResolver;
 
+import java.util.Collection;
 import java.util.UUID;
 
 public interface BoltAPI {
@@ -22,6 +23,8 @@ public interface BoltAPI {
     BlockProtection createProtection(final Block block, final UUID owner, final String type);
 
     EntityProtection createProtection(final Entity entity, final UUID owner, final String type);
+
+    Collection<Protection> loadProtections();
 
     BlockProtection loadProtection(final Block block);
 

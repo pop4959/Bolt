@@ -129,6 +129,7 @@ import org.popcraft.bolt.util.Group;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -545,6 +546,14 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     public EntityProtection createProtection(final Entity entity, final UUID owner, final String type) {
         final long now = System.currentTimeMillis();
         return new EntityProtection(entity.getUniqueId(), owner, type, now, now, new HashMap<>(), entity.getType().name());
+    }
+
+    @Override
+    public Collection<Protection> loadProtections() {
+        final Collection<Protection> protections = new ArrayList<>();
+        protections.addAll(bolt.getStore().loadBlockProtections().join());
+        protections.addAll(bolt.getStore().loadEntityProtections().join());
+        return protections;
     }
 
     @Override

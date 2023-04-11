@@ -8,7 +8,6 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.data.Profile;
-import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
@@ -55,18 +54,11 @@ public class AdminTransferCommand extends BoltCommand {
                             Placeholder.component(Translation.Placeholder.PLAYER, Component.text(newOwner))
                     ));
                 } else {
-                    final Store store = plugin.getBolt().getStore();
-                    store.loadBlockProtections().join().stream()
+                    plugin.loadProtections().stream()
                             .filter(protection -> protection.getOwner().equals(ownerProfile.uuid()))
                             .forEach(protection -> {
                                 protection.setOwner(newOwnerProfile.uuid());
-                                store.saveBlockProtection(protection);
-                            });
-                    store.loadEntityProtections().join().stream()
-                            .filter(protection -> protection.getOwner().equals(ownerProfile.uuid()))
-                            .forEach(protection -> {
-                                protection.setOwner(newOwnerProfile.uuid());
-                                store.saveEntityProtection(protection);
+                                plugin.saveProtection(protection);
                             });
                     SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                             player,
