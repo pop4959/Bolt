@@ -17,6 +17,8 @@ commands:
     description: Shortcut unlock command for convenience
     permission: bolt.command.unlock
 permissions:
+  bolt.mod:
+    default: op
   bolt.admin:
     default: op
   bolt.command:

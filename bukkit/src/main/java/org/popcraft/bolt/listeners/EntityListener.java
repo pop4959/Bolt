@@ -343,14 +343,22 @@ public final class EntityListener implements Listener {
             }
             case UNLOCK -> {
                 if (protection != null) {
-                    plugin.removeProtection(protection);
-                    BoltComponents.sendMessage(
-                            player,
-                            Translation.CLICK_UNLOCKED,
-                            plugin.isUseActionBar(),
-                            Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
-                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
-                    );
+                    if (player.hasPermission("bolt.mod") || plugin.canAccess(protection, player, Permission.DESTROY)) {
+                        plugin.removeProtection(protection);
+                        BoltComponents.sendMessage(
+                                player,
+                                Translation.CLICK_UNLOCKED,
+                                plugin.isUseActionBar(),
+                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
+                        );
+                    } else {
+                        BoltComponents.sendMessage(
+                                player,
+                                Translation.CLICK_UNLOCKED_NO_PERMISSION,
+                                plugin.isUseActionBar()
+                        );
+                    }
                 } else {
                     BoltComponents.sendMessage(
                             player,
