@@ -51,3 +51,7 @@ permissions:
     default: op
   bolt.protection.notify.self:
     default: false
+  bolt.type.source.door:
+    default: false
+  bolt.type.access.autoclose:
+    default: false
