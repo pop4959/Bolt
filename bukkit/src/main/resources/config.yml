@@ -106,11 +106,7 @@ entities:
     autoProtect: private
   leash_hitch:
     autoProtect: private
-  boat:
-    autoProtect: private
   chest_boat:
-    autoProtect: private
-  minecart:
     autoProtect: private
   minecart_chest:
     autoProtect: private
