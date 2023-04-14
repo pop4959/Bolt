@@ -15,4 +15,5 @@ public final class DefaultAccess {
     public static final Set<String> PUBLIC = Set.of(Permission.REDSTONE, Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT, Permission.WITHDRAW, Permission.MOUNT);
     public static final Set<String> NORMAL = Set.of(Permission.REDSTONE, Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT, Permission.WITHDRAW, Permission.MOUNT);
     public static final Set<String> ADMIN = Set.of(Permission.REDSTONE, Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT, Permission.WITHDRAW, Permission.MOUNT, Permission.EDIT);
+    public static final Set<String> OWNER = Set.of(Permission.REDSTONE, Permission.INTERACT, Permission.OPEN, Permission.DEPOSIT, Permission.WITHDRAW, Permission.MOUNT, Permission.EDIT, Permission.DESTROY);
 }

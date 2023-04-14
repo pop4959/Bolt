@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.access.AccessRegistry;
+import org.popcraft.bolt.access.DefaultAccess;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.command.impl.AdminCommand;
@@ -623,12 +624,12 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         if (protection == null) {
             return true;
         }
+        final Set<String> heldPermissions = new HashSet<>();
         final Source ownerSource = Source.player(protection.getOwner());
         if (sourceResolver.resolve(ownerSource) || sourceResolver.resolve(ADMIN_PERMISSION_SOURCE)) {
-            return true;
+            heldPermissions.addAll(DefaultAccess.OWNER);
         }
         final AccessRegistry accessRegistry = bolt.getAccessRegistry();
-        final Set<String> heldPermissions = new HashSet<>();
         accessRegistry.getProtectionByType(protection.getType()).ifPresent(access -> heldPermissions.addAll(access.permissions()));
         protection.getAccess().forEach((source, accessType) -> {
             if (sourceResolver.resolve(Source.parse(source))) {
