@@ -50,6 +50,10 @@ public final class Doors {
         if (doorsCloseAfter > 0) {
             doors.add(block);
             doors.forEach(door -> {
+                final Protection protection = plugin.findProtection(door);
+                if (protection == null || !plugin.canAccess(protection, player.getUniqueId(), Permission.AUTO_CLOSE)) {
+                    return;
+                }
                 final BlockLocation doorBlockLocation = new BlockLocation(door.getWorld().getName(), door.getX(), door.getY(), door.getZ());
                 CLOSING.compute(doorBlockLocation, ((blockLocation, counter) -> counter == null ? 1 : counter + 1));
                 SchedulerUtil.schedule(plugin, player, () -> {
