@@ -160,6 +160,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             new SoulFireMatcher(), new FrogspawnMatcher(), new MangrovePropaguleMatcher(), new SkulkVeinMatcher(),
             new HangingSignMatcher(), new PinkPetalsMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
+    private static final Source ADMIN_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.admin");
     private final List<BlockMatcher> enabledBlockMatchers = new ArrayList<>();
     private final List<EntityMatcher> enabledEntityMatchers = new ArrayList<>();
     private final Map<String, BoltCommand> commands = new HashMap<>();
@@ -167,7 +168,6 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private final ProfileCache profileCache = new SimpleProfileCache(profileCachePath);
     private final Map<Material, Access> protectableBlocks = new EnumMap<>(Material.class);
     private final Map<EntityType, Access> protectableEntities = new EnumMap<>(EntityType.class);
-    private final Source ADMIN_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.admin");
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
     private boolean useActionBar;
