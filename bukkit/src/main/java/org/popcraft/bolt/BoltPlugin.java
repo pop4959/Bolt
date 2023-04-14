@@ -624,32 +624,48 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         if (protection == null) {
             return true;
         }
-        final Set<String> heldPermissions = new HashSet<>();
+        final Set<String> unresolved = new HashSet<>(Arrays.asList(permissions));
         final Source ownerSource = Source.player(protection.getOwner());
         if (sourceResolver.resolve(ownerSource) || sourceResolver.resolve(ADMIN_PERMISSION_SOURCE)) {
-            heldPermissions.addAll(DefaultAccess.OWNER);
+            unresolved.removeAll(DefaultAccess.OWNER);
+            if (unresolved.isEmpty()) {
+                return true;
+            }
         }
         final AccessRegistry accessRegistry = bolt.getAccessRegistry();
-        accessRegistry.getProtectionByType(protection.getType()).ifPresent(access -> heldPermissions.addAll(access.permissions()));
-        protection.getAccess().forEach((source, accessType) -> {
-            if (sourceResolver.resolve(Source.parse(source))) {
-                accessRegistry.getAccessByType(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
+        final Access protectionType = accessRegistry.getProtectionByType(protection.getType()).orElse(null);
+        if (protectionType != null) {
+            unresolved.removeAll(protectionType.permissions());
+            if (unresolved.isEmpty()) {
+                return true;
             }
-        });
+        }
+        for (final Map.Entry<String, String> entry : protection.getAccess().entrySet()) {
+            if (sourceResolver.resolve(Source.parse(entry.getKey()))) {
+                final Access accessType = accessRegistry.getAccessByType(entry.getValue()).orElse(null);
+                if (accessType != null) {
+                    unresolved.removeAll(accessType.permissions());
+                    if (unresolved.isEmpty()) {
+                        return true;
+                    }
+                }
+            }
+        }
         final AccessList accessList = bolt.getStore().loadAccessList(protection.getOwner()).join();
         if (accessList != null) {
-            accessList.getAccess().forEach((source, accessType) -> {
-                if (sourceResolver.resolve(Source.parse(source))) {
-                    accessRegistry.getAccessByType(accessType).ifPresent(access -> heldPermissions.addAll(access.permissions()));
+            for (final Map.Entry<String, String> entry : accessList.getAccess().entrySet()) {
+                if (sourceResolver.resolve(Source.parse(entry.getKey()))) {
+                    final Access accessType = accessRegistry.getAccessByType(entry.getValue()).orElse(null);
+                    if (accessType != null) {
+                        unresolved.removeAll(accessType.permissions());
+                        if (unresolved.isEmpty()) {
+                            return true;
+                        }
+                    }
                 }
-            });
-        }
-        for (final String permission : permissions) {
-            if (!heldPermissions.contains(permission)) {
-                return false;
             }
         }
-        return true;
+        return unresolved.isEmpty();
     }
 
     private Protection matchProtection(final Block block) {
