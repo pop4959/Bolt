@@ -10,7 +10,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class CoralMatcher implements BlockMatcher {
@@ -34,17 +33,17 @@ public class CoralMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         for (final BlockFace blockFace : CARDINAL_FACES) {
             final Block adjacent = block.getRelative(blockFace);
             if (adjacent.getBlockData() instanceof final CoralWallFan coralWallFan && blockFace.equals(coralWallFan.getFacing())) {
-                return Optional.of(Match.ofBlocks(Collections.singleton(adjacent)));
+                return Match.ofBlocks(Collections.singleton(adjacent));
             }
         }
         final Block above = block.getRelative(BlockFace.UP);
         if ((Tag.CORALS.isTagged(above.getType()) || DEAD_CORALS.contains(above.getType())) && !(above.getBlockData() instanceof CoralWallFan)) {
-            return Optional.of(Match.ofBlocks(Collections.singleton(above)));
+            return Match.ofBlocks(Collections.singleton(above));
         }
-        return Optional.empty();
+        return null;
     }
 }

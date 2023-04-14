@@ -10,7 +10,6 @@ import org.popcraft.bolt.matcher.Match;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public class BellMatcher implements BlockMatcher {
@@ -33,21 +32,21 @@ public class BellMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         for (final BlockFace blockFace : CARTESIAN_FACES) {
             final Block adjacent = block.getRelative(blockFace);
             if (adjacent.getBlockData() instanceof final Bell bell) {
                 if (Bell.Attachment.CEILING.equals(bell.getAttachment()) && BlockFace.DOWN.equals(blockFace)) {
-                    return Optional.of(Match.ofBlocks(Collections.singleton(adjacent)));
+                    return Match.ofBlocks(Collections.singleton(adjacent));
                 } else if (Bell.Attachment.FLOOR.equals(bell.getAttachment()) && BlockFace.UP.equals(blockFace)) {
-                    return Optional.of(Match.ofBlocks(Collections.singleton(adjacent)));
+                    return Match.ofBlocks(Collections.singleton(adjacent));
                 } else if (Bell.Attachment.SINGLE_WALL.equals(bell.getAttachment()) && blockFace.getOppositeFace().equals(bell.getFacing())) {
-                    return Optional.of(Match.ofBlocks(Collections.singleton(adjacent)));
+                    return Match.ofBlocks(Collections.singleton(adjacent));
                 } else if (Bell.Attachment.DOUBLE_WALL.equals(bell.getAttachment())) {
-                    return Optional.of(Match.ofBlocks(List.of(block.getRelative(bell.getFacing()), block.getRelative(bell.getFacing().getOppositeFace()))));
+                    return Match.ofBlocks(List.of(block.getRelative(bell.getFacing()), block.getRelative(bell.getFacing().getOppositeFace())));
                 }
             }
         }
-        return Optional.empty();
+        return null;
     }
 }

@@ -10,7 +10,6 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class HangingSignMatcher implements BlockMatcher {
@@ -38,15 +37,15 @@ public class HangingSignMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         if (CEILING_HANGING_SIGNS == null) {
-            return Optional.empty();
+            return null;
         }
         final Set<Block> blocks = new HashSet<>();
         Block below = block;
         while (CEILING_HANGING_SIGNS.isTagged((below = below.getRelative(BlockFace.DOWN)).getType())) {
             blocks.add(below);
         }
-        return Optional.of(Match.ofBlocks(blocks));
+        return Match.ofBlocks(blocks);
     }
 }

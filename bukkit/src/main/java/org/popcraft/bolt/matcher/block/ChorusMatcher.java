@@ -9,7 +9,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class ChorusMatcher implements BlockMatcher {
@@ -32,19 +31,19 @@ public class ChorusMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         if (CHORUS.contains(block.getType())) {
             final Set<Block> blocks = new HashSet<>();
             findChorus(blocks, block);
-            return Optional.of(Match.ofBlocks(blocks));
+            return Match.ofBlocks(blocks);
         }
         final Block above = block.getRelative(BlockFace.UP);
         if (CHORUS.contains(above.getType())) {
             final Set<Block> blocks = new HashSet<>();
             findChorus(blocks, above);
-            return Optional.of(Match.ofBlocks(blocks));
+            return Match.ofBlocks(blocks);
         }
-        return Optional.empty();
+        return null;
     }
 
     private void findChorus(final Set<Block> blocks, final Block current) {

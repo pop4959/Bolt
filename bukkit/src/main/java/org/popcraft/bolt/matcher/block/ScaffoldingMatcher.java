@@ -9,7 +9,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class ScaffoldingMatcher implements BlockMatcher {
@@ -32,13 +31,13 @@ public class ScaffoldingMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         if (Material.SCAFFOLDING.equals(block.getType()) || Material.SCAFFOLDING.equals(block.getRelative(BlockFace.UP).getType())) {
             final Set<Block> blocks = new HashSet<>();
             findScaffolding(blocks, block);
-            return Optional.of(Match.ofBlocks(blocks));
+            return Match.ofBlocks(blocks);
         }
-        return Optional.empty();
+        return null;
     }
 
     private void findScaffolding(final Set<Block> scaffolds, final Block current) {

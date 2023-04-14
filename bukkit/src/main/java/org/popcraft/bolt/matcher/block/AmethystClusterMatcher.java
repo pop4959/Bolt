@@ -9,7 +9,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class AmethystClusterMatcher implements BlockMatcher {
@@ -32,13 +31,13 @@ public class AmethystClusterMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         for (final BlockFace blockFace : CARTESIAN_FACES) {
             final Block adjacent = block.getRelative(blockFace);
             if (adjacent.getBlockData() instanceof final AmethystCluster amethystCluster && blockFace.equals(amethystCluster.getFacing())) {
-                return Optional.of(Match.ofBlocks(Collections.singleton(adjacent)));
+                return Match.ofBlocks(Collections.singleton(adjacent));
             }
         }
-        return Optional.empty();
+        return null;
     }
 }

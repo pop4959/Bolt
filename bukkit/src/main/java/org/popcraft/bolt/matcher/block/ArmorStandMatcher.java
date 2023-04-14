@@ -6,7 +6,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
-import java.util.Optional;
 import java.util.Set;
 
 public class ArmorStandMatcher implements BlockMatcher {
@@ -28,7 +27,7 @@ public class ArmorStandMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
-        return Optional.of(Match.ofEntities(block.getWorld().getNearbyEntities(block.getBoundingBox().expand(0, 0, 0, 0, 1, 0), ArmorStand.class::isInstance)));
+    public Match findMatch(Block block) {
+        return Match.ofEntities(block.getWorld().getNearbyEntities(block.getBoundingBox().expand(0, 0, 0, 0, 1, 0), ArmorStand.class::isInstance));
     }
 }

@@ -10,7 +10,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public class TallFlowerMatcher implements BlockMatcher {
@@ -32,20 +31,20 @@ public class TallFlowerMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         if (Tag.TALL_FLOWERS.isTagged(block.getType()) && block.getBlockData() instanceof final Bisected bisected) {
             final Bisected.Half half = bisected.getHalf();
             if (Bisected.Half.BOTTOM.equals(half)) {
-                return Optional.of(Match.ofBlocks(Collections.singleton(block.getRelative(BlockFace.UP))));
+                return Match.ofBlocks(Collections.singleton(block.getRelative(BlockFace.UP)));
             } else {
-                return Optional.of(Match.ofBlocks(Collections.singleton(block.getRelative(BlockFace.DOWN))));
+                return Match.ofBlocks(Collections.singleton(block.getRelative(BlockFace.DOWN)));
             }
         } else {
             final Block above = block.getRelative(BlockFace.UP);
             if (Tag.TALL_FLOWERS.isTagged(above.getType())) {
-                return Optional.of(Match.ofBlocks(List.of(above, above.getRelative(BlockFace.UP))));
+                return Match.ofBlocks(List.of(above, above.getRelative(BlockFace.UP)));
             }
         }
-        return Optional.empty();
+        return null;
     }
 }

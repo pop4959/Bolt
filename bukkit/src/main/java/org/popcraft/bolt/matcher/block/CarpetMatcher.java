@@ -7,7 +7,6 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 public class CarpetMatcher implements BlockMatcher {
@@ -35,11 +34,11 @@ public class CarpetMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         final Block above = block.getRelative(BlockFace.UP);
         if (WOOL_CARPETS.contains(above.getType())) {
-            return Optional.of(Match.ofBlocks(Collections.singleton(above)));
+            return Match.ofBlocks(Collections.singleton(above));
         }
-        return Optional.empty();
+        return null;
     }
 }

@@ -9,7 +9,6 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class DoorMatcher implements BlockMatcher {
@@ -31,7 +30,7 @@ public class DoorMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         final Set<Block> blocks = new HashSet<>();
         if (block.getBlockData() instanceof Door door) {
             if (Bisected.Half.BOTTOM.equals(door.getHalf())) {
@@ -55,6 +54,6 @@ public class DoorMatcher implements BlockMatcher {
                 blocks.add(upperHalf);
             }
         }
-        return Optional.of(Match.ofBlocks(blocks));
+        return Match.ofBlocks(blocks);
     }
 }

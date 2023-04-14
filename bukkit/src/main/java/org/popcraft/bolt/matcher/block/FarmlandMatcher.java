@@ -8,7 +8,6 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 public class FarmlandMatcher implements BlockMatcher {
@@ -30,11 +29,11 @@ public class FarmlandMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         final Block below = block.getRelative(BlockFace.DOWN);
         if (Material.FARMLAND.equals(below.getType())) {
-            return Optional.of(Match.ofBlocks(Collections.singleton(below)));
+            return Match.ofBlocks(Collections.singleton(below));
         }
-        return Optional.empty();
+        return null;
     }
 }

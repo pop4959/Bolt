@@ -3,7 +3,6 @@ package org.popcraft.bolt.matcher;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
-import java.util.Optional;
 import java.util.Set;
 
 public interface Matcher<T> {
@@ -13,5 +12,5 @@ public interface Matcher<T> {
 
     boolean canMatch(T type);
 
-    Optional<Match> findMatch(T type);
+    Match findMatch(T type);
 }

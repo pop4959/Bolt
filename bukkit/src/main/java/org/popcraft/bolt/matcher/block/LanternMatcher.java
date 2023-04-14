@@ -8,7 +8,6 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 public class LanternMatcher implements BlockMatcher {
@@ -30,15 +29,15 @@ public class LanternMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         final Block above = block.getRelative(BlockFace.UP);
         if (above.getBlockData() instanceof final Lantern lantern && !lantern.isHanging()) {
-            return Optional.of(Match.ofBlocks(Collections.singleton(above)));
+            return Match.ofBlocks(Collections.singleton(above));
         }
         final Block below = block.getRelative(BlockFace.DOWN);
         if (below.getBlockData() instanceof final Lantern lantern && lantern.isHanging()) {
-            return Optional.of(Match.ofBlocks(Collections.singleton(below)));
+            return Match.ofBlocks(Collections.singleton(below));
         }
-        return Optional.empty();
+        return null;
     }
 }

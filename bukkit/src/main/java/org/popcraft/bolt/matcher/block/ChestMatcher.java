@@ -9,7 +9,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class ChestMatcher implements BlockMatcher {
@@ -32,7 +31,7 @@ public class ChestMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         if (block.getBlockData() instanceof final Chest chest && !Chest.Type.SINGLE.equals(chest.getType())) {
             final BlockFace adjacentFace = switch (chest.getFacing()) {
                 case NORTH:
@@ -49,10 +48,10 @@ public class ChestMatcher implements BlockMatcher {
             if (adjacentFace != null) {
                 final Block adjacent = block.getRelative(adjacentFace);
                 if (block.getType().equals(adjacent.getType())) {
-                    return Optional.of(Match.ofBlocks(Collections.singleton(adjacent)));
+                    return Match.ofBlocks(Collections.singleton(adjacent));
                 }
             }
         }
-        return Optional.empty();
+        return null;
     }
 }

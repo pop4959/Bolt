@@ -8,7 +8,6 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 public class TechnicalPistonMatcher implements BlockMatcher {
@@ -30,10 +29,10 @@ public class TechnicalPistonMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         if (block.getBlockData() instanceof final TechnicalPiston technicalPiston) {
-            return Optional.of(Match.ofBlocks(Collections.singleton(block.getRelative(technicalPiston.getFacing().getOppositeFace()))));
+            return Match.ofBlocks(Collections.singleton(block.getRelative(technicalPiston.getFacing().getOppositeFace())));
         }
-        return Optional.empty();
+        return null;
     }
 }

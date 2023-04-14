@@ -10,7 +10,6 @@ import org.popcraft.bolt.util.EnumUtil;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class SkulkVeinMatcher implements BlockMatcher {
@@ -39,7 +38,7 @@ public class SkulkVeinMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         final Set<Block> blocks = new HashSet<>();
         for (final BlockFace blockFace : CARTESIAN_FACES) {
             final Block adjacent = block.getRelative(blockFace);
@@ -47,6 +46,6 @@ public class SkulkVeinMatcher implements BlockMatcher {
                 blocks.add(adjacent);
             }
         }
-        return Optional.of(Match.ofBlocks(blocks));
+        return Match.ofBlocks(blocks);
     }
 }

@@ -11,7 +11,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class SignMatcher implements BlockMatcher {
@@ -34,17 +33,17 @@ public class SignMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         final Block above = block.getRelative(BlockFace.UP);
         if (above.getBlockData() instanceof Sign) {
-            return Optional.of(Match.ofBlocks(Collections.singleton(above)));
+            return Match.ofBlocks(Collections.singleton(above));
         }
         for (final BlockFace blockFace : CARDINAL_FACES) {
             final Block wall = block.getRelative(blockFace);
             if (wall.getBlockData() instanceof final WallSign wallSign && blockFace.equals(wallSign.getFacing())) {
-                return Optional.of(Match.ofBlocks(Collections.singleton(wall)));
+                return Match.ofBlocks(Collections.singleton(wall));
             }
         }
-        return Optional.empty();
+        return null;
     }
 }

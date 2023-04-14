@@ -8,7 +8,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class UprootMatcher implements BlockMatcher {
@@ -31,15 +30,15 @@ public class UprootMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         final Block above = block.getRelative(BlockFace.UP);
         if (UPROOT.contains(block.getType()) || UPROOT.contains(above.getType())) {
             final Set<Block> blocks = new HashSet<>();
             for (Block next = block.getRelative(BlockFace.UP); UPROOT.contains(next.getType()); next = next.getRelative(BlockFace.UP)) {
                 blocks.add(next);
             }
-            return Optional.of(Match.ofBlocks(blocks));
+            return Match.ofBlocks(blocks);
         }
-        return Optional.empty();
+        return null;
     }
 }

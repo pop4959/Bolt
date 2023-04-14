@@ -9,7 +9,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class TrapdoorMatcher implements BlockMatcher {
@@ -32,13 +31,13 @@ public class TrapdoorMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         for (final BlockFace blockFace : CARDINAL_FACES) {
             final Block wall = block.getRelative(blockFace);
             if (wall.getBlockData() instanceof final TrapDoor trapDoor && blockFace.equals(trapDoor.getFacing())) {
-                return Optional.of(Match.ofBlocks(Collections.singleton(wall)));
+                return Match.ofBlocks(Collections.singleton(wall));
             }
         }
-        return Optional.empty();
+        return null;
     }
 }

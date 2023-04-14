@@ -654,9 +654,8 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private Protection matchProtection(final Block block) {
         for (final BlockMatcher blockMatcher : enabledBlockMatchers) {
             if (blockMatcher.canMatch(block)) {
-                final Optional<Match> optionalMatch = blockMatcher.findMatch(block);
-                if (optionalMatch.isPresent()) {
-                    final Match match = optionalMatch.get();
+                final Match match = blockMatcher.findMatch(block);
+                if (match != null) {
                     for (final Block matchBlock : match.blocks()) {
                         final BlockProtection protection = loadProtection(matchBlock);
                         if (protection != null) {
@@ -678,9 +677,8 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private Protection matchProtection(final Entity entity) {
         for (final EntityMatcher entityMatcher : enabledEntityMatchers) {
             if (entityMatcher.canMatch(entity)) {
-                final Optional<Match> optionalMatch = entityMatcher.findMatch(entity);
-                if (optionalMatch.isPresent()) {
-                    final Match match = optionalMatch.get();
+                final Match match = entityMatcher.findMatch(entity);
+                if (match != null) {
                     for (final Block matchBlock : match.blocks()) {
                         final BlockProtection protection = loadProtection(matchBlock);
                         if (protection != null) {

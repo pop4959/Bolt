@@ -8,7 +8,6 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class PointedDripstoneMatcher implements BlockMatcher {
@@ -30,14 +29,14 @@ public class PointedDripstoneMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         if (block.getBlockData() instanceof final PointedDripstone pointedDripstone) {
             final Set<Block> blocks = new HashSet<>();
             final BlockFace verticalDirection = pointedDripstone.getVerticalDirection();
             for (Block next = block.getRelative(verticalDirection); next.getBlockData() instanceof final PointedDripstone nextDripstone && verticalDirection.equals(nextDripstone.getVerticalDirection()); next = next.getRelative(verticalDirection)) {
                 blocks.add(next);
             }
-            return Optional.of(Match.ofBlocks(blocks));
+            return Match.ofBlocks(blocks);
         }
         final Block above = block.getRelative(BlockFace.UP);
         if (above.getBlockData() instanceof final PointedDripstone pointedDripstone && BlockFace.UP.equals(pointedDripstone.getVerticalDirection())) {
@@ -45,7 +44,7 @@ public class PointedDripstoneMatcher implements BlockMatcher {
             for (Block next = above; next.getBlockData() instanceof final PointedDripstone nextDripstone && BlockFace.UP.equals(nextDripstone.getVerticalDirection()); next = next.getRelative(BlockFace.UP)) {
                 blocks.add(next);
             }
-            return Optional.of(Match.ofBlocks(blocks));
+            return Match.ofBlocks(blocks);
         }
         final Block below = block.getRelative(BlockFace.DOWN);
         if (below.getBlockData() instanceof final PointedDripstone pointedDripstone && BlockFace.DOWN.equals(pointedDripstone.getVerticalDirection())) {
@@ -53,8 +52,8 @@ public class PointedDripstoneMatcher implements BlockMatcher {
             for (Block next = below; next.getBlockData() instanceof final PointedDripstone nextDripstone && BlockFace.DOWN.equals(nextDripstone.getVerticalDirection()); next = next.getRelative(BlockFace.DOWN)) {
                 blocks.add(next);
             }
-            return Optional.of(Match.ofBlocks(blocks));
+            return Match.ofBlocks(blocks);
         }
-        return Optional.empty();
+        return null;
     }
 }

@@ -11,7 +11,6 @@ import org.bukkit.util.BoundingBox;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class PaintingMatcher implements BlockMatcher {
@@ -33,7 +32,7 @@ public class PaintingMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         final Set<Entity> entities = new HashSet<>();
         block.getWorld().getNearbyEntities(block.getBoundingBox().expand(0.5, 0, 0.5, 0.5, 0, 0.5), Painting.class::isInstance).forEach(entity -> {
             if (entity instanceof final Painting painting) {
@@ -55,6 +54,6 @@ public class PaintingMatcher implements BlockMatcher {
                 }
             }
         });
-        return Optional.of(Match.ofEntities(entities));
+        return Match.ofEntities(entities);
     }
 }

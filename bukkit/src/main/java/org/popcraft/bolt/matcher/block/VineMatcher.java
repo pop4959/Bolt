@@ -9,7 +9,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class VineMatcher implements BlockMatcher {
@@ -32,10 +31,10 @@ public class VineMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         if (Material.VINE.equals(block.getType())) {
             final Set<Block> blocks = findVines(block);
-            return Optional.of(Match.ofBlocks(blocks));
+            return Match.ofBlocks(blocks);
         } else {
             final Set<Block> blocks = new HashSet<>();
             for (final BlockFace blockFace : VINE_FACES) {
@@ -45,7 +44,7 @@ public class VineMatcher implements BlockMatcher {
                     blocks.addAll(findVines(adjacent));
                 }
             }
-            return Optional.of(Match.ofBlocks(blocks));
+            return Match.ofBlocks(blocks);
         }
     }
 

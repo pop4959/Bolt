@@ -10,7 +10,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class PortalMatcher implements BlockMatcher {
@@ -35,7 +34,7 @@ public class PortalMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         final Set<Block> blocks = new HashSet<>();
         for (final BlockFace blockFace : CARTESIAN_FACES) {
             final Block adjacent = block.getRelative(blockFace);
@@ -44,7 +43,7 @@ public class PortalMatcher implements BlockMatcher {
                 findPortal(Axis.X.equals(orientable.getAxis()) ? X_FACES : Z_FACES, blocks, adjacent);
             }
         }
-        return Optional.of(Match.ofBlocks(blocks));
+        return Match.ofBlocks(blocks);
     }
 
     private void findPortal(final EnumSet<BlockFace> faces, final Set<Block> found, final Block current) {

@@ -8,7 +8,6 @@ import org.popcraft.bolt.matcher.Match;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class BigDripleafMatcher implements BlockMatcher {
@@ -31,7 +30,7 @@ public class BigDripleafMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         if (BIG_DRIPLEAF_BLOCKS.contains(block.getType())) {
             final Set<Block> blocks = new HashSet<>();
             final Block below = block.getRelative(BlockFace.DOWN);
@@ -46,7 +45,7 @@ public class BigDripleafMatcher implements BlockMatcher {
                     blocks.add(next);
                 }
             }
-            return Optional.of(Match.ofBlocks(blocks));
+            return Match.ofBlocks(blocks);
         } else {
             final Block above = block.getRelative(BlockFace.UP);
             if (BIG_DRIPLEAF_BLOCKS.contains(above.getType())) {
@@ -54,9 +53,9 @@ public class BigDripleafMatcher implements BlockMatcher {
                 for (Block next = block.getRelative(BlockFace.UP); BIG_DRIPLEAF_BLOCKS.contains(next.getType()); next = next.getRelative(BlockFace.UP)) {
                     blocks.add(next);
                 }
-                return Optional.of(Match.ofBlocks(blocks));
+                return Match.ofBlocks(blocks);
             }
         }
-        return Optional.empty();
+        return null;
     }
 }

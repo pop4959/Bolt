@@ -8,7 +8,6 @@ import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.util.EnumUtil;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 public class FrogspawnMatcher implements BlockMatcher {
@@ -36,11 +35,11 @@ public class FrogspawnMatcher implements BlockMatcher {
     }
 
     @Override
-    public Optional<Match> findMatch(Block block) {
+    public Match findMatch(Block block) {
         final Block above = block.getRelative(BlockFace.UP);
         if (above.getType().equals(FROGSPAWN)) {
-            return Optional.of(Match.ofBlocks(Collections.singleton(above)));
+            return Match.ofBlocks(Collections.singleton(above));
         }
-        return Optional.empty();
+        return null;
     }
 }
