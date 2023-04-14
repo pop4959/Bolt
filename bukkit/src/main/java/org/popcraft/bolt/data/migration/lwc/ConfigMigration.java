@@ -8,8 +8,10 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.access.AccessRegistry;
 import org.popcraft.bolt.access.DefaultAccess;
+import org.popcraft.bolt.util.Permission;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 public class ConfigMigration {
@@ -93,6 +95,9 @@ public class ConfigMigration {
         plugin.getConfig().set("doors.open-double", doubleDoors);
         if (isOpenAndClose) {
             plugin.getConfig().set("doors.close-after", interval);
+            plugin.getConfig().set("access.autoclose.require-permission", true);
+            plugin.getConfig().set("access.autoclose.allows", List.of(Permission.AUTO_CLOSE));
+            plugin.getConfig().set("sources.door.require-permission", true);
         }
         plugin.saveConfig();
         plugin.reload();

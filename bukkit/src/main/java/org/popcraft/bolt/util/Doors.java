@@ -15,6 +15,10 @@ import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceResolver;
+import org.popcraft.bolt.source.SourceTypeResolver;
+import org.popcraft.bolt.source.SourceTypes;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -22,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class Doors {
+    private static final SourceResolver DOOR_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.DOOR));
     private static final Map<BlockLocation, Integer> CLOSING = new ConcurrentHashMap<>();
 
     private Doors() {
@@ -51,7 +56,7 @@ public final class Doors {
             doors.add(block);
             doors.forEach(door -> {
                 final Protection protection = plugin.findProtection(door);
-                if (protection == null || !plugin.canAccess(protection, player.getUniqueId(), Permission.AUTO_CLOSE)) {
+                if (protection == null || (!plugin.canAccess(protection, player.getUniqueId(), Permission.AUTO_CLOSE) && !plugin.canAccess(protection, DOOR_SOURCE_RESOLVER, Permission.AUTO_CLOSE))) {
                     return;
                 }
                 final BlockLocation doorBlockLocation = new BlockLocation(door.getWorld().getName(), door.getX(), door.getY(), door.getZ());

@@ -159,6 +159,10 @@ public class BoltMigration {
                 final DataFlag dataFlag = new DataFlag();
                 dataFlag.setId(ProtectionFlag.HOPPER.ordinal());
                 flags.add(dataFlag);
+            } else if (SourceTypes.DOOR.equals(source.getType())) {
+                final DataFlag dataFlag = new DataFlag();
+                dataFlag.setId(ProtectionFlag.AUTOCLOSE.ordinal());
+                flags.add(dataFlag);
             }
             final Permission.Access permissionAccess = switch (access) {
                 case "normal" -> Permission.Access.PLAYER;

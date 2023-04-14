@@ -147,6 +147,8 @@ public class LWCMigration {
                             access.put(Source.of(SourceTypes.REDSTONE).toString(), defaultAccessAdmin);
                         } else if (flag.getId() == ProtectionFlag.HOPPER.ordinal()) {
                             access.put(Source.of(SourceTypes.BLOCK).toString(), defaultAccessAdmin);
+                        } else if (flag.getId() == ProtectionFlag.AUTOCLOSE.ordinal()) {
+                            access.put(Source.of(SourceTypes.DOOR).toString(), "autoclose");
                         }
                     }
                 }
