@@ -93,12 +93,10 @@ public class ConfigMigration {
         }
         plugin.getConfig().set("doors.open-iron", enabled);
         plugin.getConfig().set("doors.open-double", doubleDoors);
-        if (isOpenAndClose) {
-            plugin.getConfig().set("doors.close-after", interval);
-            plugin.getConfig().set("access.autoclose.require-permission", true);
-            plugin.getConfig().set("access.autoclose.allows", List.of(Permission.AUTO_CLOSE));
-            plugin.getConfig().set("sources.door.require-permission", true);
-        }
+        plugin.getConfig().set("doors.close-after", interval);
+        plugin.getConfig().set("access.autoclose.require-permission", true);
+        plugin.getConfig().set("access.autoclose.allows", List.of(Permission.AUTO_CLOSE));
+        plugin.getConfig().set("sources.door.require-permission", true);
         plugin.saveConfig();
         plugin.reload();
     }
