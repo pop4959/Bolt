@@ -205,10 +205,7 @@ public class SQLStore implements Store {
 
     private void removeBlockProtectionNow(BlockProtection protection) {
         try (final PreparedStatement deleteBlock = connection.prepareStatement(Statements.DELETE_BLOCK.get(configuration.type()).formatted(configuration.prefix()))) {
-            deleteBlock.setString(1, protection.getWorld());
-            deleteBlock.setInt(2, protection.getX());
-            deleteBlock.setInt(3, protection.getY());
-            deleteBlock.setInt(4, protection.getZ());
+            deleteBlock.setString(1, protection.getId().toString());
             deleteBlock.execute();
         } catch (SQLException e) {
             e.printStackTrace();

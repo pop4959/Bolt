@@ -36,6 +36,7 @@ public class Translation {
     public static final String FIND_RESULT = "find_result";
     public static final String FIND_NEXT = "find_next";
     public static final String FIND_NONE = "find_none";
+    public static final String FLUSH = "flush";
     public static final String GROUP_ALREADY_EXISTS = "group_already_exists";
     public static final String GROUP_CREATED = "group_created";
     public static final String GROUP_DELETED = "group_deleted";
@@ -76,6 +77,7 @@ public class Translation {
     public static final String HELP_COMMAND_SHORT_ADMIN_CONVERT = "help_command_short_admin_convert";
     public static final String HELP_COMMAND_SHORT_ADMIN_DEBUG = "help_command_short_admin_debug";
     public static final String HELP_COMMAND_SHORT_ADMIN_FIND = "help_command_short_admin_find";
+    public static final String HELP_COMMAND_SHORT_ADMIN_FLUSH = "help_command_short_admin_flush";
     public static final String HELP_COMMAND_SHORT_ADMIN_PURGE = "help_command_short_admin_purge";
     public static final String HELP_COMMAND_SHORT_ADMIN_RELOAD = "help_command_short_admin_reload";
     public static final String HELP_COMMAND_SHORT_ADMIN_REPORT = "help_command_short_admin_report";
@@ -95,6 +97,7 @@ public class Translation {
     public static final String HELP_COMMAND_LONG_ADMIN_CONVERT = "help_command_long_admin_convert";
     public static final String HELP_COMMAND_LONG_ADMIN_DEBUG = "help_command_long_admin_debug";
     public static final String HELP_COMMAND_LONG_ADMIN_FIND = "help_command_long_admin_find";
+    public static final String HELP_COMMAND_LONG_ADMIN_FLUSH = "help_command_long_admin_flush";
     public static final String HELP_COMMAND_LONG_ADMIN_PURGE = "help_command_long_admin_purge";
     public static final String HELP_COMMAND_LONG_ADMIN_RELOAD = "help_command_long_admin_reload";
     public static final String HELP_COMMAND_LONG_ADMIN_REPORT = "help_command_long_admin_report";

@@ -37,7 +37,7 @@ public enum Statements {
             "REPLACE INTO %sblocks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
     ),
     DELETE_BLOCK(
-            "DELETE FROM %sblocks WHERE world = ? AND x = ? AND y = ? AND z = ?;"
+            "DELETE FROM %sblocks WHERE id = ?;"
     ),
     SELECT_ENTITY_BY_UUID(
             "SELECT * FROM %sentities WHERE id = ?;"

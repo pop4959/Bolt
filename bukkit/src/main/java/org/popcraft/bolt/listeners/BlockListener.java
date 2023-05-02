@@ -391,7 +391,6 @@ public final class BlockListener implements Listener {
                         blockProtection.setX(newBlock.getX());
                         blockProtection.setY(newBlock.getY());
                         blockProtection.setZ(newBlock.getZ());
-                        plugin.removeProtection(protection);
                         plugin.saveProtection(blockProtection);
                         return;
                     }

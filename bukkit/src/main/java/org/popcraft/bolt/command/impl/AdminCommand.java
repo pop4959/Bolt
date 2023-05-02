@@ -25,6 +25,7 @@ public class AdminCommand extends BoltCommand {
                 "convert", new AdminConvertCommand(plugin),
                 "debug", new AdminDebugCommand(plugin),
                 "find", new AdminFindCommand(plugin),
+                "flush", new AdminFlushCommand(plugin),
                 "purge", new AdminPurgeCommand(plugin),
                 "reload", new AdminReloadCommand(plugin),
                 "report", new AdminReportCommand(plugin),
