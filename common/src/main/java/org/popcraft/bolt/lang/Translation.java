@@ -15,6 +15,7 @@ public class Translation {
     public static final String CLICK_LOCKED_ALREADY = "click_locked_already";
     public static final String CLICK_LOCKED_CHANGED = "click_locked_changed";
     public static final String CLICK_NOT_LOCKED = "click_not_locked";
+    public static final String CLICK_NOT_LOCKABLE = "click_not_lockable";
     public static final String CLICK_TRANSFER = "click_transfer";
     public static final String CLICK_TRANSFER_ALL = "click_transfer_all";
     public static final String CLICK_TRANSFER_CONFIRM = "click_transfer_confirm";

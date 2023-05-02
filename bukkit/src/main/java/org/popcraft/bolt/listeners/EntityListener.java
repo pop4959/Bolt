@@ -338,7 +338,12 @@ public final class EntityListener implements Listener {
                             Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(entity))
                     );
                 } else {
-                    return true;
+                    BoltComponents.sendMessage(
+                            player,
+                            Translation.CLICK_NOT_LOCKABLE,
+                            plugin.isUseActionBar(),
+                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(entity))
+                    );
                 }
             }
             case UNLOCK -> {

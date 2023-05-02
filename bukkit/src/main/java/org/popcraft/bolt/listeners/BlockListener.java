@@ -213,7 +213,12 @@ public final class BlockListener implements Listener {
                             Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(block))
                     );
                 } else {
-                    return true;
+                    BoltComponents.sendMessage(
+                            player,
+                            Translation.CLICK_NOT_LOCKABLE,
+                            plugin.isUseActionBar(),
+                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(block))
+                    );
                 }
             }
             case UNLOCK -> {
