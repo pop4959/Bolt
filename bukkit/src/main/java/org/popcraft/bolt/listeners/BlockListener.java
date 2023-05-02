@@ -44,6 +44,7 @@ import org.bukkit.util.BoundingBox;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
@@ -378,7 +379,23 @@ public final class BlockListener implements Listener {
             return;
         }
         if (plugin.canAccess(protection, player, Permission.DESTROY)) {
-            if (protection instanceof BlockProtection) {
+            if (protection instanceof final BlockProtection blockProtection) {
+                // Double chests are a special case where we want to move the protection instead
+                if (plugin.getChestMatcher().canMatch(block)) {
+                    if (!plugin.isProtectedExact(block)) {
+                        return;
+                    }
+                    final Match match = plugin.getChestMatcher().findMatch(block);
+                    final Block newBlock = match == null ? null : match.blocks().stream().findAny().orElse(null);
+                    if (newBlock != null) {
+                        blockProtection.setX(newBlock.getX());
+                        blockProtection.setY(newBlock.getY());
+                        blockProtection.setZ(newBlock.getZ());
+                        plugin.removeProtection(protection);
+                        plugin.saveProtection(blockProtection);
+                        return;
+                    }
+                }
                 plugin.removeProtection(protection);
                 BoltComponents.sendMessage(
                         player,

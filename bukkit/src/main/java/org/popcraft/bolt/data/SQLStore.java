@@ -196,7 +196,11 @@ public class SQLStore implements Store {
 
     @Override
     public void removeBlockProtection(BlockProtection protection) {
-        CompletableFuture.runAsync(() -> removeBlocks.put(BlockLocation.fromProtection(protection), protection), executor);
+        CompletableFuture.runAsync(() -> {
+            final BlockLocation blockLocation = BlockLocation.fromProtection(protection);
+            saveBlocks.remove(blockLocation);
+            removeBlocks.put(blockLocation, protection);
+        }, executor);
     }
 
     private void removeBlockProtectionNow(BlockProtection protection) {
@@ -291,7 +295,10 @@ public class SQLStore implements Store {
 
     @Override
     public void removeEntityProtection(EntityProtection protection) {
-        CompletableFuture.runAsync(() -> removeEntities.put(protection.getId(), protection), executor);
+        CompletableFuture.runAsync(() -> {
+            saveEntities.remove(protection.getId());
+            removeEntities.put(protection.getId(), protection);
+        }, executor);
     }
 
     private void removeEntityProtectionNow(EntityProtection protection) {

@@ -144,8 +144,9 @@ import java.util.stream.Collectors;
 public class BoltPlugin extends JavaPlugin implements BoltAPI {
     public static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("boltDebug", "false"));
     private static final String COMMAND_PERMISSION_KEY = "bolt.command.";
-    private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(new ArmorStandMatcher(), new BannerMatcher(),
-            new BedMatcher(), new ChestMatcher(), new DoorMatcher(), new LeashHitchMatcher(),
+    private static final BlockMatcher CHEST_MATCHER = new ChestMatcher();
+    private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(CHEST_MATCHER, new ArmorStandMatcher(),
+            new BannerMatcher(), new BedMatcher(), new DoorMatcher(), new LeashHitchMatcher(),
             new PressurePlateMatcher(), new RailMatcher(), new SignMatcher(), new SwitchMatcher(),
             new TrapdoorMatcher(), new CropsMatcher(), new FarmlandMatcher(), new UprootMatcher(),
             new BellMatcher(), new TorchMatcher(), new LanternMatcher(), new LadderMatcher(),
@@ -517,6 +518,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return defaultAccessType;
     }
 
+    public BlockMatcher getChestMatcher() {
+        return CHEST_MATCHER;
+    }
+
     @Override
     public boolean isProtectable(final Block block) {
         return DEBUG || protectableBlocks.containsKey(block.getType());
@@ -535,6 +540,16 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     @Override
     public boolean isProtected(final Entity entity) {
         return findProtection(entity) != null;
+    }
+
+    @Override
+    public boolean isProtectedExact(Block block) {
+        return loadProtection(block) != null;
+    }
+
+    @Override
+    public boolean isProtectedExact(Entity entity) {
+        return loadProtection(entity) != null;
     }
 
     @Override

@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class EntityProtection extends Protection {
-    private final String entity;
+    private String entity;
 
     public EntityProtection(UUID id, UUID owner, String type, long created, long accessed, Map<String, String> access, String entity) {
         super(id, owner, type, created, accessed, access);
@@ -13,6 +13,10 @@ public class EntityProtection extends Protection {
 
     public String getEntity() {
         return entity;
+    }
+
+    public void setEntity(String entity) {
+        this.entity = entity;
     }
 
     @Override
