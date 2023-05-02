@@ -364,7 +364,7 @@ public final class BlockListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(final BlockBreakEvent e) {
         final Block block = e.getBlock();
         final Protection protection = plugin.findProtection(block);
