@@ -254,7 +254,7 @@ public final class BlockListener implements Listener {
                     Profiles.findOrLookupProfileByUniqueId(protection.getOwner())
                             .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                     player,
-                                    player.hasPermission("bolt.command.info.full") ? Translation.INFO_FULL : Translation.INFO,
+                                    protection.getOwner().equals(player.getUniqueId()) || player.hasPermission("bolt.command.info.full") ? Translation.INFO_FULL : Translation.INFO,
                                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
                                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection)),
                                     Placeholder.component(Translation.Placeholder.PLAYER, Component.text(Optional.ofNullable(profile.name()).orElse(translate(Translation.UNKNOWN)))),
