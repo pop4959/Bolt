@@ -14,7 +14,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SimpleProtectionCache implements Store {
-    private final Map<BlockLocation, BlockProtection> cachedBlocks = new ConcurrentHashMap<>();
+    private final Map<BlockLocation, UUID> cachedBlockLocationId = new ConcurrentHashMap<>();
+    private final Map<UUID, BlockLocation> cachedBlockIdLocation = new ConcurrentHashMap<>();
+    private final Map<UUID, BlockProtection> cachedBlocks = new ConcurrentHashMap<>();
     private final Map<UUID, EntityProtection> cachedEntities = new ConcurrentHashMap<>();
     private final Map<String, Group> cachedGroups = new ConcurrentHashMap<>();
     private final Map<UUID, AccessList> cachedAccessLists = new ConcurrentHashMap<>();
@@ -22,7 +24,13 @@ public class SimpleProtectionCache implements Store {
 
     public SimpleProtectionCache(final Store backingStore) {
         this.backingStore = backingStore;
-        backingStore.loadBlockProtections().join().forEach(blockProtection -> cachedBlocks.putIfAbsent(BlockLocation.fromProtection(blockProtection), blockProtection));
+        backingStore.loadBlockProtections().join().forEach(blockProtection -> {
+            final UUID id = blockProtection.getId();
+            final BlockLocation blockLocation = BlockLocation.fromProtection(blockProtection);
+            cachedBlockLocationId.put(blockLocation, id);
+            cachedBlockIdLocation.put(id, blockLocation);
+            cachedBlocks.put(id, blockProtection);
+        });
         backingStore.loadEntityProtections().join().forEach(entityProtection -> cachedEntities.putIfAbsent(entityProtection.getId(), entityProtection));
         backingStore.loadGroups().join().forEach(group -> cachedGroups.putIfAbsent(group.getName(), group));
         backingStore.loadAccessLists().join().forEach(accessList -> cachedAccessLists.putIfAbsent(accessList.getOwner(), accessList));
@@ -30,7 +38,8 @@ public class SimpleProtectionCache implements Store {
 
     @Override
     public CompletableFuture<BlockProtection> loadBlockProtection(BlockLocation location) {
-        final BlockProtection blockProtection = cachedBlocks.get(location);
+        final UUID id = cachedBlockLocationId.get(location);
+        final BlockProtection blockProtection = id == null ? null : cachedBlocks.get(id);
         Metrics.recordProtectionAccess(blockProtection != null);
         return CompletableFuture.completedFuture(blockProtection);
     }
@@ -42,13 +51,26 @@ public class SimpleProtectionCache implements Store {
 
     @Override
     public void saveBlockProtection(BlockProtection protection) {
-        cachedBlocks.put(BlockLocation.fromProtection(protection), protection);
+        final UUID id = protection.getId();
+        final BlockLocation oldBlockLocation = cachedBlockIdLocation.remove(id);
+        if (oldBlockLocation != null) {
+            cachedBlockLocationId.remove(oldBlockLocation);
+        }
+        final BlockLocation blockLocation = BlockLocation.fromProtection(protection);
+        cachedBlockLocationId.put(blockLocation, id);
+        cachedBlockIdLocation.put(id, blockLocation);
+        cachedBlocks.put(id, protection);
+        cachedBlocks.forEach((loc, blockProtection) -> System.out.println(loc.toString()));
         backingStore.saveBlockProtection(protection);
     }
 
     @Override
     public void removeBlockProtection(BlockProtection protection) {
-        cachedBlocks.remove(BlockLocation.fromProtection(protection));
+        final UUID id = protection.getId();
+        final BlockLocation blockLocation = BlockLocation.fromProtection(protection);
+        cachedBlockLocationId.remove(blockLocation);
+        cachedBlockIdLocation.remove(id);
+        cachedBlocks.remove(id);
         backingStore.removeBlockProtection(protection);
     }
 

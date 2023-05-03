@@ -36,8 +36,8 @@ import java.util.logging.LogManager;
 public class SQLStore implements Store {
     private static final Gson GSON = new Gson();
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    private final Map<BlockLocation, BlockProtection> saveBlocks = new HashMap<>();
-    private final Map<BlockLocation, BlockProtection> removeBlocks = new HashMap<>();
+    private final Map<UUID, BlockProtection> saveBlocks = new HashMap<>();
+    private final Map<UUID, BlockProtection> removeBlocks = new HashMap<>();
     private final Map<UUID, EntityProtection> saveEntities = new HashMap<>();
     private final Map<UUID, EntityProtection> removeEntities = new HashMap<>();
     private final Map<String, Group> saveGroups = new HashMap<>();
@@ -171,7 +171,7 @@ public class SQLStore implements Store {
 
     @Override
     public void saveBlockProtection(BlockProtection protection) {
-        CompletableFuture.runAsync(() -> saveBlocks.put(BlockLocation.fromProtection(protection), protection), executor);
+        CompletableFuture.runAsync(() -> saveBlocks.put(protection.getId(), protection), executor);
     }
 
     private void saveBlockProtectionNow(BlockProtection protection) {
@@ -197,9 +197,9 @@ public class SQLStore implements Store {
     @Override
     public void removeBlockProtection(BlockProtection protection) {
         CompletableFuture.runAsync(() -> {
-            final BlockLocation blockLocation = BlockLocation.fromProtection(protection);
-            saveBlocks.remove(blockLocation);
-            removeBlocks.put(blockLocation, protection);
+            final UUID id = protection.getId();
+            saveBlocks.remove(id);
+            removeBlocks.put(id, protection);
         }, executor);
     }
 
