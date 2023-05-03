@@ -42,7 +42,7 @@ public class EditCommand extends BoltCommand {
         final BoltPlayer boltPlayer = plugin.player(player);
         final boolean adding = "add".equalsIgnoreCase(arguments.next());
         boltPlayer.setAction(new Action(Action.Type.EDIT, Boolean.toString(adding)));
-        final String accessType = arguments.next();
+        final String accessType = arguments.next().toLowerCase();
         final Access access = plugin.getBolt().getAccessRegistry().getAccessByType(accessType).orElse(null);
         if (access == null) {
             BoltComponents.sendMessage(
@@ -56,7 +56,7 @@ public class EditCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, Translation.EDIT_ACCESS_NO_PERMISSION);
             return;
         }
-        final String sourceTypeName = arguments.next();
+        final String sourceTypeName = arguments.next().toLowerCase();
         final SourceType sourceType = plugin.getBolt().getSourceTypeRegistry().getSourceByName(sourceTypeName).orElse(null);
         if (sourceType == null || !plugin.getBolt().getSourceTypeRegistry().sourceTypes().contains(sourceType)) {
             BoltComponents.sendMessage(

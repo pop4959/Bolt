@@ -25,7 +25,7 @@ public class LockCommand extends BoltCommand {
         if (sender instanceof final Player player) {
             final BoltPlayer boltPlayer = plugin.player(player);
             final String argument = arguments.next();
-            final String type = argument == null ? plugin.getDefaultProtectionType() : argument;
+            final String type = argument == null ? plugin.getDefaultProtectionType() : argument.toLowerCase();
             final Access access = plugin.getBolt().getAccessRegistry().getProtectionByType(type).orElse(null);
             if (access == null) {
                 BoltComponents.sendMessage(
