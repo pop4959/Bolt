@@ -7,11 +7,11 @@ repositories {
 
 dependencies {
     compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.19.4-R0.1-SNAPSHOT")
-    compileOnly(group = "org.popcraft", name = "chunky-common", version = "1.3.67")
     implementation(group = "net.kyori", name = "adventure-api", version = "4.13.1")
     implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.13.1")
     implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.3.0")
     implementation(group = "org.bstats", name = "bstats-bukkit", version = "3.0.1")
+    implementation(group = "org.popcraft", name = "chunky-nbt", version = "1.3.76")
     implementation(project(":bolt-common"))
     implementation(project(":bolt-paper"))
     implementation(project(":bolt-folia"))
@@ -37,5 +37,6 @@ tasks {
         }
         relocate("net.kyori", "${project.group}.${rootProject.name}.lib.net.kyori")
         relocate("org.bstats", "${project.group}.${rootProject.name}.lib.org.bstats")
+        relocate("org.popcraft.chunky.nbt", "${project.group}.${rootProject.name}.lib.org.popcraft.chunky.nbt")
     }
 }

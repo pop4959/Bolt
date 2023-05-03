@@ -1,6 +1,8 @@
 package org.popcraft.bolt.data.migration.lwc;
 
 import com.google.gson.Gson;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -15,12 +17,11 @@ import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.Profiles;
-import org.popcraft.chunky.ChunkyProvider;
 import org.popcraft.chunky.nbt.CompoundTag;
 import org.popcraft.chunky.nbt.IntArrayTag;
 import org.popcraft.chunky.nbt.ListTag;
 import org.popcraft.chunky.nbt.StringTag;
-import org.popcraft.chunky.world.RegionFile;
+import org.popcraft.chunky.nbt.util.RegionFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -211,8 +212,8 @@ public class LWCMigration {
     public CompletableFuture<MemoryStore> convertEntityBlocks() {
         return CompletableFuture.supplyAsync(() -> {
             final MemoryStore store = new MemoryStore();
-            ChunkyProvider.get().getServer().getWorlds().forEach(world -> {
-                final Optional<Path> entityDirectory = world.getEntitiesDirectory();
+            Bukkit.getServer().getWorlds().forEach(world -> {
+                final Optional<Path> entityDirectory = findEntitiesDirectory(world);
                 if (entityDirectory.isPresent()) {
                     try (final Stream<Path> regionWalker = Files.walk(entityDirectory.get())) {
                         regionWalker.filter(path -> {
@@ -274,5 +275,16 @@ public class LWCMigration {
             });
             return store;
         });
+    }
+
+    private Optional<Path> findEntitiesDirectory(final World world) {
+        try (final Stream<Path> paths = Files.walk(world.getWorldFolder().toPath())) {
+            return paths.filter(Files::isDirectory)
+                    .filter(path -> "entities".equals(path.getFileName().toString()))
+                    .findFirst();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
     }
 }
