@@ -396,13 +396,15 @@ public final class BlockListener implements Listener {
                     }
                 }
                 plugin.removeProtection(protection);
-                BoltComponents.sendMessage(
-                        player,
-                        Translation.CLICK_UNLOCKED,
-                        plugin.isUseActionBar(),
-                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
-                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
-                );
+                if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
+                    BoltComponents.sendMessage(
+                            player,
+                            Translation.CLICK_UNLOCKED,
+                            plugin.isUseActionBar(),
+                            Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection)),
+                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
+                    );
+                }
             }
         } else {
             e.setCancelled(true);
