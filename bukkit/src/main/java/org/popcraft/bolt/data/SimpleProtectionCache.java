@@ -60,7 +60,6 @@ public class SimpleProtectionCache implements Store {
         cachedBlockLocationId.put(blockLocation, id);
         cachedBlockIdLocation.put(id, blockLocation);
         cachedBlocks.put(id, protection);
-        cachedBlocks.forEach((loc, blockProtection) -> System.out.println(loc.toString()));
         backingStore.saveBlockProtection(protection);
     }
 
