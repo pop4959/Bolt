@@ -63,6 +63,7 @@ public class Translation {
     public static final String PROTECTION_NOTIFY_GENERIC = "protection_notify_generic";
     public static final String PURGE = "purge";
     public static final String RELOAD = "reload";
+    public static final String STATUS = "status";
     public static final String TRUST = "trust";
     public static final String TRUST_ADD = "trust_add";
     public static final String TRUST_REMOVE = "trust_remove";
@@ -138,6 +139,8 @@ public class Translation {
         public static final String SOURCE_IDENTIFIER = "source_identifier";
         public static final String RAW_PROTECTION = "raw_protection";
         public static final String COUNT = "count";
+        public static final String COUNT_BLOCKS = "count_blocks";
+        public static final String COUNT_ENTITIES = "count_entities";
         public static final String SECONDS = "seconds";
         public static final String WORLD = "world";
         public static final String X = "x";

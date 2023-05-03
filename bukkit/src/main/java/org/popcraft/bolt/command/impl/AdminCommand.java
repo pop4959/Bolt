@@ -7,9 +7,13 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.BoltComponents;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +40,18 @@ public class AdminCommand extends BoltCommand {
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
         final String subcommand = arguments.next();
+        if (subcommand == null) {
+            final Collection<Protection> protections = plugin.loadProtections();
+            final long blockCount = protections.stream().filter(BlockProtection.class::isInstance).count();
+            final long entityCount = protections.stream().filter(EntityProtection.class::isInstance).count();
+            BoltComponents.sendMessage(
+                    sender,
+                    Translation.STATUS,
+                    Placeholder.component(Translation.Placeholder.COUNT_BLOCKS, Component.text(blockCount)),
+                    Placeholder.component(Translation.Placeholder.COUNT_ENTITIES, Component.text(entityCount))
+            );
+            return;
+        }
         if (!SUB_COMMANDS.containsKey(subcommand)) {
             return;
         }
