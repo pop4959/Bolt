@@ -27,12 +27,13 @@ import org.popcraft.bolt.access.DefaultAccess;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.command.impl.AdminCommand;
-import org.popcraft.bolt.command.impl.ModifyCommand;
+import org.popcraft.bolt.command.impl.EditCommand;
 import org.popcraft.bolt.command.impl.GroupCommand;
 import org.popcraft.bolt.command.impl.HelpCommand;
 import org.popcraft.bolt.command.impl.InfoCommand;
 import org.popcraft.bolt.command.impl.LockCommand;
 import org.popcraft.bolt.command.impl.ModeCommand;
+import org.popcraft.bolt.command.impl.ModifyCommand;
 import org.popcraft.bolt.command.impl.PasswordCommand;
 import org.popcraft.bolt.command.impl.TransferCommand;
 import org.popcraft.bolt.command.impl.TrustCommand;
@@ -400,6 +401,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     private void registerCommands() {
         commands.put("admin", new AdminCommand(this));
+        commands.put("edit", new EditCommand(this));
         commands.put("group", new GroupCommand(this));
         commands.put("help", new HelpCommand(this));
         commands.put("info", new InfoCommand(this));
