@@ -83,7 +83,7 @@ public class Translation {
     public static final String HELP_COMMAND_SHORT_ADMIN_RELOAD = "help_command_short_admin_reload";
     public static final String HELP_COMMAND_SHORT_ADMIN_REPORT = "help_command_short_admin_report";
     public static final String HELP_COMMAND_SHORT_ADMIN_TRANSFER = "help_command_short_admin_transfer";
-    public static final String HELP_COMMAND_SHORT_EDIT = "help_command_short_edit";
+    public static final String HELP_COMMAND_SHORT_MODIFY = "help_command_short_modify";
     public static final String HELP_COMMAND_SHORT_GROUP = "help_command_short_group";
     public static final String HELP_COMMAND_SHORT_HELP = "help_command_short_help";
     public static final String HELP_COMMAND_SHORT_INFO = "help_command_short_info";
@@ -103,7 +103,7 @@ public class Translation {
     public static final String HELP_COMMAND_LONG_ADMIN_RELOAD = "help_command_long_admin_reload";
     public static final String HELP_COMMAND_LONG_ADMIN_REPORT = "help_command_long_admin_report";
     public static final String HELP_COMMAND_LONG_ADMIN_TRANSFER = "help_command_long_admin_transfer";
-    public static final String HELP_COMMAND_LONG_EDIT = "help_command_long_edit";
+    public static final String HELP_COMMAND_LONG_MODIFY = "help_command_long_modify";
     public static final String HELP_COMMAND_LONG_GROUP = "help_command_long_group";
     public static final String HELP_COMMAND_LONG_HELP = "help_command_long_help";
     public static final String HELP_COMMAND_LONG_INFO = "help_command_long_info";

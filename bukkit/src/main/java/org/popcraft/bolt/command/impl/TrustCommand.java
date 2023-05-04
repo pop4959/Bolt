@@ -76,7 +76,7 @@ public class TrustCommand extends BoltCommand {
             final Action playerAction = boltPlayer.getAction();
             final boolean trusting = boltPlayer.isTrusting();
             if (playerAction == null || !Action.Type.EDIT.equals(playerAction.getType()) || !trusting) {
-                final String command = trusting ? "/bolt edit" : "/bolt trust";
+                final String command = trusting ? "/bolt modify" : "/bolt trust";
                 BoltComponents.sendMessage(
                         sender,
                         Translation.TRUST_EDITED_FAILED,
@@ -107,7 +107,7 @@ public class TrustCommand extends BoltCommand {
                 BoltComponents.sendMessage(
                         sender,
                         Translation.TRUST,
-                        Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt edit")),
+                        Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt modify")),
                         Placeholder.component(Translation.Placeholder.COMMAND_2, Component.text("/bolt trust confirm"))
                 );
             }

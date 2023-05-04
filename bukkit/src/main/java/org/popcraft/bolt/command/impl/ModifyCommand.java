@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class EditCommand extends BoltCommand {
-    public EditCommand(BoltPlugin plugin) {
+public class ModifyCommand extends BoltCommand {
+    public ModifyCommand(BoltPlugin plugin) {
         super(plugin);
     }
 
@@ -156,14 +156,14 @@ public class EditCommand extends BoltCommand {
     public void shortHelp(CommandSender sender, Arguments arguments) {
         BoltComponents.sendMessage(
                 sender,
-                Translation.HELP_COMMAND_SHORT_EDIT,
-                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt edit")),
+                Translation.HELP_COMMAND_SHORT_MODIFY,
+                Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt modify")),
                 Placeholder.component(Translation.Placeholder.LITERAL, Component.text("(add|remove)"))
         );
     }
 
     @Override
     public void longHelp(CommandSender sender, Arguments arguments) {
-        BoltComponents.sendMessage(sender, Translation.HELP_COMMAND_LONG_EDIT);
+        BoltComponents.sendMessage(sender, Translation.HELP_COMMAND_LONG_MODIFY);
     }
 }

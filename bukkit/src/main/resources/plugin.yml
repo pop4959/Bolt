@@ -39,6 +39,8 @@ permissions:
     default: true
   bolt.command.mode:
     default: true
+  bolt.command.modify:
+    default: true
   bolt.command.password:
     default: true
   bolt.command.transfer:
