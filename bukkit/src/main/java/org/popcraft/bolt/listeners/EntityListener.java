@@ -133,11 +133,14 @@ public final class EntityListener implements Listener {
         if (!plugin.isProtectable(entity)) {
             return;
         }
-        final Access defaultAccess = plugin.getDefaultAccess(entity);
-        if (defaultAccess == null) {
+        final Access access = plugin.getDefaultAccess(entity);
+        if (access == null) {
             return;
         }
-        final EntityProtection newProtection = plugin.createProtection(entity, player.getUniqueId(), defaultAccess.type());
+        if (access.restricted() && !player.hasPermission("bolt.type.protection.%s".formatted(access.type()))) {
+            return;
+        }
+        final EntityProtection newProtection = plugin.createProtection(entity, player.getUniqueId(), access.type());
         plugin.saveProtection(newProtection);
         if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
             BoltComponents.sendMessage(

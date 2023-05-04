@@ -350,14 +350,17 @@ public final class BlockListener implements Listener {
         if (!plugin.isProtectable(block)) {
             return;
         }
-        final Access defaultAccess = plugin.getDefaultAccess(block);
-        if (defaultAccess == null) {
+        final Access access = plugin.getDefaultAccess(block);
+        if (access == null) {
+            return;
+        }
+        if (access.restricted() && !player.hasPermission("bolt.type.protection.%s".formatted(access.type()))) {
             return;
         }
         if (plugin.isProtected(block)) {
             return;
         }
-        final BlockProtection newProtection = plugin.createProtection(block, player.getUniqueId(), defaultAccess.type());
+        final BlockProtection newProtection = plugin.createProtection(block, player.getUniqueId(), access.type());
         plugin.saveProtection(newProtection);
         if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
             BoltComponents.sendMessage(
