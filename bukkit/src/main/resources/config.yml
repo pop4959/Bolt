@@ -12,6 +12,7 @@ database:
   properties: [ ]
 protections:
   private:
+    default: true
     require-permission: false
     allows: [ "redstone" ]
   display:
@@ -28,6 +29,7 @@ protections:
     allows: [ "redstone", "interact", "open", "deposit", "withdraw", "mount" ]
 access:
   normal:
+    default: true
     require-permission: false
     allows: [ "redstone", "interact", "open", "deposit", "withdraw", "mount" ]
   admin:

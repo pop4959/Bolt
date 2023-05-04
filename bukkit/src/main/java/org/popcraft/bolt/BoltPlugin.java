@@ -277,7 +277,8 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
                 final List<String> allows = protections.getStringList("%s.allows".formatted(type));
                 final List<String> permissions = allows.isEmpty() ? protections.getStringList(type) : allows;
                 bolt.getAccessRegistry().registerProtectionType(type, requirePermission, new HashSet<>(permissions));
-                if (defaultProtectionType == null || permissions.size() < bolt.getAccessRegistry().getProtectionByType(defaultProtectionType).map(Access::permissions).map(Set::size).orElse(0)) {
+                final boolean isDefault = protections.getBoolean("%s.default".formatted(type), false);
+                if (isDefault) {
                     defaultProtectionType = type;
                 }
             }
@@ -289,7 +290,8 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
                 final List<String> allows = access.getStringList("%s.allows".formatted(type));
                 final List<String> permissions = allows.isEmpty() ? access.getStringList(type) : allows;
                 bolt.getAccessRegistry().registerAccessType(type, requirePermission, new HashSet<>(permissions));
-                if (defaultAccessType == null || permissions.size() < bolt.getAccessRegistry().getAccessByType(defaultAccessType).map(Access::permissions).map(Set::size).orElse(0)) {
+                final boolean isDefault = access.getBoolean("%s.default".formatted(type), false);
+                if (isDefault) {
                     defaultAccessType = type;
                 }
             }

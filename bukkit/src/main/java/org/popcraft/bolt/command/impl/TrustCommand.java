@@ -8,13 +8,14 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.data.Profile;
 import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.Protections;
-import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,27 +39,39 @@ public class TrustCommand extends BoltCommand {
         if ("list".equals(action)) {
             final AccessList accessList = plugin.getBolt().getStore().loadAccessList(player.getUniqueId()).join();
             final Map<String, String> accessMap = accessList == null ? new HashMap<>() : accessList.getAccess();
-            Profiles.findOrLookupProfileByUniqueId(player.getUniqueId())
-                    .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
-                            player,
-                            Translation.INFO_SELF,
-                            Placeholder.component(Translation.Placeholder.ACCESS_LIST_SIZE, Component.text(accessMap.size())),
-                            Placeholder.component(Translation.Placeholder.ACCESS_LIST, Component.text(Protections.accessList(accessMap)))
-                    )));
-        } else if (!"confirm".equals(action)) {
-            final boolean silent = "silent".equals(action);
-            final BoltPlayer boltPlayer = plugin.player(player);
-            boltPlayer.setTrusting(true);
-            boltPlayer.setTrustingSilently(silent);
-            if (!silent) {
+            BoltComponents.sendMessage(
+                    player,
+                    Translation.INFO_SELF,
+                    Placeholder.component(Translation.Placeholder.ACCESS_LIST_SIZE, Component.text(accessMap.size())),
+                    Placeholder.component(Translation.Placeholder.ACCESS_LIST, Component.text(Protections.accessList(accessMap)))
+            );
+        } else if ("add".equals(action) || "remove".equals(action)) {
+            if (arguments.remaining() < 1) {
+                shortHelp(sender, arguments);
+                return;
+            }
+            final boolean adding = "add".equals(action);
+            final String target = arguments.next();
+            final UUID uuid = player.getUniqueId();
+            final AccessList accessList = Objects.requireNonNullElse(plugin.getBolt().getStore().loadAccessList(uuid).join(), new AccessList(uuid, new HashMap<>()));
+            final Profile playerProfile = Profiles.findOrLookupProfileByName(target).join();
+            if (!playerProfile.complete()) {
                 BoltComponents.sendMessage(
                         sender,
-                        Translation.TRUST,
-                        Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt edit")),
-                        Placeholder.component(Translation.Placeholder.COMMAND_2, Component.text("/bolt trust confirm"))
+                        Translation.PLAYER_NOT_FOUND,
+                        Placeholder.component(Translation.Placeholder.PLAYER, Component.text(target))
                 );
+                return;
             }
-        } else {
+            final Source source = Source.player(playerProfile.uuid());
+            if (adding) {
+                accessList.getAccess().put(source.toString(), plugin.getDefaultAccessType());
+            } else {
+                accessList.getAccess().remove(source.toString());
+            }
+            plugin.getBolt().getStore().saveAccessList(accessList);
+            BoltComponents.sendMessage(sender, Translation.TRUST_EDITED);
+        } else if ("confirm".equals(action)) {
             final BoltPlayer boltPlayer = plugin.player(player);
             final Action playerAction = boltPlayer.getAction();
             final boolean trusting = boltPlayer.isTrusting();
@@ -85,6 +98,19 @@ public class TrustCommand extends BoltCommand {
             boltPlayer.clearAction();
             boltPlayer.setTrusting(false);
             boltPlayer.setTrustingSilently(false);
+        } else {
+            final boolean silent = "silent".equals(action);
+            final BoltPlayer boltPlayer = plugin.player(player);
+            boltPlayer.setTrusting(true);
+            boltPlayer.setTrustingSilently(silent);
+            if (!silent) {
+                BoltComponents.sendMessage(
+                        sender,
+                        Translation.TRUST,
+                        Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt edit")),
+                        Placeholder.component(Translation.Placeholder.COMMAND_2, Component.text("/bolt trust confirm"))
+                );
+            }
         }
     }
 
@@ -93,9 +119,13 @@ public class TrustCommand extends BoltCommand {
         if (arguments.remaining() == 0) {
             return Collections.emptyList();
         }
-        arguments.next();
+        final String subcommand = arguments.next();
         if (arguments.remaining() == 0) {
-            return List.of("list", "confirm");
+            return List.of("list", "add", "remove", "confirm");
+        }
+        arguments.next();
+        if (arguments.remaining() == 0 && ("add".equals(subcommand) || "remove".equals(subcommand))) {
+            return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
         }
         return Collections.emptyList();
     }
@@ -106,7 +136,7 @@ public class TrustCommand extends BoltCommand {
                 sender,
                 Translation.HELP_COMMAND_SHORT_TRUST,
                 Placeholder.component(Translation.Placeholder.COMMAND, Component.text("/bolt trust")),
-                Placeholder.component(Translation.Placeholder.LITERAL, Component.text("[list|confirm]"))
+                Placeholder.component(Translation.Placeholder.LITERAL, Component.text("[list|add|remove|confirm]"))
         );
     }
 
