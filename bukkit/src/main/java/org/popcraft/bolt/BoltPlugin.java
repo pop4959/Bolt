@@ -117,6 +117,7 @@ import org.popcraft.bolt.matcher.entity.EntityMatcher;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.source.PlayerSourceResolver;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypeRegistry;
@@ -688,8 +689,8 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     }
 
     @Override
-    public void registerPlayerSourceResolver(SourceResolver sourceResolver) {
-        bolt.getRegisteredPlayerResolvers().add(sourceResolver);
+    public void registerPlayerSourceResolver(PlayerSourceResolver playerSourceResolver) {
+        bolt.getRegisteredPlayerResolvers().add(playerSourceResolver);
     }
 
     private Protection matchProtection(final Block block) {

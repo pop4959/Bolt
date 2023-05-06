@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.source.PlayerSourceResolver;
 import org.popcraft.bolt.source.SourceResolver;
 
 import java.util.Collection;
@@ -54,5 +55,5 @@ public interface BoltAPI {
 
     boolean canAccess(final Protection protection, final SourceResolver sourceResolver, String... permissions);
 
-    void registerPlayerSourceResolver(final SourceResolver sourceResolver);
+    void registerPlayerSourceResolver(final PlayerSourceResolver playerSourceResolver);
 }

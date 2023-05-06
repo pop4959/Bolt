@@ -2,7 +2,7 @@ package org.popcraft.bolt;
 
 import org.popcraft.bolt.access.AccessRegistry;
 import org.popcraft.bolt.data.Store;
-import org.popcraft.bolt.source.SourceResolver;
+import org.popcraft.bolt.source.PlayerSourceResolver;
 import org.popcraft.bolt.source.SourceTypeRegistry;
 import org.popcraft.bolt.util.BoltPlayer;
 
@@ -16,7 +16,7 @@ public final class Bolt {
     private final AccessRegistry accessRegistry = new AccessRegistry();
     private final SourceTypeRegistry sourceTypeRegistry = new SourceTypeRegistry();
     private final Map<UUID, BoltPlayer> players = new HashMap<>();
-    private final List<SourceResolver> registeredPlayerResolvers = new ArrayList<>();
+    private final List<PlayerSourceResolver> registeredPlayerResolvers = new ArrayList<>();
     private Store store;
 
     public Bolt(final Store store) {
@@ -47,7 +47,7 @@ public final class Bolt {
         return sourceTypeRegistry;
     }
 
-    public List<SourceResolver> getRegisteredPlayerResolvers() {
+    public List<PlayerSourceResolver> getRegisteredPlayerResolvers() {
         return registeredPlayerResolvers;
     }
 }

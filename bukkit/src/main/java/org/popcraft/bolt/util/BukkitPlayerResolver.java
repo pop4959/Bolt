@@ -3,6 +3,7 @@ package org.popcraft.bolt.util;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.Bolt;
+import org.popcraft.bolt.source.PlayerSourceResolver;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypes;
@@ -36,8 +37,8 @@ public class BukkitPlayerResolver implements SourceResolver {
         if (player != null && SourceTypes.PERMISSION.equals(source.getType()) && player.hasPermission(source.getIdentifier())) {
             return true;
         }
-        for (final SourceResolver sourceResolver : bolt.getRegisteredPlayerResolvers()) {
-            if (sourceResolver.resolve(source)) {
+        for (final PlayerSourceResolver playerSourceResolver : bolt.getRegisteredPlayerResolvers()) {
+            if (playerSourceResolver.resolve(source, uuid)) {
                 return true;
             }
         }
