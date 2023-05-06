@@ -687,6 +687,11 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return unresolved.isEmpty();
     }
 
+    @Override
+    public void registerPlayerSourceResolver(SourceResolver sourceResolver) {
+        bolt.getRegisteredPlayerResolvers().add(sourceResolver);
+    }
+
     private Protection matchProtection(final Block block) {
         for (final BlockMatcher blockMatcher : enabledBlockMatchers) {
             if (blockMatcher.canMatch(block)) {

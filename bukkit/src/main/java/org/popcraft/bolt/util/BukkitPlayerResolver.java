@@ -33,6 +33,14 @@ public class BukkitPlayerResolver implements SourceResolver {
                 return true;
             }
         }
-        return player != null && SourceTypes.PERMISSION.equals(source.getType()) && player.hasPermission(source.getIdentifier());
+        if (player != null && SourceTypes.PERMISSION.equals(source.getType()) && player.hasPermission(source.getIdentifier())) {
+            return true;
+        }
+        for (final SourceResolver sourceResolver : bolt.getRegisteredPlayerResolvers()) {
+            if (sourceResolver.resolve(source)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

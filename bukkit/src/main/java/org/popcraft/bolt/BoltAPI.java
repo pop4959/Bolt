@@ -53,4 +53,6 @@ public interface BoltAPI {
     boolean canAccess(final Protection protection, final UUID uuid, final String... permissions);
 
     boolean canAccess(final Protection protection, final SourceResolver sourceResolver, String... permissions);
+
+    void registerPlayerSourceResolver(final SourceResolver sourceResolver);
 }
