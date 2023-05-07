@@ -172,6 +172,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private final ProfileCache profileCache = new SimpleProfileCache(profileCachePath);
     private final Map<Material, Access> protectableBlocks = new EnumMap<>(Material.class);
     private final Map<EntityType, Access> protectableEntities = new EnumMap<>(EntityType.class);
+    private final Map<Material, Tag<Material>> materialTags = new EnumMap<>(Material.class);
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
     private boolean useActionBar;
@@ -205,7 +206,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         profileCache.load();
         final Metrics metrics = new Metrics(this, 17711);
         registerCustomCharts(metrics);
-        new ConfigMigration(this).convert(protectableBlocks);
+        new ConfigMigration(this).convert();
         // Future: Move this into LWC Migration
         new TrustMigration(this).convert();
         getServer().getServicesManager().register(BoltAPI.class, this, this, ServicePriority.Normal);
@@ -324,7 +325,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
                         getLogger().warning(() -> "Invalid block tag defined in config: %s. Skipping.".formatted(key));
                         continue;
                     }
-                    tag.getValues().forEach(block -> protectableBlocks.put(block, defaultAccess));
+                    tag.getValues().forEach(block -> {
+                        protectableBlocks.put(block, defaultAccess);
+                        materialTags.put(block, tag);
+                    });
                 } else {
                     EnumUtil.valueOf(Material.class, key.toUpperCase()).filter(Material::isBlock).ifPresentOrElse(block -> protectableBlocks.put(block, defaultAccess), () -> getLogger().warning(() -> "Invalid block defined in config: %s. Skipping.".formatted(key)));
                 }
@@ -525,6 +529,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public BlockMatcher getChestMatcher() {
         return CHEST_MATCHER;
+    }
+
+    public Map<Material, Tag<Material>> getMaterialTags() {
+        return materialTags;
     }
 
     @Override

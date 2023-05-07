@@ -5,7 +5,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.popcraft.bolt.BoltPlugin;
-import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.access.AccessRegistry;
 import org.popcraft.bolt.access.DefaultAccess;
 import org.popcraft.bolt.util.Permission;
@@ -32,15 +31,15 @@ public class ConfigMigration {
         defaultProtectionPublic = accessRegistry.findProtectionTypeWithExactPermissions(DefaultAccess.PUBLIC).orElse("public");
     }
 
-    public void convert(final Map<Material, Access> protectableBlocks) {
+    public void convert() {
         if (!plugin.loadProtections().isEmpty()) {
             return;
         }
-        convertCore(protectableBlocks);
+        convertCore();
         convertDoors();
     }
 
-    private void convertCore(final Map<Material, Access> protectableBlocks) {
+    private void convertCore() {
         final FileConfiguration lwcCoreConfig = YamlConfiguration.loadConfiguration(plugin.getPluginsPath().resolve("LWC/core.yml").toFile());
         final ConfigurationSection blocks = lwcCoreConfig.getConfigurationSection("protections.blocks");
         if (blocks == null) {
@@ -50,7 +49,7 @@ public class ConfigMigration {
         for (final String block : blocks.getKeys(false)) {
             final boolean enabled = blocks.getBoolean("%s.enabled".formatted(block), false);
             final Material material = Material.getMaterial(block.toUpperCase());
-            if (material != null && material.isBlock() && !protectableBlocks.containsKey(material)) {
+            if (material != null && material.isBlock()) {
                 migrateToBoltConfig.put(material, enabled ? blocks.getString("%s.autoRegister".formatted(block), "false") : "false");
             }
         }
@@ -70,7 +69,11 @@ public class ConfigMigration {
                 } else {
                     boltProtectionType = protectionType;
                 }
-                plugin.getConfig().set("blocks.%s.autoProtect".formatted(material.name().toLowerCase()), boltProtectionType);
+                if (plugin.getMaterialTags().containsKey(material)) {
+                    plugin.getConfig().set("blocks.#%s.autoProtect".formatted(plugin.getMaterialTags().get(material).getKey().getKey()), boltProtectionType);
+                } else {
+                    plugin.getConfig().set("blocks.%s.autoProtect".formatted(material.name().toLowerCase()), boltProtectionType);
+                }
             });
             plugin.saveConfig();
             plugin.reload();
