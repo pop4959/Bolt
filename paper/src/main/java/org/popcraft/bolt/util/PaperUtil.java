@@ -8,6 +8,7 @@ import org.bukkit.World;
 import java.util.concurrent.CompletableFuture;
 
 public class PaperUtil {
+    private static final boolean CONFIG_EXISTS = classExists("com.destroystokyo.paper.PaperConfig") || classExists("io.papermc.paper.configuration.Configuration");
     private static boolean getOfflinePlayerIfCachedExists;
     private static boolean getChunkAtAsyncExists;
 
@@ -29,6 +30,10 @@ public class PaperUtil {
     private PaperUtil() {
     }
 
+    public static boolean isPaper() {
+        return CONFIG_EXISTS;
+    }
+
     public static OfflinePlayer getOfflinePlayer(final String name) {
         if (getOfflinePlayerIfCachedExists) {
             return Bukkit.getOfflinePlayerIfCached(name);
@@ -42,6 +47,15 @@ public class PaperUtil {
             return world.getChunkAtAsync(x, z);
         } else {
             return CompletableFuture.completedFuture(world.getChunkAt(x, z));
+        }
+    }
+
+    private static boolean classExists(final String clazz) {
+        try {
+            Class.forName(clazz);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
         }
     }
 }

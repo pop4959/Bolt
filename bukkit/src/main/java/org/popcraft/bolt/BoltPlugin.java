@@ -128,6 +128,7 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Group;
+import org.popcraft.bolt.util.PaperUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -398,7 +399,9 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         final PluginManager pluginManager = getServer().getPluginManager();
         final BlockListener blockListener = new BlockListener(this);
         pluginManager.registerEvents(blockListener, this);
-        pluginManager.registerEvents(new PlayerRecipeBookClickListener(blockListener::onPlayerRecipeBookClick), this);
+        if (PaperUtil.isPaper()) {
+            pluginManager.registerEvents(new PlayerRecipeBookClickListener(blockListener::onPlayerRecipeBookClick), this);
+        }
         pluginManager.registerEvents(new EntityListener(this), this);
         pluginManager.registerEvents(new InventoryListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
