@@ -56,7 +56,7 @@ public class BoltMigration {
         final Set<BlockLocation> existing = new HashSet<>();
         final FileConfiguration lwcCoreConfig = YamlConfiguration.loadConfiguration(plugin.getPluginsPath().resolve("LWC/core.yml").toFile());
         final SQLStore.Configuration configuration = new SQLStore.Configuration(
-                lwcCoreConfig.getString("database.adapter", "sqlite"),
+                lwcCoreConfig.getString("database.adapter", "sqlite").toLowerCase(),
                 lwcCoreConfig.getString("database.path", "%s/LWC/lwc.db".formatted(plugin.getPluginsPath().toFile().getName())),
                 lwcCoreConfig.getString("database.host", ""),
                 lwcCoreConfig.getString("database.database", ""),
