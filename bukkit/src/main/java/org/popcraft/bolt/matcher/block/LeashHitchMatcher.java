@@ -6,6 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LeashHitch;
 import org.popcraft.bolt.matcher.Match;
+import org.popcraft.bolt.util.FoliaUtil;
 
 import java.util.Set;
 
@@ -29,6 +30,6 @@ public class LeashHitchMatcher implements BlockMatcher {
 
     @Override
     public Match findMatch(Block block) {
-        return Match.ofEntities(block.getWorld().getNearbyEntities(block.getBoundingBox(), LeashHitch.class::isInstance));
+        return Match.ofEntities(FoliaUtil.getNearbyEntities(block, block.getBoundingBox(), LeashHitch.class::isInstance));
     }
 }

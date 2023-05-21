@@ -55,6 +55,7 @@ import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Doors;
+import org.popcraft.bolt.util.FoliaUtil;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
@@ -498,7 +499,7 @@ public final class BlockListener implements Listener {
                 return;
             }
             final BoundingBox moveArea = block.getBoundingBox().shift(e.getDirection().getDirection());
-            if (!block.getWorld().getNearbyEntities(moveArea, plugin::isProtected).isEmpty()) {
+            if (!FoliaUtil.getNearbyEntities(block, moveArea, plugin::isProtected).isEmpty()) {
                 e.setCancelled(true);
                 return;
             }
@@ -506,7 +507,7 @@ public final class BlockListener implements Listener {
         if (blocks.isEmpty()) {
             final Block piston = e.getBlock();
             final BoundingBox moveArea = piston.getBoundingBox().shift(e.getDirection().getDirection());
-            if (!piston.getWorld().getNearbyEntities(moveArea, plugin::isProtected).isEmpty()) {
+            if (!FoliaUtil.getNearbyEntities(piston, moveArea, plugin::isProtected).isEmpty()) {
                 e.setCancelled(true);
             }
         }
