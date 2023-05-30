@@ -10,7 +10,7 @@ dependencies {
     implementation(group = "net.kyori", name = "adventure-api", version = "4.13.1")
     implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.13.1")
     implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.3.0")
-    implementation(group = "org.bstats", name = "bstats-bukkit", version = "3.0.1")
+    implementation(group = "org.bstats", name = "bstats-bukkit", version = "3.0.2")
     implementation(group = "org.popcraft", name = "chunky-nbt", version = "1.3.76")
     implementation(project(":bolt-common"))
     implementation(project(":bolt-paper"))
@@ -21,7 +21,7 @@ tasks {
     processResources {
         filesMatching("plugin.yml") {
             expand(
-                "name" to rootProject.name.capitalize(),
+                "name" to project.property("artifactName"),
                 "version" to project.version,
                 "group" to project.group,
                 "author" to project.property("author"),

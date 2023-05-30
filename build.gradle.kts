@@ -3,7 +3,7 @@ import java.io.ByteArrayOutputStream
 plugins {
     id("java-library")
     id("maven-publish")
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 subprojects {
@@ -30,7 +30,7 @@ subprojects {
         }
         shadowJar {
             archiveClassifier.set("")
-            archiveFileName.set("${rootProject.name.capitalize()}-${project.version}.jar")
+            archiveFileName.set("${project.property("artifactName")}-${project.version}.jar")
         }
         build {
             dependsOn(shadowJar)
