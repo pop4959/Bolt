@@ -89,6 +89,8 @@ blocks:
     autoProtect: false
   '#wall_signs':
     autoProtect: false
+  '#all_hanging_signs':
+    autoProtect: false
   '#doors':
     autoProtect: false
   '#trapdoors':
