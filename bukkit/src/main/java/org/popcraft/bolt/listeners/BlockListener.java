@@ -451,7 +451,11 @@ public final class BlockListener implements Listener {
         if (Tag.DOORS.isTagged(e.getBlock().getType())) {
             return;
         }
-        if (plugin.isProtected(e.getBlock())) {
+        final Protection protection = plugin.findProtection(e.getBlock());
+        if (protection == null) {
+            return;
+        }
+        if (!(e.getEntity() instanceof final Player player) || !plugin.canAccess(protection, player, Permission.INTERACT)) {
             e.setCancelled(true);
         }
     }
