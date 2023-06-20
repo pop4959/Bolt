@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.ChiseledBookshelf;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Leaves;
@@ -40,6 +41,7 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.util.Vector;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.lang.Translation;
@@ -54,7 +56,9 @@ import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Doors;
+import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Mode;
+import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.Protections;
@@ -71,6 +75,7 @@ import static org.popcraft.bolt.util.Profiles.NIL_UUID;
 public final class BlockListener implements Listener {
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
+    private static final Material CHISELED_BOOKSHELF = EnumUtil.valueOf(Material.class, "CHISELED_BOOKSHELF").orElse(null);
     private final BoltPlugin plugin;
 
     public BlockListener(final BoltPlugin plugin) {
@@ -163,6 +168,18 @@ public final class BlockListener implements Listener {
                 } else if ((Tag.SIGNS.isTagged(clicked.getType()) && (DYES.contains(itemType) || Material.GLOW_INK_SAC.equals(itemType)) && !plugin.canAccess(protection, player, Permission.INTERACT))) {
                     e.setUseItemInHand(Event.Result.DENY);
                     e.setUseInteractedBlock(Event.Result.DENY);
+                }
+            }
+            if (CHISELED_BOOKSHELF != null && CHISELED_BOOKSHELF.equals(clicked.getType()) && clicked.getState() instanceof final ChiseledBookshelf chiseledBookshelf && clicked.getBlockData() instanceof final org.bukkit.block.data.type.ChiseledBookshelf chiseledBookshelfBlockData && chiseledBookshelfBlockData.getFacing() == e.getBlockFace()) {
+                // Future: Replace with Material.CHISELED_BOOKSHELF
+                final Vector clickedPosition = PaperUtil.getClickedPosition(e);
+                if (clickedPosition != null) {
+                    final int slot = chiseledBookshelf.getSlot(clickedPosition);
+                    final boolean isOccupied = chiseledBookshelfBlockData.isSlotOccupied(slot);
+                    if ((!isOccupied && !plugin.canAccess(protection, player, Permission.DEPOSIT)) || (isOccupied && !plugin.canAccess(protection, player, Permission.WITHDRAW))) {
+                        e.setUseItemInHand(Event.Result.DENY);
+                        e.setUseInteractedBlock(Event.Result.DENY);
+                    }
                 }
             }
             boltPlayer.setInteracted();

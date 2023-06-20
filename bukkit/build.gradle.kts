@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.19.4-R0.1-SNAPSHOT")
+    compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.20.1-R0.1-SNAPSHOT")
     implementation(group = "net.kyori", name = "adventure-api", version = "4.13.1")
     implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.13.1")
     implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.3.0")

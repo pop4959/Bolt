@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.util.Vector;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -11,6 +13,7 @@ public class PaperUtil {
     private static final boolean CONFIG_EXISTS = classExists("com.destroystokyo.paper.PaperConfig") || classExists("io.papermc.paper.configuration.Configuration");
     private static boolean getOfflinePlayerIfCachedExists;
     private static boolean getChunkAtAsyncExists;
+    private static boolean getClickedPositionExists;
 
     static {
         try {
@@ -24,6 +27,12 @@ public class PaperUtil {
             getChunkAtAsyncExists = true;
         } catch (NoSuchMethodException e) {
             getChunkAtAsyncExists = false;
+        }
+        try {
+            PlayerInteractEvent.class.getMethod("getClickedPosition");
+            getClickedPositionExists = true;
+        } catch (NoSuchMethodException e) {
+            getClickedPositionExists = false;
         }
     }
 
@@ -47,6 +56,15 @@ public class PaperUtil {
             return world.getChunkAtAsync(x, z);
         } else {
             return CompletableFuture.completedFuture(world.getChunkAt(x, z));
+        }
+    }
+
+    public static Vector getClickedPosition(final PlayerInteractEvent e) {
+        if (getClickedPositionExists) {
+            //noinspection deprecation
+            return e.getClickedPosition();
+        } else {
+            return null;
         }
     }
 
