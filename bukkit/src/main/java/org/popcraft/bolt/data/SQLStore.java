@@ -73,16 +73,18 @@ public class SQLStore implements Store {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        try (final PreparedStatement createBlocksOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_BLOCK_OWNER.get(configuration.type()).formatted(configuration.prefix()));
-             final PreparedStatement createBlocksLocationIndex = connection.prepareStatement(Statements.CREATE_INDEX_BLOCK_LOCATION.get(configuration.type()).formatted(configuration.prefix()));
-             final PreparedStatement createEntitiesOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_ENTITY_OWNER.get(configuration.type()).formatted(configuration.prefix()));
-             final PreparedStatement createGroupsOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_GROUP_OWNER.get(configuration.type()).formatted(configuration.prefix()))) {
-            createBlocksOwnerIndex.execute();
-            createBlocksLocationIndex.execute();
-            createEntitiesOwnerIndex.execute();
-            createGroupsOwnerIndex.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (!usingMySQL) {
+            try (final PreparedStatement createBlocksOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_BLOCK_OWNER.get(configuration.type()).formatted(configuration.prefix()));
+                 final PreparedStatement createBlocksLocationIndex = connection.prepareStatement(Statements.CREATE_INDEX_BLOCK_LOCATION.get(configuration.type()).formatted(configuration.prefix()));
+                 final PreparedStatement createEntitiesOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_ENTITY_OWNER.get(configuration.type()).formatted(configuration.prefix()));
+                 final PreparedStatement createGroupsOwnerIndex = connection.prepareStatement(Statements.CREATE_INDEX_GROUP_OWNER.get(configuration.type()).formatted(configuration.prefix()))) {
+                createBlocksOwnerIndex.execute();
+                createBlocksLocationIndex.execute();
+                createEntitiesOwnerIndex.execute();
+                createGroupsOwnerIndex.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         executor.scheduleWithFixedDelay(this::flush, 30, 30, TimeUnit.SECONDS);
         if (usingMySQL) {
