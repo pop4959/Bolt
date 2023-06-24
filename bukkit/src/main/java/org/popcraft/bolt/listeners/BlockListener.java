@@ -28,6 +28,7 @@ import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockReceiveGameEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
@@ -76,6 +77,8 @@ public final class BlockListener implements Listener {
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     private static final Material CHISELED_BOOKSHELF = EnumUtil.valueOf(Material.class, "CHISELED_BOOKSHELF").orElse(null);
+    private static final Material SCULK_SENSOR = EnumUtil.valueOf(Material.class, "SCULK_SENSOR").orElse(null);
+    private static final Material CALIBRATED_SCULK_SENSOR = EnumUtil.valueOf(Material.class, "CALIBRATED_SCULK_SENSOR").orElse(null);
     private final BoltPlugin plugin;
 
     public BlockListener(final BoltPlugin plugin) {
@@ -648,5 +651,23 @@ public final class BlockListener implements Listener {
             final BlockProtection newProtection = plugin.createProtection(placed, existingProtection.getOwner(), existingProtection.getType());
             plugin.saveProtection(newProtection);
         });
+    }
+
+    @EventHandler
+    public void onBlockReceiveGameEvent(final BlockReceiveGameEvent e) {
+        if (!(e.getEntity() instanceof final Player player)) {
+            return;
+        }
+        final Material material = e.getBlock().getType();
+        if ((SCULK_SENSOR == null || !SCULK_SENSOR.equals(material)) && (CALIBRATED_SCULK_SENSOR == null || !CALIBRATED_SCULK_SENSOR.equals(material))) {
+            return;
+        }
+        final Protection protection = plugin.findProtection(e.getBlock());
+        if (protection == null) {
+            return;
+        }
+        if (!plugin.canAccess(protection, player, Permission.INTERACT)) {
+            e.setCancelled(true);
+        }
     }
 }
