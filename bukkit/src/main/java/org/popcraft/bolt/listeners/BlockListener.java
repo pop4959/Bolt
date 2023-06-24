@@ -201,7 +201,7 @@ public final class BlockListener implements Listener {
                         .map(Access::type)
                         .orElse(plugin.getDefaultProtectionType());
                 if (protection != null) {
-                    if (protection.getOwner().equals(player.getUniqueId()) && !protection.getType().equals(protectionType)) {
+                    if (!protection.getType().equals(protectionType) && plugin.canAccess(protection, player, Permission.EDIT)) {
                         protection.setType(protectionType);
                         plugin.saveProtection(protection);
                         BoltComponents.sendMessage(
