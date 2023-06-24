@@ -10,9 +10,9 @@ public enum Statements {
             "CREATE TABLE IF NOT EXISTS %sentities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created bigint, accessed bigint, access text, entity varchar(128));"
     ),
     CREATE_TABLE_GROUPS(
-            "CREATE TABLE IF NOT EXISTS %sgroups (name varchar(128) PRIMARY KEY, owner varchar(36), members text, INDEX group_owner(owner));",
-            "CREATE TABLE IF NOT EXISTS %sgroups (name varchar(128) PRIMARY KEY, owner varchar(36), members text);"
-    ),
+            "CREATE TABLE IF NOT EXISTS %sgroups (name varchar(128) PRIMARY KEY, owner varchar(36), members text);",
+            "CREATE TABLE IF NOT EXISTS %sgroups (name varchar(128) PRIMARY KEY, owner varchar(36), members text, INDEX group_owner(owner));"
+            ),
     CREATE_TABLE_ACCESS(
             "CREATE TABLE IF NOT EXISTS %saccess (owner varchar(36) PRIMARY KEY, access text);"
     ),
