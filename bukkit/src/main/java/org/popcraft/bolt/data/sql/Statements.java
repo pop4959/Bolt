@@ -12,7 +12,7 @@ public enum Statements {
     CREATE_TABLE_GROUPS(
             "CREATE TABLE IF NOT EXISTS %sgroups (name varchar(128) PRIMARY KEY, owner varchar(36), members text);",
             "CREATE TABLE IF NOT EXISTS %sgroups (name varchar(128) PRIMARY KEY, owner varchar(36), members text, INDEX group_owner(owner));"
-            ),
+    ),
     CREATE_TABLE_ACCESS(
             "CREATE TABLE IF NOT EXISTS %saccess (owner varchar(36) PRIMARY KEY, access text);"
     ),
