@@ -2,12 +2,12 @@ package org.popcraft.bolt.data.sql;
 
 public enum Statements {
     CREATE_TABLE_BLOCKS(
-            "CREATE TABLE IF NOT EXISTS %sblocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created integer, accessed integer, access text, world varchar(128), x integer, y integer, z integer, block varchar(128), INDEX block_owner(owner), INDEX block_location(world, x, y, z));",
-            "CREATE TABLE IF NOT EXISTS %sblocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created bigint, accessed bigint, access text, world varchar(128), x integer, y integer, z integer, block varchar(128));"
+            "CREATE TABLE IF NOT EXISTS %sblocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created bigint, accessed bigint, access text, world varchar(128), x integer, y integer, z integer, block varchar(128));",
+            "CREATE TABLE IF NOT EXISTS %sblocks (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created integer, accessed integer, access text, world varchar(128), x integer, y integer, z integer, block varchar(128), INDEX block_owner(owner), INDEX block_location(world, x, y, z));"
     ),
     CREATE_TABLE_ENTITIES(
-            "CREATE TABLE IF NOT EXISTS %sentities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created integer, accessed integer, access text, entity varchar(128), INDEX entity_owner(owner));",
-            "CREATE TABLE IF NOT EXISTS %sentities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created bigint, accessed bigint, access text, entity varchar(128));"
+            "CREATE TABLE IF NOT EXISTS %sentities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created bigint, accessed bigint, access text, entity varchar(128));",
+            "CREATE TABLE IF NOT EXISTS %sentities (id varchar(36) PRIMARY KEY, owner varchar(36), type varchar(128), created integer, accessed integer, access text, entity varchar(128), INDEX entity_owner(owner));"
     ),
     CREATE_TABLE_GROUPS(
             "CREATE TABLE IF NOT EXISTS %sgroups (name varchar(128) PRIMARY KEY, owner varchar(36), members text);",
