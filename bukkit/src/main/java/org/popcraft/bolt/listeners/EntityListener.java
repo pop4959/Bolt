@@ -57,6 +57,7 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
+import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 import org.spigotmc.event.entity.EntityMountEvent;
@@ -133,7 +134,14 @@ public final class EntityListener implements Listener {
         if (!plugin.isProtectable(entity)) {
             return;
         }
-        final Access access = plugin.getDefaultAccess(entity);
+        final ProtectableConfig protectableConfig = plugin.getProtectableConfig(entity);
+        if (protectableConfig == null) {
+            return;
+        }
+        if (protectableConfig.autoProtectPermission() && !player.hasPermission("bolt.protection.autoprotect.%s".formatted(entity.getType().name().toLowerCase()))) {
+            return;
+        }
+        final Access access = protectableConfig.defaultAccess();
         if (access == null) {
             return;
         }
@@ -311,6 +319,8 @@ public final class EntityListener implements Listener {
                         .flatMap(type -> plugin.getBolt().getAccessRegistry().getProtectionByType(type))
                         .map(Access::type)
                         .orElse(plugin.getDefaultProtectionType());
+                final ProtectableConfig protectableConfig = plugin.getProtectableConfig(entity);
+                final boolean lockPermission = protectableConfig != null && protectableConfig.lockPermission();
                 if (protection != null) {
                     if (!protection.getType().equals(protectionType) && plugin.canAccess(protection, player, Permission.EDIT)) {
                         protection.setType(protectionType);
@@ -329,7 +339,7 @@ public final class EntityListener implements Listener {
                                 Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
                         );
                     }
-                } else if (plugin.isProtectable(entity)) {
+                } else if (plugin.isProtectable(entity) && (!lockPermission || player.hasPermission("bolt.protection.lock.%s".formatted(entity.getType().name().toLowerCase())))) {
                     final EntityProtection newProtection = plugin.createProtection(entity, boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
                     plugin.saveProtection(newProtection);
                     boltPlayer.setLockNil(false);

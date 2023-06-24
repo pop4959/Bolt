@@ -62,6 +62,7 @@ import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
+import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 
@@ -203,6 +204,8 @@ public final class BlockListener implements Listener {
                         .flatMap(type -> plugin.getBolt().getAccessRegistry().getProtectionByType(type))
                         .map(Access::type)
                         .orElse(plugin.getDefaultProtectionType());
+                final ProtectableConfig protectableConfig = plugin.getProtectableConfig(block);
+                final boolean lockPermission = protectableConfig != null && protectableConfig.lockPermission();
                 if (protection != null) {
                     if (!protection.getType().equals(protectionType) && plugin.canAccess(protection, player, Permission.EDIT)) {
                         protection.setType(protectionType);
@@ -221,7 +224,7 @@ public final class BlockListener implements Listener {
                                 Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection))
                         );
                     }
-                } else if (plugin.isProtectable(block)) {
+                } else if (plugin.isProtectable(block) && (!lockPermission || player.hasPermission("bolt.protection.lock.%s".formatted(block.getType().name().toLowerCase())))) {
                     final BlockProtection newProtection = plugin.createProtection(block, boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
                     plugin.saveProtection(newProtection);
                     boltPlayer.setLockNil(false);
@@ -369,7 +372,14 @@ public final class BlockListener implements Listener {
         if (!plugin.isProtectable(block)) {
             return;
         }
-        final Access access = plugin.getDefaultAccess(block);
+        final ProtectableConfig protectableConfig = plugin.getProtectableConfig(block);
+        if (protectableConfig == null) {
+            return;
+        }
+        if (protectableConfig.autoProtectPermission() && !player.hasPermission("bolt.protection.autoprotect.%s".formatted(block.getType().name().toLowerCase()))) {
+            return;
+        }
+        final Access access = protectableConfig.defaultAccess();
         if (access == null) {
             return;
         }
