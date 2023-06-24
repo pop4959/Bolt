@@ -20,6 +20,7 @@ import java.util.Map;
 
 public class AdminCommand extends BoltCommand {
     public static final Map<String, BoltCommand> SUB_COMMANDS = new HashMap<>();
+    private static final String COMMAND_PERMISSION_KEY = "bolt.command.admin.";
 
     public AdminCommand(BoltPlugin plugin) {
         super(plugin);
@@ -53,6 +54,10 @@ public class AdminCommand extends BoltCommand {
             return;
         }
         if (!SUB_COMMANDS.containsKey(subcommand)) {
+            return;
+        }
+        if (!sender.hasPermission(COMMAND_PERMISSION_KEY + subcommand)) {
+            BoltComponents.sendMessage(sender, Translation.COMMAND_NO_PERMISSION);
             return;
         }
         SUB_COMMANDS.get(subcommand).execute(sender, arguments);

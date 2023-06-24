@@ -24,6 +24,24 @@ permissions:
     default: true
   bolt.command.admin:
     default: op
+  bolt.command.admin.cleanup:
+    default: op
+  bolt.command.admin.convert:
+    default: op
+  bolt.command.admin.debug:
+    default: op
+  bolt.command.admin.find:
+    default: op
+  bolt.command.admin.flush:
+    default: op
+  bolt.command.admin.purge:
+    default: op
+  bolt.command.admin.reload:
+    default: op
+  bolt.command.admin.report:
+    default: op
+  bolt.command.admin.transfer:
+    default: op
   bolt.command.edit:
     default: true
   bolt.command.group:
