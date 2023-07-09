@@ -53,7 +53,6 @@ import org.popcraft.bolt.listeners.PlayerListener;
 import org.popcraft.bolt.listeners.adapter.PlayerRecipeBookClickListener;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.matcher.block.AmethystClusterMatcher;
-import org.popcraft.bolt.matcher.block.ArmorStandMatcher;
 import org.popcraft.bolt.matcher.block.BannerMatcher;
 import org.popcraft.bolt.matcher.block.BedMatcher;
 import org.popcraft.bolt.matcher.block.BellMatcher;
@@ -149,7 +148,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     public static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("boltDebug", "false"));
     private static final String COMMAND_PERMISSION_KEY = "bolt.command.";
     private static final BlockMatcher CHEST_MATCHER = new ChestMatcher();
-    private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(CHEST_MATCHER, new ArmorStandMatcher(),
+    private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(CHEST_MATCHER,
             new BannerMatcher(), new BedMatcher(), new DoorMatcher(), new LeashHitchMatcher(),
             new PressurePlateMatcher(), new RailMatcher(), new SignMatcher(), new SwitchMatcher(),
             new TrapdoorMatcher(), new CropsMatcher(), new FarmlandMatcher(), new UprootMatcher(),
