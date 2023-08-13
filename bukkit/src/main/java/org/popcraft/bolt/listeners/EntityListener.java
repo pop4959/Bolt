@@ -63,7 +63,9 @@ import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 import org.spigotmc.event.entity.EntityMountEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -544,7 +546,22 @@ public final class EntityListener implements Listener {
 
     @EventHandler
     public void onPlayerArmorStandManipulate(final PlayerArmorStandManipulateEvent e) {
-        if (!plugin.canAccess(e.getRightClicked(), e.getPlayer(), Permission.INTERACT)) {
+        final Player player = e.getPlayer();
+        final Entity entity = e.getRightClicked();
+        if (!plugin.canAccess(entity, player, Permission.INTERACT)) {
+            e.setCancelled(true);
+            return;
+        }
+        final boolean hasPlayerItem = !e.getPlayerItem().getType().isAir();
+        final boolean hasArmorStandItem = !e.getArmorStandItem().getType().isAir();
+        final List<String> permissionsToCheck = new ArrayList<>();
+        if (hasPlayerItem) {
+            permissionsToCheck.add(Permission.DEPOSIT);
+        }
+        if (hasArmorStandItem) {
+            permissionsToCheck.add(Permission.WITHDRAW);
+        }
+        if (!permissionsToCheck.isEmpty() && !plugin.canAccess(entity, player, permissionsToCheck.toArray(new String[0]))) {
             e.setCancelled(true);
         }
     }
