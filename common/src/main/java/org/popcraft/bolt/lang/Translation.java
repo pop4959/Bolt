@@ -32,6 +32,8 @@ public class Translation {
     public static final String EDIT_SOURCE_NO_PERMISSION = "edit_source_no_permission";
     public static final String ENTER_PASSWORD = "enter_password";
     public static final String ENTER_PASSWORD_NONE = "enter_password_none";
+    public static final String EXPIRE_COMPLETE = "expire_complete";
+    public static final String EXPIRE_INVALID_TIME = "expire_invalid_time";
     public static final String FIND_HEADER = "find_header";
     public static final String FIND_RESULT = "find_result";
     public static final String FIND_NEXT = "find_next";
@@ -77,6 +79,7 @@ public class Translation {
     public static final String HELP_COMMAND_SHORT_ADMIN = "help_command_short_admin";
     public static final String HELP_COMMAND_SHORT_ADMIN_CONVERT = "help_command_short_admin_convert";
     public static final String HELP_COMMAND_SHORT_ADMIN_DEBUG = "help_command_short_admin_debug";
+    public static final String HELP_COMMAND_SHORT_ADMIN_EXPIRE = "help_command_short_admin_expire";
     public static final String HELP_COMMAND_SHORT_ADMIN_FIND = "help_command_short_admin_find";
     public static final String HELP_COMMAND_SHORT_ADMIN_FLUSH = "help_command_short_admin_flush";
     public static final String HELP_COMMAND_SHORT_ADMIN_PURGE = "help_command_short_admin_purge";
@@ -98,6 +101,7 @@ public class Translation {
     public static final String HELP_COMMAND_LONG_ADMIN = "help_command_long_admin";
     public static final String HELP_COMMAND_LONG_ADMIN_CONVERT = "help_command_long_admin_convert";
     public static final String HELP_COMMAND_LONG_ADMIN_DEBUG = "help_command_long_admin_debug";
+    public static final String HELP_COMMAND_LONG_ADMIN_EXPIRE = "help_command_long_admin_expire";
     public static final String HELP_COMMAND_LONG_ADMIN_FIND = "help_command_long_admin_find";
     public static final String HELP_COMMAND_LONG_ADMIN_FLUSH = "help_command_long_admin_flush";
     public static final String HELP_COMMAND_LONG_ADMIN_PURGE = "help_command_long_admin_purge";

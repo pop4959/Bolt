@@ -30,6 +30,8 @@ permissions:
     default: op
   bolt.command.admin.debug:
     default: op
+  bolt.command.admin.expire:
+    default: op
   bolt.command.admin.find:
     default: op
   bolt.command.admin.flush:
