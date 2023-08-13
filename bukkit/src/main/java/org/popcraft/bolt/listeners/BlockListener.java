@@ -98,14 +98,17 @@ public final class BlockListener implements Listener {
         final Player player = e.getPlayer();
         final BoltPlayer boltPlayer = plugin.player(player);
         if (boltPlayer.hasInteracted()) {
-            e.setCancelled(true);
+            if (boltPlayer.isInteractionCancelled()) {
+                e.setCancelled(true);
+            }
             return;
         }
         final Protection protection = plugin.findProtection(clicked);
+        boolean shouldCancel = false;
         if (triggerActions(player, protection, clicked)) {
-            boltPlayer.setInteracted();
+            boltPlayer.setInteracted(true);
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
-            e.setCancelled(true);
+            shouldCancel = true;
         } else if (protection != null) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
             final boolean canInteract = plugin.canAccess(protection, player, Permission.INTERACT);
@@ -114,7 +117,7 @@ public final class BlockListener implements Listener {
                 plugin.saveProtection(blockProtection);
             }
             if (!canInteract) {
-                e.setCancelled(true);
+                shouldCancel = true;
                 if (!hasNotifyPermission) {
                     BoltComponents.sendMessage(
                             player,
@@ -186,8 +189,11 @@ public final class BlockListener implements Listener {
                     }
                 }
             }
-            boltPlayer.setInteracted();
+            boltPlayer.setInteracted(shouldCancel);
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
+        }
+        if (shouldCancel) {
+            e.setCancelled(true);
         }
     }
 

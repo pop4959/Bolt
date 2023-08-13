@@ -240,7 +240,7 @@ public final class EntityListener implements Listener {
         boolean shouldCancel = false;
         final Protection protection = plugin.findProtection(entity);
         if (triggerActions(player, protection, entity)) {
-            boltPlayer.setInteracted();
+            boltPlayer.setInteracted(true);
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
             shouldCancel = true;
         } else if (protection != null) {
@@ -300,7 +300,7 @@ public final class EntityListener implements Listener {
                     }
                 });
             }
-            boltPlayer.setInteracted();
+            boltPlayer.setInteracted(shouldCancel);
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
         }
         return shouldCancel;
