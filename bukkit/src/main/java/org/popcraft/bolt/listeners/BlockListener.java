@@ -203,6 +203,10 @@ public final class BlockListener implements Listener {
         if (action == null) {
             return false;
         }
+        if (!player.hasPermission(action.getPermission())) {
+            BoltComponents.sendMessage(player, Translation.COMMAND_NO_PERMISSION);
+            return false;
+        }
         final Action.Type actionType = action.getType();
         switch (actionType) {
             case LOCK -> {

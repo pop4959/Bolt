@@ -39,7 +39,7 @@ public class LockCommand extends BoltCommand {
                 BoltComponents.sendMessage(sender, Translation.CLICK_LOCKED_NO_PERMISSION);
                 return;
             }
-            boltPlayer.setAction(new Action(Action.Type.LOCK, type));
+            boltPlayer.setAction(new Action(Action.Type.LOCK, "bolt.command.lock", type));
             if (BoltPlugin.DEBUG && arguments.remaining() > 0) {
                 boltPlayer.setLockNil(true);
             }

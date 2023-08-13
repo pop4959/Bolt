@@ -34,7 +34,7 @@ public class TransferCommand extends BoltCommand {
         final String owner = arguments.next();
         Profiles.findOrLookupProfileByName(owner).thenAccept(profile -> {
             if (profile.uuid() != null) {
-                plugin.player(player).setAction(new Action(Action.Type.TRANSFER, profile.uuid().toString()));
+                plugin.player(player).setAction(new Action(Action.Type.TRANSFER, "bolt.command.transfer", profile.uuid().toString()));
                 SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                         player,
                         Translation.CLICK_TRANSFER,

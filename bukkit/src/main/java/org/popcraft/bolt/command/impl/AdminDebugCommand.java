@@ -22,7 +22,7 @@ public class AdminDebugCommand extends BoltCommand {
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
         if (sender instanceof final Player player) {
-            plugin.player(player).setAction(new Action(Action.Type.DEBUG));
+            plugin.player(player).setAction(new Action(Action.Type.DEBUG, "bolt.command.admin.debug"));
             BoltComponents.sendMessage(player, "Click to debug object");
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);

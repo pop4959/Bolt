@@ -2,29 +2,37 @@ package org.popcraft.bolt.util;
 
 public class Action {
     private final Type type;
+    private final String permission;
     private final String data;
     private final boolean admin;
 
-    public Action(final Type type) {
+    public Action(final Type type, final String permission) {
         this.type = type;
+        this.permission = permission;
         this.data = null;
         this.admin = false;
     }
 
-    public Action(final Type type, final String data) {
+    public Action(final Type type, final String permission, final String data) {
         this.type = type;
+        this.permission = permission;
         this.data = data;
         this.admin = false;
     }
 
-    public Action(Type type, String data, boolean admin) {
+    public Action(Type type, final String permission, String data, boolean admin) {
         this.type = type;
+        this.permission = permission;
         this.data = data;
         this.admin = admin;
     }
 
     public Type getType() {
         return type;
+    }
+
+    public String getPermission() {
+        return permission;
     }
 
     public String getData() {

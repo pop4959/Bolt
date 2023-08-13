@@ -35,7 +35,7 @@ public class EditCommand extends BoltCommand {
         }
         final BoltPlayer boltPlayer = plugin.player(player);
         final boolean adding = "add".equalsIgnoreCase(arguments.next());
-        boltPlayer.setAction(new Action(Action.Type.EDIT, Boolean.toString(adding)));
+        boltPlayer.setAction(new Action(Action.Type.EDIT, "bolt.command.edit", Boolean.toString(adding)));
 
         final String target = arguments.next();
         final Profile playerProfile = Profiles.findOrLookupProfileByName(target).join();
