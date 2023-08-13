@@ -49,8 +49,6 @@ blocks:
     autoProtect: private
   trapped_chest:
     autoProtect: private
-  ender_chest:
-    autoProtect: private
   furnace:
     autoProtect: private
   blast_furnace:
@@ -85,6 +83,8 @@ blocks:
     autoProtect: private
   '#cauldrons':
     autoProtect: private
+  ender_chest:
+    autoProtect: public
   '#standing_signs':
     autoProtect: false
   '#wall_signs':
