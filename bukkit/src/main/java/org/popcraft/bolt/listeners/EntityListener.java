@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -191,6 +192,13 @@ public final class EntityListener implements Listener {
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
         final Entity damager = getDamagerSource(e.getDamager());
         final Entity entity = e.getEntity();
+        if (entity instanceof final ItemFrame itemFrame && damager instanceof final Player player) {
+            final boolean itemInFrame = !itemFrame.getItem().getType().isAir();
+            if (itemInFrame && !plugin.canAccess(entity, player, Permission.WITHDRAW)) {
+                e.setCancelled(true);
+            }
+            return;
+        }
         if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) || (!(damager instanceof Player) && plugin.isProtected(entity))) {
             e.setCancelled(true);
         }
@@ -520,8 +528,17 @@ public final class EntityListener implements Listener {
             e.setCancelled(true);
             return;
         }
-        if (!plugin.canAccess(e.getRightClicked(), player, Permission.INTERACT)) {
+        final Entity entity = e.getRightClicked();
+        if (!plugin.canAccess(entity, player, Permission.INTERACT)) {
             e.setCancelled(true);
+            return;
+        }
+        if (e.getRightClicked() instanceof final ItemFrame itemFrame) {
+            final boolean noItemInFrame = itemFrame.getItem().getType().isAir();
+            final boolean hasItemInHand = e.getPlayer().getInventory().getItem(e.getHand()) != null;
+            if (noItemInFrame && hasItemInHand && !plugin.canAccess(entity, player, Permission.DEPOSIT)) {
+                e.setCancelled(true);
+            }
         }
     }
 
