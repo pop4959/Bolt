@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -34,6 +35,7 @@ import java.util.Map;
 public final class InventoryListener implements Listener {
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
     private static final Map<InventoryType, EnumSet<Material>> INVENTORY_TYPE_BLOCKS = Map.of(
+            InventoryType.ANVIL, EnumSet.of(Material.ANVIL, Material.CHIPPED_ANVIL, Material.DAMAGED_ANVIL),
             InventoryType.BARREL, EnumSet.of(Material.BARREL),
             InventoryType.BLAST_FURNACE, EnumSet.of(Material.BLAST_FURNACE),
             InventoryType.CHEST, EnumSet.of(Material.CHEST, Material.TRAPPED_CHEST),
@@ -159,6 +161,14 @@ public final class InventoryListener implements Listener {
         if (!plugin.canAccess(entity, player, Permission.DEPOSIT)) {
             e.setCancelled(true);
         }
+    }
+
+    public void onAnvilBreak(final InventoryEvent e) {
+        final Protection anvilProtection = getInventoryProtection(e.getInventory());
+        if (anvilProtection == null) {
+            return;
+        }
+        plugin.removeProtection(anvilProtection);
     }
 
     private Protection getInventoryProtection(final Inventory inventory) {

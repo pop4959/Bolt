@@ -50,6 +50,7 @@ import org.popcraft.bolt.listeners.BlockListener;
 import org.popcraft.bolt.listeners.EntityListener;
 import org.popcraft.bolt.listeners.InventoryListener;
 import org.popcraft.bolt.listeners.PlayerListener;
+import org.popcraft.bolt.listeners.adapter.AnvilDamagedListener;
 import org.popcraft.bolt.listeners.adapter.PlayerRecipeBookClickListener;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.matcher.block.AmethystClusterMatcher;
@@ -407,7 +408,11 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             pluginManager.registerEvents(new PlayerRecipeBookClickListener(blockListener::onPlayerRecipeBookClick), this);
         }
         pluginManager.registerEvents(new EntityListener(this), this);
-        pluginManager.registerEvents(new InventoryListener(this), this);
+        final InventoryListener inventoryListener = new InventoryListener(this);
+        pluginManager.registerEvents(inventoryListener, this);
+        if (PaperUtil.isPaper()) {
+            pluginManager.registerEvents(new AnvilDamagedListener(inventoryListener::onAnvilBreak), this);
+        }
         pluginManager.registerEvents(new PlayerListener(this), this);
     }
 
