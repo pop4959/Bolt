@@ -462,7 +462,8 @@ public final class BlockListener implements Listener {
         if (block == null) {
             return;
         }
-        if (!plugin.canAccess(block, e.getPlayer(), Permission.DESTROY)) {
+        final boolean isPressurePlate = Tag.PRESSURE_PLATES.isTagged(block.getType());
+        if (!plugin.canAccess(block, e.getPlayer(), isPressurePlate ? Permission.INTERACT : Permission.DESTROY)) {
             e.setCancelled(true);
         }
     }
