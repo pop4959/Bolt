@@ -6,10 +6,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.20.1-R0.1-SNAPSHOT")
-    implementation(group = "net.kyori", name = "adventure-api", version = "4.13.1")
-    implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.13.1")
-    implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.3.0")
+    compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.20.2-R0.1-SNAPSHOT")
+    implementation(group = "net.kyori", name = "adventure-api", version = "4.14.0")
+    implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.14.0")
+    implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.3.1")
     implementation(group = "org.bstats", name = "bstats-bukkit", version = "3.0.2")
     implementation(group = "org.popcraft", name = "chunky-nbt", version = "1.3.76")
     implementation(project(":bolt-common"))
