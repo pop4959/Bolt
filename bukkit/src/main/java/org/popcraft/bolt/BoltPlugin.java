@@ -8,6 +8,7 @@ import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -19,6 +20,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.access.AccessList;
@@ -637,6 +639,26 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     public Protection findProtection(final Entity entity) {
         final Protection protection = loadProtection(entity);
         return protection != null ? protection : matchProtection(entity);
+    }
+
+    @Override
+    public Collection<Protection> findProtections(final World world, final BoundingBox boundingBox) {
+        final Collection<Protection> protections = new ArrayList<>();
+        bolt.getStore().loadBlockProtections().join().stream()
+                .filter(p -> world.getName().equals(p.getWorld()))
+                .filter(p -> boundingBox.contains(p.getX(), p.getY(), p.getZ()))
+                .forEach(protections::add);
+        Collection<EntityProtection> entityProtections = bolt.getStore().loadEntityProtections().join();
+        for (final EntityProtection entityProtection : entityProtections) {
+            final Entity entity = getServer().getEntity(entityProtection.getId());
+            if (entity == null) {
+                continue;
+            }
+            if (world.getName().equals(entity.getWorld().getName()) && boundingBox.contains(entity.getBoundingBox())) {
+                protections.add(entityProtection);
+            }
+        }
+        return protections;
     }
 
     @Override

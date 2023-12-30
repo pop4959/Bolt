@@ -1,8 +1,10 @@
 package org.popcraft.bolt;
 
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.BoundingBox;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
@@ -42,6 +44,8 @@ public interface BoltAPI {
     Protection findProtection(final Block block);
 
     Protection findProtection(final Entity entity);
+
+    Collection<Protection> findProtections(final World world, final BoundingBox boundingBox);
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     boolean canAccess(final Block block, final Player player, final String... permissions);
