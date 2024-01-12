@@ -190,7 +190,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     public void onEnable() {
         saveDefaultConfig();
         final SQLStore.Configuration databaseConfiguration = new SQLStore.Configuration(
-                getConfig().getString("database.type", "sqlite"),
+                getConfig().getString("database.type", "sqlite").toLowerCase(),
                 getConfig().getString("database.path", "%s/Bolt/bolt.db".formatted(getPluginsPath().toFile().getName())),
                 getConfig().getString("database.hostname", ""),
                 getConfig().getString("database.database", ""),
@@ -209,7 +209,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         registerCommands();
         profileCache.load();
         final Metrics metrics = new Metrics(this, 17711);
-        registerCustomCharts(metrics);
+        registerCustomCharts(metrics, databaseConfiguration);
         new ConfigMigration(this).convert();
         // Future: Move this into LWC Migration
         new TrustMigration(this).convert();
@@ -240,9 +240,9 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         initializeMatchers();
     }
 
-    private void registerCustomCharts(final Metrics metrics) {
+    private void registerCustomCharts(final Metrics metrics, final SQLStore.Configuration databaseConfiguration) {
         metrics.addCustomChart(new SimplePie("config_language", Translator::selected));
-        metrics.addCustomChart(new SimplePie("config_database", () -> getConfig().getString("database.type", "sqlite")));
+        metrics.addCustomChart(new SimplePie("config_database", databaseConfiguration::type));
         metrics.addCustomChart(new AdvancedPie("config_protections", () -> {
             final Map<String, Integer> map = new HashMap<>();
             bolt.getAccessRegistry().protectionTypes().forEach(type -> map.put(type, 1));
