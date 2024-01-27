@@ -27,7 +27,7 @@ public class UnlockCommand extends BoltCommand {
                     player,
                     Translation.CLICK_ACTION,
                     plugin.isUseActionBar(),
-                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.UNLOCK))
+                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.UNLOCK, player))
             );
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);

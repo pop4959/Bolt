@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.lang.Strings;
@@ -23,7 +24,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.popcraft.bolt.lang.Translator.isTranslatable;
-import static org.popcraft.bolt.lang.Translator.translate;
+import static org.popcraft.bolt.util.BoltComponents.getLocaleOf;
+import static org.popcraft.bolt.util.BoltComponents.resolveTranslation;
+import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 
 public final class Protections {
     // Future: Remove when support for lower than 1.19.3 is dropped
@@ -45,55 +48,55 @@ public final class Protections {
         return Component.text(protection.toString());
     }
 
-    public static Component protectionType(final Protection protection) {
+    public static Component protectionType(final Protection protection, final CommandSender sender) {
         final String protectionType = protection.getType();
         final String translationKey = "protection_type_%s".formatted(protectionType);
-        if (!isTranslatable(translationKey)) {
+        if (!isTranslatable(translationKey, getLocaleOf(sender))) {
             return Component.text(Strings.toTitleCase(protectionType));
         }
-        return BoltComponents.resolveTranslation(translationKey);
+        return BoltComponents.resolveTranslation(translationKey, sender);
     }
 
-    public static Component displayType(final Protection protection) {
+    public static Component displayType(final Protection protection, final CommandSender sender) {
         if (protection instanceof final BlockProtection blockProtection) {
             final World world = Bukkit.getWorld(blockProtection.getWorld());
             final int x = blockProtection.getX();
             final int y = blockProtection.getY();
             final int z = blockProtection.getZ();
             if (world == null || !world.isChunkLoaded(x >> 4, z >> 4)) {
-                return displayType(Objects.requireNonNullElse(Material.getMaterial(blockProtection.getBlock().toUpperCase()), Material.AIR));
+                return displayType(Objects.requireNonNullElse(Material.getMaterial(blockProtection.getBlock().toUpperCase()), Material.AIR), sender);
             } else {
-                return displayType(world.getBlockAt(x, y, z));
+                return displayType(world.getBlockAt(x, y, z), sender);
             }
         } else if (protection instanceof final EntityProtection entityProtection) {
             final Entity entity = Bukkit.getServer().getEntity(entityProtection.getId());
             if (entity == null) {
                 try {
-                    return displayType(EntityType.valueOf(entityProtection.getEntity().toUpperCase()));
+                    return displayType(EntityType.valueOf(entityProtection.getEntity().toUpperCase()), sender);
                 } catch (IllegalArgumentException e) {
-                    return displayType(EntityType.PIG);
+                    return displayType(EntityType.PIG, sender);
                 }
             } else {
-                return displayType(entity);
+                return displayType(entity, sender);
             }
         } else {
-            return Component.text(translate(Translation.UNKNOWN));
+            return resolveTranslation(Translation.UNKNOWN, sender);
         }
     }
 
-    public static Component displayType(final Block block) {
+    public static Component displayType(final Block block, final CommandSender sender) {
         final Material material = block.getType();
         if (translatableSupport) {
-            return displayType(material);
+            return displayType(material, sender);
         } else {
             return displayTypeFromData(material);
         }
     }
 
-    private static Component displayType(final Material material) {
+    private static Component displayType(final Material material, final CommandSender sender) {
         final String materialNameLower = material.name().toLowerCase();
         final String blockTranslationKey = "block_%s".formatted(materialNameLower);
-        final String blockTranslation = translate(blockTranslationKey);
+        final String blockTranslation = translateRaw(blockTranslationKey, sender);
         if (!blockTranslationKey.equals(blockTranslation)) {
             return Component.text(blockTranslation);
         }
@@ -116,18 +119,18 @@ public final class Protections {
         return Component.translatable("block.%s".formatted(key));
     }
 
-    public static Component displayType(final Entity entity) {
+    public static Component displayType(final Entity entity, final CommandSender sender) {
         if (translatableSupport) {
-            return displayType(entity.getType());
+            return displayType(entity.getType(), sender);
         } else {
             return Component.text(entity.getName());
         }
     }
 
-    private static Component displayType(final EntityType entityType) {
+    private static Component displayType(final EntityType entityType, final CommandSender sender) {
         final String entityTypeLower = entityType.name().toLowerCase();
         final String entityTranslationKey = "entity_%s".formatted(entityTypeLower);
-        final String entityTranslation = translate(entityTranslationKey);
+        final String entityTranslation = translateRaw(entityTranslationKey, sender);
         if (!entityTranslationKey.equals(entityTranslation)) {
             return Component.text(entityTranslation);
         }

@@ -111,7 +111,7 @@ public class ModifyCommand extends BoltCommand {
                     player,
                     Translation.CLICK_ACTION,
                     plugin.isUseActionBar(),
-                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.EDIT))
+                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.EDIT, player))
             );
         }
     }

@@ -48,7 +48,7 @@ public class ModeCommand extends BoltCommand {
             BoltComponents.sendMessage(
                     player,
                     hasMode ? Translation.MODE_ENABLED : Translation.MODE_DISABLED,
-                    Placeholder.component(Translation.Placeholder.MODE, BoltComponents.resolveTranslation("mode_%s".formatted(mode.name().toLowerCase())))
+                    Placeholder.component(Translation.Placeholder.MODE, BoltComponents.resolveTranslation("mode_%s".formatted(mode.name().toLowerCase()), player))
             );
             final UUID uuid = player.getUniqueId();
             CompletableFuture.runAsync(() -> {
