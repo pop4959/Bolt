@@ -8,6 +8,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.popcraft.bolt.lang.Translator;
 
 import java.util.Locale;
 
@@ -76,7 +77,7 @@ public final class BoltComponents {
      */
     public static Locale getLocaleOf(CommandSender sender) {
         if (sender instanceof Player player) {
-            return Locale.forLanguageTag(player.getLocale().replace('_', '-')); // reasons
+            return Translator.parseLocale(player.getLocale());
         } else {
             return new Locale("");
         }

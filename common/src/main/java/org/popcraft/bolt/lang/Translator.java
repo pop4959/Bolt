@@ -82,8 +82,7 @@ public final class Translator {
                 files.forEach(path -> {
                     if (!path.toString().endsWith(".properties")) return;
 
-                    final String localeName = path.getFileName().toString().split("\\.")[0].replace('_', '-');
-                    final Locale locale = Locale.forLanguageTag(localeName);
+                    final Locale locale = parseLocale(path.getFileName().toString().split("\\.", 2)[0]);
                     final Properties properties = loadTranslation(locale.toString());
                     languages.put(locale, properties);
                 });
@@ -97,8 +96,7 @@ public final class Translator {
         // Load user-defined localization files. This is done after, so it overrides any built-in translations.
         try (Stream<Path> files = Files.list(directory).filter((name) -> name.toString().toLowerCase().endsWith(".properties"))) {
             files.forEach(path -> {
-                final String localeName = path.getFileName().toString().split("\\.")[0].replace('_', '-');
-                final Locale locale = Locale.forLanguageTag(localeName);
+                final Locale locale = parseLocale(path.getFileName().toString().split("\\.", 2)[0]);
                 final Properties properties = loadTranslationFromFile(path);
                 languages.put(locale, properties);
             });
@@ -107,7 +105,7 @@ public final class Translator {
         }
 
         // Load the preferred fallback language
-        translation = languages.getOrDefault(Locale.forLanguageTag(preferredLanguage.replace('_', '-')), fallback);
+        translation = languages.getOrDefault(parseLocale(preferredLanguage), fallback);
 
         // This is no longer really that useful, but keep it around
         selected = preferredLanguage;
@@ -142,5 +140,15 @@ public final class Translator {
             e.printStackTrace();
         }
         return properties;
+    }
+
+    public static Locale parseLocale(final String string) {
+        final String[] segments = string.split("_", 3);
+        return switch (segments.length) {
+            case 1 -> new Locale(string);
+            case 2 -> new Locale(segments[0], segments[1]);
+            case 3 -> new Locale(segments[0], segments[1], segments[2]);
+            default -> new Locale("");
+        };
     }
 }
