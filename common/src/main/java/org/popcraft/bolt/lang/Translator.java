@@ -12,6 +12,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -77,16 +78,15 @@ public final class Translator {
             // "just loading all the translation files"
             final URI uri = Objects.requireNonNull(classLoader.getResource("lang/")).toURI();
             try (final FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
-                 Stream<Path> walk = Files.walk(fileSystem.getPath("lang/"), 1)) {
-                for (Iterator<Path> it = walk.iterator(); it.hasNext();) {
-                    Path path = it.next();
-                    if (!path.toString().endsWith(".properties")) continue;
+                 Stream<Path> files = Files.list(fileSystem.getPath("lang/"))) {
+                files.forEach(path -> {
+                    if (!path.toString().endsWith(".properties")) return;
 
                     final String localeName = path.getFileName().toString().split("\\.")[0].replace('_', '-');
                     final Locale locale = Locale.forLanguageTag(localeName);
                     final Properties properties = loadTranslation(locale.toString());
                     languages.put(locale, properties);
-                }
+                });
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -95,12 +95,15 @@ public final class Translator {
         }
 
         // Load user-defined localization files. This is done after, so it overrides any built-in translations.
-        File[] files = directory.toFile().listFiles((dir, name) -> name.toLowerCase().endsWith(".properties"));
-        for (File file : Objects.requireNonNull(files)) {
-            final String localeName = file.getName().split("\\.")[0].replace('_', '-');
-            final Locale locale = Locale.forLanguageTag(localeName);
-            final Properties properties = loadTranslationFromFile(file.toPath());
-            languages.put(locale, properties);
+        try (Stream<Path> files = Files.list(directory).filter((name) -> name.toString().toLowerCase().endsWith(".properties"))) {
+            files.forEach(path -> {
+                final String localeName = path.getFileName().toString().split("\\.")[0].replace('_', '-');
+                final Locale locale = Locale.forLanguageTag(localeName);
+                final Properties properties = loadTranslationFromFile(path);
+                languages.put(locale, properties);
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         // Load the preferred fallback language
