@@ -29,7 +29,7 @@ public class EditCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
             return;
         }
-        if (arguments.remaining() < 1) {
+        if (arguments.remaining() < 2) {
             shortHelp(sender, arguments);
             return;
         }
