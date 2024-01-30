@@ -97,6 +97,13 @@ public final class Translator {
             e.printStackTrace();
         }
 
+        // Use "custom" if the language used doesn't exist in the built-in set of languages
+        if (languages.containsKey(parseLocale(preferredLanguage))) {
+            selected = preferredLanguage;
+        } else {
+            selected = "custom";
+        }
+
         // Load user-defined localization files.
         try (Stream<Path> files = Files.list(directory)) {
             files.forEach(path -> {
@@ -118,8 +125,6 @@ public final class Translator {
         // Load the preferred fallback language
         translation = languages.getOrDefault(parseLocale(preferredLanguage), fallback);
 
-        // This is no longer really that useful, but keep it around
-        selected = preferredLanguage;
         perPlayerLocale = perPlayerLocales;
 
         final long timeNanos = System.nanoTime() - startTimeNanos;
