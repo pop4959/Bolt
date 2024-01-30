@@ -47,7 +47,7 @@ public class LockCommand extends BoltCommand {
                     player,
                     Translation.CLICK_ACTION,
                     plugin.isUseActionBar(),
-                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.LOCK))
+                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.LOCK, player))
             );
         } else {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);

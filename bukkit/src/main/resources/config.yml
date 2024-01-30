@@ -1,5 +1,6 @@
 version: 0
 language: en
+per-player-locale: true
 settings:
   use-action-bar: false
 database:
