@@ -59,7 +59,9 @@ public final class Translator {
 
     private static String tryGetProperty(final String key, final Locale locale) {
         final Properties properties = languages.get(locale);
-        if (properties == null) return null;
+        if (properties == null) {
+            return null;
+        }
 
         return properties.getProperty(key);
     }
@@ -80,7 +82,9 @@ public final class Translator {
             try (final FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
                  Stream<Path> files = Files.list(fileSystem.getPath("lang/"))) {
                 files.forEach(path -> {
-                    if (!path.toString().endsWith(".properties")) return;
+                    if (!path.toString().endsWith(".properties")) {
+                        return;
+                    }
 
                     final Locale locale = parseLocale(path.getFileName().toString().split("\\.", 2)[0]);
                     final Properties properties = loadTranslation(locale.toString());
