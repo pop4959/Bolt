@@ -82,7 +82,7 @@ public final class Translator {
             try (final FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
                  Stream<Path> files = Files.list(fileSystem.getPath("lang/"))) {
                 files.forEach(path -> {
-                    if (!path.toString().endsWith(".properties")) {
+                    if (!path.toString().toLowerCase().endsWith(".properties")) {
                         return;
                     }
 
@@ -97,11 +97,18 @@ public final class Translator {
             e.printStackTrace();
         }
 
-        // Load user-defined localization files. This is done after, so it overrides any built-in translations.
-        try (Stream<Path> files = Files.list(directory).filter((name) -> name.toString().toLowerCase().endsWith(".properties"))) {
+        // Load user-defined localization files.
+        try (Stream<Path> files = Files.list(directory)) {
             files.forEach(path -> {
+                if (!path.toString().toLowerCase().endsWith(".properties")) {
+                    return;
+                }
+
                 final Locale locale = parseLocale(path.getFileName().toString().split("\\.", 2)[0]);
-                final Properties properties = loadTranslationFromFile(path);
+                // If a default locale exists for this language, load it as a base. This allows any translation keys
+                // that do not have a custom translation set to still fall through to the built-in translation.
+                final Properties properties = languages.getOrDefault(locale, new Properties());
+                properties.putAll(loadTranslationFromFile(path));
                 languages.put(locale, properties);
             });
         } catch (IOException e) {
