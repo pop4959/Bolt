@@ -51,7 +51,7 @@ public class GroupCommand extends BoltCommand {
             final List<UUID> uuids = new ArrayList<>(completeProfiles.stream().map(Profile::uuid).toList());
             final List<String> names = new ArrayList<>(completeProfiles.stream().map(Profile::name).toList());
             switch (action) {
-                case "create":
+                case "create" -> {
                     if (existingGroup != null) {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
@@ -66,8 +66,8 @@ public class GroupCommand extends BoltCommand {
                                 Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     }
-                    break;
-                case "delete":
+                }
+                case "delete" -> {
                     if (existingGroup == null) {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
@@ -88,8 +88,8 @@ public class GroupCommand extends BoltCommand {
                                 Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         ));
                     }
-                    break;
-                case "add":
+                }
+                case "add" -> {
                     if (existingGroup == null) {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
@@ -112,8 +112,8 @@ public class GroupCommand extends BoltCommand {
                                 Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         )));
                     }
-                    break;
-                case "remove":
+                }
+                case "remove" -> {
                     if (existingGroup == null) {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
@@ -136,8 +136,8 @@ public class GroupCommand extends BoltCommand {
                                 Placeholder.component(Translation.Placeholder.GROUP, Component.text(group))
                         )));
                     }
-                    break;
-                case "list":
+                }
+                case "list" -> {
                     if (existingGroup == null) {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
@@ -156,7 +156,7 @@ public class GroupCommand extends BoltCommand {
                             ));
                         });
                     }
-                    break;
+                }
             }
         });
     }

@@ -126,18 +126,7 @@ public class LWCMigration {
         }
         final Gson gson = new Gson();
         for (final Protection protection : protections) {
-            final String protectionType;
-            if (protection.type() == ProtectionType.PUBLIC.ordinal()) {
-                protectionType = defaultProtectionPublic;
-            } else if (protection.type() == ProtectionType.DONATION.ordinal()) {
-                protectionType = defaultProtectionDeposit;
-            } else if (protection.type() == ProtectionType.DISPLAY.ordinal()) {
-                protectionType = defaultProtectionDisplay;
-            } else if (protection.type() == ProtectionType.SUPPLY.ordinal()) {
-                protectionType = defaultProtectionWithdrawal;
-            } else {
-                protectionType = defaultProtectionPrivate;
-            }
+            final String protectionType = getProtectionType(protection);
             final Map<String, String> access = new HashMap<>();
             final Data data = gson.fromJson(protection.data(), Data.class);
             if (data != null) {
@@ -205,8 +194,24 @@ public class LWCMigration {
         return store;
     }
 
+    private String getProtectionType(final Protection protection) {
+        final String protectionType;
+        if (protection.type() == ProtectionType.PUBLIC.ordinal()) {
+            protectionType = defaultProtectionPublic;
+        } else if (protection.type() == ProtectionType.DONATION.ordinal()) {
+            protectionType = defaultProtectionDeposit;
+        } else if (protection.type() == ProtectionType.DISPLAY.ordinal()) {
+            protectionType = defaultProtectionDisplay;
+        } else if (protection.type() == ProtectionType.SUPPLY.ordinal()) {
+            protectionType = defaultProtectionWithdrawal;
+        } else {
+            protectionType = defaultProtectionPrivate;
+        }
+        return protectionType;
+    }
+
     public boolean hasEntityBlocks() {
-        return entityBlocks.size() > 0;
+        return !entityBlocks.isEmpty();
     }
 
     public CompletableFuture<MemoryStore> convertEntityBlocks() {

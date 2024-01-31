@@ -406,7 +406,7 @@ public final class EntityListener implements Listener {
                     Profiles.findOrLookupProfileByUniqueId(protection.getOwner())
                             .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                     player,
-                                    protection.getAccess().size() > 0 && (protection.getOwner().equals(player.getUniqueId()) || player.hasPermission("bolt.command.info.full")) ? Translation.INFO_FULL : Translation.INFO,
+                                    !protection.getAccess().isEmpty() && (protection.getOwner().equals(player.getUniqueId()) || player.hasPermission("bolt.command.info.full")) ? Translation.INFO_FULL : Translation.INFO,
                                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
                                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player)),
                                     Placeholder.component(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, player))),
