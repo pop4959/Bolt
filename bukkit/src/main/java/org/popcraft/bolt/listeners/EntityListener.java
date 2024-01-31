@@ -587,6 +587,8 @@ public final class EntityListener implements Listener {
         }
     }
 
+    // Future: Replace with org.bukkit.event.entity.EntityMountEvent when support for lower than 1.20.4 is dropped
+    @SuppressWarnings({"UnstableApiUsage", "deprecation"})
     @EventHandler
     public void onEntityMount(final EntityMountEvent e) {
         if (!(e.getEntity() instanceof final Player player)) {
