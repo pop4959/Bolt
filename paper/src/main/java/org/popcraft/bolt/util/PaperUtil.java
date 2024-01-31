@@ -59,9 +59,9 @@ public class PaperUtil {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static Vector getClickedPosition(final PlayerInteractEvent e) {
         if (getClickedPositionExists) {
-            //noinspection deprecation
             return e.getClickedPosition();
         } else {
             return null;
