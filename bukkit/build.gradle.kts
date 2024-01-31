@@ -11,7 +11,7 @@ dependencies {
     implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.15.0")
     implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.3.2")
     implementation(group = "org.bstats", name = "bstats-bukkit", version = "3.0.2")
-    implementation(group = "org.popcraft", name = "chunky-nbt", version = "1.3.76")
+    implementation(group = "org.popcraft", name = "chunky-nbt", version = "1.3.127")
     implementation(project(":bolt-common"))
     implementation(project(":bolt-paper"))
     implementation(project(":bolt-folia"))
