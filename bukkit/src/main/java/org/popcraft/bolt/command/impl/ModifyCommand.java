@@ -41,7 +41,6 @@ public class ModifyCommand extends BoltCommand {
         }
         final BoltPlayer boltPlayer = plugin.player(player);
         final boolean adding = "add".equalsIgnoreCase(arguments.next());
-        boltPlayer.setAction(new Action(Action.Type.EDIT, "bolt.command.edit", Boolean.toString(adding)));
         final String accessType = arguments.next().toLowerCase();
         final Access access = plugin.getBolt().getAccessRegistry().getAccessByType(accessType).orElse(null);
         if (access == null) {
@@ -70,6 +69,7 @@ public class ModifyCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, Translation.EDIT_SOURCE_NO_PERMISSION);
             return;
         }
+        boltPlayer.setAction(new Action(Action.Type.EDIT, "bolt.command.edit", Boolean.toString(adding)));
         String identifier;
         while ((identifier = arguments.next()) != null) {
             final CompletableFuture<Source> editFuture;
