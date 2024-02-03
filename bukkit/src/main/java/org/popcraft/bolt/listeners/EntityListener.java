@@ -652,13 +652,11 @@ public final class EntityListener implements Listener {
             return;
         }
         if (EntityUnleashEvent.UnleashReason.DISTANCE.equals(e.getReason())) {
-            if (entity.getPassengers().stream().anyMatch(passenger -> plugin.canAccess(protection, passenger.getUniqueId(), Permission.DESTROY))) {
+            if (!(e instanceof final Cancellable c) || entity.getPassengers().stream().anyMatch(passenger -> plugin.canAccess(protection, passenger.getUniqueId(), Permission.DESTROY))) {
                 plugin.removeProtection(protection);
             } else {
                 entity.eject();
-                if (e instanceof final Cancellable c) {
-                    c.setCancelled(true);
-                }
+                c.setCancelled(true);
             }
         } else {
             plugin.removeProtection(protection);
