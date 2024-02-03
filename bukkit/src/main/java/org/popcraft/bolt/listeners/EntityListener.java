@@ -5,8 +5,10 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,6 +26,7 @@ import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
+import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -636,6 +639,29 @@ public final class EntityListener implements Listener {
     public void onPlayerUnleashEntity(final PlayerUnleashEntityEvent e) {
         if (!plugin.canAccess(e.getEntity(), e.getPlayer(), Permission.INTERACT)) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityUnleash(final EntityUnleashEvent e) {
+        if (EntityUnleashEvent.UnleashReason.PLAYER_UNLEASH.equals(e.getReason()) || !(e.getEntity() instanceof final LivingEntity entity) || !entity.isLeashed()) {
+            return;
+        }
+        final Protection protection = plugin.findProtection(entity.getLeashHolder());
+        if (protection == null) {
+            return;
+        }
+        if (EntityUnleashEvent.UnleashReason.DISTANCE.equals(e.getReason())) {
+            if (entity.getPassengers().stream().anyMatch(passenger -> plugin.canAccess(protection, passenger.getUniqueId(), Permission.DESTROY))) {
+                plugin.removeProtection(protection);
+            } else {
+                entity.eject();
+                if (e instanceof final Cancellable c) {
+                    c.setCancelled(true);
+                }
+            }
+        } else {
+            plugin.removeProtection(protection);
         }
     }
 
