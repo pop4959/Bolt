@@ -128,7 +128,6 @@ public final class BlockListener implements Listener {
                     );
                 }
             }
-
             if (plugin.isDoors() && canInteract) {
                 Doors.handlePlayerInteract(plugin, e);
             }
