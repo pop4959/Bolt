@@ -129,29 +129,8 @@ public final class BlockListener implements Listener {
                 }
             }
 
-            if (plugin.isDoors() && Doors.isDoor(e.getClickedBlock()) && canInteract) {
-                boolean denied = e.useInteractedBlock().equals(Event.Result.DENY);
-
-                final Block block = e.getClickedBlock();
-                final boolean leftClick = org.bukkit.event.block.Action.LEFT_CLICK_BLOCK.equals(e.getAction());
-                final boolean convertDoor = plugin.isDoorsOpenIron() && Doors.isIronDoor(block);
-
-                if (!denied && (leftClick || convertDoor)) {
-                    final var originalState = block.getState();
-                    if (convertDoor) {
-                        block.setType(Material.OAK_DOOR, false);
-                    }
-                    final var fakeInteract = new PlayerInteractEvent(player, org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK, e.getItem(), e.getClickedBlock(), e.getBlockFace());
-                    plugin.getServer().getPluginManager().callEvent(fakeInteract);
-                    denied = fakeInteract.useInteractedBlock().equals(Event.Result.DENY);
-                    if (convertDoor) {
-                        block.setBlockData(originalState.getBlockData(), false);
-                    }
-                }
-
-                if (!denied) {
-                    Doors.handlePlayerInteract(plugin, player, clicked);
-                }
+            if (plugin.isDoors() && canInteract) {
+                Doors.handlePlayerInteract(plugin, e);
             }
             if (hasNotifyPermission) {
                 Profiles.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> {

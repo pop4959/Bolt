@@ -13,6 +13,8 @@ import org.bukkit.block.data.type.Door;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
@@ -32,9 +34,11 @@ public final class Doors {
     private Doors() {
     }
 
-    public static void handlePlayerInteract(final BoltPlugin plugin, final Player player, final Block block) {
+    public static void handlePlayerInteract(final BoltPlugin plugin, final PlayerInteractEvent event) {
         final boolean openIron = plugin.isDoorsOpenIron();
-        if (!isDoor(block) || !isDoorOpenable(block, openIron)) {
+        final Block block = event.getClickedBlock();
+        final Player player = event.getPlayer();
+        if (!isDoor(block) || !isDoorOpenable(block, openIron) || interactionDenied(plugin, event)) {
             return;
         }
         final Set<Block> doors = new HashSet<>();
@@ -70,6 +74,39 @@ public final class Doors {
                 }, doorsCloseAfter * 20L);
             });
         }
+    }
+
+    public static boolean interactionDenied(final BoltPlugin plugin, final PlayerInteractEvent event) {
+        final Block block = event.getClickedBlock();
+        if (block == null) {
+            return false;
+        }
+
+        boolean denied = event.useInteractedBlock().equals(Event.Result.DENY);
+
+        final boolean leftClick = org.bukkit.event.block.Action.LEFT_CLICK_BLOCK.equals(event.getAction());
+        final boolean ironDoor = plugin.isDoorsOpenIron() && Doors.isIronDoor(block);
+
+        if (!denied && (leftClick || ironDoor)) {
+            final var originalState = block.getState();
+            if (ironDoor) {
+                block.setType(Material.OAK_DOOR, false);
+            }
+            final var fakeInteract = new PlayerInteractEvent(
+                event.getPlayer(),
+                org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK,
+                event.getItem(),
+                event.getClickedBlock(),
+                event.getBlockFace()
+            );
+            plugin.getServer().getPluginManager().callEvent(fakeInteract);
+            denied = fakeInteract.useInteractedBlock().equals(Event.Result.DENY);
+            if (ironDoor) {
+                block.setBlockData(originalState.getBlockData(), false);
+            }
+        }
+
+        return denied;
     }
 
     public static boolean isDoor(final Block block) {
