@@ -115,6 +115,10 @@ public final class Doors {
         return !isIronDoor && !isIronTrapdoor;
     }
 
+    public static boolean isIronDoor(final Block block) {
+        return block.getType().equals(Material.IRON_DOOR) || block.getType().equals(Material.IRON_TRAPDOOR);
+    }
+
     public static void toggleDoor(final Block block, final boolean canOpen) {
         if (block.getBlockData() instanceof final Openable openable) {
             if (!canOpen && !openable.isOpen()) {
