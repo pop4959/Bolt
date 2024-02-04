@@ -35,7 +35,7 @@ public class ModifyCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
             return;
         }
-        if (arguments.remaining() < 3) {
+        if (arguments.remaining() < 4) {
             shortHelp(sender, arguments);
             return;
         }
