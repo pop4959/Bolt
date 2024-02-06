@@ -184,6 +184,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private boolean doorsOpenIron;
     private boolean doorsOpenDouble;
     private int doorsCloseAfter;
+    private boolean doorsFixPlugins;
     private Bolt bolt;
 
     @Override
@@ -234,6 +235,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         this.doorsOpenIron = getConfig().getBoolean("doors.open-iron", false);
         this.doorsOpenDouble = getConfig().getBoolean("doors.open-double", false);
         this.doorsCloseAfter = getConfig().getInt("doors.close-after", 0);
+        this.doorsFixPlugins = getConfig().getBoolean("doors.fix-plugins", false);
         registerAccessTypes();
         registerProtectableAccess();
         registerAccessSources();
@@ -504,6 +506,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public int getDoorsCloseAfter() {
         return doorsCloseAfter;
+    }
+
+    public boolean getDoorsFixPlugins() {
+        return doorsFixPlugins;
     }
 
     public ProfileCache getProfileCache() {

@@ -77,6 +77,10 @@ public final class Doors {
     }
 
     public static boolean interactionDenied(final BoltPlugin plugin, final PlayerInteractEvent event) {
+        if (!plugin.getDoorsFixPlugins()) {
+            return false;
+        }
+
         final Block block = event.getClickedBlock();
         if (block == null) {
             return false;
