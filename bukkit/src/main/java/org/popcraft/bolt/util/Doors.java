@@ -97,7 +97,7 @@ public final class Doors {
         }
 
         final boolean leftClick = org.bukkit.event.block.Action.LEFT_CLICK_BLOCK.equals(event.getAction());
-        final boolean ironDoor = plugin.isDoorsOpenIron() && isIronDoor(block);
+        final boolean ironDoor = plugin.isDoorsOpenIron() && !isDoorOpenableNormally(block);
 
         if (leftClick || ironDoor) {
             final BlockState originalState = block.getState();
@@ -164,10 +164,6 @@ public final class Doors {
         final boolean isIronDoor = Tag.DOORS.isTagged(material) && !Tag.WOODEN_DOORS.isTagged(material);
         final boolean isIronTrapdoor = Tag.TRAPDOORS.isTagged(material) && !Tag.WOODEN_TRAPDOORS.isTagged(material);
         return !isIronDoor && !isIronTrapdoor;
-    }
-
-    public static boolean isIronDoor(final Block block) {
-        return block.getType().equals(Material.IRON_DOOR) || block.getType().equals(Material.IRON_TRAPDOOR);
     }
 
     public static void toggleDoor(final Block block, final boolean canOpen) {
