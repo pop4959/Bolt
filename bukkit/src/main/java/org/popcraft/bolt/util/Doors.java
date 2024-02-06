@@ -30,11 +30,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class Doors {
     private static final SourceResolver DOOR_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.DOOR));
     private static final Map<BlockLocation, Integer> CLOSING = new ConcurrentHashMap<>();
+    private static final Set<PlayerInteractEvent> SELF_FIRED_EVENTS = ConcurrentHashMap.newKeySet();
 
     private Doors() {
     }
 
     public static void handlePlayerInteract(final BoltPlugin plugin, final PlayerInteractEvent event) {
+        if (SELF_FIRED_EVENTS.remove(event)) {
+            return;
+        }
+
         final boolean openIron = plugin.isDoorsOpenIron();
         final Block block = event.getClickedBlock();
         final Player player = event.getPlayer();
@@ -103,6 +108,8 @@ public final class Doors {
                 event.getClickedBlock(),
                 event.getBlockFace()
             );
+            SELF_FIRED_EVENTS.add(fakeInteract);
+            SchedulerUtil.schedule(plugin, block.getLocation(), () -> SELF_FIRED_EVENTS.remove(fakeInteract));
             plugin.getServer().getPluginManager().callEvent(fakeInteract);
             denied = fakeInteract.useInteractedBlock().equals(Event.Result.DENY);
             if (ironDoor) {
