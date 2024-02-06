@@ -7,12 +7,15 @@ import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
@@ -28,13 +31,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class Doors {
     private static final SourceResolver DOOR_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.DOOR));
     private static final Map<BlockLocation, Integer> CLOSING = new ConcurrentHashMap<>();
+    private static final Set<PlayerInteractEvent> SELF_FIRED_EVENTS = ConcurrentHashMap.newKeySet();
 
     private Doors() {
     }
 
-    public static void handlePlayerInteract(final BoltPlugin plugin, final Player player, final Block block) {
+    public static void handlePlayerInteract(final BoltPlugin plugin, final PlayerInteractEvent event) {
+        if (SELF_FIRED_EVENTS.remove(event)) {
+            return;
+        }
+
         final boolean openIron = plugin.isDoorsOpenIron();
-        if (!isDoor(block) || !isDoorOpenable(block, openIron)) {
+        final Block block = event.getClickedBlock();
+        final Player player = event.getPlayer();
+        if (!isDoor(block) || !isDoorOpenable(block, openIron) || interactionDenied(plugin, event)) {
             return;
         }
         final Set<Block> doors = new HashSet<>();
@@ -70,6 +80,47 @@ public final class Doors {
                 }, doorsCloseAfter * 20L);
             });
         }
+    }
+
+    public static boolean interactionDenied(final BoltPlugin plugin, final PlayerInteractEvent event) {
+        if (!plugin.getDoorsFixPlugins()) {
+            return false;
+        }
+
+        final Block block = event.getClickedBlock();
+        if (block == null) {
+            return false;
+        }
+
+        if (event.useInteractedBlock().equals(Event.Result.DENY)) {
+            return true;
+        }
+
+        final boolean leftClick = org.bukkit.event.block.Action.LEFT_CLICK_BLOCK.equals(event.getAction());
+        final boolean ironDoor = plugin.isDoorsOpenIron() && !isDoorOpenableNormally(block);
+
+        if (leftClick || ironDoor) {
+            final BlockState originalState = block.getState();
+            if (ironDoor) {
+                block.setType(Material.OAK_DOOR, false);
+            }
+            final PlayerInteractEvent fakeInteract = new PlayerInteractEvent(
+                event.getPlayer(),
+                org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK,
+                event.getItem(),
+                event.getClickedBlock(),
+                event.getBlockFace()
+            );
+            SELF_FIRED_EVENTS.add(fakeInteract);
+            SchedulerUtil.schedule(plugin, block.getLocation(), () -> SELF_FIRED_EVENTS.remove(fakeInteract));
+            plugin.getServer().getPluginManager().callEvent(fakeInteract);
+            if (ironDoor) {
+                block.setBlockData(originalState.getBlockData(), false);
+            }
+            return fakeInteract.useInteractedBlock().equals(Event.Result.DENY);
+        }
+
+        return false;
     }
 
     public static boolean isDoor(final Block block) {

@@ -129,7 +129,7 @@ public final class BlockListener implements Listener {
                 }
             }
             if (plugin.isDoors() && canInteract) {
-                Doors.handlePlayerInteract(plugin, player, clicked);
+                Doors.handlePlayerInteract(plugin, e);
             }
             if (hasNotifyPermission) {
                 Profiles.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> {
