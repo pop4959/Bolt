@@ -7,6 +7,7 @@ import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.Door;
@@ -91,17 +92,19 @@ public final class Doors {
             return false;
         }
 
-        boolean denied = event.useInteractedBlock().equals(Event.Result.DENY);
+        if (event.useInteractedBlock().equals(Event.Result.DENY)) {
+            return true;
+        }
 
         final boolean leftClick = org.bukkit.event.block.Action.LEFT_CLICK_BLOCK.equals(event.getAction());
-        final boolean ironDoor = plugin.isDoorsOpenIron() && Doors.isIronDoor(block);
+        final boolean ironDoor = plugin.isDoorsOpenIron() && isIronDoor(block);
 
-        if (!denied && (leftClick || ironDoor)) {
-            final var originalState = block.getState();
+        if (leftClick || ironDoor) {
+            final BlockState originalState = block.getState();
             if (ironDoor) {
                 block.setType(Material.OAK_DOOR, false);
             }
-            final var fakeInteract = new PlayerInteractEvent(
+            final PlayerInteractEvent fakeInteract = new PlayerInteractEvent(
                 event.getPlayer(),
                 org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK,
                 event.getItem(),
@@ -111,13 +114,13 @@ public final class Doors {
             SELF_FIRED_EVENTS.add(fakeInteract);
             SchedulerUtil.schedule(plugin, block.getLocation(), () -> SELF_FIRED_EVENTS.remove(fakeInteract));
             plugin.getServer().getPluginManager().callEvent(fakeInteract);
-            denied = fakeInteract.useInteractedBlock().equals(Event.Result.DENY);
             if (ironDoor) {
                 block.setBlockData(originalState.getBlockData(), false);
             }
+            return fakeInteract.useInteractedBlock().equals(Event.Result.DENY);
         }
 
-        return denied;
+        return false;
     }
 
     public static boolean isDoor(final Block block) {
