@@ -19,6 +19,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
@@ -653,6 +654,10 @@ public final class BlockListener implements Listener {
         if (existingProtection == null) {
             return;
         }
+        if (!plugin.canAccess(existingProtection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
+            e.setCancelled(true);
+            return;
+        }
         final BlockData blockData = block.getBlockData();
         if (!(blockData instanceof final Directional directional)) {
             return;
@@ -673,6 +678,20 @@ public final class BlockListener implements Listener {
             final BlockProtection newProtection = plugin.createProtection(placed, existingProtection.getOwner(), existingProtection.getType());
             plugin.saveProtection(newProtection);
         });
+    }
+
+    public void onBlockPreDispense(final BlockEvent e) {
+        if (!(e instanceof Cancellable cancellable)) {
+            return;
+        }
+        final Block block = e.getBlock();
+        final Protection existingProtection = plugin.findProtection(block);
+        if (existingProtection == null) {
+            return;
+        }
+        if (!plugin.canAccess(existingProtection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
+            cancellable.setCancelled(true);
+        }
     }
 
     @EventHandler
