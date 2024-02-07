@@ -16,6 +16,7 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceTypes;
+import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.chunky.nbt.CompoundTag;
 import org.popcraft.chunky.nbt.IntArrayTag;
@@ -126,6 +127,16 @@ public class LWCMigration {
         }
         final Gson gson = new Gson();
         for (final Protection protection : protections) {
+            final BlockLocation blockLocation = new BlockLocation(
+                    protection.world(),
+                    protection.x(),
+                    protection.y(),
+                    protection.z()
+            );
+            final boolean exists = plugin.getBolt().getStore().loadBlockProtection(blockLocation).join() != null;
+            if (exists) {
+                continue;
+            }
             final String protectionType = getProtectionType(protection);
             final Map<String, String> access = new HashMap<>();
             final Data data = gson.fromJson(protection.data(), Data.class);
