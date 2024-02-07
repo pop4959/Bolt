@@ -27,14 +27,18 @@ import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Permission;
 
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class InventoryListener implements Listener {
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
-    private static final Map<InventoryType, EnumSet<Material>> INVENTORY_TYPE_BLOCKS = Map.of(
+    private static final InventoryType CRAFTER_TYPE = EnumUtil.valueOf(InventoryType.class, "CRAFTER").orElse(null);
+    private static final Material CRAFTER_MATERIAL = EnumUtil.valueOf(Material.class, "CRAFTER").orElse(null);
+    private static final Map<InventoryType, EnumSet<Material>> INVENTORY_TYPE_BLOCKS = new HashMap<>(Map.of(
             InventoryType.ANVIL, EnumSet.of(Material.ANVIL, Material.CHIPPED_ANVIL, Material.DAMAGED_ANVIL),
             InventoryType.BARREL, EnumSet.of(Material.BARREL),
             InventoryType.BLAST_FURNACE, EnumSet.of(Material.BLAST_FURNACE),
@@ -45,8 +49,15 @@ public final class InventoryListener implements Listener {
             InventoryType.HOPPER, EnumSet.of(Material.HOPPER),
             InventoryType.SHULKER_BOX, EnumSet.of(Material.SHULKER_BOX),
             InventoryType.SMOKER, EnumSet.of(Material.SMOKER)
-    );
+    ));
     private final BoltPlugin plugin;
+
+    static {
+        // Future: Replace with InventoryType.CRAFTER and Material.CRAFTER, and merge into map above (and remove new HashMap)
+        if (CRAFTER_TYPE != null && CRAFTER_MATERIAL != null) {
+            INVENTORY_TYPE_BLOCKS.put(CRAFTER_TYPE, EnumSet.of(CRAFTER_MATERIAL));
+        }
+    }
 
     public InventoryListener(final BoltPlugin plugin) {
         this.plugin = plugin;

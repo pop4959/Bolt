@@ -80,6 +80,8 @@ blocks:
     autoProtect: private
   decorated_pot:
     autoProtect: private
+  crafter:
+    autoProtect: private
   '#shulker_boxes':
     autoProtect: private
   '#anvil':
