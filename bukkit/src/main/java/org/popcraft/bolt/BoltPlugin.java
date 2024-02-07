@@ -405,7 +405,6 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
             defaultModes.add(mode);
         }
-        getLogger().info(() -> Arrays.toString(defaultModes.toArray()));
     }
 
     public Set<Mode> defaultModes() {
