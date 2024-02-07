@@ -8,7 +8,6 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
-import org.popcraft.bolt.data.Profile;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.util.Action;
@@ -16,6 +15,7 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.Protections;
+import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,23 +54,24 @@ public class TrustCommand extends BoltCommand {
             final String target = arguments.next();
             final UUID uuid = player.getUniqueId();
             final AccessList accessList = Objects.requireNonNullElse(plugin.getBolt().getStore().loadAccessList(uuid).join(), new AccessList(uuid, new HashMap<>()));
-            final Profile playerProfile = Profiles.findOrLookupProfileByName(target).join();
-            if (!playerProfile.complete()) {
-                BoltComponents.sendMessage(
-                        sender,
-                        Translation.PLAYER_NOT_FOUND,
-                        Placeholder.component(Translation.Placeholder.PLAYER, Component.text(target))
-                );
-                return;
-            }
-            final Source source = Source.player(playerProfile.uuid());
-            if (adding) {
-                accessList.getAccess().put(source.toString(), plugin.getDefaultAccessType());
-            } else {
-                accessList.getAccess().remove(source.toString());
-            }
-            plugin.getBolt().getStore().saveAccessList(accessList);
-            BoltComponents.sendMessage(sender, Translation.TRUST_EDITED);
+            Profiles.findOrLookupProfileByName(target).thenAccept(playerProfile -> SchedulerUtil.schedule(plugin, sender, () -> {
+                if (!playerProfile.complete()) {
+                    BoltComponents.sendMessage(
+                            sender,
+                            Translation.PLAYER_NOT_FOUND,
+                            Placeholder.component(Translation.Placeholder.PLAYER, Component.text(target))
+                    );
+                    return;
+                }
+                final Source source = Source.player(playerProfile.uuid());
+                if (adding) {
+                    accessList.getAccess().put(source.toString(), plugin.getDefaultAccessType());
+                } else {
+                    accessList.getAccess().remove(source.toString());
+                }
+                plugin.getBolt().getStore().saveAccessList(accessList);
+                BoltComponents.sendMessage(sender, Translation.TRUST_EDITED);
+            }));
         } else if ("confirm".equals(action)) {
             final BoltPlayer boltPlayer = plugin.player(player);
             final Action playerAction = boltPlayer.getAction();

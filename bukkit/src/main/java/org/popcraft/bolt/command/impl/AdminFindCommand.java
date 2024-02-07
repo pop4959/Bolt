@@ -15,6 +15,7 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.Protections;
+import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -38,21 +39,22 @@ public class AdminFindCommand extends BoltCommand {
         }
         final String player = arguments.next();
         final Integer page = arguments.nextAsInteger();
-        final Profile playerProfile = Profiles.findOrLookupProfileByName(player).join();
-        if (!playerProfile.complete()) {
-            BoltComponents.sendMessage(
-                    sender,
-                    Translation.PLAYER_NOT_FOUND,
-                    Placeholder.component(Translation.Placeholder.PLAYER, Component.text(player))
-            );
-            return;
-        }
-        final Store store = plugin.getBolt().getStore();
-        final List<BlockProtection> blockProtectionsFromPlayer = store.loadBlockProtections().join().stream()
-                .filter(blockProtection -> playerProfile.uuid().equals(blockProtection.getOwner()))
-                .sorted(Comparator.comparingLong(BlockProtection::getCreated).reversed())
-                .toList();
-        runPage(sender, playerProfile, blockProtectionsFromPlayer, page == null ? 0 : page);
+        Profiles.findOrLookupProfileByName(player).thenAccept(playerProfile -> SchedulerUtil.schedule(plugin, sender, () -> {
+            if (!playerProfile.complete()) {
+                BoltComponents.sendMessage(
+                        sender,
+                        Translation.PLAYER_NOT_FOUND,
+                        Placeholder.component(Translation.Placeholder.PLAYER, Component.text(player))
+                );
+                return;
+            }
+            final Store store = plugin.getBolt().getStore();
+            final List<BlockProtection> blockProtectionsFromPlayer = store.loadBlockProtections().join().stream()
+                    .filter(blockProtection -> playerProfile.uuid().equals(blockProtection.getOwner()))
+                    .sorted(Comparator.comparingLong(BlockProtection::getCreated).reversed())
+                    .toList();
+            runPage(sender, playerProfile, blockProtectionsFromPlayer, page == null ? 0 : page);
+        }));
     }
 
     private void runPage(final CommandSender sender, final Profile playerProfile, final List<BlockProtection> blockProtectionsFromPlayer, final int page) {

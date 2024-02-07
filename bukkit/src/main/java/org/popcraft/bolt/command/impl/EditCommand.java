@@ -7,13 +7,13 @@ import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
-import org.popcraft.bolt.data.Profile;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Profiles;
+import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,26 +35,26 @@ public class EditCommand extends BoltCommand {
         }
         final BoltPlayer boltPlayer = plugin.player(player);
         final boolean adding = "add".equalsIgnoreCase(arguments.next());
-
         final String target = arguments.next();
-        final Profile playerProfile = Profiles.findOrLookupProfileByName(target).join();
-        if (!playerProfile.complete()) {
+        Profiles.findOrLookupProfileByName(target).thenAccept(playerProfile -> SchedulerUtil.schedule(plugin, sender, () -> {
+            if (!playerProfile.complete()) {
+                BoltComponents.sendMessage(
+                        sender,
+                        Translation.PLAYER_NOT_FOUND,
+                        Placeholder.component(Translation.Placeholder.PLAYER, Component.text(target))
+                );
+                return;
+            }
+            final Source source = Source.player(playerProfile.uuid());
+            boltPlayer.setAction(new Action(Action.Type.EDIT, "bolt.command.edit", Boolean.toString(adding)));
+            boltPlayer.getModifications().put(source, plugin.getDefaultAccessType());
             BoltComponents.sendMessage(
-                    sender,
-                    Translation.PLAYER_NOT_FOUND,
-                    Placeholder.component(Translation.Placeholder.PLAYER, Component.text(target))
+                    player,
+                    Translation.CLICK_ACTION,
+                    plugin.isUseActionBar(),
+                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.EDIT, player))
             );
-            return;
-        }
-        final Source source = Source.player(playerProfile.uuid());
-        boltPlayer.setAction(new Action(Action.Type.EDIT, "bolt.command.edit", Boolean.toString(adding)));
-        boltPlayer.getModifications().put(source, plugin.getDefaultAccessType());
-        BoltComponents.sendMessage(
-                player,
-                Translation.CLICK_ACTION,
-                plugin.isUseActionBar(),
-                Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.EDIT, player))
-        );
+        }));
     }
 
     @Override
