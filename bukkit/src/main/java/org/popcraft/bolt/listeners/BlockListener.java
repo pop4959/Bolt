@@ -35,7 +35,6 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
@@ -82,6 +81,7 @@ public final class BlockListener implements Listener {
     private static final Material CHISELED_BOOKSHELF = EnumUtil.valueOf(Material.class, "CHISELED_BOOKSHELF").orElse(null);
     private static final Material SCULK_SENSOR = EnumUtil.valueOf(Material.class, "SCULK_SENSOR").orElse(null);
     private static final Material CALIBRATED_SCULK_SENSOR = EnumUtil.valueOf(Material.class, "CALIBRATED_SCULK_SENSOR").orElse(null);
+    private static final Material DECORATED_POT = EnumUtil.valueOf(Material.class, "DECORATED_POT").orElse(null);
     private final BoltPlugin plugin;
 
     public BlockListener(final BoltPlugin plugin) {
@@ -189,6 +189,12 @@ public final class BlockListener implements Listener {
                         e.setUseItemInHand(Event.Result.DENY);
                         e.setUseInteractedBlock(Event.Result.DENY);
                     }
+                }
+            }
+            if (DECORATED_POT != null && DECORATED_POT.equals(clicked.getType()) && e.getItem() != null) {
+                if (!plugin.canAccess(protection, player, Permission.DEPOSIT)) {
+                    e.setUseItemInHand(Event.Result.DENY);
+                    e.setUseInteractedBlock(Event.Result.DENY);
                 }
             }
             boltPlayer.setInteracted(shouldCancel);
@@ -485,20 +491,6 @@ public final class BlockListener implements Listener {
             return;
         }
         e.getBlocks().removeIf(blockState -> plugin.isProtected(blockState.getBlock()));
-    }
-
-    @EventHandler
-    public void onEntityChangeBlock(final EntityChangeBlockEvent e) {
-        if (Tag.DOORS.isTagged(e.getBlock().getType())) {
-            return;
-        }
-        final Protection protection = plugin.findProtection(e.getBlock());
-        if (protection == null) {
-            return;
-        }
-        if (!(e.getEntity() instanceof final Player player) || !plugin.canAccess(protection, player, Permission.INTERACT)) {
-            e.setCancelled(true);
-        }
     }
 
     @EventHandler

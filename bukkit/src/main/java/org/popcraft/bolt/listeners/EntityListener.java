@@ -2,7 +2,9 @@ package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -16,6 +18,7 @@ import org.bukkit.event.block.BlockShearEntityEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustByBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -775,6 +778,26 @@ public final class EntityListener implements Listener {
         }
         if (!plugin.canAccess(protection, ENTITY_SOURCE_RESOLVER, Permission.ENTITY_BREAK_DOOR)) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityChangeBlock(final EntityChangeBlockEvent e) {
+        if (Tag.DOORS.isTagged(e.getBlock().getType())) {
+            return;
+        }
+        final Protection protection = plugin.findProtection(e.getBlock());
+        if (protection == null) {
+            return;
+        }
+        // This event is called for decorated pots broken by an arrow. WATER is needed for waterlogged decorated pots.
+        final boolean broken = e.getTo().equals(Material.AIR) || e.getTo().equals(Material.WATER);
+        if (!(getDamagerSource(e.getEntity()) instanceof final Player player) || !plugin.canAccess(protection, player, broken ? Permission.DESTROY : Permission.INTERACT)) {
+            e.setCancelled(true);
+            return;
+        }
+        if (broken) {
+            plugin.removeProtection(protection);
         }
     }
 
