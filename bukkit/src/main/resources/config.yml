@@ -1,8 +1,8 @@
 version: 0
 language: en
-per-player-locale: true
 settings:
   use-action-bar: false
+  per-player-locale: true
 database:
   type: sqlite
   hostname: ""

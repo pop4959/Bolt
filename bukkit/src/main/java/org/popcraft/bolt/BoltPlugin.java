@@ -131,6 +131,7 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Group;
+import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.ProtectableConfig;
 
@@ -178,6 +179,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private final Map<Material, ProtectableConfig> protectableBlocks = new EnumMap<>(Material.class);
     private final Map<EntityType, ProtectableConfig> protectableEntities = new EnumMap<>(EntityType.class);
     private final Map<Material, Tag<Material>> materialTags = new EnumMap<>(Material.class);
+    private final Set<Mode> defaultModes = new HashSet<>();
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
     private boolean useActionBar;
@@ -230,7 +232,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public void reload() {
         reloadConfig();
-        Translator.loadAllTranslations(getDataPath(), getConfig().getString("language", "en"), getConfig().getBoolean("per-player-locale", true));
+        Translator.loadAllTranslations(getDataPath(), getConfig().getString("language", "en"), getConfig().getBoolean("settings.per-player-locale", true));
         this.useActionBar = getConfig().getBoolean("settings.use-action-bar", false);
         this.doors = getConfig().getConfigurationSection("doors") != null;
         this.doorsOpenIron = getConfig().getBoolean("doors.open-iron", false);
@@ -241,6 +243,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         registerProtectableAccess();
         registerAccessSources();
         initializeMatchers();
+        loadDefaultModes();
     }
 
     private void registerCustomCharts(final Metrics metrics, final SQLStore.Configuration databaseConfiguration) {
@@ -386,6 +389,27 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private <T extends Keyed> Tag<T> resolveTagProtectableAccess(final String registry, final Class<T> clazz, final String name) {
         final NamespacedKey tagKey = NamespacedKey.fromString(name);
         return tagKey == null ? null : getServer().getTag(registry, tagKey, clazz);
+    }
+
+    private void loadDefaultModes() {
+        defaultModes.clear();
+        final List<String> modes = getConfig().getStringList("settings.default-modes");
+        for (String modeName : modes) {
+            final Mode mode;
+            try {
+                mode = Mode.valueOf(modeName.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                getLogger().warning(() -> "Invalid default mode defined in config: %s. Skipping.".formatted(modeName));
+                return;
+            }
+
+            defaultModes.add(mode);
+        }
+        getLogger().info(() -> Arrays.toString(defaultModes.toArray()));
+    }
+
+    public Set<Mode> defaultModes() {
+        return defaultModes;
     }
 
     private void initializeMatchers() {
