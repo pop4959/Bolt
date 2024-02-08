@@ -714,7 +714,14 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     }
 
     @Override
-    public boolean canAccess(final Protection protection, final SourceResolver sourceResolver, String... permissions) {
+    public boolean canAccess(final Protection protection, final SourceResolver sourceResolver, final String... permissions) {
+        if (permissions.length == 0) {
+            return true;
+        }
+        return permissions.length == 1 ? canAccessSingle(protection, sourceResolver, permissions[0]) : canAccessMulti(protection, sourceResolver, permissions);
+    }
+
+    private boolean canAccessMulti(final Protection protection, final SourceResolver sourceResolver, final String... permissions) {
         if (protection == null) {
             return true;
         }
@@ -769,28 +776,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return unresolved.isEmpty();
     }
 
-    @Override
-    public boolean canAccess(final Block block, final Player player, final String permission) {
-        return canAccess(findProtection(block), player.getUniqueId(), permission);
-    }
-
-    @Override
-    public boolean canAccess(final Entity entity, final Player player, final String permission) {
-        return canAccess(findProtection(entity), player.getUniqueId(), permission);
-    }
-
-    @Override
-    public boolean canAccess(final Protection protection, final Player player, final String permission) {
-        return canAccess(protection, player.getUniqueId(), permission);
-    }
-
-    @Override
-    public boolean canAccess(final Protection protection, final UUID uuid, final String permission) {
-        return canAccess(protection, new BukkitPlayerResolver(bolt, uuid), permission);
-    }
-
-    @Override
-    public boolean canAccess(final Protection protection, final SourceResolver sourceResolver, String permission) {
+    private boolean canAccessSingle(final Protection protection, final SourceResolver sourceResolver, final String permission) {
         if (protection == null) {
             return true;
         }
