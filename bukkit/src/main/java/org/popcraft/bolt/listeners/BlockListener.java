@@ -686,6 +686,22 @@ public final class BlockListener implements Listener {
         }
     }
 
+    // BlockDestroyEvent is called when a block is about to be destroyed. We use it here to prevent a protected block
+    // from becoming destroyed involuntarily, for example, because it is a door and its support was removed. For other
+    // cases, like just breaking the door itself, it will go through other events and be handled properly.
+    // This is a last resort event.
+    public void onBlockDestroy(final BlockEvent e) {
+        if (!(e instanceof Cancellable cancellable)) {
+            return;
+        }
+        final Block block = e.getBlock();
+        final Protection existingProtection = plugin.findProtection(block);
+        if (existingProtection == null) {
+            return;
+        }
+        cancellable.setCancelled(true);
+    }
+
     @EventHandler
     public void onBlockReceiveGameEvent(final BlockReceiveGameEvent e) {
         if (!(e.getEntity() instanceof final Player player)) {
