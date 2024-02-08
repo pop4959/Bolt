@@ -715,16 +715,13 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     @Override
     public boolean canAccess(final Protection protection, final SourceResolver sourceResolver, final String... permissions) {
-        if (permissions.length == 0) {
+        if (protection == null || permissions.length == 0) {
             return true;
         }
         return permissions.length == 1 ? canAccessSingle(protection, sourceResolver, permissions[0]) : canAccessMulti(protection, sourceResolver, permissions);
     }
 
     private boolean canAccessMulti(final Protection protection, final SourceResolver sourceResolver, final String... permissions) {
-        if (protection == null) {
-            return true;
-        }
         final Set<String> unresolved = new HashSet<>(Arrays.asList(permissions));
         final Source ownerSource = Source.player(protection.getOwner());
         if (sourceResolver.resolve(ownerSource) || sourceResolver.resolve(ADMIN_PERMISSION_SOURCE)) {
@@ -777,9 +774,6 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     }
 
     private boolean canAccessSingle(final Protection protection, final SourceResolver sourceResolver, final String permission) {
-        if (protection == null) {
-            return true;
-        }
         final Source ownerSource = Source.player(protection.getOwner());
         if (sourceResolver.resolve(ownerSource) || sourceResolver.resolve(ADMIN_PERMISSION_SOURCE)) {
             if (DefaultAccess.OWNER.contains(permission)) {
