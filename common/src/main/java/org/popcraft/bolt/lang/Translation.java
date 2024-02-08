@@ -35,8 +35,13 @@ public class Translation {
     public static final String EXPIRE_COMPLETE = "expire_complete";
     public static final String EXPIRE_INVALID_TIME = "expire_invalid_time";
     public static final String FIND_HEADER = "find_header";
+    public static final String FIND_HEADER_NEW = "find_header_new";
     public static final String FIND_RESULT = "find_result";
     public static final String FIND_NEXT = "find_next";
+    public static final String FIND_NEXT_NEW = "find_next_new";
+    public static final String FIND_NEXT_NEW_PAGE_CURRENT = "find_next_new_page_current";
+    public static final String FIND_NEXT_NEW_PAGE_OTHER = "find_next_new_page_other";
+    public static final String FIND_NEXT_NEW_PAGE_SEPARATOR = "find_next_new_page_separator";
     public static final String FIND_NONE = "find_none";
     public static final String FLUSH = "flush";
     public static final String GROUP_ALREADY_EXISTS = "group_already_exists";
@@ -153,6 +158,10 @@ public class Translation {
         public static final String Y = "y";
         public static final String Z = "z";
         public static final String TIME = "time";
+        public static final String FIRST = "first";
+        public static final String LAST = "last";
+        public static final String PAGES = "pages";
+        public static final String PAGE = "page";
 
         private Placeholder() {
         }

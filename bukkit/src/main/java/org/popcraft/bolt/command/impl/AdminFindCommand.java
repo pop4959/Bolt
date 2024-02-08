@@ -11,6 +11,7 @@ import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.data.Profile;
 import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.lang.Translator;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.Profiles;
@@ -24,8 +25,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.popcraft.bolt.util.BoltComponents.getLocaleOf;
+import static org.popcraft.bolt.util.BoltComponents.resolveTranslation;
+
 public class AdminFindCommand extends BoltCommand {
     private static final int RESULTS_PER_PAGE = 4;
+    private static final int PAGES_BEFORE_AND_AFTER = 4;
 
     public AdminFindCommand(BoltPlugin plugin) {
         super(plugin);
@@ -59,13 +64,27 @@ public class AdminFindCommand extends BoltCommand {
 
     private void runPage(final CommandSender sender, final Profile playerProfile, final List<BlockProtection> blockProtectionsFromPlayer, final int page) {
         final int skip = RESULTS_PER_PAGE * page;
-        BoltComponents.sendMessage(sender, Translation.FIND_HEADER);
+        final boolean newFindFormat = Translator.isTranslated(Translation.FIND_HEADER_NEW, getLocaleOf(sender));
+        final int total = blockProtectionsFromPlayer.size();
+        final int totalPages = Math.max(0, (int) Math.ceil((double) total / RESULTS_PER_PAGE) - 1);
+        if (newFindFormat) {
+            BoltComponents.sendMessage(
+                    sender,
+                    Translation.FIND_HEADER_NEW,
+                    Placeholder.component(Translation.Placeholder.FIRST, Component.text(RESULTS_PER_PAGE * page + 1)),
+                    Placeholder.component(Translation.Placeholder.LAST, Component.text(Math.min(RESULTS_PER_PAGE * (page + 1), total))),
+                    Placeholder.component(Translation.Placeholder.COUNT, Component.text(total))
+            );
+        } else {
+            BoltComponents.sendMessage(sender, Translation.FIND_HEADER);
+        }
         final long now = System.currentTimeMillis();
         final AtomicInteger displayed = new AtomicInteger();
         blockProtectionsFromPlayer.stream().skip(skip).limit(RESULTS_PER_PAGE).forEach(blockProtection -> {
             final long elapsed = now - blockProtection.getCreated();
             final Duration duration = Duration.of(elapsed, ChronoUnit.MILLIS);
             final String time = "%d:%02d".formatted(duration.toHours(), duration.toMinutesPart());
+            final ClickEvent teleport = ClickEvent.runCommand("/execute in minecraft:%s run tp %s %d %d %d".formatted(blockProtection.getWorld(), sender.getName(), blockProtection.getX(), blockProtection.getY(), blockProtection.getZ()));
             BoltComponents.sendMessage(
                     sender,
                     Translation.FIND_RESULT,
@@ -73,16 +92,45 @@ public class AdminFindCommand extends BoltCommand {
                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(blockProtection, sender)),
                     Placeholder.component(Translation.Placeholder.PLAYER, Component.text(playerProfile.name())),
                     Placeholder.component(Translation.Placeholder.TIME, Component.text(time)),
-                    Placeholder.component(Translation.Placeholder.WORLD, Component.text(blockProtection.getWorld())),
-                    Placeholder.component(Translation.Placeholder.X, Component.text(blockProtection.getX())),
-                    Placeholder.component(Translation.Placeholder.Y, Component.text(blockProtection.getY())),
-                    Placeholder.component(Translation.Placeholder.Z, Component.text(blockProtection.getZ()))
+                    Placeholder.component(Translation.Placeholder.WORLD, Component.text(blockProtection.getWorld()).clickEvent(teleport)),
+                    Placeholder.component(Translation.Placeholder.X, Component.text(blockProtection.getX()).clickEvent(teleport)),
+                    Placeholder.component(Translation.Placeholder.Y, Component.text(blockProtection.getY()).clickEvent(teleport)),
+                    Placeholder.component(Translation.Placeholder.Z, Component.text(blockProtection.getZ()).clickEvent(teleport))
             );
             displayed.incrementAndGet();
         });
         final int numberDisplayed = displayed.get();
         if (numberDisplayed == 0) {
             BoltComponents.sendMessage(sender, Translation.FIND_NONE);
+        } else if (newFindFormat) {
+            Component pages = Component.empty();
+            final int firstPage = Math.max(0, page - PAGES_BEFORE_AND_AFTER);
+            final int lastPage = Math.min(page + PAGES_BEFORE_AND_AFTER, totalPages);
+            pages = pages.append(resolveTranslation(
+                    firstPage == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
+                    sender,
+                    Placeholder.component(Translation.Placeholder.PAGE, Component.text(firstPage + 1)
+                            .clickEvent(ClickEvent.runCommand("/bolt admin find %s %s".formatted(playerProfile.name(), firstPage))))
+            ));
+            for (int p = firstPage + 1; p <= lastPage; ++p) {
+                pages = pages.append(resolveTranslation(Translation.FIND_NEXT_NEW_PAGE_SEPARATOR, sender));
+                pages = pages.append(resolveTranslation(
+                        p == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
+                        sender,
+                        Placeholder.component(Translation.Placeholder.PAGE, Component.text(p + 1)
+                                .clickEvent(ClickEvent.runCommand("/bolt admin find %s %s".formatted(playerProfile.name(), p))))
+                ));
+            }
+            BoltComponents.sendMessage(
+                    sender,
+                    Translation.FIND_NEXT_NEW,
+                    Placeholder.component(Translation.Placeholder.PAGES, pages),
+                    Placeholder.component(Translation.Placeholder.PAGE, resolveTranslation(
+                            totalPages == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
+                            sender,
+                            Placeholder.component(Translation.Placeholder.PAGE, Component.text(totalPages + 1)
+                                    .clickEvent(ClickEvent.runCommand("/bolt admin find %s %s".formatted(playerProfile.name(), totalPages))))))
+            );
         } else if (numberDisplayed == RESULTS_PER_PAGE) {
             BoltComponents.sendClickableMessage(
                     sender,
