@@ -264,7 +264,7 @@ public final class BlockListener implements Listener {
             }
             case UNLOCK -> {
                 if (protection != null) {
-                    if (player.hasPermission("bolt.mod") || plugin.canAccess(protection, player, Permission.DESTROY)) {
+                    if (plugin.canAccess(protection, player, Permission.DESTROY)) {
                         plugin.removeProtection(protection);
                         BoltComponents.sendMessage(
                                 player,
