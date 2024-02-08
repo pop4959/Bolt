@@ -171,6 +171,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             new HangingSignMatcher(), new PinkPetalsMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private static final Source ADMIN_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.admin");
+    private static final Source MOD_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.mod");
     private final List<BlockMatcher> enabledBlockMatchers = new ArrayList<>();
     private final List<EntityMatcher> enabledEntityMatchers = new ArrayList<>();
     private final Map<String, BoltCommand> commands = new HashMap<>();
@@ -721,6 +722,12 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         final Source ownerSource = Source.player(protection.getOwner());
         if (sourceResolver.resolve(ownerSource) || sourceResolver.resolve(ADMIN_PERMISSION_SOURCE)) {
             unresolved.removeAll(DefaultAccess.OWNER);
+            if (unresolved.isEmpty()) {
+                return true;
+            }
+        }
+        if (sourceResolver.resolve(MOD_PERMISSION_SOURCE)) {
+            unresolved.removeAll(DefaultAccess.DISPLAY);
             if (unresolved.isEmpty()) {
                 return true;
             }
