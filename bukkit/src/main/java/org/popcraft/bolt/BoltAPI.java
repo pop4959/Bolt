@@ -14,6 +14,7 @@ import org.popcraft.bolt.source.SourceResolver;
 import java.util.Collection;
 import java.util.UUID;
 
+@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public interface BoltAPI {
     boolean isProtectable(final Block block);
 
@@ -47,10 +48,8 @@ public interface BoltAPI {
 
     Collection<Protection> findProtections(final World world, final BoundingBox boundingBox);
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     boolean canAccess(final Block block, final Player player, final String... permissions);
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     boolean canAccess(final Entity entity, final Player player, final String... permissions);
 
     boolean canAccess(final Protection protection, final Player player, final String... permissions);
@@ -58,6 +57,16 @@ public interface BoltAPI {
     boolean canAccess(final Protection protection, final UUID uuid, final String... permissions);
 
     boolean canAccess(final Protection protection, final SourceResolver sourceResolver, String... permissions);
+
+    boolean canAccess(final Block block, final Player player, final String permission);
+
+    boolean canAccess(final Entity entity, final Player player, final String permission);
+
+    boolean canAccess(final Protection protection, final Player player, final String permission);
+
+    boolean canAccess(final Protection protection, final UUID uuid, final String permission);
+
+    boolean canAccess(Protection protection, SourceResolver sourceResolver, String permission);
 
     void registerPlayerSourceResolver(final PlayerSourceResolver playerSourceResolver);
 }

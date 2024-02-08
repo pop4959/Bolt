@@ -770,6 +770,75 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     }
 
     @Override
+    public boolean canAccess(final Block block, final Player player, final String permission) {
+        return canAccess(findProtection(block), player.getUniqueId(), permission);
+    }
+
+    @Override
+    public boolean canAccess(final Entity entity, final Player player, final String permission) {
+        return canAccess(findProtection(entity), player.getUniqueId(), permission);
+    }
+
+    @Override
+    public boolean canAccess(final Protection protection, final Player player, final String permission) {
+        return canAccess(protection, player.getUniqueId(), permission);
+    }
+
+    @Override
+    public boolean canAccess(final Protection protection, final UUID uuid, final String permission) {
+        return canAccess(protection, new BukkitPlayerResolver(bolt, uuid), permission);
+    }
+
+    @Override
+    public boolean canAccess(final Protection protection, final SourceResolver sourceResolver, String permission) {
+        if (protection == null) {
+            return true;
+        }
+        final Source ownerSource = Source.player(protection.getOwner());
+        if (sourceResolver.resolve(ownerSource) || sourceResolver.resolve(ADMIN_PERMISSION_SOURCE)) {
+            if (DefaultAccess.OWNER.contains(permission)) {
+                return true;
+            }
+        }
+        if (sourceResolver.resolve(MOD_PERMISSION_SOURCE)) {
+            if (DefaultAccess.DISPLAY.contains(permission)) {
+                return true;
+            }
+        }
+        final AccessRegistry accessRegistry = bolt.getAccessRegistry();
+        final Access protectionType = accessRegistry.getProtectionByType(protection.getType()).orElse(null);
+        if (protectionType != null) {
+            if (protectionType.permissions().contains(permission)) {
+                return true;
+            }
+        }
+        for (final Map.Entry<String, String> entry : protection.getAccess().entrySet()) {
+            if (sourceResolver.resolve(Source.parse(entry.getKey()))) {
+                final Access accessType = accessRegistry.getAccessByType(entry.getValue()).orElse(null);
+                if (accessType != null) {
+                    if (accessType.permissions().contains(permission)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        final AccessList accessList = bolt.getStore().loadAccessList(protection.getOwner()).join();
+        if (accessList != null) {
+            for (final Map.Entry<String, String> entry : accessList.getAccess().entrySet()) {
+                if (sourceResolver.resolve(Source.parse(entry.getKey()))) {
+                    final Access accessType = accessRegistry.getAccessByType(entry.getValue()).orElse(null);
+                    if (accessType != null) {
+                        if (accessType.permissions().contains(permission)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return sourceResolver.resolve(Source.of(SourceTypes.PERMISSION, "bolt.permission." + permission));
+    }
+
+    @Override
     public void registerPlayerSourceResolver(PlayerSourceResolver playerSourceResolver) {
         bolt.getRegisteredPlayerResolvers().add(playerSourceResolver);
     }
