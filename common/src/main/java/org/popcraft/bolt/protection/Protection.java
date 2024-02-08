@@ -3,7 +3,7 @@ package org.popcraft.bolt.protection;
 import java.util.Map;
 import java.util.UUID;
 
-public abstract class Protection {
+public sealed abstract class Protection permits BlockProtection, EntityProtection {
     protected final UUID id;
     protected UUID owner;
     protected String type;

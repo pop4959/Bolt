@@ -3,7 +3,7 @@ package org.popcraft.bolt.protection;
 import java.util.Map;
 import java.util.UUID;
 
-public class BlockProtection extends Protection {
+public final class BlockProtection extends Protection {
     private String world;
     private int x;
     private int y;

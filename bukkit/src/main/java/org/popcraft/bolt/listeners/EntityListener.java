@@ -65,6 +65,7 @@ import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.ProtectableConfig;
+import org.popcraft.bolt.util.ProtectableEntity;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 import org.spigotmc.event.entity.EntityMountEvent;
@@ -80,13 +81,12 @@ import static org.popcraft.bolt.util.BoltComponents.resolveTranslation;
 import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 import static org.popcraft.bolt.util.Profiles.NIL_UUID;
 
-public final class EntityListener implements Listener {
+public final class EntityListener extends AbstractInteractionListener<ProtectableEntity> implements Listener {
     private static final SourceResolver ENTITY_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.ENTITY));
     private final Map<NamespacedKey, UUID> spawnEggPlayers = new HashMap<>();
-    private final BoltPlugin plugin;
 
     public EntityListener(final BoltPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     @EventHandler
@@ -256,7 +256,7 @@ public final class EntityListener implements Listener {
         }
         boolean shouldCancel = false;
         final Protection protection = plugin.findProtection(entity);
-        if (triggerActions(player, protection, entity)) {
+        if (triggerActions(player, protection, new ProtectableEntity(entity))) {
             boltPlayer.setInteracted(true);
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
             shouldCancel = true;
@@ -321,181 +321,6 @@ public final class EntityListener implements Listener {
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
         }
         return shouldCancel;
-    }
-
-    private boolean triggerActions(final Player player, final Protection protection, final Entity entity) {
-        final BoltPlayer boltPlayer = plugin.player(player);
-        final Action action = boltPlayer.getAction();
-        if (action == null) {
-            return false;
-        }
-        if (!player.hasPermission(action.getPermission())) {
-            BoltComponents.sendMessage(player, Translation.COMMAND_NO_PERMISSION);
-            return false;
-        }
-        final Action.Type actionType = action.getType();
-        switch (actionType) {
-            case LOCK -> {
-                final String protectionType = Optional.ofNullable(action.getData())
-                        .flatMap(type -> plugin.getBolt().getAccessRegistry().getProtectionByType(type))
-                        .map(Access::type)
-                        .orElse(plugin.getDefaultProtectionType());
-                final ProtectableConfig protectableConfig = plugin.getProtectableConfig(entity);
-                final boolean lockPermission = protectableConfig != null && protectableConfig.lockPermission();
-                if (protection != null) {
-                    if (!protection.getType().equals(protectionType) && plugin.canAccess(protection, player, Permission.EDIT)) {
-                        protection.setType(protectionType);
-                        plugin.saveProtection(protection);
-                        BoltComponents.sendMessage(
-                                player,
-                                Translation.CLICK_LOCKED_CHANGED,
-                                plugin.isUseActionBar(),
-                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player))
-                        );
-                    } else {
-                        BoltComponents.sendMessage(
-                                player,
-                                Translation.CLICK_LOCKED_ALREADY,
-                                plugin.isUseActionBar(),
-                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
-                        );
-                    }
-                } else if (plugin.isProtectable(entity) && (!lockPermission || player.hasPermission("bolt.protection.lock.%s".formatted(entity.getType().name().toLowerCase())))) {
-                    final EntityProtection newProtection = plugin.createProtection(entity, boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
-                    plugin.saveProtection(newProtection);
-                    boltPlayer.setLockNil(false);
-                    BoltComponents.sendMessage(
-                            player,
-                            Translation.CLICK_LOCKED,
-                            plugin.isUseActionBar(),
-                            Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(newProtection, player)),
-                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(entity, player))
-                    );
-                } else {
-                    BoltComponents.sendMessage(
-                            player,
-                            Translation.CLICK_NOT_LOCKABLE,
-                            plugin.isUseActionBar(),
-                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(entity, player))
-                    );
-                }
-            }
-            case UNLOCK -> {
-                if (protection != null) {
-                    if (plugin.canAccess(protection, player, Permission.DESTROY)) {
-                        plugin.removeProtection(protection);
-                        BoltComponents.sendMessage(
-                                player,
-                                Translation.CLICK_UNLOCKED,
-                                plugin.isUseActionBar(),
-                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
-                        );
-                    } else {
-                        BoltComponents.sendMessage(
-                                player,
-                                Translation.CLICK_UNLOCKED_NO_PERMISSION,
-                                plugin.isUseActionBar()
-                        );
-                    }
-                } else {
-                    BoltComponents.sendMessage(
-                            player,
-                            Translation.CLICK_NOT_LOCKED,
-                            plugin.isUseActionBar(),
-                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(entity, player))
-                    );
-                }
-            }
-            case INFO -> {
-                if (protection != null) {
-                    Profiles.findOrLookupProfileByUniqueId(protection.getOwner())
-                            .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
-                                    player,
-                                    !protection.getAccess().isEmpty() && (protection.getOwner().equals(player.getUniqueId()) || player.hasPermission("bolt.command.info.full")) ? Translation.INFO_FULL : Translation.INFO,
-                                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player)),
-                                    Placeholder.component(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, player))),
-                                    Placeholder.component(Translation.Placeholder.ACCESS_LIST_SIZE, Component.text(protection.getAccess().size())),
-                                    Placeholder.component(Translation.Placeholder.ACCESS_LIST, Component.text(Protections.accessList(protection.getAccess())))
-                            )));
-                } else {
-                    BoltComponents.sendMessage(
-                            player,
-                            Translation.CLICK_NOT_LOCKED,
-                            plugin.isUseActionBar(),
-                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(entity, player))
-                    );
-                }
-            }
-            case EDIT -> {
-                if (protection != null) {
-                    if (plugin.canAccess(protection, player, Permission.EDIT)) {
-                        boltPlayer.consumeModifications().forEach((source, type) -> {
-                            if (Boolean.parseBoolean(action.getData())) {
-                                protection.getAccess().put(source.toString(), type);
-                            } else {
-                                protection.getAccess().remove(source.toString());
-                            }
-                        });
-                        plugin.saveProtection(protection);
-                        BoltComponents.sendMessage(
-                                player,
-                                Translation.CLICK_EDITED,
-                                plugin.isUseActionBar(),
-                                Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
-                        );
-                    } else {
-                        BoltComponents.sendMessage(
-                                player,
-                                Translation.CLICK_EDITED_NO_PERMISSION,
-                                plugin.isUseActionBar()
-                        );
-                    }
-                } else {
-                    BoltComponents.sendMessage(
-                            player,
-                            Translation.CLICK_NOT_LOCKED,
-                            plugin.isUseActionBar(),
-                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(entity, player))
-                    );
-                }
-            }
-            case DEBUG -> BoltComponents.sendMessage(
-                    player,
-                    Optional.ofNullable(protection).map(Protection::toString).toString()
-            );
-            case TRANSFER -> {
-                if (protection != null) {
-                    if (player.getUniqueId().equals(protection.getOwner()) || action.isAdmin()) {
-                        final UUID uuid = UUID.fromString(action.getData());
-                        protection.setOwner(uuid);
-                        plugin.saveProtection(protection);
-                        Profiles.findOrLookupProfileByUniqueId(uuid)
-                                .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
-                                        player,
-                                        Translation.CLICK_TRANSFER_CONFIRM,
-                                        plugin.isUseActionBar(),
-                                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player)),
-                                        Placeholder.component(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, player)))
-                                )));
-                    } else {
-                        BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER, plugin.isUseActionBar());
-                    }
-                } else {
-                    BoltComponents.sendMessage(
-                            player,
-                            Translation.CLICK_NOT_LOCKED,
-                            plugin.isUseActionBar(),
-                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(entity, player))
-                    );
-                }
-            }
-        }
-        boltPlayer.clearAction();
-        return true;
     }
 
     @EventHandler

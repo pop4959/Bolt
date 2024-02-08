@@ -3,7 +3,7 @@ package org.popcraft.bolt.protection;
 import java.util.Map;
 import java.util.UUID;
 
-public class EntityProtection extends Protection {
+public final class EntityProtection extends Protection {
     private String entity;
 
     public EntityProtection(UUID id, UUID owner, String type, long created, long accessed, Map<String, String> access, String entity) {

@@ -84,6 +84,16 @@ public final class Protections {
         }
     }
 
+    public static Component displayType(final Protectable protectable, final CommandSender sender) {
+        if (protectable instanceof ProtectableBlock block) {
+            return displayType(block.block(), sender);
+        } else if (protectable instanceof ProtectableEntity entity) {
+            return displayType(entity.entity(), sender);
+        } else {
+            throw new RuntimeException(); // wish I could use exhaustive switches
+        }
+    }
+
     public static Component displayType(final Block block, final CommandSender sender) {
         final Material material = block.getType();
         if (translatableSupport) {
