@@ -758,6 +758,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
                 }
             }
         }
+        unresolved.removeIf(permission -> sourceResolver.resolve(Source.of(SourceTypes.PERMISSION, "bolt.bypass." + permission)));
         return unresolved.isEmpty();
     }
 
