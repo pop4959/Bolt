@@ -58,7 +58,6 @@ import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.source.SourceTypes;
-import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Mode;
@@ -74,12 +73,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
-import static org.popcraft.bolt.util.BoltComponents.resolveTranslation;
 import static org.popcraft.bolt.util.BoltComponents.translateRaw;
-import static org.popcraft.bolt.util.Profiles.NIL_UUID;
 
 public final class EntityListener extends AbstractInteractionListener<ProtectableEntity> implements Listener {
     private static final SourceResolver ENTITY_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.ENTITY));

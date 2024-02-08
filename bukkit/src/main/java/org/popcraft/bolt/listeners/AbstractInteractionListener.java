@@ -2,12 +2,10 @@ package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.lang.Translation;
-import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
@@ -25,7 +23,7 @@ import java.util.UUID;
 import static org.popcraft.bolt.util.BoltComponents.resolveTranslation;
 import static org.popcraft.bolt.util.Profiles.NIL_UUID;
 
-public abstract class AbstractInteractionListener<T extends Protectable> {
+abstract class AbstractInteractionListener<T extends Protectable> {
     protected final BoltPlugin plugin;
 
     protected AbstractInteractionListener(BoltPlugin plugin) {

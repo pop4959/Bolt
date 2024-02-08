@@ -1,7 +1,5 @@
 package org.popcraft.bolt.util;
 
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.popcraft.bolt.protection.Protection;
 
 import java.util.UUID;
