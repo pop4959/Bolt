@@ -38,7 +38,7 @@ public class Time {
     }
 
     private static Component agoComponent(Duration duration, CommandSender sender) {
-        final ArrayList<Component> parts = new ArrayList<>(5);
+        final ArrayList<Component> parts = new ArrayList<>();
 
         long days = duration.toDays();
         final int hours = duration.toHoursPart();
