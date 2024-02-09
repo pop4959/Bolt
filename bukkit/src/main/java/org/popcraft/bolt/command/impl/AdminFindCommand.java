@@ -2,7 +2,9 @@ package org.popcraft.bolt.command.impl;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
@@ -17,9 +19,8 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
+import org.popcraft.bolt.util.Time;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -78,24 +79,23 @@ public class AdminFindCommand extends BoltCommand {
         } else {
             BoltComponents.sendMessage(sender, Translation.FIND_HEADER);
         }
-        final long now = System.currentTimeMillis();
         final AtomicInteger displayed = new AtomicInteger();
         blockProtectionsFromPlayer.stream().skip(skip).limit(RESULTS_PER_PAGE).forEach(blockProtection -> {
-            final long elapsed = now - blockProtection.getCreated();
-            final Duration duration = Duration.of(elapsed, ChronoUnit.MILLIS);
-            final String time = "%d:%02d".formatted(duration.toHours(), duration.toMinutesPart());
-            final ClickEvent teleport = ClickEvent.runCommand("/execute in minecraft:%s run tp %s %d %d %d".formatted(blockProtection.getWorld(), sender.getName(), blockProtection.getX(), blockProtection.getY(), blockProtection.getZ()));
+            final World world = plugin.getServer().getWorld(blockProtection.getWorld());
+            final String worldName = world == null ? blockProtection.getWorld() : world.getKey().toString(); // At least it doesn't NPE
+            final ClickEvent teleport = ClickEvent.runCommand("/execute in %s run tp %s %d %d %d".formatted(worldName, sender.getName(), blockProtection.getX(), blockProtection.getY(), blockProtection.getZ()));
             BoltComponents.sendMessage(
                     sender,
                     Translation.FIND_RESULT,
                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(blockProtection, sender)),
                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(blockProtection, sender)),
                     Placeholder.component(Translation.Placeholder.PLAYER, Component.text(playerProfile.name())),
-                    Placeholder.component(Translation.Placeholder.TIME, Component.text(time)),
+                    Placeholder.component(Translation.Placeholder.TIME, Time.relativeTimestamp(blockProtection.getCreated(), sender, 2)),
                     Placeholder.component(Translation.Placeholder.WORLD, Component.text(blockProtection.getWorld()).clickEvent(teleport)),
-                    Placeholder.component(Translation.Placeholder.X, Component.text(blockProtection.getX()).clickEvent(teleport)),
-                    Placeholder.component(Translation.Placeholder.Y, Component.text(blockProtection.getY()).clickEvent(teleport)),
-                    Placeholder.component(Translation.Placeholder.Z, Component.text(blockProtection.getZ()).clickEvent(teleport))
+                    Placeholder.component(Translation.Placeholder.X, Component.text(blockProtection.getX())),
+                    Placeholder.component(Translation.Placeholder.Y, Component.text(blockProtection.getY())),
+                    Placeholder.component(Translation.Placeholder.Z, Component.text(blockProtection.getZ())),
+                    Placeholder.styling(Translation.Placeholder.COMMAND, teleport, HoverEvent.showText(resolveTranslation(Translation.FIND_TELEPORT, sender)))
             );
             displayed.incrementAndGet();
         });
