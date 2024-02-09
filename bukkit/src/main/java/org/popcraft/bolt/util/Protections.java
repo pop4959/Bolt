@@ -159,7 +159,7 @@ public final class Protections {
             } else {
                 subject = source.getIdentifier();
             }
-            lines.add("%s (%s: %s)".formatted(subject, Strings.toTitleCase(source.getType()), Strings.toTitleCase(access)));
+            lines.add(" * %s (%s: %s)".formatted(subject, Strings.toTitleCase(source.getType()), Strings.toTitleCase(access)));
         });
         return String.join("\n", lines);
     }

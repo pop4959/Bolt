@@ -65,6 +65,7 @@ import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
+import org.popcraft.bolt.util.Time;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -291,15 +292,19 @@ public final class BlockListener implements Listener {
             }
             case INFO -> {
                 if (protection != null) {
+                    final boolean showFull = protection.getOwner().equals(player.getUniqueId()) || player.hasPermission("bolt.command.info.full");
+                    final boolean showAccessList = !protection.getAccess().isEmpty();
                     Profiles.findOrLookupProfileByUniqueId(protection.getOwner())
                             .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                     player,
-                                    !protection.getAccess().isEmpty() && (protection.getOwner().equals(player.getUniqueId()) || player.hasPermission("bolt.command.info.full")) ? Translation.INFO_FULL : Translation.INFO,
+                                    showFull ? (showAccessList ? Translation.INFO_FULL_ACCESS : Translation.INFO_FULL_NO_ACCESS) : Translation.INFO,
                                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
                                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player)),
                                     Placeholder.component(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, player))),
                                     Placeholder.component(Translation.Placeholder.ACCESS_LIST_SIZE, Component.text(protection.getAccess().size())),
-                                    Placeholder.component(Translation.Placeholder.ACCESS_LIST, Component.text(Protections.accessList(protection.getAccess())))
+                                    Placeholder.component(Translation.Placeholder.ACCESS_LIST, Component.text(Protections.accessList(protection.getAccess()))),
+                                    Placeholder.component(Translation.Placeholder.CREATED_TIME, Time.relativeTimestamp(protection.getCreated(), player)),
+                                    Placeholder.component(Translation.Placeholder.ACCESSED_TIME, Time.relativeTimestamp(protection.getAccessed(), player))
                             )));
                 } else {
                     BoltComponents.sendMessage(
