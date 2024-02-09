@@ -101,6 +101,7 @@ public class AdminCleanup extends BoltCommand {
                     Placeholder.component(Translation.Placeholder.COUNT, Component.text(removed.get())),
                     Placeholder.component(Translation.Placeholder.SECONDS, Component.text(seconds))
             );
+            WORKING.release(PERMITS);
         }, SchedulerUtil.executor(plugin, sender));
     }
 
