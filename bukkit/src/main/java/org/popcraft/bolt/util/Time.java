@@ -22,7 +22,7 @@ public class Time {
     private static final int DAYS_IN_YEAR = 365;
     private static final int DAYS_IN_MONTH = 30;
     private static final ZoneId UTC = ZoneId.of("UTC");
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.LONG);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG);
 
     private Time() {
     }
