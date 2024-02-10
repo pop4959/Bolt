@@ -37,11 +37,16 @@ public class CallbackCommand extends BoltCommand {
 
     @Override
     public void shortHelp(CommandSender sender, Arguments arguments) {
-        // idk
+        // No help
     }
 
     @Override
     public void longHelp(CommandSender sender, Arguments arguments) {
-        // idk
+        // No help
+    }
+
+    @Override
+    public boolean hidden() {
+        return true;
     }
 }

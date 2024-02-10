@@ -500,7 +500,9 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         final String commandKey = (isBoltCommand ? args[0] : command.getName()).toLowerCase();
         final List<String> suggestions = new ArrayList<>();
         if (args.length == commandStart) {
-            commands.keySet().stream().filter(name -> sender.hasPermission(COMMAND_PERMISSION_KEY + name)).forEach(suggestions::add);
+            commands.entrySet().stream()
+                .filter(i -> sender.hasPermission(COMMAND_PERMISSION_KEY + i.getKey()) && !i.getValue().hidden())
+                .forEach(i -> suggestions.add(i.getKey()));
         } else if (commands.containsKey(commandKey) && sender.hasPermission(COMMAND_PERMISSION_KEY + commandKey)) {
             suggestions.addAll(commands.get(commandKey).suggestions(sender, new Arguments(Arrays.copyOfRange(args, commandStart, args.length))));
         }
