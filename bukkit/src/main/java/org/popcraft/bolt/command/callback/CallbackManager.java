@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class CallbackManager {
-    private static final Duration DEFAULT_EXPIRY = Duration.of(1, ChronoUnit.MINUTES);
+    private static final Duration DEFAULT_EXPIRY = Duration.of(10, ChronoUnit.MINUTES);
 
     private final Map<UUID, Callback> callbacks = new ConcurrentHashMap<>();
 
