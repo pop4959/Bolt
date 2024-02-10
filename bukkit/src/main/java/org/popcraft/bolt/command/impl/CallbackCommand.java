@@ -1,15 +1,9 @@
 package org.popcraft.bolt.command.impl;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
-import org.popcraft.bolt.lang.Translation;
-import org.popcraft.bolt.util.Action;
-import org.popcraft.bolt.util.BoltComponents;
 
 import java.util.Collections;
 import java.util.List;

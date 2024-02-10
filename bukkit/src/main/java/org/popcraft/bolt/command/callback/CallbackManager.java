@@ -11,8 +11,6 @@ import org.popcraft.bolt.util.SchedulerUtil;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,9 +26,7 @@ public class CallbackManager {
     }
 
     private void cleanupExpired() {
-        System.out.println("Cleaning up callbacks: contained entries: " + callbacks.size());
         this.callbacks.entrySet().removeIf(i -> i.getValue().expired());
-        System.out.println("Now: " + callbacks.size());
     }
 
     public void execute(final CommandSender sender, final UUID id) {
