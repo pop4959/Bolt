@@ -28,7 +28,9 @@ import org.popcraft.bolt.access.AccessRegistry;
 import org.popcraft.bolt.access.DefaultAccess;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.command.callback.CallbackManager;
 import org.popcraft.bolt.command.impl.AdminCommand;
+import org.popcraft.bolt.command.impl.CallbackCommand;
 import org.popcraft.bolt.command.impl.EditCommand;
 import org.popcraft.bolt.command.impl.GroupCommand;
 import org.popcraft.bolt.command.impl.HelpCommand;
@@ -191,6 +193,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private int doorsCloseAfter;
     private boolean doorsFixPlugins;
     private Bolt bolt;
+    private CallbackManager callbackManager;
 
     @Override
     public void onEnable() {
@@ -213,6 +216,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         BoltComponents.enable(this);
         registerEvents();
         registerCommands();
+        this.callbackManager = new CallbackManager(this);
         profileCache.load();
         final Metrics metrics = new Metrics(this, 17711);
         registerCustomCharts(metrics, databaseConfiguration);
@@ -461,6 +465,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         commands.put("transfer", new TransferCommand(this));
         commands.put("trust", new TrustCommand(this));
         commands.put("unlock", new UnlockCommand(this));
+        commands.put("callback", new CallbackCommand(this));
     }
 
     public Map<String, BoltCommand> commands() {
@@ -495,7 +500,9 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         final String commandKey = (isBoltCommand ? args[0] : command.getName()).toLowerCase();
         final List<String> suggestions = new ArrayList<>();
         if (args.length == commandStart) {
-            commands.keySet().stream().filter(name -> sender.hasPermission(COMMAND_PERMISSION_KEY + name)).forEach(suggestions::add);
+            commands.entrySet().stream()
+                .filter(i -> sender.hasPermission(COMMAND_PERMISSION_KEY + i.getKey()) && !i.getValue().hidden())
+                .forEach(i -> suggestions.add(i.getKey()));
         } else if (commands.containsKey(commandKey) && sender.hasPermission(COMMAND_PERMISSION_KEY + commandKey)) {
             suggestions.addAll(commands.get(commandKey).suggestions(sender, new Arguments(Arrays.copyOfRange(args, commandStart, args.length))));
         }
@@ -542,6 +549,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public ProfileCache getProfileCache() {
         return profileCache;
+    }
+
+    public CallbackManager getCallbackManager() {
+        return this.callbackManager;
     }
 
     public BoltPlayer player(final Player player) {

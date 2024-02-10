@@ -28,16 +28,20 @@ public class Time {
     }
 
     public static Component relativeTimestamp(long unixMs, CommandSender sender) {
+        return relativeTimestamp(unixMs, sender, Integer.MAX_VALUE);
+    }
+
+    public static Component relativeTimestamp(long unixMs, CommandSender sender, int precision) {
         final long now = System.currentTimeMillis();
 
         final String timestamp = FORMATTER.withLocale(getLocaleOf(sender)).format(ZonedDateTime.ofInstant(Instant.ofEpochMilli(unixMs), UTC));
         final Duration duration = Duration.of(now - unixMs, ChronoUnit.MILLIS);
-        final Component ago = agoComponent(duration, sender);
+        final Component ago = agoComponent(duration, sender, precision);
 
         return resolveTranslation(Translation.TIME_AGO, sender, Placeholder.component(Translation.Placeholder.TIME, ago)).hoverEvent(Component.text(timestamp));
     }
 
-    private static Component agoComponent(Duration duration, CommandSender sender) {
+    private static Component agoComponent(Duration duration, CommandSender sender, int precision) {
         final ArrayList<Component> parts = new ArrayList<>();
 
         long days = duration.toDays();
@@ -50,25 +54,25 @@ public class Time {
             parts.add(resolveTranslation(Translation.TIME_YEARS, sender, Placeholder.component(Translation.Placeholder.NUMBER, Component.text(years))));
         }
 
-        if (days >= DAYS_IN_MONTH) {
+        if (days >= DAYS_IN_MONTH && parts.size() < precision) {
             final long months = Math.floorDiv(days, DAYS_IN_MONTH);
             days -= (months * DAYS_IN_MONTH);
             parts.add(resolveTranslation(Translation.TIME_MONTHS, sender, Placeholder.component(Translation.Placeholder.NUMBER, Component.text(months))));
         }
 
-        if (days != 0) {
+        if (days != 0 && parts.size() < precision) {
             parts.add(resolveTranslation(Translation.TIME_DAYS, sender, Placeholder.component(Translation.Placeholder.NUMBER, Component.text(days))));
         }
 
-        if (hours != 0) {
+        if (hours != 0 && parts.size() < precision) {
             parts.add(resolveTranslation(Translation.TIME_HOURS, sender, Placeholder.component(Translation.Placeholder.NUMBER, Component.text(hours))));
         }
 
-        if (minutes != 0) {
+        if (minutes != 0 && parts.size() < precision) {
             parts.add(resolveTranslation(Translation.TIME_MINUTES, sender, Placeholder.component(Translation.Placeholder.NUMBER, Component.text(minutes))));
         }
 
-        if (seconds != 0) {
+        if (seconds != 0 && parts.size() < precision) {
             parts.add(resolveTranslation(Translation.TIME_SECONDS, sender, Placeholder.component(Translation.Placeholder.NUMBER, Component.text(seconds))));
         } else if (parts.isEmpty()) {
             // avoid an empty string, say "0s" instead

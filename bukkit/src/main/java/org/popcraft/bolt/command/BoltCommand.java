@@ -19,4 +19,8 @@ public abstract class BoltCommand {
     public abstract void shortHelp(CommandSender sender, Arguments arguments);
 
     public abstract void longHelp(CommandSender sender, Arguments arguments);
+
+    public boolean hidden() {
+        return false;
+    }
 }
