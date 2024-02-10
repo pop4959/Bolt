@@ -28,7 +28,7 @@ public class Time {
     }
 
     public static Component relativeTimestamp(long unixMs, CommandSender sender) {
-        return relativeTimestamp(unixMs, sender, 100);
+        return relativeTimestamp(unixMs, sender, Integer.MAX_VALUE);
     }
 
     public static Component relativeTimestamp(long unixMs, CommandSender sender, int precision) {
