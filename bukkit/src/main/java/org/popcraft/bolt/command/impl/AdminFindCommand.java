@@ -90,7 +90,7 @@ public class AdminFindCommand extends BoltCommand {
                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(blockProtection, sender)),
                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(blockProtection, sender)),
                     Placeholder.component(Translation.Placeholder.PLAYER, Component.text(playerProfile.name())),
-                    Placeholder.component(Translation.Placeholder.TIME, Time.relativeTimestamp(blockProtection.getCreated(), sender, 2)),
+                    Placeholder.component(Translation.Placeholder.TIME, Time.relativeTimestamp(blockProtection.getCreated(), sender, 1)),
                     Placeholder.component(Translation.Placeholder.WORLD, Component.text(blockProtection.getWorld())),
                     Placeholder.component(Translation.Placeholder.X, Component.text(blockProtection.getX())),
                     Placeholder.component(Translation.Placeholder.Y, Component.text(blockProtection.getY())),
