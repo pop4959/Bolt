@@ -36,6 +36,7 @@ import java.util.Map;
 
 public final class InventoryListener implements Listener {
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
+    private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private static final InventoryType CRAFTER_TYPE = EnumUtil.valueOf(InventoryType.class, "CRAFTER").orElse(null);
     private static final Material CRAFTER_MATERIAL = EnumUtil.valueOf(Material.class, "CRAFTER").orElse(null);
     private static final Map<InventoryType, EnumSet<Material>> INVENTORY_TYPE_BLOCKS = new HashMap<>(Map.of(
@@ -152,6 +153,13 @@ public final class InventoryListener implements Listener {
         final Protection destinationProtection = getInventoryProtection(e.getDestination());
         if (sourceProtection == null && destinationProtection == null) {
             return;
+        }
+        // Droppers can move items to another container, but they need to be activated by redstone to do so
+        if (sourceProtection != null && InventoryType.DROPPER.equals(e.getSource().getType())) {
+            if (!plugin.canAccess(sourceProtection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
+                e.setCancelled(true);
+                return;
+            }
         }
         if (sourceProtection != null && destinationProtection != null) {
             if (!plugin.canAccess(destinationProtection, sourceProtection.getOwner(), Permission.DEPOSIT) || !plugin.canAccess(sourceProtection, destinationProtection.getOwner(), Permission.WITHDRAW)) {
