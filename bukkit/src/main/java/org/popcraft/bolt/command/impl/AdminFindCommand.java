@@ -4,9 +4,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
@@ -82,8 +84,9 @@ public class AdminFindCommand extends BoltCommand {
         final AtomicInteger displayed = new AtomicInteger();
         blockProtectionsFromPlayer.stream().skip(skip).limit(RESULTS_PER_PAGE).forEach(blockProtection -> {
             final World world = plugin.getServer().getWorld(blockProtection.getWorld());
-            final String worldName = world == null ? blockProtection.getWorld() : world.getKey().toString(); // At least it doesn't NPE
-            final ClickEvent teleport = ClickEvent.runCommand("/execute in %s run tp %s %d %d %d".formatted(worldName, sender.getName(), blockProtection.getX(), blockProtection.getY(), blockProtection.getZ()));
+            final ClickEvent teleport = plugin.getCallbackManager().registerPlayerOnly(player -> {
+                player.teleport(new Location(world, blockProtection.getX() + 0.5, blockProtection.getY(), blockProtection.getZ() + 0.5));
+            });
             BoltComponents.sendMessage(
                     sender,
                     Translation.FIND_RESULT,

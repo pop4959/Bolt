@@ -44,6 +44,8 @@ permissions:
     default: op
   bolt.command.admin.transfer:
     default: op
+  bolt.command.callback:
+    default: true
   bolt.command.edit:
     default: true
   bolt.command.group:

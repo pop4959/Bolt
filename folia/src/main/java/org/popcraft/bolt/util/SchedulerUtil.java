@@ -41,6 +41,14 @@ public class SchedulerUtil {
         }
     }
 
+    public static void schedule(final Plugin plugin, final Runnable runnable, final long delay, final long interval) {
+        if (FoliaUtil.isFolia()) {
+            Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, scheduledTask -> runnable.run(), delay, interval);
+        } else {
+            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, runnable, delay, interval);
+        }
+    }
+
     public static Executor executor(final Plugin plugin, final CommandSender sender) {
         return command -> schedule(plugin, sender, command);
     }
