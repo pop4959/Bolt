@@ -8,6 +8,8 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
@@ -159,7 +161,12 @@ public final class Protections {
             } else {
                 subject = source.getIdentifier();
             }
-            lines.add(" * %s (%s: %s)".formatted(subject, Strings.toTitleCase(source.getType()), Strings.toTitleCase(access)));
+            final BoltPlugin plugin = JavaPlugin.getPlugin(BoltPlugin.class);
+            if (plugin.getDefaultAccessType().equals(access)) {
+                lines.add(" * %s (%s)".formatted(subject, Strings.toTitleCase(source.getType())));
+            } else {
+                lines.add(" * %s (%s: %s)".formatted(subject, Strings.toTitleCase(source.getType()), Strings.toTitleCase(access)));
+            }
         });
         return String.join("\n", lines);
     }
