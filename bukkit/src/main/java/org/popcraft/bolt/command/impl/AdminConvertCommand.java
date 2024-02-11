@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
+import org.popcraft.bolt.data.migration.lockette.LocketteMigration;
 import org.popcraft.bolt.data.migration.lwc.BoltMigration;
 import org.popcraft.bolt.data.migration.lwc.LWCMigration;
 import org.popcraft.bolt.lang.Translation;
@@ -17,9 +18,11 @@ import org.popcraft.bolt.util.SchedulerUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AdminConvertCommand extends BoltCommand {
+    private final Set<String> locketteNames = Set.of("lockette", "lockettepro", "deadbolt", "blocklocker");
     private final AtomicBoolean isConverting = new AtomicBoolean();
     private LWCMigration lastMigration;
 
@@ -56,8 +59,9 @@ public class AdminConvertCommand extends BoltCommand {
             lastMigration = null;
             return;
         }
-        final boolean convertBack = "back".equalsIgnoreCase(arg);
-        if (convertBack) {
+        final boolean convertBolt = "bolt".equalsIgnoreCase(arg);
+        final boolean lockette = arg != null && locketteNames.contains(arg.toLowerCase());
+        if (convertBolt) {
             if (!plugin.getServer().getPluginManager().isPluginEnabled("LWC")) {
                 BoltComponents.sendMessage(sender, Translation.MIGRATION_LWC_MISSING);
                 return;
@@ -77,6 +81,32 @@ public class AdminConvertCommand extends BoltCommand {
                 }
                 BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED);
             }, SchedulerUtil.executor(plugin, sender));
+        } else if (lockette) {
+            final LocketteMigration migration = new LocketteMigration(plugin);
+            final String pluginName = switch(arg.toLowerCase()) {
+                case "lockette" -> "Lockette";
+                case "lockettepro" -> "LockettePro";
+                case "deadbolt" -> "DeadBolt";
+                case "blocklocker" -> "BlockLocker";
+                default -> throw new IllegalStateException();
+            };
+            BoltComponents.sendMessage(
+                    sender,
+                    Translation.MIGRATION_STARTED,
+                    Placeholder.component(Translation.Placeholder.OLD_PLUGIN, Component.text(pluginName)),
+                    Placeholder.component(Translation.Placeholder.NEW_PLUGIN, Component.text("Bolt"))
+            );
+            isConverting.set(true);
+            migration.convertAsync().whenCompleteAsync(((memoryStore, throwable) -> {
+                isConverting.set(false);
+                if (throwable != null) {
+                    throwable.printStackTrace();
+                }
+                for (final BlockProtection blockProtection : memoryStore.loadBlockProtections().join()) {
+                    plugin.saveProtection(blockProtection);
+                }
+                BoltComponents.sendMessage(sender, Translation.MIGRATION_COMPLETED);
+            }), SchedulerUtil.executor(plugin, sender));
         } else {
             final LWCMigration migration = new LWCMigration(plugin);
             BoltComponents.sendMessage(
@@ -117,7 +147,8 @@ public class AdminConvertCommand extends BoltCommand {
         }
         arguments.next();
         if (arguments.remaining() == 0) {
-            final List<String> suggestions = new ArrayList<>(List.of("back"));
+            final List<String> suggestions = new ArrayList<>(List.of("lwc", "bolt"));
+            suggestions.addAll(locketteNames);
             if (lastMigration != null && lastMigration.hasEntityBlocks()) {
                 suggestions.add("entities");
             }
