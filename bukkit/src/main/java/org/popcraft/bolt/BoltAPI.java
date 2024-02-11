@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
+import org.popcraft.bolt.event.Event;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
@@ -13,6 +14,7 @@ import org.popcraft.bolt.source.SourceResolver;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public interface BoltAPI {
@@ -59,4 +61,6 @@ public interface BoltAPI {
     boolean canAccess(final Protection protection, final SourceResolver sourceResolver, final String... permissions);
 
     void registerPlayerSourceResolver(final PlayerSourceResolver playerSourceResolver);
+
+    <T extends Event> void registerEvent(final Class<T> clazz, final Consumer<? super T> subscriber);
 }

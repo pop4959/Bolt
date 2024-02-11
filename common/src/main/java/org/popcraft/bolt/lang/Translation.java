@@ -12,6 +12,7 @@ public class Translation {
     public static final String CLICK_LOCKED = "click_locked";
     public static final String CLICK_LOCKED_NO_EXIST = "click_locked_no_exist";
     public static final String CLICK_LOCKED_NO_PERMISSION = "click_locked_no_permission";
+    public static final String CLICK_LOCKED_CANCELLED = "click_locked_cancelled";
     public static final String CLICK_LOCKED_ALREADY = "click_locked_already";
     public static final String CLICK_LOCKED_CHANGED = "click_locked_changed";
     public static final String CLICK_NOT_LOCKED = "click_not_locked";

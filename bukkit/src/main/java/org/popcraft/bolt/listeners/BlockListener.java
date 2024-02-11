@@ -45,6 +45,7 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.util.Vector;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
+import org.popcraft.bolt.event.LockBlockEvent;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.protection.BlockProtection;
@@ -219,6 +220,18 @@ public final class BlockListener implements Listener {
         final Action.Type actionType = action.getType();
         switch (actionType) {
             case LOCK -> {
+                final LockBlockEvent event = new LockBlockEvent(player, block);
+                plugin.getEventBus().post(event);
+                if (event.isCancelled()) {
+                    BoltComponents.sendMessage(
+                        player,
+                        Translation.CLICK_LOCKED_CANCELLED,
+                        plugin.isUseActionBar(),
+                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(block, player))
+                    );
+                    break;
+                }
+
                 final String protectionType = Optional.ofNullable(action.getData())
                         .flatMap(type -> plugin.getBolt().getAccessRegistry().getProtectionByType(type))
                         .map(Access::type)
