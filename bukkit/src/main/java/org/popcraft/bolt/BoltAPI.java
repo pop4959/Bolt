@@ -62,5 +62,5 @@ public interface BoltAPI {
 
     void registerPlayerSourceResolver(final PlayerSourceResolver playerSourceResolver);
 
-    <T extends Event> void registerEvent(final Class<T> clazz, final Consumer<? super T> subscriber);
+    <T extends Event> void registerListener(final Class<T> clazz, final Consumer<? super T> listener);
 }

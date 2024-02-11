@@ -566,8 +566,8 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     }
 
     @Override
-    public <T extends Event> void registerEvent(final Class<T> clazz, final Consumer<? super T> subscriber) {
-        this.eventBus.register(clazz, subscriber::accept);
+    public <T extends Event> void registerListener(final Class<T> clazz, final Consumer<? super T> listener) {
+        this.eventBus.register(clazz, listener::accept);
     }
 
     public BoltPlayer player(final Player player) {
