@@ -42,6 +42,16 @@ public final class Translator {
             || fallback.containsKey(key);
     }
 
+    public static boolean isTranslated(final String key, final Locale locale) {
+        if (!perPlayerLocale) {
+            return translation.containsKey(key);
+        }
+
+        return tryGetProperty(key, locale) != null
+                || tryGetProperty(key, new Locale(locale.getLanguage())) != null
+                || translation.containsKey(key);
+    }
+
     public static String translate(final String key, final Locale locale) {
         if (!perPlayerLocale) {
             return Objects.requireNonNullElseGet(translation.getProperty(key),

@@ -3,7 +3,6 @@ package org.popcraft.bolt.command.impl;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
@@ -22,10 +21,6 @@ public class AdminPurgeCommand extends BoltCommand {
 
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
-        if (!(sender instanceof final Player player)) {
-            BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
-            return;
-        }
         if (arguments.remaining() < 1) {
             shortHelp(sender, arguments);
             return;
@@ -36,14 +31,14 @@ public class AdminPurgeCommand extends BoltCommand {
                 plugin.loadProtections().stream()
                         .filter(protection -> protection.getOwner().equals(profile.uuid()))
                         .forEach(plugin::removeProtection);
-                SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
-                        player,
+                SchedulerUtil.schedule(plugin, sender, () -> BoltComponents.sendMessage(
+                        sender,
                         Translation.PURGE,
                         Placeholder.component(Translation.Placeholder.PLAYER, Component.text(owner))
                 ));
             } else {
-                SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
-                        player,
+                SchedulerUtil.schedule(plugin, sender, () -> BoltComponents.sendMessage(
+                        sender,
                         Translation.PLAYER_NOT_FOUND,
                         Placeholder.component(Translation.Placeholder.PLAYER, Component.text(owner))
                 ));

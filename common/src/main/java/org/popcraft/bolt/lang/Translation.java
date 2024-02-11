@@ -35,8 +35,14 @@ public class Translation {
     public static final String EXPIRE_COMPLETE = "expire_complete";
     public static final String EXPIRE_INVALID_TIME = "expire_invalid_time";
     public static final String FIND_HEADER = "find_header";
+    public static final String FIND_HEADER_NEW = "find_header_new";
     public static final String FIND_RESULT = "find_result";
+    public static final String FIND_TELEPORT = "find_teleport";
     public static final String FIND_NEXT = "find_next";
+    public static final String FIND_NEXT_NEW = "find_next_new";
+    public static final String FIND_NEXT_NEW_PAGE_CURRENT = "find_next_new_page_current";
+    public static final String FIND_NEXT_NEW_PAGE_OTHER = "find_next_new_page_other";
+    public static final String FIND_NEXT_NEW_PAGE_SEPARATOR = "find_next_new_page_separator";
     public static final String FIND_NONE = "find_none";
     public static final String FLUSH = "flush";
     public static final String GROUP_ALREADY_EXISTS = "group_already_exists";
@@ -48,8 +54,16 @@ public class Translation {
     public static final String GROUP_PLAYER_ADD = "group_player_add";
     public static final String GROUP_PLAYER_REMOVE = "group_player_remove";
     public static final String INFO = "info";
-    public static final String INFO_FULL = "info_full";
+    public static final String INFO_FULL_ACCESS = "info_full_access";
+    public static final String INFO_FULL_NO_ACCESS = "info_full_no_access";
     public static final String INFO_SELF = "info_self";
+    public static final String TIME_AGO = "time_ago";
+    public static final String TIME_SECONDS = "time_seconds";
+    public static final String TIME_MINUTES = "time_minutes";
+    public static final String TIME_HOURS = "time_hours";
+    public static final String TIME_DAYS = "time_days";
+    public static final String TIME_MONTHS = "time_months";
+    public static final String TIME_YEARS = "time_years";
     public static final String LOCK = "lock";
     public static final String LOCKED = "locked";
     public static final String MIGRATION_COMPLETED = "migration_completed";
@@ -153,6 +167,13 @@ public class Translation {
         public static final String Y = "y";
         public static final String Z = "z";
         public static final String TIME = "time";
+        public static final String FIRST = "first";
+        public static final String LAST = "last";
+        public static final String PAGES = "pages";
+        public static final String PAGE = "page";
+        public static final String CREATED_TIME = "created_time";
+        public static final String ACCESSED_TIME = "accessed_time";
+        public static final String NUMBER = "number";
 
         private Placeholder() {
         }

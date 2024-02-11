@@ -65,6 +65,7 @@ import org.popcraft.bolt.util.ProtectableBlock;
 import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
+import org.popcraft.bolt.util.Time;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -504,6 +505,22 @@ public final class BlockListener extends AbstractInteractionListener<Protectable
         if (!plugin.canAccess(existingProtection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
             cancellable.setCancelled(true);
         }
+    }
+
+    // BlockDestroyEvent is called when a block is about to be destroyed. We use it here to prevent a protected block
+    // from becoming destroyed involuntarily, for example, because it is a door and its support was removed. For other
+    // cases, like just breaking the door itself, it will go through other events and be handled properly.
+    // This is a last resort event.
+    public void onBlockDestroy(final BlockEvent e) {
+        if (!(e instanceof Cancellable cancellable)) {
+            return;
+        }
+        final Block block = e.getBlock();
+        final Protection existingProtection = plugin.findProtection(block);
+        if (existingProtection == null) {
+            return;
+        }
+        cancellable.setCancelled(true);
     }
 
     @EventHandler

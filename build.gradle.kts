@@ -63,7 +63,7 @@ subprojects {
 fun commitsSinceLastTag(): String {
     val tagDescription = ByteArrayOutputStream()
     exec {
-        commandLine("git", "describe", "--tags")
+        commandLine("git", "describe", "--tags", "--always")
         standardOutput = tagDescription
     }
     if (tagDescription.toString().indexOf('-') < 0) {
