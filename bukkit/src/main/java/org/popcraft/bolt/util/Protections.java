@@ -1,6 +1,8 @@
 package org.popcraft.bolt.util;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -143,12 +145,15 @@ public final class Protections {
         }
     }
 
-    public static String accessList(final Map<String, String> accessMap) {
+    public static Component accessList(final Map<String, String> accessMap, final CommandSender sender) {
         if (accessMap == null || accessMap.isEmpty()) {
-            return "";
+            return Component.empty();
         }
+        final List<Component> list = new ArrayList<>();
         final List<String> lines = new ArrayList<>();
-        accessMap.forEach((entry, access) -> {
+        for (final Map.Entry<String, String> accessEntry : accessMap.entrySet()) {
+            final String entry = accessEntry.getKey();
+            final String access = accessEntry.getValue();
             final Source source = Source.parse(entry);
             final String subject;
             if (SourceTypes.PLAYER.equals(source.getType())) {
@@ -163,11 +168,23 @@ public final class Protections {
             }
             final BoltPlugin plugin = JavaPlugin.getPlugin(BoltPlugin.class);
             if (plugin.getDefaultAccessType().equals(access)) {
-                lines.add(" * %s (%s)".formatted(subject, Strings.toTitleCase(source.getType())));
+                list.add(resolveTranslation(
+                        Translation.ACCESS_LIST_ENTRY_DEFAULT,
+                        sender,
+                        Placeholder.component(Translation.Placeholder.SOURCE_IDENTIFIER, Component.text(subject)),
+                        Placeholder.component(Translation.Placeholder.SOURCE_TYPE, Component.text(Strings.toTitleCase(source.getType()))),
+                        Placeholder.component(Translation.Placeholder.ACCESS_TYPE, Component.text(Strings.toTitleCase(access)))
+                ));
             } else {
-                lines.add(" * %s (%s: %s)".formatted(subject, Strings.toTitleCase(source.getType()), Strings.toTitleCase(access)));
+                list.add(resolveTranslation(
+                        Translation.ACCESS_LIST_ENTRY,
+                        sender,
+                        Placeholder.component(Translation.Placeholder.SOURCE_IDENTIFIER, Component.text(subject)),
+                        Placeholder.component(Translation.Placeholder.SOURCE_TYPE, Component.text(Strings.toTitleCase(source.getType()))),
+                        Placeholder.component(Translation.Placeholder.ACCESS_TYPE, Component.text(Strings.toTitleCase(access)))
+                ));
             }
-        });
-        return String.join("\n", lines);
+        }
+        return Component.join(JoinConfiguration.newlines(), list);
     }
 }

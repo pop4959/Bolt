@@ -43,7 +43,7 @@ public class TrustCommand extends BoltCommand {
                     player,
                     Translation.INFO_SELF,
                     Placeholder.component(Translation.Placeholder.ACCESS_LIST_SIZE, Component.text(accessMap.size())),
-                    Placeholder.component(Translation.Placeholder.ACCESS_LIST, Component.text(Protections.accessList(accessMap)))
+                    Placeholder.component(Translation.Placeholder.ACCESS_LIST, Protections.accessList(accessMap, sender))
             );
         } else if ("add".equals(action) || "remove".equals(action)) {
             if (arguments.remaining() < 1) {
