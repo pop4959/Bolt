@@ -105,7 +105,7 @@ abstract class InteractionListener {
                                 Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
                         );
                     }
-                } else if (protectable && (!requiresLockPermission || player.hasPermission(lockPermission))) {
+                } else if ((protectable || action.isAdmin()) && (!requiresLockPermission || player.hasPermission(lockPermission))) {
                     final UUID protectionUUID = boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId();
                     final Protection newProtection;
                     if (object instanceof final Block block) {

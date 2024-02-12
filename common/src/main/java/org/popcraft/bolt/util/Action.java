@@ -20,7 +20,7 @@ public class Action {
         this.admin = false;
     }
 
-    public Action(Type type, final String permission, String data, boolean admin) {
+    public Action(final Type type, final String permission, final String data, final boolean admin) {
         this.type = type;
         this.permission = permission;
         this.data = data;

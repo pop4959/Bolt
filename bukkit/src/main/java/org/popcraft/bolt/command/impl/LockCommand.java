@@ -39,10 +39,12 @@ public class LockCommand extends BoltCommand {
                 BoltComponents.sendMessage(sender, Translation.CLICK_LOCKED_NO_PERMISSION);
                 return;
             }
-            boltPlayer.setAction(new Action(Action.Type.LOCK, "bolt.command.lock", type));
-            if (BoltPlugin.DEBUG && arguments.remaining() > 0) {
+            final boolean argumentsRemaining = arguments.remaining() > 0;
+            final boolean force = "force".equalsIgnoreCase(arguments.next()) && sender.hasPermission("bolt.admin");
+            if (BoltPlugin.DEBUG && argumentsRemaining && !force) {
                 boltPlayer.setLockNil(true);
             }
+            boltPlayer.setAction(new Action(Action.Type.LOCK, "bolt.command.lock", type, force));
             BoltComponents.sendMessage(
                     player,
                     Translation.CLICK_ACTION,
@@ -65,6 +67,10 @@ public class LockCommand extends BoltCommand {
                     .stream().filter(protection -> !protection.restricted() || sender.hasPermission("bolt.type.protection.%s".formatted(protection.type())))
                     .map(Access::type)
                     .toList();
+        }
+        arguments.next();
+        if (arguments.remaining() == 0 && sender.hasPermission("bolt.admin")) {
+            return List.of("force");
         }
         return Collections.emptyList();
     }
