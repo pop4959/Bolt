@@ -96,22 +96,6 @@ public class BoltPlayer {
         return modificationsCopy;
     }
 
-    public boolean isTrusting() {
-        return trusting;
-    }
-
-    public void setTrusting(boolean trusting) {
-        this.trusting = trusting;
-    }
-
-    public boolean isTrustingSilently() {
-        return trustingSilently;
-    }
-
-    public void setTrustingSilently(boolean trustingSilently) {
-        this.trustingSilently = trustingSilently;
-    }
-
     public boolean isLockNil() {
         return lockNil;
     }

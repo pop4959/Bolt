@@ -95,25 +95,15 @@ public class ModifyCommand extends BoltCommand {
             editFuture.thenAccept(source -> SchedulerUtil.schedule(plugin, player, () -> {
                 if (source != null) {
                     boltPlayer.getModifications().put(source, access.type());
-                    if (boltPlayer.isTrusting() && !boltPlayer.isTrustingSilently()) {
-                        BoltComponents.sendMessage(
-                                player,
-                                adding ? Translation.TRUST_ADD : Translation.TRUST_REMOVE,
-                                Placeholder.component(Translation.Placeholder.SOURCE_TYPE, Component.text(source.getType())),
-                                Placeholder.component(Translation.Placeholder.SOURCE_IDENTIFIER, Component.text(finalIdentifier))
-                        );
-                    }
                 }
             }));
         }
-        if (!boltPlayer.isTrusting()) {
-            BoltComponents.sendMessage(
-                    player,
-                    Translation.CLICK_ACTION,
-                    plugin.isUseActionBar(),
-                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.EDIT, player))
-            );
-        }
+        BoltComponents.sendMessage(
+                player,
+                Translation.CLICK_ACTION,
+                plugin.isUseActionBar(),
+                Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.EDIT, player))
+        );
     }
 
     @Override
