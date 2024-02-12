@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
+import org.popcraft.bolt.event.LockBlockEvent;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Action;
@@ -61,6 +62,19 @@ abstract class InteractionListener {
         final Action.Type actionType = action.getType();
         switch (actionType) {
             case LOCK -> {
+                if (object instanceof final Block block) {
+                    final LockBlockEvent event = new LockBlockEvent(player, block);
+                    plugin.getEventBus().post(event);
+                    if (event.isCancelled()) {
+                        BoltComponents.sendMessage(
+                                player,
+                                Translation.CLICK_LOCKED_CANCELLED,
+                                plugin.isUseActionBar(),
+                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(block, player))
+                        );
+                        break;
+                    }
+                }
                 final String protectionType = Optional.ofNullable(action.getData())
                         .flatMap(type -> plugin.getBolt().getAccessRegistry().getProtectionByType(type))
                         .map(Access::type)
