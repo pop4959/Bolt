@@ -64,7 +64,6 @@ import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.ProtectableConfig;
-import org.popcraft.bolt.util.ProtectableEntity;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 import org.spigotmc.event.entity.EntityMountEvent;
@@ -77,7 +76,7 @@ import java.util.UUID;
 
 import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 
-public final class EntityListener extends AbstractInteractionListener<ProtectableEntity> implements Listener {
+public final class EntityListener extends InteractionListener implements Listener {
     private static final SourceResolver ENTITY_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.ENTITY));
     private final Map<NamespacedKey, UUID> spawnEggPlayers = new HashMap<>();
 
@@ -246,13 +245,16 @@ public final class EntityListener extends AbstractInteractionListener<Protectabl
     }
 
     private boolean handlePlayerEntityInteraction(final Player player, final Entity entity, final String permission, final boolean shouldSendMessage) {
+        if (entity == null) {
+            return false;
+        }
         final BoltPlayer boltPlayer = plugin.player(player);
         if (boltPlayer.hasInteracted()) {
             return true;
         }
         boolean shouldCancel = false;
         final Protection protection = plugin.findProtection(entity);
-        if (triggerActions(player, protection, new ProtectableEntity(entity))) {
+        if (triggerAction(player, protection, entity)) {
             boltPlayer.setInteracted(true);
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
             shouldCancel = true;

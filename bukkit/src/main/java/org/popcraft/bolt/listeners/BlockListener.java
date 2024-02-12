@@ -61,7 +61,6 @@ import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
-import org.popcraft.bolt.util.ProtectableBlock;
 import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
@@ -71,7 +70,7 @@ import java.util.List;
 
 import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 
-public final class BlockListener extends AbstractInteractionListener<ProtectableBlock> implements Listener {
+public final class BlockListener extends InteractionListener implements Listener {
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     private static final Material CHISELED_BOOKSHELF = EnumUtil.valueOf(Material.class, "CHISELED_BOOKSHELF").orElse(null);
@@ -102,7 +101,7 @@ public final class BlockListener extends AbstractInteractionListener<Protectable
         }
         final Protection protection = plugin.findProtection(clicked);
         boolean shouldCancel = false;
-        if (triggerActions(player, protection, new ProtectableBlock(clicked))) {
+        if (triggerAction(player, protection, clicked)) {
             boltPlayer.setInteracted(true);
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
             shouldCancel = true;

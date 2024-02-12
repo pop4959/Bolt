@@ -2,6 +2,8 @@ package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
@@ -12,7 +14,6 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
-import org.popcraft.bolt.util.Protectable;
 import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
@@ -24,14 +25,30 @@ import java.util.UUID;
 import static org.popcraft.bolt.util.BoltComponents.resolveTranslation;
 import static org.popcraft.bolt.util.Profiles.NIL_UUID;
 
-abstract class AbstractInteractionListener<T extends Protectable> {
+abstract class InteractionListener {
     protected final BoltPlugin plugin;
 
-    protected AbstractInteractionListener(BoltPlugin plugin) {
+    protected InteractionListener(final BoltPlugin plugin) {
         this.plugin = plugin;
     }
 
-    protected boolean triggerActions(final Player player, final Protection protection, final T target) {
+    protected boolean triggerAction(final Player player, final Protection protection, final Block block) {
+        final boolean protectable = plugin.isProtectable(block);
+        final ProtectableConfig config = plugin.getProtectableConfig(block);
+        final Component displayName = Protections.displayType(block, player);
+        final String lockPermission = "bolt.protection.lock.%s".formatted(block.getType().name().toLowerCase());
+        return triggerAction(player, protection, block, protectable, config, displayName, lockPermission);
+    }
+
+    protected boolean triggerAction(final Player player, final Protection protection, final Entity entity) {
+        final boolean protectable = plugin.isProtectable(entity);
+        final ProtectableConfig config = plugin.getProtectableConfig(entity);
+        final Component displayName = Protections.displayType(entity, player);
+        final String lockPermission = "bolt.protection.lock.%s".formatted(entity.getType().name().toLowerCase());
+        return triggerAction(player, protection, entity, protectable, config, displayName, lockPermission);
+    }
+
+    private boolean triggerAction(final Player player, final Protection protection, final Object object, final boolean protectable, final ProtectableConfig config, final Component displayName, final String lockPermission) {
         final BoltPlayer boltPlayer = plugin.player(player);
         final Action action = boltPlayer.getAction();
         if (action == null) {
@@ -48,8 +65,7 @@ abstract class AbstractInteractionListener<T extends Protectable> {
                     .flatMap(type -> plugin.getBolt().getAccessRegistry().getProtectionByType(type))
                     .map(Access::type)
                     .orElse(plugin.getDefaultProtectionType());
-                final ProtectableConfig protectableConfig = plugin.getProtectableConfig(target);
-                final boolean lockPermission = protectableConfig != null && protectableConfig.lockPermission();
+                final boolean requiresLockPermission = config != null && config.lockPermission();
                 if (protection != null) {
                     if (!protection.getType().equals(protectionType) && plugin.canAccess(protection, player, Permission.EDIT)) {
                         protection.setType(protectionType);
@@ -68,8 +84,16 @@ abstract class AbstractInteractionListener<T extends Protectable> {
                             Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
                         );
                     }
-                } else if (plugin.isProtectable(target) && (!lockPermission || player.hasPermission("bolt.protection.lock.%s".formatted(target.getTypeName().toLowerCase())))) {
-                    final Protection newProtection = target.createProtection(boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId(), protectionType);
+                } else if (protectable && (!requiresLockPermission || player.hasPermission(lockPermission))) {
+                    final UUID protectionUUID = boltPlayer.isLockNil() ? NIL_UUID : player.getUniqueId();
+                    final Protection newProtection;
+                    if (object instanceof final Block block) {
+                        newProtection = plugin.createProtection(block, protectionUUID, protectionType);
+                    } else if (object instanceof final Entity entity) {
+                        newProtection = plugin.createProtection(entity, protectionUUID, protectionType);
+                    } else {
+                        throw new IllegalStateException("Protection is not a block or entity");
+                    }
                     plugin.saveProtection(newProtection);
                     boltPlayer.setLockNil(false);
                     BoltComponents.sendMessage(
@@ -77,14 +101,14 @@ abstract class AbstractInteractionListener<T extends Protectable> {
                         Translation.CLICK_LOCKED,
                         plugin.isUseActionBar(),
                         Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(newProtection, player)),
-                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(target, player))
+                        Placeholder.component(Translation.Placeholder.PROTECTION, displayName)
                     );
                 } else {
                     BoltComponents.sendMessage(
                         player,
                         Translation.CLICK_NOT_LOCKABLE,
                         plugin.isUseActionBar(),
-                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(target, player))
+                        Placeholder.component(Translation.Placeholder.PROTECTION, displayName)
                     );
                 }
             }
@@ -111,7 +135,7 @@ abstract class AbstractInteractionListener<T extends Protectable> {
                         player,
                         Translation.CLICK_NOT_LOCKED,
                         plugin.isUseActionBar(),
-                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(target, player))
+                        Placeholder.component(Translation.Placeholder.PROTECTION, displayName)
                     );
                 }
             }
@@ -136,7 +160,7 @@ abstract class AbstractInteractionListener<T extends Protectable> {
                         player,
                         Translation.CLICK_NOT_LOCKED,
                         plugin.isUseActionBar(),
-                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(target, player))
+                        Placeholder.component(Translation.Placeholder.PROTECTION, displayName)
                     );
                 }
             }
@@ -170,7 +194,7 @@ abstract class AbstractInteractionListener<T extends Protectable> {
                         player,
                         Translation.CLICK_NOT_LOCKED,
                         plugin.isUseActionBar(),
-                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(target, player))
+                        Placeholder.component(Translation.Placeholder.PROTECTION, displayName)
                     );
                 }
             }
@@ -201,7 +225,7 @@ abstract class AbstractInteractionListener<T extends Protectable> {
                         player,
                         Translation.CLICK_NOT_LOCKED,
                         plugin.isUseActionBar(),
-                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(target, player))
+                        Placeholder.component(Translation.Placeholder.PROTECTION, displayName)
                     );
                 }
             }

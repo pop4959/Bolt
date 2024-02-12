@@ -139,10 +139,7 @@ import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.PaperUtil;
-import org.popcraft.bolt.util.Protectable;
-import org.popcraft.bolt.util.ProtectableBlock;
 import org.popcraft.bolt.util.ProtectableConfig;
-import org.popcraft.bolt.util.ProtectableEntity;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -596,16 +593,6 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return protectableEntities.get(entity.getType());
     }
 
-    public ProtectableConfig getProtectableConfig(final Protectable protectable) {
-        if (protectable instanceof ProtectableBlock block) {
-            return protectableBlocks.get(block.block().getType());
-        } else if (protectable instanceof ProtectableEntity entity) {
-            return protectableEntities.get(entity.entity().getType());
-        } else {
-            throw new RuntimeException(); // wish I could use exhaustive switches
-        }
-    }
-
     public String getDefaultProtectionType() {
         return defaultProtectionType;
     }
@@ -630,12 +617,6 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     @Override
     public boolean isProtectable(final Entity entity) {
         return DEBUG || protectableEntities.containsKey(entity.getType());
-    }
-
-    public boolean isProtectable(final Protectable protectable) {
-        return DEBUG
-            || ((protectable instanceof ProtectableBlock block) && protectableBlocks.containsKey(block.block().getType()))
-            || ((protectable instanceof ProtectableEntity entity) && protectableEntities.containsKey(entity.entity().getType()));
     }
 
     @Override
