@@ -7,7 +7,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
+import org.popcraft.bolt.event.Cancellable;
 import org.popcraft.bolt.event.LockBlockEvent;
+import org.popcraft.bolt.event.LockEntityEvent;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Action;
@@ -62,18 +64,23 @@ abstract class InteractionListener {
         final Action.Type actionType = action.getType();
         switch (actionType) {
             case LOCK -> {
+                final Cancellable event;
                 if (object instanceof final Block block) {
-                    final LockBlockEvent event = new LockBlockEvent(player, block);
-                    plugin.getEventBus().post(event);
-                    if (event.isCancelled()) {
-                        BoltComponents.sendMessage(
-                                player,
-                                Translation.CLICK_LOCKED_CANCELLED,
-                                plugin.isUseActionBar(),
-                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(block, player))
-                        );
-                        break;
-                    }
+                    event = new LockBlockEvent(player, block);
+                } else if (object instanceof final Entity entity) {
+                    event = new LockEntityEvent(player, entity);
+                } else {
+                    throw new IllegalStateException("Protection is not a block or entity");
+                }
+                plugin.getEventBus().post(event);
+                if (event.isCancelled()) {
+                    BoltComponents.sendMessage(
+                            player,
+                            Translation.CLICK_LOCKED_CANCELLED,
+                            plugin.isUseActionBar(),
+                            Placeholder.component(Translation.Placeholder.PROTECTION, displayName)
+                    );
+                    break;
                 }
                 final String protectionType = Optional.ofNullable(action.getData())
                         .flatMap(type -> plugin.getBolt().getAccessRegistry().getProtectionByType(type))
