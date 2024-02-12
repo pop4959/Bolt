@@ -9,8 +9,8 @@ import java.util.Set;
 public class SourceTypeRegistry {
     private final Map<String, SourceType> sourceTypes = new HashMap<>();
 
-    public void registerSourceType(final String sourceType, final boolean restricted) {
-        sourceTypes.put(sourceType, new SourceType(sourceType, restricted));
+    public void registerSourceType(final String sourceType, final boolean restricted, final boolean unique) {
+        sourceTypes.put(sourceType, new SourceType(sourceType, restricted, unique));
     }
 
     public void unregisterAll() {

@@ -100,6 +100,7 @@ public class ConfigMigration {
         plugin.getConfig().set("access.autoclose.require-permission", true);
         plugin.getConfig().set("access.autoclose.allows", List.of(Permission.AUTO_CLOSE));
         plugin.getConfig().set("sources.door.require-permission", true);
+        plugin.getConfig().set("sources.door.unique", true);
         plugin.saveConfig();
         plugin.reload();
     }

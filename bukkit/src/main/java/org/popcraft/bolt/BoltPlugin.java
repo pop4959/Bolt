@@ -388,13 +388,14 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         }
         for (final String source : sources.getKeys(false)) {
             final boolean requirePermission = sources.getBoolean("%s.require-permission".formatted(source), false);
-            sourceTypeRegistry.registerSourceType(source, requirePermission);
+            final boolean unique = sources.getBoolean("%s.unique".formatted(source), false);
+            sourceTypeRegistry.registerSourceType(source, requirePermission, unique);
         }
         if (sourceTypeRegistry.sourceTypes().isEmpty()) {
-            sourceTypeRegistry.registerSourceType(SourceTypes.PLAYER, false);
-            sourceTypeRegistry.registerSourceType(SourceTypes.PASSWORD, false);
-            sourceTypeRegistry.registerSourceType(SourceTypes.GROUP, false);
-            sourceTypeRegistry.registerSourceType(SourceTypes.PERMISSION, true);
+            sourceTypeRegistry.registerSourceType(SourceTypes.PLAYER, false, false);
+            sourceTypeRegistry.registerSourceType(SourceTypes.PASSWORD, false, false);
+            sourceTypeRegistry.registerSourceType(SourceTypes.GROUP, false, false);
+            sourceTypeRegistry.registerSourceType(SourceTypes.PERMISSION, true, false);
         }
     }
 

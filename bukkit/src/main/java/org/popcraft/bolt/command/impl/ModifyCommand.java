@@ -18,6 +18,7 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.SchedulerUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +36,7 @@ public class ModifyCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, Translation.COMMAND_PLAYER_ONLY);
             return;
         }
-        if (arguments.remaining() < 4) {
+        if (arguments.remaining() < 3) {
             shortHelp(sender, arguments);
             return;
         }
@@ -69,11 +70,22 @@ public class ModifyCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, Translation.EDIT_SOURCE_NO_PERMISSION);
             return;
         }
+        final List<String> identifiers = new ArrayList<>();
+        if (sourceType.unique()) {
+            identifiers.add(sourceType.name());
+        } else {
+            if (arguments.remaining() < 1) {
+                shortHelp(sender, arguments);
+                return;
+            }
+            String identifier;
+            while ((identifier = arguments.next()) != null) {
+                identifiers.add(identifier);
+            }
+        }
         boltPlayer.setAction(new Action(Action.Type.EDIT, "bolt.command.edit", Boolean.toString(adding)));
-        String identifier;
-        while ((identifier = arguments.next()) != null) {
+        for (final String identifier : identifiers) {
             final CompletableFuture<Source> editFuture;
-            final String finalIdentifier = identifier;
             if (SourceTypes.PLAYER.equals(sourceType.name())) {
                 editFuture = Profiles.findOrLookupProfileByName(identifier).thenApply(profile -> {
                     if (profile.uuid() != null) {
@@ -82,7 +94,7 @@ public class ModifyCommand extends BoltCommand {
                         SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                                 player,
                                 Translation.PLAYER_NOT_FOUND,
-                                Placeholder.component(Translation.Placeholder.PLAYER, Component.text(finalIdentifier))
+                                Placeholder.component(Translation.Placeholder.PLAYER, Component.text(identifier))
                         ));
                         return null;
                     }
