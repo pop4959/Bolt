@@ -61,6 +61,23 @@ public final class Protections {
         return BoltComponents.resolveTranslation(translationKey, sender);
     }
 
+    public static Component sourceType(final Source source, final CommandSender sender) {
+        final String sourceType = source.getType();
+        final String translationKey = "source_type_%s".formatted(sourceType);
+        if (!isTranslatable(translationKey, getLocaleOf(sender))) {
+            return Component.text(Strings.toTitleCase(sourceType));
+        }
+        return BoltComponents.resolveTranslation(translationKey, sender);
+    }
+
+    public static Component accessType(final String accessType, final CommandSender sender) {
+        final String translationKey = "access_type_%s".formatted(accessType);
+        if (!isTranslatable(translationKey, getLocaleOf(sender))) {
+            return Component.text(Strings.toTitleCase(accessType));
+        }
+        return BoltComponents.resolveTranslation(translationKey, sender);
+    }
+
     public static Component displayType(final Protection protection, final CommandSender sender) {
         if (protection instanceof final BlockProtection blockProtection) {
             final World world = Bukkit.getWorld(blockProtection.getWorld());
@@ -172,16 +189,16 @@ public final class Protections {
                         Translation.ACCESS_LIST_ENTRY_DEFAULT,
                         sender,
                         Placeholder.component(Translation.Placeholder.SOURCE_IDENTIFIER, Component.text(subject)),
-                        Placeholder.component(Translation.Placeholder.SOURCE_TYPE, Component.text(Strings.toTitleCase(source.getType()))),
-                        Placeholder.component(Translation.Placeholder.ACCESS_TYPE, Component.text(Strings.toTitleCase(access)))
+                        Placeholder.component(Translation.Placeholder.SOURCE_TYPE, sourceType(source, sender)),
+                        Placeholder.component(Translation.Placeholder.ACCESS_TYPE, accessType(access, sender))
                 ));
             } else {
                 list.add(resolveTranslation(
                         Translation.ACCESS_LIST_ENTRY,
                         sender,
                         Placeholder.component(Translation.Placeholder.SOURCE_IDENTIFIER, Component.text(subject)),
-                        Placeholder.component(Translation.Placeholder.SOURCE_TYPE, Component.text(Strings.toTitleCase(source.getType()))),
-                        Placeholder.component(Translation.Placeholder.ACCESS_TYPE, Component.text(Strings.toTitleCase(access)))
+                        Placeholder.component(Translation.Placeholder.SOURCE_TYPE, sourceType(source, sender)),
+                        Placeholder.component(Translation.Placeholder.ACCESS_TYPE, accessType(access, sender))
                 ));
             }
         }
