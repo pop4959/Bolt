@@ -127,7 +127,7 @@ abstract class AbstractInteractionListener<T extends Protectable> {
                             Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player)),
                             Placeholder.component(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, player))),
                             Placeholder.component(Translation.Placeholder.ACCESS_LIST_SIZE, Component.text(protection.getAccess().size())),
-                            Placeholder.component(Translation.Placeholder.ACCESS_LIST, Component.text(Protections.accessList(protection.getAccess()))),
+                            Placeholder.component(Translation.Placeholder.ACCESS_LIST, Protections.accessList(protection.getAccess(), player)),
                             Placeholder.component(Translation.Placeholder.CREATED_TIME, Time.relativeTimestamp(protection.getCreated(), player)),
                             Placeholder.component(Translation.Placeholder.ACCESSED_TIME, Time.relativeTimestamp(protection.getAccessed(), player))
                         )));

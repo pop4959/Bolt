@@ -1,6 +1,8 @@
 package org.popcraft.bolt.lang;
 
 public class Translation {
+    public static final String ACCESS_LIST_ENTRY = "access_list_entry";
+    public static final String ACCESS_LIST_ENTRY_DEFAULT = "access_list_entry_default";
     public static final String CLEANUP_START = "cleanup_start";
     public static final String CLEANUP_REMOVE = "cleanup_remove";
     public static final String CLEANUP_COMPLETE = "cleanup_complete";
@@ -12,6 +14,7 @@ public class Translation {
     public static final String CLICK_LOCKED = "click_locked";
     public static final String CLICK_LOCKED_NO_EXIST = "click_locked_no_exist";
     public static final String CLICK_LOCKED_NO_PERMISSION = "click_locked_no_permission";
+    public static final String CLICK_LOCKED_CANCELLED = "click_locked_cancelled";
     public static final String CLICK_LOCKED_ALREADY = "click_locked_already";
     public static final String CLICK_LOCKED_CHANGED = "click_locked_changed";
     public static final String CLICK_NOT_LOCKED = "click_not_locked";

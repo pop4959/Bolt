@@ -2,8 +2,10 @@ package org.popcraft.bolt.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
@@ -14,6 +16,7 @@ public class PaperUtil {
     private static boolean getOfflinePlayerIfCachedExists;
     private static boolean getChunkAtAsyncExists;
     private static boolean getClickedPositionExists;
+    private static boolean teleportAsyncExists;
 
     static {
         try {
@@ -33,6 +36,12 @@ public class PaperUtil {
             getClickedPositionExists = true;
         } catch (NoSuchMethodException e) {
             getClickedPositionExists = false;
+        }
+        try {
+            Entity.class.getMethod("teleportAsync", Location.class);
+            teleportAsyncExists = true;
+        } catch (NoSuchMethodException e) {
+            teleportAsyncExists = false;
         }
     }
 
@@ -65,6 +74,14 @@ public class PaperUtil {
             return e.getClickedPosition();
         } else {
             return null;
+        }
+    }
+
+    public static CompletableFuture<Boolean> teleportAsync(final Entity entity, final Location location) {
+        if (teleportAsyncExists) {
+            return entity.teleportAsync(location);
+        } else {
+            return CompletableFuture.completedFuture(entity.teleport(location));
         }
     }
 

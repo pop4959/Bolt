@@ -17,6 +17,7 @@ import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.lang.Translator;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BoltComponents;
+import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
@@ -84,7 +85,7 @@ public class AdminFindCommand extends BoltCommand {
         blockProtectionsFromPlayer.stream().skip(skip).limit(RESULTS_PER_PAGE).forEach(blockProtection -> {
             final World world = plugin.getServer().getWorld(blockProtection.getWorld());
             final ClickEvent teleport = plugin.getCallbackManager().registerPlayerOnly(player -> {
-                player.teleport(new Location(world, blockProtection.getX() + 0.5, blockProtection.getY(), blockProtection.getZ() + 0.5));
+                PaperUtil.teleportAsync(player, new Location(world, blockProtection.getX() + 0.5, blockProtection.getY(), blockProtection.getZ() + 0.5));
             });
             BoltComponents.sendMessage(
                     sender,

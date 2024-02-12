@@ -1,5 +1,7 @@
 package org.popcraft.bolt;
 
+import net.kyori.event.EventBus;
+import net.kyori.event.SimpleEventBus;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
 import org.bstats.charts.DrilldownPie;
@@ -48,6 +50,7 @@ import org.popcraft.bolt.data.SimpleProfileCache;
 import org.popcraft.bolt.data.SimpleProtectionCache;
 import org.popcraft.bolt.data.migration.lwc.ConfigMigration;
 import org.popcraft.bolt.data.migration.lwc.TrustMigration;
+import org.popcraft.bolt.event.Event;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.lang.Translator;
 import org.popcraft.bolt.listeners.BlockListener;
@@ -153,6 +156,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class BoltPlugin extends JavaPlugin implements BoltAPI {
@@ -197,6 +201,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private boolean doorsFixPlugins;
     private Bolt bolt;
     private CallbackManager callbackManager;
+    private EventBus<Event> eventBus;
 
     @Override
     public void onEnable() {
@@ -220,6 +225,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         registerEvents();
         registerCommands();
         this.callbackManager = new CallbackManager(this);
+        this.eventBus = new SimpleEventBus<>(Event.class);
         profileCache.load();
         final Metrics metrics = new Metrics(this, 17711);
         registerCustomCharts(metrics, databaseConfiguration);
@@ -556,6 +562,15 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public CallbackManager getCallbackManager() {
         return this.callbackManager;
+    }
+
+    public EventBus<Event> getEventBus() {
+        return this.eventBus;
+    }
+
+    @Override
+    public <T extends Event> void registerListener(final Class<T> clazz, final Consumer<? super T> listener) {
+        this.eventBus.register(clazz, listener::accept);
     }
 
     public BoltPlayer player(final Player player) {
