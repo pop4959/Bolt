@@ -11,6 +11,7 @@ import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Metrics;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -35,6 +36,12 @@ import java.util.logging.LogManager;
 
 public class SQLStore implements Store {
     private static final Gson GSON = new Gson();
+    private static final TypeToken<HashMap<String, String>> ACCESS_LIST_TYPE_TOKEN = new TypeToken<>() {
+    };
+    private static final TypeToken<List<String>> PLAYER_LIST_TYPE_TOKEN = new TypeToken<>() {
+    };
+    private static final Type ACCESS_LIST_TYPE = ACCESS_LIST_TYPE_TOKEN.getType();
+    private static final Type PLAYER_LIST_TYPE = PLAYER_LIST_TYPE_TOKEN.getType();
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private final Map<UUID, BlockProtection> saveBlocks = new HashMap<>();
     private final Map<UUID, BlockProtection> removeBlocks = new HashMap<>();
@@ -161,8 +168,7 @@ public class SQLStore implements Store {
         final long created = resultSet.getLong(4);
         final long accessed = resultSet.getLong(5);
         final String accessText = resultSet.getString(6);
-        final Map<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, new TypeToken<HashMap<String, String>>() {
-        }.getType()), new HashMap<>());
+        final Map<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, ACCESS_LIST_TYPE_TOKEN), new HashMap<>());
         final String world = resultSet.getString(7);
         final int x = resultSet.getInt(8);
         final int y = resultSet.getInt(9);
@@ -183,8 +189,7 @@ public class SQLStore implements Store {
             replaceBlock.setString(3, protection.getType());
             replaceBlock.setLong(4, protection.getCreated());
             replaceBlock.setLong(5, protection.getAccessed());
-            replaceBlock.setString(6, GSON.toJson(protection.getAccess(), new TypeToken<Map<String, String>>() {
-            }.getType()));
+            replaceBlock.setString(6, GSON.toJson(protection.getAccess(), ACCESS_LIST_TYPE));
             replaceBlock.setString(7, protection.getWorld());
             replaceBlock.setInt(8, protection.getX());
             replaceBlock.setInt(9, protection.getY());
@@ -265,8 +270,7 @@ public class SQLStore implements Store {
         final long created = resultSet.getLong(4);
         final long accessed = resultSet.getLong(5);
         final String accessText = resultSet.getString(6);
-        final Map<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, new TypeToken<HashMap<String, String>>() {
-        }.getType()), new HashMap<>());
+        final Map<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessText, ACCESS_LIST_TYPE_TOKEN), new HashMap<>());
         final String entity = resultSet.getString(7);
         return new EntityProtection(UUID.fromString(id), UUID.fromString(owner), type, created, accessed, access, entity);
     }
@@ -283,8 +287,7 @@ public class SQLStore implements Store {
             replaceEntity.setString(3, protection.getType());
             replaceEntity.setLong(4, protection.getCreated());
             replaceEntity.setLong(5, protection.getAccessed());
-            replaceEntity.setString(6, GSON.toJson(protection.getAccess(), new TypeToken<Map<String, String>>() {
-            }.getType()));
+            replaceEntity.setString(6, GSON.toJson(protection.getAccess(), ACCESS_LIST_TYPE));
             replaceEntity.setString(7, protection.getEntity());
             replaceEntity.execute();
         } catch (SQLException e) {
@@ -350,8 +353,7 @@ public class SQLStore implements Store {
         final String name = resultSet.getString(1);
         final String owner = resultSet.getString(2);
         final String membersText = resultSet.getString(3);
-        final List<String> membersRaw = Objects.requireNonNullElse(GSON.fromJson(membersText, new TypeToken<List<String>>() {
-        }.getType()), new ArrayList<>());
+        final List<String> membersRaw = Objects.requireNonNullElse(GSON.fromJson(membersText, PLAYER_LIST_TYPE_TOKEN), new ArrayList<>());
         final List<UUID> members = new ArrayList<>();
         membersRaw.forEach(memberRaw -> members.add(UUID.fromString(memberRaw)));
         return new Group(name, UUID.fromString(owner), members);
@@ -366,8 +368,7 @@ public class SQLStore implements Store {
         try (final PreparedStatement replaceGroup = connection.prepareStatement(Statements.REPLACE_GROUP.get(configuration.type()).formatted(configuration.prefix()))) {
             replaceGroup.setString(1, group.getName());
             replaceGroup.setString(2, group.getOwner().toString());
-            replaceGroup.setString(3, GSON.toJson(group.getMembers(), new TypeToken<List<String>>() {
-            }.getType()));
+            replaceGroup.setString(3, GSON.toJson(group.getMembers(), PLAYER_LIST_TYPE));
             replaceGroup.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -428,8 +429,7 @@ public class SQLStore implements Store {
     private AccessList accessListFromResultSet(final ResultSet resultSet) throws SQLException {
         final String owner = resultSet.getString(1);
         final String accessListText = resultSet.getString(2);
-        final Map<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessListText, new TypeToken<HashMap<String, String>>() {
-        }.getType()), new HashMap<>());
+        final Map<String, String> access = Objects.requireNonNullElse(GSON.fromJson(accessListText, ACCESS_LIST_TYPE_TOKEN), new HashMap<>());
         return new AccessList(UUID.fromString(owner), access);
     }
 
@@ -441,8 +441,7 @@ public class SQLStore implements Store {
     private void saveAccessListNow(AccessList accessList) {
         try (final PreparedStatement replaceAccessList = connection.prepareStatement(Statements.REPLACE_ACCESS_LIST.get(configuration.type()).formatted(configuration.prefix()))) {
             replaceAccessList.setString(1, accessList.getOwner().toString());
-            replaceAccessList.setString(2, GSON.toJson(accessList.getAccess(), new TypeToken<Map<String, String>>() {
-            }.getType()));
+            replaceAccessList.setString(2, GSON.toJson(accessList.getAccess(), ACCESS_LIST_TYPE));
             replaceAccessList.execute();
         } catch (SQLException e) {
             e.printStackTrace();
