@@ -23,6 +23,7 @@ dependencies {
 
 tasks {
     processResources {
+        inputs.property("version", project.version)
         filesMatching("plugin.yml") {
             expand(
                 "name" to project.property("artifactName"),
