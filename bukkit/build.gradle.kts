@@ -1,3 +1,7 @@
+plugins {
+    id("com.modrinth.minotaur") version "2.+"
+}
+
 repositories {
     mavenCentral()
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
@@ -44,4 +48,27 @@ tasks {
         relocate("org.bstats", "${project.group}.${rootProject.name}.lib.org.bstats")
         relocate("org.popcraft.chunky.nbt", "${project.group}.${rootProject.name}.lib.org.popcraft.chunky.nbt")
     }
+}
+
+modrinth {
+    token.set(System.getenv("MODRINTH_TOKEN"))
+    projectId.set("bolt")
+    versionName.set("${project.property("artifactName")} ${project.version}")
+    versionNumber.set("${project.version}")
+    versionType.set("release")
+    uploadFile.set(tasks.shadowJar)
+    gameVersions.addAll(
+        "1.18.2",
+        "1.19",
+        "1.19.1",
+        "1.19.2",
+        "1.19.3",
+        "1.19.4",
+        "1.20",
+        "1.20.1",
+        "1.20.2",
+        "1.20.3",
+        "1.20.4"
+    )
+    loaders.addAll("bukkit", "spigot", "paper", "folia")
 }
