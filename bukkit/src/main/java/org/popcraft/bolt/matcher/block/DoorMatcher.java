@@ -48,10 +48,10 @@ public class DoorMatcher implements BlockMatcher {
             final Block lowerHalf = block.getRelative(BlockFace.UP);
             if (lowerHalf.getBlockData() instanceof Door) {
                 blocks.add(lowerHalf);
-            }
-            final Block upperHalf = lowerHalf.getRelative(BlockFace.UP);
-            if (upperHalf.getBlockData() instanceof Door) {
-                blocks.add(upperHalf);
+                final Block upperHalf = lowerHalf.getRelative(BlockFace.UP);
+                if (upperHalf.getBlockData() instanceof Door) {
+                    blocks.add(upperHalf);
+                }
             }
         }
         return Match.ofBlocks(blocks);
