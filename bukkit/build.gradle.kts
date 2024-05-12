@@ -48,6 +48,9 @@ tasks {
         relocate("net.kyori", "${project.group}.${rootProject.name}.lib.net.kyori")
         relocate("org.bstats", "${project.group}.${rootProject.name}.lib.org.bstats")
         relocate("org.popcraft.chunky.nbt", "${project.group}.${rootProject.name}.lib.org.popcraft.chunky.nbt")
+        manifest {
+            attributes("paperweight-mappings-namespace" to "mojang")
+        }
     }
 }
 
