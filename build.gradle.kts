@@ -3,20 +3,20 @@ import java.io.ByteArrayOutputStream
 plugins {
     id("java-library")
     id("maven-publish")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.github.goooler.shadow") version "8.1.7"
 }
 
 subprojects {
     plugins.apply("java-library")
     plugins.apply("maven-publish")
-    plugins.apply("com.github.johnrengelman.shadow")
+    plugins.apply("io.github.goooler.shadow")
 
     group = "${project.property("group")}"
     version = "${project.property("version")}.${commitsSinceLastTag()}"
 
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
+            languageVersion.set(JavaLanguageVersion.of(21))
         }
         withSourcesJar()
     }
