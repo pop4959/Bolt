@@ -113,13 +113,13 @@ entities:
     autoProtect: private
   painting:
     autoProtect: private
-  leash_hitch:
+  leash_knot:
     autoProtect: private
   chest_boat:
     autoProtect: private
-  minecart_chest:
+  chest_minecart:
     autoProtect: private
-  minecart_furnace:
+  furnace_minecart:
     autoProtect: private
-  minecart_hopper:
+  hopper_minecart:
     autoProtect: private
