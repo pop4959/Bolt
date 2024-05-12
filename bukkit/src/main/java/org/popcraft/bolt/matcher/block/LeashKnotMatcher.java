@@ -10,7 +10,7 @@ import org.popcraft.bolt.util.FoliaUtil;
 
 import java.util.Set;
 
-public class LeashHitchMatcher implements BlockMatcher {
+public class LeashKnotMatcher implements BlockMatcher {
     private boolean enabled;
 
     @Override

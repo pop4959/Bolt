@@ -88,7 +88,7 @@ import org.popcraft.bolt.matcher.block.HangingVineMatcher;
 import org.popcraft.bolt.matcher.block.ItemFrameMatcher;
 import org.popcraft.bolt.matcher.block.LadderMatcher;
 import org.popcraft.bolt.matcher.block.LanternMatcher;
-import org.popcraft.bolt.matcher.block.LeashHitchMatcher;
+import org.popcraft.bolt.matcher.block.LeashKnotMatcher;
 import org.popcraft.bolt.matcher.block.LilyPadMatcher;
 import org.popcraft.bolt.matcher.block.MangrovePropaguleMatcher;
 import org.popcraft.bolt.matcher.block.MossCarpetMatcher;
@@ -161,7 +161,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private static final String COMMAND_PERMISSION_KEY = "bolt.command.";
     private static final BlockMatcher CHEST_MATCHER = new ChestMatcher();
     private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(CHEST_MATCHER,
-            new BannerMatcher(), new BedMatcher(), new DoorMatcher(), new LeashHitchMatcher(),
+            new BannerMatcher(), new BedMatcher(), new DoorMatcher(), new LeashKnotMatcher(),
             new PressurePlateMatcher(), new RailMatcher(), new SignMatcher(), new SwitchMatcher(),
             new TrapdoorMatcher(), new CropsMatcher(), new FarmlandMatcher(), new UprootMatcher(),
             new BellMatcher(), new TorchMatcher(), new LanternMatcher(), new LadderMatcher(),
