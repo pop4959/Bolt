@@ -25,6 +25,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
@@ -66,7 +67,6 @@ import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
-import org.spigotmc.event.entity.EntityMountEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -416,8 +416,6 @@ public final class EntityListener extends InteractionListener implements Listene
         }
     }
 
-    // Future: Replace with org.bukkit.event.entity.EntityMountEvent when support for lower than 1.20.4 is dropped
-    @SuppressWarnings({"UnstableApiUsage", "deprecation"})
     @EventHandler
     public void onEntityMount(final EntityMountEvent e) {
         if (!(e.getEntity() instanceof final Player player)) {

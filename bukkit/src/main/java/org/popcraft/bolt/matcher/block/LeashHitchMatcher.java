@@ -15,7 +15,7 @@ public class LeashHitchMatcher implements BlockMatcher {
 
     @Override
     public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
-        enabled = protectableEntities.contains(EntityType.LEASH_HITCH);
+        enabled = protectableEntities.contains(EntityType.LEASH_KNOT);
     }
 
     @Override
