@@ -60,7 +60,7 @@ public final class Doors {
                 }
             }
         }
-        doors.forEach(door -> toggleDoor(door, true));
+        doors.forEach(door -> toggleDoor(plugin, event, door, true));
         final int doorsCloseAfter = plugin.getDoorsCloseAfter();
         if (doorsCloseAfter > 0) {
             doors.add(block);
@@ -75,7 +75,7 @@ public final class Doors {
                     final int count = CLOSING.compute(doorBlockLocation, (blockLocation, counter) -> counter == null ? 0 : counter - 1);
                     if (count <= 0) {
                         CLOSING.remove(doorBlockLocation);
-                        toggleDoor(door, false);
+                        toggleDoor(plugin, event, door, false);
                     }
                 }, doorsCloseAfter * 20L);
             });
@@ -105,11 +105,11 @@ public final class Doors {
                 block.setType(Material.OAK_DOOR, false);
             }
             final PlayerInteractEvent fakeInteract = new PlayerInteractEvent(
-                event.getPlayer(),
-                org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK,
-                event.getItem(),
-                event.getClickedBlock(),
-                event.getBlockFace()
+                    event.getPlayer(),
+                    org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK,
+                    event.getItem(),
+                    event.getClickedBlock(),
+                    event.getBlockFace()
             );
             SELF_FIRED_EVENTS.add(fakeInteract);
             SchedulerUtil.schedule(plugin, block.getLocation(), () -> SELF_FIRED_EVENTS.remove(fakeInteract));
@@ -166,15 +166,21 @@ public final class Doors {
         return !isIronDoor && !isIronTrapdoor;
     }
 
-    public static void toggleDoor(final Block block, final boolean canOpen) {
-        if (block.getBlockData() instanceof final Openable openable) {
+    public static void toggleDoor(final BoltPlugin plugin, final PlayerInteractEvent event, final Block block, final boolean canOpen) {
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            if (Event.Result.DENY.equals(event.useInteractedBlock())) {
+                return;
+            }
+            if (!(block.getBlockData() instanceof final Openable openable)) {
+                return;
+            }
             if (!canOpen && !openable.isOpen()) {
                 return;
             }
             openable.setOpen(!openable.isOpen());
             block.setBlockData(openable);
             playDoorSound(block, openable.isOpen());
-        }
+        });
     }
 
     private static void playDoorSound(final Block block, final boolean open) {
