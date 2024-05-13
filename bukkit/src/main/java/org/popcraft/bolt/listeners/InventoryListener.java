@@ -27,38 +27,29 @@ import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BoltPlayer;
-import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Permission;
 
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 
 public final class InventoryListener implements Listener {
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
-    private static final InventoryType CRAFTER_TYPE = EnumUtil.valueOf(InventoryType.class, "CRAFTER").orElse(null);
-    private static final Material CRAFTER_MATERIAL = EnumUtil.valueOf(Material.class, "CRAFTER").orElse(null);
-    private static final Map<InventoryType, EnumSet<Material>> INVENTORY_TYPE_BLOCKS = new HashMap<>(Map.of(
-            InventoryType.ANVIL, EnumSet.of(Material.ANVIL, Material.CHIPPED_ANVIL, Material.DAMAGED_ANVIL),
-            InventoryType.BARREL, EnumSet.of(Material.BARREL),
-            InventoryType.BLAST_FURNACE, EnumSet.of(Material.BLAST_FURNACE),
-            InventoryType.CHEST, EnumSet.of(Material.CHEST, Material.TRAPPED_CHEST),
-            InventoryType.DISPENSER, EnumSet.of(Material.DISPENSER),
-            InventoryType.DROPPER, EnumSet.of(Material.DROPPER),
-            InventoryType.FURNACE, EnumSet.of(Material.FURNACE),
-            InventoryType.HOPPER, EnumSet.of(Material.HOPPER),
-            InventoryType.SHULKER_BOX, EnumSet.of(Material.SHULKER_BOX),
-            InventoryType.SMOKER, EnumSet.of(Material.SMOKER)
-    ));
+    @SuppressWarnings("UnstableApiUsage")
+    private static final Map<InventoryType, EnumSet<Material>> INVENTORY_TYPE_BLOCKS = Map.ofEntries(
+            Map.entry(InventoryType.ANVIL, EnumSet.of(Material.ANVIL, Material.CHIPPED_ANVIL, Material.DAMAGED_ANVIL)),
+            Map.entry(InventoryType.BARREL, EnumSet.of(Material.BARREL)),
+            Map.entry(InventoryType.BLAST_FURNACE, EnumSet.of(Material.BLAST_FURNACE)),
+            Map.entry(InventoryType.CHEST, EnumSet.of(Material.CHEST, Material.TRAPPED_CHEST)),
+            Map.entry(InventoryType.CRAFTER, EnumSet.of(Material.CRAFTER)),
+            Map.entry(InventoryType.DISPENSER, EnumSet.of(Material.DISPENSER)),
+            Map.entry(InventoryType.DROPPER, EnumSet.of(Material.DROPPER)),
+            Map.entry(InventoryType.FURNACE, EnumSet.of(Material.FURNACE)),
+            Map.entry(InventoryType.HOPPER, EnumSet.of(Material.HOPPER)),
+            Map.entry(InventoryType.SHULKER_BOX, EnumSet.of(Material.SHULKER_BOX)),
+            Map.entry(InventoryType.SMOKER, EnumSet.of(Material.SMOKER))
+    );
     private final BoltPlugin plugin;
-
-    static {
-        // Future: Replace with InventoryType.CRAFTER and Material.CRAFTER, and merge into map above (and remove new HashMap)
-        if (CRAFTER_TYPE != null && CRAFTER_MATERIAL != null) {
-            INVENTORY_TYPE_BLOCKS.put(CRAFTER_TYPE, EnumSet.of(CRAFTER_MATERIAL));
-        }
-    }
 
     public InventoryListener(final BoltPlugin plugin) {
         this.plugin = plugin;
