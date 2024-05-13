@@ -56,7 +56,6 @@ import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Doors;
-import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.Permission;
@@ -73,9 +72,6 @@ import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 public final class BlockListener extends InteractionListener implements Listener {
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
-    private static final Material SCULK_SENSOR = EnumUtil.valueOf(Material.class, "SCULK_SENSOR").orElse(null);
-    private static final Material CALIBRATED_SCULK_SENSOR = EnumUtil.valueOf(Material.class, "CALIBRATED_SCULK_SENSOR").orElse(null);
-    private static final Material DECORATED_POT = EnumUtil.valueOf(Material.class, "DECORATED_POT").orElse(null);
 
     public BlockListener(final BoltPlugin plugin) {
         super(plugin);
@@ -183,7 +179,7 @@ public final class BlockListener extends InteractionListener implements Listener
                     }
                 }
             }
-            if (DECORATED_POT != null && DECORATED_POT.equals(clicked.getType()) && e.getItem() != null) {
+            if (Material.DECORATED_POT.equals(clicked.getType()) && e.getItem() != null) {
                 if (!plugin.canAccess(protection, player, Permission.DEPOSIT)) {
                     e.setUseItemInHand(Event.Result.DENY);
                     e.setUseInteractedBlock(Event.Result.DENY);
@@ -525,7 +521,7 @@ public final class BlockListener extends InteractionListener implements Listener
             return;
         }
         final Material material = e.getBlock().getType();
-        if ((SCULK_SENSOR == null || !SCULK_SENSOR.equals(material)) && (CALIBRATED_SCULK_SENSOR == null || !CALIBRATED_SCULK_SENSOR.equals(material))) {
+        if (!Material.SCULK_SENSOR.equals(material) && !Material.CALIBRATED_SCULK_SENSOR.equals(material)) {
             return;
         }
         final Protection protection = plugin.findProtection(e.getBlock());
