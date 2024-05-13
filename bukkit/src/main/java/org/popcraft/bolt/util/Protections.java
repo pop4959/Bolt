@@ -34,17 +34,6 @@ import static org.popcraft.bolt.util.BoltComponents.resolveTranslation;
 import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 
 public final class Protections {
-    // Future: Remove when support for lower than 1.19.3 is dropped
-    private static boolean translatableSupport;
-
-    static {
-        try {
-            Class.forName("org.bukkit.Translatable");
-            translatableSupport = true;
-        } catch (ClassNotFoundException e) {
-            translatableSupport = false;
-        }
-    }
 
     private Protections() {
     }
@@ -109,11 +98,7 @@ public final class Protections {
 
     public static Component displayType(final Block block, final CommandSender sender) {
         final Material material = block.getType();
-        if (translatableSupport) {
-            return displayType(material, sender);
-        } else {
-            return displayTypeFromData(material);
-        }
+        return displayType(material, sender);
     }
 
     private static Component displayType(final Material material, final CommandSender sender) {
@@ -123,31 +108,11 @@ public final class Protections {
         if (!blockTranslationKey.equals(blockTranslation)) {
             return Component.text(blockTranslation);
         }
-        if (translatableSupport) {
-            return Component.translatable(material.getTranslationKey());
-        } else {
-            return Component.text(Strings.toTitleCase(materialNameLower));
-        }
-    }
-
-    private static Component displayTypeFromData(final Material material) {
-        final String blockDataString = material.createBlockData().getAsString().replace(':', '.');
-        final int nbtIndex = blockDataString.indexOf('[');
-        final String key;
-        if (nbtIndex > -1) {
-            key = blockDataString.substring(0, nbtIndex);
-        } else {
-            key = blockDataString;
-        }
-        return Component.translatable("block.%s".formatted(key));
+        return Component.translatable(material.getTranslationKey());
     }
 
     public static Component displayType(final Entity entity, final CommandSender sender) {
-        if (translatableSupport) {
-            return displayType(entity.getType(), sender);
-        } else {
-            return Component.text(entity.getName());
-        }
+        return displayType(entity.getType(), sender);
     }
 
     private static Component displayType(final EntityType entityType, final CommandSender sender) {
@@ -157,11 +122,7 @@ public final class Protections {
         if (!entityTranslationKey.equals(entityTranslation)) {
             return Component.text(entityTranslation);
         }
-        if (translatableSupport) {
-            return Component.translatable(entityType.getTranslationKey());
-        } else {
-            return Component.text(Strings.toTitleCase(entityTypeLower));
-        }
+        return Component.translatable(entityType.getTranslationKey());
     }
 
     public static Component accessList(final Map<String, String> accessMap, final CommandSender sender) {
