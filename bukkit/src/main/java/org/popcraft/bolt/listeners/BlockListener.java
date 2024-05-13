@@ -73,7 +73,6 @@ import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 public final class BlockListener extends InteractionListener implements Listener {
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private static final EnumSet<Material> DYES = EnumSet.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
-    private static final Material CHISELED_BOOKSHELF = EnumUtil.valueOf(Material.class, "CHISELED_BOOKSHELF").orElse(null);
     private static final Material SCULK_SENSOR = EnumUtil.valueOf(Material.class, "SCULK_SENSOR").orElse(null);
     private static final Material CALIBRATED_SCULK_SENSOR = EnumUtil.valueOf(Material.class, "CALIBRATED_SCULK_SENSOR").orElse(null);
     private static final Material DECORATED_POT = EnumUtil.valueOf(Material.class, "DECORATED_POT").orElse(null);
@@ -173,8 +172,7 @@ public final class BlockListener extends InteractionListener implements Listener
                     e.setUseInteractedBlock(Event.Result.DENY);
                 }
             }
-            if (CHISELED_BOOKSHELF != null && CHISELED_BOOKSHELF.equals(clicked.getType()) && clicked.getState() instanceof final ChiseledBookshelf chiseledBookshelf && clicked.getBlockData() instanceof final org.bukkit.block.data.type.ChiseledBookshelf chiseledBookshelfBlockData && chiseledBookshelfBlockData.getFacing() == e.getBlockFace()) {
-                // Future: Replace with Material.CHISELED_BOOKSHELF
+            if (Material.CHISELED_BOOKSHELF.equals(clicked.getType()) && clicked.getState() instanceof final ChiseledBookshelf chiseledBookshelf && clicked.getBlockData() instanceof final org.bukkit.block.data.type.ChiseledBookshelf chiseledBookshelfBlockData && chiseledBookshelfBlockData.getFacing() == e.getBlockFace()) {
                 final Vector clickedPosition = PaperUtil.getClickedPosition(e);
                 if (clickedPosition != null) {
                     final int slot = chiseledBookshelf.getSlot(clickedPosition);
