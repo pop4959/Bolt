@@ -5,23 +5,16 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
-import org.popcraft.bolt.util.EnumUtil;
 
 import java.util.Collections;
 import java.util.Set;
 
 public class MangrovePropaguleMatcher implements BlockMatcher {
-    private static final Material MANGROVE_PROPAGULE = EnumUtil.valueOf(Material.class, "MANGROVE_PROPAGULE").orElse(null);
     private boolean enabled;
 
     @Override
     public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
-        // Future: Replace with Material.MANGROVE_PROPAGULE
-        if (MANGROVE_PROPAGULE == null) {
-            enabled = false;
-        } else {
-            enabled = protectableBlocks.contains(MANGROVE_PROPAGULE);
-        }
+        enabled = protectableBlocks.contains(Material.MANGROVE_PROPAGULE);
     }
 
     @Override
@@ -37,7 +30,7 @@ public class MangrovePropaguleMatcher implements BlockMatcher {
     @Override
     public Match findMatch(Block block) {
         final Block below = block.getRelative(BlockFace.DOWN);
-        if (below.getType().equals(MANGROVE_PROPAGULE)) {
+        if (Material.MANGROVE_PROPAGULE.equals(below.getType())) {
             return Match.ofBlocks(Collections.singleton(below));
         }
         return null;
