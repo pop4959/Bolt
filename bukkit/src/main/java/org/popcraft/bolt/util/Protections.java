@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.popcraft.bolt.BoltPlugin;
+import org.popcraft.bolt.compat.EntityTypeMapper;
 import org.popcraft.bolt.lang.Strings;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
@@ -93,9 +94,10 @@ public final class Protections {
             final Entity entity = Bukkit.getServer().getEntity(entityProtection.getId());
             if (entity == null) {
                 try {
-                    return displayType(EntityType.valueOf(entityProtection.getEntity().toUpperCase()), sender);
+                    final String entityType = entityProtection.getEntity().toUpperCase();
+                    return displayType(EntityType.valueOf(EntityTypeMapper.map(entityType)), sender);
                 } catch (IllegalArgumentException e) {
-                    return displayType(EntityType.PIG, sender);
+                    return resolveTranslation(Translation.UNKNOWN, sender);
                 }
             } else {
                 return displayType(entity, sender);
