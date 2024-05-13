@@ -43,10 +43,10 @@ public final class Doors {
 
         final boolean openIron = plugin.isDoorsOpenIron();
         final Block block = event.getClickedBlock();
-        final Player player = event.getPlayer();
-        if (!isDoor(block) || !isDoorOpenable(block, openIron) || interactionDenied(plugin, event)) {
+        if (block == null || !isDoor(block) || !isDoorOpenable(block, openIron) || interactionDenied(plugin, event)) {
             return;
         }
+        final Player player = event.getPlayer();
         final Set<Block> doors = new HashSet<>();
         if (!isDoorOpenableNormally(block)) {
             doors.add(block);
