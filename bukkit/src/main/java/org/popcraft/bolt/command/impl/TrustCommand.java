@@ -97,7 +97,7 @@ public class TrustCommand extends BoltCommand {
             editFuture.thenAccept(source -> SchedulerUtil.schedule(plugin, player, () -> {
                 if (source != null) {
                     if (adding) {
-                        accessList.getAccess().put(source.toString(), plugin.getDefaultAccessType());
+                        accessList.getAccess().put(source.toString(), access.type());
                     } else {
                         accessList.getAccess().remove(source.toString());
                     }
