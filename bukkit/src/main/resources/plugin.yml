@@ -78,3 +78,27 @@ permissions:
     default: false
   bolt.type.access.autoclose:
     default: false
+  bolt.permission.interact:
+    default: false
+  bolt.permission.open:
+    default: false
+  bolt.permission.deposit:
+    default: false
+  bolt.permission.withdraw:
+    default: false
+  bolt.permission.modify:
+    default: false
+  bolt.permission.mount:
+    default: false
+  bolt.permission.edit:
+    default: false
+  bolt.permission.destroy:
+    default: false
+  bolt.permission.redstone:
+    default: false
+  bolt.permission.entity_interact:
+    default: false
+  bolt.permission.entity_break_door:
+    default: false
+  bolt.permission.auto_close:
+    default: false
