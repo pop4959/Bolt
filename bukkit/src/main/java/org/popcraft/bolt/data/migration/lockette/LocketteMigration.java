@@ -286,7 +286,12 @@ public class LocketteMigration {
                     }
                 } else {
                     final String name = cleaned.trim().replace(" ", "");
-                    uuid = Profiles.findOrLookupProfileByName(name).join().uuid();
+                    if (name.length() <= 16) {
+                        uuid = Profiles.findOrLookupProfileByName(name).join().uuid();
+                    } else {
+                        System.out.printf("Encountered malformed input: %s in %s%n", name, cleaned);
+                        uuid = null;
+                    }
                 }
                 if (uuid != null) {
                     if (hasPrivateHeader && owner == null) {
