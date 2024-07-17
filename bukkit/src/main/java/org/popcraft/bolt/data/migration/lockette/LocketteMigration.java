@@ -1,5 +1,7 @@
 package org.popcraft.bolt.data.migration.lockette;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -37,6 +39,7 @@ import java.util.concurrent.Semaphore;
 import java.util.stream.Stream;
 
 public class LocketteMigration {
+    private final Gson gson = new Gson();
     private final BoltPlugin plugin;
 
     public LocketteMigration(final BoltPlugin plugin) {
@@ -222,6 +225,7 @@ public class LocketteMigration {
     }
 
     private LocketteProtection fromSignMessages(final CompoundTag sign) {
+        System.out.println(sign.toString());
         final Integer x = sign.getInt("x").map(IntTag::value).orElse(null);
         final Integer y = sign.getInt("y").map(IntTag::value).orElse(null);
         final Integer z = sign.getInt("z").map(IntTag::value).orElse(null);
@@ -261,7 +265,25 @@ public class LocketteMigration {
         UUID owner = null;
         final Map<String, String> access = new HashMap<>();
         for (final String message : messages) {
-            final String cleaned = message.replaceAll("\"", "");
+            final String cleaned;
+            if (message.startsWith("{")) {
+                try {
+                    final SignData signData = gson.fromJson(message, SignData.class);
+                    if (signData.getExtra() == null || signData.getExtra().length == 0) {
+                        if (signData.getText() == null) {
+                            continue;
+                        } else {
+                            cleaned = signData.getText().replaceAll("\"", "");
+                        }
+                    } else {
+                        cleaned = signData.getExtra()[0];
+                    }
+                } catch (final JsonSyntaxException e) {
+                    continue;
+                }
+            } else {
+                cleaned = message.replaceAll("\"", "");
+            }
             final boolean privateHeader = cleaned.contains("[Private]");
             final boolean moreUsersHeader = cleaned.contains("[More Users]");
             if (privateHeader || moreUsersHeader) {
@@ -321,5 +343,26 @@ public class LocketteMigration {
     }
 
     private record LocketteProtection(int x, int y, int z, UUID owner, String type, Map<String, String> access) {
+    }
+
+    public static class SignData {
+        private String[] extra;
+        private String text;
+
+        public String[] getExtra() {
+            return extra;
+        }
+
+        public void setExtra(String[] extra) {
+            this.extra = extra;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
     }
 }
