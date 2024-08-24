@@ -1,5 +1,10 @@
 package org.popcraft.bolt.util;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -22,11 +27,6 @@ import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.source.SourceTypes;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public final class Doors {
     private static final SourceResolver DOOR_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.DOOR));
@@ -53,7 +53,7 @@ public final class Doors {
         }
         if (plugin.isDoorsOpenDouble()) {
             final Block hingedBlock = getHingedBlock(block);
-            if (hingedBlock != null && hingedBlock.getType().equals(block.getType()) && isDoor(hingedBlock) && isDoorOpenable(hingedBlock, openIron)) {
+            if (hingedBlock != null && areParsedDoors(block, hingedBlock)  && isDoor(hingedBlock) && isDoorOpenable(hingedBlock, openIron)) {
                 final Protection hingedProtection = plugin.findProtection(hingedBlock);
                 if (hingedProtection != null && plugin.canAccess(hingedProtection, player, Permission.INTERACT)) {
                     doors.add(hingedBlock);
@@ -123,6 +123,15 @@ public final class Doors {
         return false;
     }
 
+    private static boolean areParsedDoors(Block block, Block hingedBlock) {
+        Material hingedBlockType = hingedBlock.getType();
+        Material blockType = block.getType();
+        return block.getType().equals(hingedBlockType) || (isCopperDoor(blockType) && isCopperDoor(hingedBlockType));
+    }
+    private static boolean isCopperDoor(Material material) {
+        return Tag.DOORS.isTagged(material) && !Tag.WOODEN_DOORS.isTagged(material) && material != Material.IRON_DOOR;
+    }
+
     public static boolean isDoor(final Block block) {
         final BlockData blockData = block.getBlockData();
         return blockData instanceof Door || blockData instanceof Gate || blockData instanceof TrapDoor;
@@ -163,6 +172,9 @@ public final class Doors {
         final Material material = block.getType();
         final boolean isIronDoor = Tag.DOORS.isTagged(material) && !Tag.WOODEN_DOORS.isTagged(material);
         final boolean isIronTrapdoor = Tag.TRAPDOORS.isTagged(material) && !Tag.WOODEN_TRAPDOORS.isTagged(material);
+        final boolean isCopperDoor = isIronDoor && material != Material.IRON_DOOR;
+        final boolean isCooperTrapdoor = isIronTrapdoor && material != Material.IRON_TRAPDOOR;
+        if (isCooperTrapdoor || isCopperDoor) return true;
         return !isIronDoor && !isIronTrapdoor;
     }
 
