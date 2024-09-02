@@ -284,18 +284,20 @@ public class LocketteMigration {
             } else {
                 cleaned = message.replaceAll("\"", "");
             }
-            final boolean privateHeader = cleaned.contains("[Private]");
-            final boolean moreUsersHeader = cleaned.contains("[More Users]");
+            final String cleanedNormalized = cleaned.toLowerCase();
+            final boolean privateHeader = cleanedNormalized.contains("[private]");
+            final boolean moreUsersHeader = cleanedNormalized.contains("[more users]");
             if (privateHeader || moreUsersHeader) {
                 isValid = true;
                 hasPrivateHeader = privateHeader;
-            } else if (cleaned.contains("[Everyone]")) {
+            } else if (cleanedNormalized.contains("[everyone]")) {
                 isPublic = true;
-            } else if (cleaned.contains("[Redstone]")) {
+            } else if (cleanedNormalized.contains("[redstone]")) {
                 isRedstone = true;
-            } else if (cleaned.contains("Timer")) {
+            } else if (cleanedNormalized.contains("timer")) {
                 access.put(Source.of("door").toString(), "autoclose");
-            } else {
+            } else if (isValid) {
+                // Since this involves an expensive call to look up the user, only do this when a valid sign
                 UUID uuid;
                 final boolean isLocketteProFormat = cleaned.contains("#");
                 if (isLocketteProFormat) {
