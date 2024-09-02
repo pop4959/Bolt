@@ -14,7 +14,7 @@ dependencies {
     compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.20.6-R0.1-SNAPSHOT")
     implementation(group = "net.kyori", name = "adventure-api", version = "4.17.0")
     implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.17.0")
-    implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.3.3")
+    implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.3.4")
     implementation(group = "net.kyori", name = "event-api", version = "3.0.0") {
         exclude(module = "guava")
         exclude(module = "checker-qual")
