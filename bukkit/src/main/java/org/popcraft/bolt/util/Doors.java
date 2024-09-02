@@ -1,7 +1,9 @@
 package org.popcraft.bolt.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.Tag;
 import org.bukkit.World;
@@ -27,11 +29,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 public final class Doors {
     private static final SourceResolver DOOR_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.DOOR));
     private static final Map<BlockLocation, Integer> CLOSING = new ConcurrentHashMap<>();
     private static final Set<PlayerInteractEvent> SELF_FIRED_EVENTS = ConcurrentHashMap.newKeySet();
+    // Future: Replace with Tag.MOB_INTERACTABLE_DOORS
+    private static final Tag<Material> MOB_INTERACTABLE_DOORS = Bukkit.getServer().getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("mob_interactable_doors"), Material.class);
+    // There is no tag for copper doors
+    private static final Function<Material, Boolean> IS_COPPER_DOOR = (material) -> material.name().contains("COPPER_DOOR");
 
     private Doors() {
     }
@@ -53,7 +60,7 @@ public final class Doors {
         }
         if (plugin.isDoorsOpenDouble()) {
             final Block hingedBlock = getHingedBlock(block);
-            if (hingedBlock != null && hingedBlock.getType().equals(block.getType()) && isDoor(hingedBlock) && isDoorOpenable(hingedBlock, openIron)) {
+            if (hingedBlock != null && areMatchingDoors(block, hingedBlock) && isDoor(hingedBlock) && isDoorOpenable(hingedBlock, openIron)) {
                 final Protection hingedProtection = plugin.findProtection(hingedBlock);
                 if (hingedProtection != null && plugin.canAccess(hingedProtection, player, Permission.INTERACT)) {
                     doors.add(hingedBlock);
@@ -151,16 +158,30 @@ public final class Doors {
         return block.getRelative(adjacentFace);
     }
 
+    public static boolean areMatchingDoors(final Block door, final Block hinged) {
+        if (IS_COPPER_DOOR.apply(door.getType()) && IS_COPPER_DOOR.apply(hinged.getType())) {
+            // Should match regardless of oxidation level
+            return true;
+        }
+        return hinged.getType().equals(door.getType());
+    }
+
     public static boolean isDoorOpenable(final Block block, final boolean openIron) {
         final Material material = block.getType();
-        final Tag<Material> openableDoors = openIron ? Tag.DOORS : Tag.WOODEN_DOORS;
-        final Tag<Material> openableGates = Tag.FENCE_GATES;
-        final Tag<Material> openableTrapdoors = openIron ? Tag.TRAPDOORS : Tag.WOODEN_TRAPDOORS;
-        return openableDoors.isTagged(material) || openableGates.isTagged(material) || openableTrapdoors.isTagged(material);
+        if (openIron && Material.IRON_DOOR.equals(material)) {
+            return true;
+        }
+        if (MOB_INTERACTABLE_DOORS != null) {
+            return MOB_INTERACTABLE_DOORS.isTagged(material);
+        }
+        return Tag.DOORS.isTagged(material) || Tag.FENCES.isTagged(material) || Tag.TRAPDOORS.isTagged(material);
     }
 
     public static boolean isDoorOpenableNormally(final Block block) {
         final Material material = block.getType();
+        if (MOB_INTERACTABLE_DOORS != null) {
+            return MOB_INTERACTABLE_DOORS.isTagged(material);
+        }
         final boolean isIronDoor = Tag.DOORS.isTagged(material) && !Tag.WOODEN_DOORS.isTagged(material);
         final boolean isIronTrapdoor = Tag.TRAPDOORS.isTagged(material) && !Tag.WOODEN_TRAPDOORS.isTagged(material);
         return !isIronDoor && !isIronTrapdoor;
