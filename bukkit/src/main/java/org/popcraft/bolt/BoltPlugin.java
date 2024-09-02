@@ -297,7 +297,8 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         bolt.getAccessRegistry().unregisterAll();
         final ConfigurationSection protections = getConfig().getConfigurationSection("protections");
         if (protections != null) {
-            for (final String type : protections.getKeys(false)) {
+            for (final String typeKey : protections.getKeys(false)) {
+                final String type = typeKey.toLowerCase();
                 final boolean requirePermission = protections.getBoolean("%s.require-permission".formatted(type), false);
                 final List<String> allows = protections.getStringList("%s.allows".formatted(type));
                 final List<String> permissions = allows.isEmpty() ? protections.getStringList(type) : allows;
@@ -310,7 +311,8 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         }
         final ConfigurationSection access = getConfig().getConfigurationSection("access");
         if (access != null) {
-            for (final String type : access.getKeys(false)) {
+            for (final String typeKey : access.getKeys(false)) {
+                final String type = typeKey.toLowerCase();
                 final boolean requirePermission = access.getBoolean("%s.require-permission".formatted(type), false);
                 final List<String> allows = access.getStringList("%s.allows".formatted(type));
                 final List<String> permissions = allows.isEmpty() ? access.getStringList(type) : allows;
