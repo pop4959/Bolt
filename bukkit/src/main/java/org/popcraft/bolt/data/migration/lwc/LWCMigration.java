@@ -28,8 +28,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -106,6 +108,12 @@ public class LWCMigration {
             }
             final ResultSet protectionSet = statement.executeQuery(Statements.LWC_SELECT_ALL_PROTECTIONS.get(configuration.type()).formatted(configuration.prefix()));
             while (protectionSet.next()) {
+                Date date;
+                try {
+                    date = protectionSet.getDate("date");
+                } catch (final SQLDataException e) {
+                    date = new Date(protectionSet.getInt("date"));
+                }
                 protections.add(new Protection(
                         protectionSet.getInt("id"),
                         protectionSet.getString("owner"),
@@ -117,7 +125,7 @@ public class LWCMigration {
                         protectionSet.getInt("blockId"),
                         protectionSet.getString("world"),
                         protectionSet.getString("password"),
-                        protectionSet.getDate("date"),
+                        date,
                         protectionSet.getLong("last_accessed")
                 ));
             }
