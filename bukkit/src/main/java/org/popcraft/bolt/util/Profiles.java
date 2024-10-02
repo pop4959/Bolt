@@ -22,6 +22,7 @@ public final class Profiles {
     private static final Set<String> KNOWN_NULL_LOOKUPS_BY_NAME = ConcurrentHashMap.newKeySet();
     private static final String NIL_UUID_STRING = "00000000-0000-0000-0000-000000000000";
     public static final UUID NIL_UUID = UUID.fromString(NIL_UUID_STRING);
+    public static final int MAX_NAME_LENGTH = 16;
 
     private Profiles() {
     }
@@ -47,7 +48,7 @@ public final class Profiles {
     }
 
     public static CompletableFuture<Profile> lookupProfileByName(final String name) {
-        if (name == null || name.isEmpty() || NIL_UUID_STRING.equals(name) || KNOWN_NULL_LOOKUPS_BY_NAME.contains(name)) {
+        if (name == null || name.isEmpty() || NIL_UUID_STRING.equals(name) || name.length() > MAX_NAME_LENGTH || KNOWN_NULL_LOOKUPS_BY_NAME.contains(name)) {
             return CompletableFuture.completedFuture(SimpleProfileCache.EMPTY_PROFILE);
         }
         final PlayerProfile playerProfile = Bukkit.createPlayerProfile(name);
@@ -60,7 +61,9 @@ public final class Profiles {
                 KNOWN_NULL_LOOKUPS_BY_NAME.add(name);
             }
         });
-        return updatedProfile.thenApply(PlayerProfile::getUniqueId).thenApply(profileCache::getProfile);
+        return updatedProfile.thenApply(PlayerProfile::getUniqueId)
+                .thenApply(profileCache::getProfile)
+                .exceptionally(ignored -> SimpleProfileCache.EMPTY_PROFILE);
     }
 
     public static CompletableFuture<Profile> findOrLookupProfileByName(final String name) {
@@ -105,7 +108,9 @@ public final class Profiles {
                 KNOWN_NULL_LOOKUPS_BY_UUID.add(uuid);
             }
         });
-        return updatedProfile.thenApply(PlayerProfile::getName).thenApply(profileCache::getProfile);
+        return updatedProfile.thenApply(PlayerProfile::getName)
+                .thenApply(profileCache::getProfile)
+                .exceptionally(ignored -> SimpleProfileCache.EMPTY_PROFILE);
     }
 
     public static CompletableFuture<Profile> findOrLookupProfileByUniqueId(final UUID uuid) {
