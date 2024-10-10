@@ -51,7 +51,12 @@ public final class Profiles {
         if (name == null || name.isEmpty() || NIL_UUID_STRING.equals(name) || name.length() > MAX_NAME_LENGTH || KNOWN_NULL_LOOKUPS_BY_NAME.contains(name)) {
             return CompletableFuture.completedFuture(SimpleProfileCache.EMPTY_PROFILE);
         }
-        final PlayerProfile playerProfile = Bukkit.createPlayerProfile(name);
+        final PlayerProfile playerProfile;
+        try {
+            playerProfile = Bukkit.createPlayerProfile(name);
+        } catch (final IllegalArgumentException ignored) {
+            return CompletableFuture.completedFuture(SimpleProfileCache.EMPTY_PROFILE);
+        }
         final CompletableFuture<PlayerProfile> updatedProfile = playerProfile.update();
         final ProfileCache profileCache = JavaPlugin.getPlugin(BoltPlugin.class).getProfileCache();
         updatedProfile.thenAccept(profile -> {
@@ -98,7 +103,12 @@ public final class Profiles {
         if (uuid == null || NIL_UUID.equals(uuid) || KNOWN_NULL_LOOKUPS_BY_UUID.contains(uuid)) {
             return CompletableFuture.completedFuture(SimpleProfileCache.EMPTY_PROFILE);
         }
-        final PlayerProfile playerProfile = Bukkit.createPlayerProfile(uuid);
+        final PlayerProfile playerProfile;
+        try {
+            playerProfile = Bukkit.createPlayerProfile(uuid);
+        } catch (final IllegalArgumentException ignored) {
+            return CompletableFuture.completedFuture(SimpleProfileCache.EMPTY_PROFILE);
+        }
         final CompletableFuture<PlayerProfile> updatedProfile = playerProfile.update();
         final ProfileCache profileCache = JavaPlugin.getPlugin(BoltPlugin.class).getProfileCache();
         updatedProfile.thenAccept(profile -> {
