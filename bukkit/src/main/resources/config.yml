@@ -115,7 +115,25 @@ entities:
     autoProtect: private
   leash_knot:
     autoProtect: private
-  chest_boat:
+  acacia_chest_boat:
+    autoProtect: private
+  bamboo_chest_raft:
+    autoProtect: private
+  birch_chest_boat:
+    autoProtect: private
+  cherry_chest_boat:
+    autoProtect: private
+  dark_oak_chest_boat:
+    autoProtect: private
+  jungle_chest_boat:
+    autoProtect: private
+  mangrove_chest_boat:
+    autoProtect: private
+  oak_chest_boat:
+    autoProtect: private
+  pale_oak_chest_boat:
+    autoProtect: private
+  spruce_chest_boat:
     autoProtect: private
   chest_minecart:
     autoProtect: private
