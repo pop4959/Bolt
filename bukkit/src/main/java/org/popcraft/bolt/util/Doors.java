@@ -38,7 +38,7 @@ public final class Doors {
     // Future: Replace with Tag.MOB_INTERACTABLE_DOORS
     private static final Tag<Material> MOB_INTERACTABLE_DOORS = Bukkit.getServer().getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("mob_interactable_doors"), Material.class);
     // There is no tag for copper doors
-    private static final Function<Material, Boolean> IS_COPPER_DOOR = (material) -> material.name().contains("COPPER_DOOR");
+    private static final Function<Material, Boolean> IS_COPPER_DOOR = (material) -> material.name().contains("COPPER_DOOR") || material.name().contains("COPPER_TRAPDOOR");
 
     private Doors() {
     }
@@ -171,20 +171,20 @@ public final class Doors {
         if (openIron && (Material.IRON_DOOR.equals(material) || Material.IRON_TRAPDOOR.equals(material))) {
             return true;
         }
-        if (MOB_INTERACTABLE_DOORS != null) {
-            return MOB_INTERACTABLE_DOORS.isTagged(material);
+        if (Tag.DOORS.isTagged(material) || Tag.FENCE_GATES.isTagged(material) || Tag.TRAPDOORS.isTagged(material)) {
+            return true;
         }
-        return Tag.DOORS.isTagged(material) || Tag.FENCES.isTagged(material) || Tag.TRAPDOORS.isTagged(material);
+        return MOB_INTERACTABLE_DOORS != null && MOB_INTERACTABLE_DOORS.isTagged(material);
     }
 
     public static boolean isDoorOpenableNormally(final Block block) {
         final Material material = block.getType();
-        if (MOB_INTERACTABLE_DOORS != null) {
-            return MOB_INTERACTABLE_DOORS.isTagged(material);
-        }
         final boolean isIronDoor = Tag.DOORS.isTagged(material) && !Tag.WOODEN_DOORS.isTagged(material);
         final boolean isIronTrapdoor = Tag.TRAPDOORS.isTagged(material) && !Tag.WOODEN_TRAPDOORS.isTagged(material);
-        return !isIronDoor && !isIronTrapdoor;
+        if (!isIronDoor && !isIronTrapdoor) {
+            return true;
+        }
+        return MOB_INTERACTABLE_DOORS != null && MOB_INTERACTABLE_DOORS.isTagged(material);
     }
 
     public static void toggleDoor(final BoltPlugin plugin, final PlayerInteractEvent event, final Block block, final boolean canOpen) {
