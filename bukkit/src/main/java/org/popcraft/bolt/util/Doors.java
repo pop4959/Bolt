@@ -168,7 +168,7 @@ public final class Doors {
 
     public static boolean isDoorOpenable(final Block block, final boolean openIron) {
         final Material material = block.getType();
-        if (openIron && Material.IRON_DOOR.equals(material)) {
+        if (openIron && (Material.IRON_DOOR.equals(material) || Material.IRON_TRAPDOOR.equals(material))) {
             return true;
         }
         if (MOB_INTERACTABLE_DOORS != null) {
