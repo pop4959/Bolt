@@ -118,7 +118,6 @@ import org.popcraft.bolt.matcher.block.TallFlowerMatcher;
 import org.popcraft.bolt.matcher.block.TallGrassMatcher;
 import org.popcraft.bolt.matcher.block.TechnicalPistonMatcher;
 import org.popcraft.bolt.matcher.block.TorchMatcher;
-import org.popcraft.bolt.matcher.block.TrapdoorMatcher;
 import org.popcraft.bolt.matcher.block.TripwireHookMatcher;
 import org.popcraft.bolt.matcher.block.UprootMatcher;
 import org.popcraft.bolt.matcher.block.VineMatcher;
@@ -163,7 +162,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private static final List<BlockMatcher> BLOCK_MATCHERS = List.of(CHEST_MATCHER,
             new BannerMatcher(), new BedMatcher(), new DoorMatcher(), new LeashKnotMatcher(),
             new PressurePlateMatcher(), new RailMatcher(), new SignMatcher(), new SwitchMatcher(),
-            new TrapdoorMatcher(), new CropsMatcher(), new FarmlandMatcher(), new UprootMatcher(),
+            new CropsMatcher(), new FarmlandMatcher(), new UprootMatcher(),
             new BellMatcher(), new TorchMatcher(), new LanternMatcher(), new LadderMatcher(),
             new CocoaMatcher(), new TripwireHookMatcher(), new AmethystClusterMatcher(), new SaplingMatcher(),
             new TechnicalPistonMatcher(), new ItemFrameMatcher(), new PaintingMatcher(), new HangingVineMatcher(),
