@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -609,6 +610,10 @@ public final class EntityListener extends InteractionListener implements Listene
         }
         final Protection protection = plugin.findProtection(e.getBlock());
         if (protection == null) {
+            return;
+        }
+        // This event is called if a bee in a nest produces honey. We don't want to block that.
+        if (e.getEntity().getType() == EntityType.BEE && e.getBlock().getType() == e.getTo() && (e.getTo().equals(Material.BEE_NEST) || e.getTo().equals(Material.BEEHIVE))) {
             return;
         }
         // This event is called for decorated pots broken by an arrow. WATER is needed for waterlogged decorated pots.
