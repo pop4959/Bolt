@@ -169,6 +169,9 @@ public interface BoltAPI {
     /**
      * Registers a source resolver for players. This source resolver is checked every time a player tries to access a
      * protection and is passed the source and the player's UUID for each source that could access the protection.
+     *
+     * @see org.popcraft.bolt.source.Source Source
+     * @see SourceResolver
      */
     void registerPlayerSourceResolver(final PlayerSourceResolver playerSourceResolver);
 
