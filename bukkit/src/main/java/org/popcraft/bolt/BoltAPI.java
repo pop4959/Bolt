@@ -16,6 +16,13 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+/**
+ * Bolt API methods. It is meant to be used through the {@link org.bukkit.plugin.ServicesManager services manager}.
+ * <p>
+ * {@snippet lang=java :
+ * BoltAPI bolt = Bukkit.getServer().getServicesManager().load(BoltAPI.class);
+ * }
+ */
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public interface BoltAPI {
     /**
