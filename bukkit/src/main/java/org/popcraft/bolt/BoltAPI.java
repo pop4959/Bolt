@@ -110,7 +110,7 @@ public interface BoltAPI {
     /**
      * Loads the protection associated with the given entity. Does not consider supporting entities, like {@link #isProtectedExact(Entity)}.
      * @return protection object, or {@code null} if no protection exists for this entity.
-     * @see #findProtection(Block)
+     * @see #findProtection(Entity)
      */
     EntityProtection loadProtection(final Entity entity);
 
