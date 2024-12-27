@@ -119,13 +119,13 @@ public interface BoltAPI {
     void removeProtection(final Protection protection);
 
     /**
-     * Loads the protection associated with the given block or another protected block that this block supports, like {@link #isProtected(Block)}.
+     * Loads the protection associated with the given block or another protected block or entity that this block supports, like {@link #isProtected(Block)}.
      * @return protection object, or {@code null} if no protection exists for this block.
      */
     Protection findProtection(final Block block);
 
     /**
-     * Loads the protection associated with the given entity or another protected entity that this entity supports, like {@link #isProtected(Entity)}.
+     * Loads the protection associated with the given entity or another protected block or entity that this entity supports, like {@link #isProtected(Entity)}.
      * @return protection object, or {@code null} if no protection exists for this entity.
      */
     Protection findProtection(final Entity entity);
