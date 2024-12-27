@@ -37,8 +37,7 @@ public interface BoltAPI {
 
     /**
      * Checks whether the given block is currently protected in any way. This method will return true for blocks that
-     * are not protected themselves but are in some way supporting another protected block or part of a different
-     * protected block.
+     * are not protected themselves but are in some way supporting another protected block or entity.
      *
      * @see #isProtectedExact(Block)
      */
@@ -46,8 +45,7 @@ public interface BoltAPI {
 
     /**
      * Checks whether the given entity is currently protected in any way. This method will return true for entities that
-     * are not protected themselves but are in some way supporting another protected entity or part of a different
-     * protected entity.
+     * are not protected themselves but are in some way supporting another protected block or entity.
      *
      * @see #isProtectedExact(Entity)
      */
