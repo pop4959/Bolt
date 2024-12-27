@@ -11,7 +11,6 @@ import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.PlayerSourceResolver;
 import org.popcraft.bolt.source.SourceResolver;
-import org.popcraft.bolt.util.Profiles;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -71,7 +70,7 @@ public interface BoltAPI {
      * {@link #isProtectable(Block)} to check that.
      *
      * @param block block to be protected
-     * @param owner owner of the protection. May be {@link Profiles#NIL_UUID} for a protection not owned by anyone in particular
+     * @param owner owner of the protection. May be {@link org.popcraft.bolt.util.Profiles#NIL_UUID NIL_UUID} for a protection not owned by anyone in particular
      * @param type protection type. See the {@code protections} section in the config
      * @return protection object representing the newly created protection
      */
@@ -83,7 +82,7 @@ public interface BoltAPI {
      * {@link #isProtectable(Entity)} to check that.
      *
      * @param entity entity to be protected
-     * @param owner owner of the protection. May be {@link Profiles#NIL_UUID} for a protection not owned by anyone in particular
+     * @param owner owner of the protection. May be {@link org.popcraft.bolt.util.Profiles#NIL_UUID NIL_UUID} for a protection not owned by anyone in particular
      * @param type protection type. See the {@code protections} section in the config
      * @return protection object representing the newly created protection
      */
