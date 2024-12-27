@@ -105,12 +105,14 @@ public interface BoltAPI {
     /**
      * Loads the protection associated with the given block. Does not consider supporting blocks, like {@link #isProtectedExact(Block)}.
      * @return protection object, or {@code null} if no protection exists for this block.
+     * @see #findProtection(Block)
      */
     BlockProtection loadProtection(final Block block);
 
     /**
      * Loads the protection associated with the given entity. Does not consider supporting entities, like {@link #isProtectedExact(Entity)}.
      * @return protection object, or {@code null} if no protection exists for this entity.
+     * @see #findProtection(Block)
      */
     EntityProtection loadProtection(final Entity entity);
 
@@ -127,12 +129,14 @@ public interface BoltAPI {
     /**
      * Loads the protection associated with the given block or another protected block or entity that this block supports, like {@link #isProtected(Block)}.
      * @return protection object, or {@code null} if no protection exists for this block.
+     * @see #loadProtection(Block) 
      */
     Protection findProtection(final Block block);
 
     /**
      * Loads the protection associated with the given entity or another protected block or entity that this entity supports, like {@link #isProtected(Entity)}.
      * @return protection object, or {@code null} if no protection exists for this entity.
+     * @see #findProtection(Entity)
      */
     Protection findProtection(final Entity entity);
 
