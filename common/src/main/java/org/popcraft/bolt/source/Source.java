@@ -8,9 +8,9 @@ import java.util.UUID;
 
 /**
  * A source is an abstract thing that could access something protected. Sources are like a namespaced key, consisting
- * of a {@link #type} and {@link #identifier}. For example, for a player, the {@code type} would be {@code "player"} and
- * the {@code identifier} would be the player's UUID. For some source types, like {@code "door"}, the identifier does
- * not matter.
+ * of a {@link #getType() type} and {@link #getIdentifier() identifier}. For example, for a player, the {@code type}
+ * would be {@code "player"} and the {@code identifier} would be the player's UUID. For some source types, like
+ * {@code "door"}, the identifier does not matter.
  * <p>
  * For built-in source types, see {@link SourceTypes}. Note that add-ons may use custom source types, as the system is
  * designed to be extensible.
