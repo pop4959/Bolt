@@ -27,6 +27,7 @@ import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Permission;
 
 import java.util.EnumSet;
@@ -49,6 +50,15 @@ public final class InventoryListener implements Listener {
             Map.entry(InventoryType.SHULKER_BOX, EnumSet.of(Material.SHULKER_BOX)),
             Map.entry(InventoryType.SMOKER, EnumSet.of(Material.SMOKER))
     );
+
+    // These exist only in newer versions of 1.21.4 and only in Paper.
+    private static final InventoryAction PICKUP_FROM_BUNDLE = EnumUtil.valueOf(InventoryAction.class, "PICKUP_FROM_BUNDLE").orElse(null);
+    private static final InventoryAction PICKUP_ALL_INTO_BUNDLE = EnumUtil.valueOf(InventoryAction.class, "PICKUP_ALL_INTO_BUNDLE").orElse(null);
+    private static final InventoryAction PICKUP_SOME_INTO_BUNDLE = EnumUtil.valueOf(InventoryAction.class, "PICKUP_SOME_INTO_BUNDLE").orElse(null);
+    private static final InventoryAction PLACE_FROM_BUNDLE = EnumUtil.valueOf(InventoryAction.class, "PLACE_FROM_BUNDLE").orElse(null);
+    private static final InventoryAction PLACE_ALL_INTO_BUNDLE = EnumUtil.valueOf(InventoryAction.class, "PLACE_ALL_INTO_BUNDLE").orElse(null);
+    private static final InventoryAction PLACE_SOME_INTO_BUNDLE = EnumUtil.valueOf(InventoryAction.class, "PLACE_SOME_INTO_BUNDLE").orElse(null);
+
     private final BoltPlugin plugin;
 
     public InventoryListener(final BoltPlugin plugin) {
@@ -114,7 +124,14 @@ public final class InventoryListener implements Listener {
                     yield !plugin.canAccess(protection, player, Permission.WITHDRAW);
                 }
             }
-            default -> true;
+            default -> {
+                if (action == PICKUP_FROM_BUNDLE || action == PICKUP_ALL_INTO_BUNDLE || action == PICKUP_SOME_INTO_BUNDLE) {
+                    yield !plugin.canAccess(protection, player, Permission.WITHDRAW);
+                } else if (action == PLACE_FROM_BUNDLE || action == PLACE_ALL_INTO_BUNDLE || action == PLACE_SOME_INTO_BUNDLE) {
+                    yield !plugin.canAccess(protection, player, Permission.DEPOSIT);
+                }
+                yield true;
+            }
         };
         if (shouldCancel) {
             e.setCancelled(true);
