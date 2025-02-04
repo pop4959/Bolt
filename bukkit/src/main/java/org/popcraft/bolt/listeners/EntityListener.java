@@ -613,7 +613,7 @@ public final class EntityListener extends InteractionListener implements Listene
             return;
         }
         // This event is called if a bee in a nest produces honey. We don't want to block that.
-        if (e.getEntity().getType() == EntityType.BEE && e.getBlock().getType() == e.getTo() && (e.getTo().equals(Material.BEE_NEST) || e.getTo().equals(Material.BEEHIVE))) {
+        if (e.getEntity().getType() == EntityType.BEE && e.getBlock().getType() == e.getTo() && Tag.BEEHIVES.isTagged(e.getTo())) {
             return;
         }
         // This event is called for decorated pots broken by an arrow. WATER is needed for waterlogged decorated pots.
