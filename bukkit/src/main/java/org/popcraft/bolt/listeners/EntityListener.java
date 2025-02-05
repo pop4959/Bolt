@@ -409,6 +409,10 @@ public final class EntityListener extends InteractionListener implements Listene
 
     @EventHandler
     public void onEntityDamage(final EntityDamageEvent e) {
+        if (e instanceof EntityDamageByEntityEvent) {
+            // EntityDamageByEntityEvent is already handled in onEntityDamageByEntity
+            return;
+        }
         if (EntityDamageEvent.DamageCause.ENTITY_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.PROJECTILE.equals(e.getCause()) || EntityDamageEvent.DamageCause.ENTITY_EXPLOSION.equals(e.getCause())) {
             return;
         }
