@@ -84,7 +84,7 @@ public final class Translator {
         final ClassLoader classLoader = Translator.class.getClassLoader();
         try {
             // This is like using a bazooka to kill a fly (where the bazooka is "FileSystems" and the fly is
-            // "just loading all the translation files"
+            // "just loading all the translation files")
             final URI uri = Objects.requireNonNull(classLoader.getResource("lang/")).toURI();
             try (final FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
                  Stream<Path> files = Files.list(fileSystem.getPath("lang/"))) {
