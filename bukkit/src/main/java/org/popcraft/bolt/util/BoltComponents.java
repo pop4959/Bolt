@@ -36,20 +36,26 @@ public final class BoltComponents {
         }
     }
 
+    private static void sendMessage(final CommandSender sender, final Component component) {
+        if (!component.equals(Component.empty())) {
+            adventure.sender(sender).sendMessage(component);
+        }
+    }
+
     public static void sendMessage(final CommandSender sender, String key, TagResolver... placeholders) {
-        adventure.sender(sender).sendMessage(resolveTranslation(key, sender, placeholders));
+        sendMessage(sender, resolveTranslation(key, sender, placeholders));
     }
 
     public static void sendMessage(final CommandSender sender, String key, boolean actionBar, TagResolver... placeholders) {
         if (actionBar) {
             adventure.sender(sender).sendActionBar(resolveTranslation(key, sender, placeholders));
         } else {
-            adventure.sender(sender).sendMessage(resolveTranslation(key, sender, placeholders));
+            sendMessage(sender, resolveTranslation(key, sender, placeholders));
         }
     }
 
     public static void sendClickableMessage(final CommandSender sender, String key, ClickEvent clickEvent, TagResolver... placeholders) {
-        adventure.sender(sender).sendMessage(resolveTranslation(key, sender, placeholders).clickEvent(clickEvent));
+        sendMessage(sender, resolveTranslation(key, sender, placeholders).clickEvent(clickEvent));
     }
 
     public static Component resolveTranslation(final String key, final CommandSender sender, TagResolver... placeholders) {
