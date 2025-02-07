@@ -93,10 +93,8 @@ public interface BoltAPI {
      */
     EntityProtection createProtection(final Entity entity, final UUID owner, final String type);
 
-    // TODO(rymiel): the implementation uses futures, but these are not exposed in the API, so there's no non-blocking option.
     /**
-     * Loads all block and entity protections in the world. This method may block for database operations if the protections
-     * are stored on a database.
+     * Loads ALL block and entity protections in all worlds.
      */
     Collection<Protection> loadProtections();
 
