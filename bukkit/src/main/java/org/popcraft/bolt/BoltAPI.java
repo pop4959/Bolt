@@ -67,8 +67,6 @@ public interface BoltAPI {
      */
     boolean isProtectedExact(final Entity entity);
 
-    // TODO(rymiel): this method doesn't check if `type` is valid, and you can't check that yourself in the API currently.
-    //   If you provide an invalid one, it's as if it had no protection type and allows nothing.
     /**
      * Creates a new block protection. The created protection is NOT saved to storage, you must call {@link #saveProtection(Protection)}
      * for this protection to exist in the world. This method does not check if the provided block can normally be protected, use
