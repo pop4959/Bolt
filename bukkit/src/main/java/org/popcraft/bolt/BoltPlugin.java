@@ -9,6 +9,7 @@ import org.bstats.charts.SimplePie;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -327,7 +328,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         protectableBlocks.clear();
         protectableEntities.clear();
         if (DEBUG) {
-            for (final Material material : Material.values()) {
+            for (final Material material : Registry.MATERIAL) {
                 if (material.isBlock()) {
                     protectableBlocks.put(material, new ProtectableConfig(bolt.getAccessRegistry().getProtectionByType(defaultAccessType).orElse(null), false, false));
                 }
