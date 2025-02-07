@@ -30,25 +30,25 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Permission;
 
-import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 
 public final class InventoryListener implements Listener {
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     @SuppressWarnings("UnstableApiUsage")
-    private static final Map<InventoryType, EnumSet<Material>> INVENTORY_TYPE_BLOCKS = Map.ofEntries(
-            Map.entry(InventoryType.ANVIL, EnumSet.of(Material.ANVIL, Material.CHIPPED_ANVIL, Material.DAMAGED_ANVIL)),
-            Map.entry(InventoryType.BARREL, EnumSet.of(Material.BARREL)),
-            Map.entry(InventoryType.BLAST_FURNACE, EnumSet.of(Material.BLAST_FURNACE)),
-            Map.entry(InventoryType.CHEST, EnumSet.of(Material.CHEST, Material.TRAPPED_CHEST)),
-            Map.entry(InventoryType.CRAFTER, EnumSet.of(Material.CRAFTER)),
-            Map.entry(InventoryType.DISPENSER, EnumSet.of(Material.DISPENSER)),
-            Map.entry(InventoryType.DROPPER, EnumSet.of(Material.DROPPER)),
-            Map.entry(InventoryType.FURNACE, EnumSet.of(Material.FURNACE)),
-            Map.entry(InventoryType.HOPPER, EnumSet.of(Material.HOPPER)),
-            Map.entry(InventoryType.SHULKER_BOX, EnumSet.of(Material.SHULKER_BOX)),
-            Map.entry(InventoryType.SMOKER, EnumSet.of(Material.SMOKER))
+    private static final Map<InventoryType, Set<Material>> INVENTORY_TYPE_BLOCKS = Map.ofEntries(
+            Map.entry(InventoryType.ANVIL, Set.of(Material.ANVIL, Material.CHIPPED_ANVIL, Material.DAMAGED_ANVIL)),
+            Map.entry(InventoryType.BARREL, Set.of(Material.BARREL)),
+            Map.entry(InventoryType.BLAST_FURNACE, Set.of(Material.BLAST_FURNACE)),
+            Map.entry(InventoryType.CHEST, Set.of(Material.CHEST, Material.TRAPPED_CHEST)),
+            Map.entry(InventoryType.CRAFTER, Set.of(Material.CRAFTER)),
+            Map.entry(InventoryType.DISPENSER, Set.of(Material.DISPENSER)),
+            Map.entry(InventoryType.DROPPER, Set.of(Material.DROPPER)),
+            Map.entry(InventoryType.FURNACE, Set.of(Material.FURNACE)),
+            Map.entry(InventoryType.HOPPER, Set.of(Material.HOPPER)),
+            Map.entry(InventoryType.SHULKER_BOX, Set.of(Material.SHULKER_BOX)),
+            Map.entry(InventoryType.SMOKER, Set.of(Material.SMOKER))
     );
 
     // These exist only in newer versions of 1.21.4 and only in Paper.
@@ -200,7 +200,7 @@ public final class InventoryListener implements Listener {
 
     private Protection getInventoryProtection(final Inventory inventory) {
         final InventoryType inventoryType = inventory.getType();
-        final EnumSet<Material> blockTypes = INVENTORY_TYPE_BLOCKS.get(inventoryType);
+        final Set<Material> blockTypes = INVENTORY_TYPE_BLOCKS.get(inventoryType);
         if (blockTypes != null) {
             final Location inventoryLocation = inventory.getLocation();
             if (inventoryLocation != null) {

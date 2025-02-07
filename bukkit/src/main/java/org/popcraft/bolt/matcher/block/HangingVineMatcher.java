@@ -7,12 +7,11 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
 public class HangingVineMatcher implements BlockMatcher {
-    private static final EnumSet<Material> WEEPING_VINES = EnumSet.of(Material.WEEPING_VINES, Material.WEEPING_VINES_PLANT);
+    private static final Set<Material> WEEPING_VINES = Set.of(Material.WEEPING_VINES, Material.WEEPING_VINES_PLANT);
     private boolean enabled;
 
     @Override

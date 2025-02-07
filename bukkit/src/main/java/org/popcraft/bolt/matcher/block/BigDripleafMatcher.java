@@ -6,12 +6,11 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
 public class BigDripleafMatcher implements BlockMatcher {
-    private static final EnumSet<Material> BIG_DRIPLEAF_BLOCKS = EnumSet.of(Material.BIG_DRIPLEAF, Material.BIG_DRIPLEAF_STEM);
+    private static final Set<Material> BIG_DRIPLEAF_BLOCKS = Set.of(Material.BIG_DRIPLEAF, Material.BIG_DRIPLEAF_STEM);
     private boolean enabled;
 
     @Override

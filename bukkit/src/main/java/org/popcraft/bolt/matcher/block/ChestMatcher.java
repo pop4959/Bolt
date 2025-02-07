@@ -8,11 +8,10 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Set;
 
 public class ChestMatcher implements BlockMatcher {
-    private static final EnumSet<Material> CHESTS = EnumSet.of(Material.CHEST, Material.TRAPPED_CHEST);
+    private static final Set<Material> CHESTS = Set.of(Material.CHEST, Material.TRAPPED_CHEST);
     private boolean enabled;
 
     @Override

@@ -7,12 +7,11 @@ import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ChorusMatcher implements BlockMatcher {
-    private static final EnumSet<Material> CHORUS = EnumSet.of(Material.CHORUS_PLANT, Material.CHORUS_FLOWER);
+    private static final Set<Material> CHORUS = Set.of(Material.CHORUS_PLANT, Material.CHORUS_FLOWER);
     private boolean enabled;
 
     @Override
