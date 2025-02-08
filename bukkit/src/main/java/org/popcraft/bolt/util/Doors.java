@@ -168,8 +168,8 @@ public final class Doors {
 
     public static boolean isDoorOpenable(final Block block, final boolean openIron) {
         final Material material = block.getType();
-        if (openIron && (Material.IRON_DOOR.equals(material) || Material.IRON_TRAPDOOR.equals(material))) {
-            return true;
+        if (Material.IRON_DOOR.equals(material) || Material.IRON_TRAPDOOR.equals(material)) {
+            return openIron;
         }
         if (Tag.DOORS.isTagged(material) || Tag.FENCE_GATES.isTagged(material) || Tag.TRAPDOORS.isTagged(material)) {
             return true;
@@ -178,13 +178,7 @@ public final class Doors {
     }
 
     public static boolean isDoorOpenableNormally(final Block block) {
-        final Material material = block.getType();
-        final boolean isIronDoor = Tag.DOORS.isTagged(material) && !Tag.WOODEN_DOORS.isTagged(material);
-        final boolean isIronTrapdoor = Tag.TRAPDOORS.isTagged(material) && !Tag.WOODEN_TRAPDOORS.isTagged(material);
-        if (!isIronDoor && !isIronTrapdoor) {
-            return true;
-        }
-        return MOB_INTERACTABLE_DOORS != null && MOB_INTERACTABLE_DOORS.isTagged(material);
+        return isDoorOpenable(block, false);
     }
 
     public static void toggleDoor(final BoltPlugin plugin, final PlayerInteractEvent event, final Block block, final boolean canOpen) {
