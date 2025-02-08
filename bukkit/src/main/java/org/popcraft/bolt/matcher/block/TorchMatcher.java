@@ -13,8 +13,8 @@ import java.util.Set;
 
 public class TorchMatcher implements BlockMatcher {
     private static final EnumSet<BlockFace> CARDINAL_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
-    private static final EnumSet<Material> TORCHES = EnumSet.of(Material.TORCH, Material.REDSTONE_TORCH, Material.SOUL_TORCH);
-    private static final EnumSet<Material> WALL_TORCHES = EnumSet.of(Material.WALL_TORCH, Material.REDSTONE_WALL_TORCH, Material.SOUL_WALL_TORCH);
+    private static final Set<Material> TORCHES = Set.of(Material.TORCH, Material.REDSTONE_TORCH, Material.SOUL_TORCH);
+    private static final Set<Material> WALL_TORCHES = Set.of(Material.WALL_TORCH, Material.REDSTONE_WALL_TORCH, Material.SOUL_WALL_TORCH);
     private boolean enabled;
 
     @Override

@@ -8,12 +8,11 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 public class TallFlowerMatcher implements BlockMatcher {
-    private static final EnumSet<Material> TALL_FLOWERS = EnumSet.of(Material.SUNFLOWER, Material.LILAC, Material.PEONY, Material.ROSE_BUSH, Material.PITCHER_PLANT);
+    private static final Set<Material> TALL_FLOWERS = Set.of(Material.SUNFLOWER, Material.LILAC, Material.PEONY, Material.ROSE_BUSH, Material.PITCHER_PLANT);
     private boolean enabled;
 
     @Override

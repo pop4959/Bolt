@@ -9,6 +9,7 @@ import org.bstats.charts.SimplePie;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -144,7 +145,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -183,9 +183,9 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private final Map<String, BoltCommand> commands = new HashMap<>();
     private final Path profileCachePath = getDataPath().resolve("profiles");
     private final ProfileCache profileCache = new SimpleProfileCache(profileCachePath);
-    private final Map<Material, ProtectableConfig> protectableBlocks = new EnumMap<>(Material.class);
-    private final Map<EntityType, ProtectableConfig> protectableEntities = new EnumMap<>(EntityType.class);
-    private final Map<Material, Tag<Material>> materialTags = new EnumMap<>(Material.class);
+    private final Map<Material, ProtectableConfig> protectableBlocks = new HashMap<>();
+    private final Map<EntityType, ProtectableConfig> protectableEntities = new HashMap<>();
+    private final Map<Material, Tag<Material>> materialTags = new HashMap<>();
     private final Set<Mode> defaultModes = new HashSet<>();
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
@@ -328,7 +328,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         protectableBlocks.clear();
         protectableEntities.clear();
         if (DEBUG) {
-            for (final Material material : Material.values()) {
+            for (final Material material : Registry.MATERIAL) {
                 if (material.isBlock()) {
                     protectableBlocks.put(material, new ProtectableConfig(bolt.getAccessRegistry().getProtectionByType(defaultAccessType).orElse(null), false, false));
                 }

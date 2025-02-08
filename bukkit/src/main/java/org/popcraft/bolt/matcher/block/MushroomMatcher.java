@@ -7,11 +7,10 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Set;
 
 public class MushroomMatcher implements BlockMatcher {
-    private static final EnumSet<Material> MUSHROOMS = EnumSet.of(Material.BROWN_MUSHROOM, Material.RED_MUSHROOM, Material.WARPED_FUNGUS, Material.CRIMSON_FUNGUS);
+    private static final Set<Material> MUSHROOMS = Set.of(Material.BROWN_MUSHROOM, Material.RED_MUSHROOM, Material.WARPED_FUNGUS, Material.CRIMSON_FUNGUS);
     private boolean enabled;
 
     @Override

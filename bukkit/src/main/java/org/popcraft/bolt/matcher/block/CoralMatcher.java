@@ -13,7 +13,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public class CoralMatcher implements BlockMatcher {
-    private static final EnumSet<Material> DEAD_CORALS = EnumSet.of(Material.DEAD_BRAIN_CORAL, Material.DEAD_BUBBLE_CORAL, Material.DEAD_FIRE_CORAL, Material.DEAD_HORN_CORAL, Material.DEAD_TUBE_CORAL);
+    private static final Set<Material> DEAD_CORALS = Set.of(Material.DEAD_BRAIN_CORAL, Material.DEAD_BUBBLE_CORAL, Material.DEAD_FIRE_CORAL, Material.DEAD_HORN_CORAL, Material.DEAD_TUBE_CORAL);
     private static final EnumSet<BlockFace> CARDINAL_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
     private boolean enabled;
 

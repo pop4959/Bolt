@@ -6,12 +6,11 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
 public class UprootMatcher implements BlockMatcher {
-    private static final EnumSet<Material> UPROOT = EnumSet.of(Material.BAMBOO, Material.CACTUS, Material.SUGAR_CANE, Material.TWISTING_VINES, Material.TWISTING_VINES_PLANT, Material.KELP, Material.KELP_PLANT);
+    private static final Set<Material> UPROOT = Set.of(Material.BAMBOO, Material.CACTUS, Material.SUGAR_CANE, Material.TWISTING_VINES, Material.TWISTING_VINES_PLANT, Material.KELP, Material.KELP_PLANT);
     private boolean enabled;
 
     @Override

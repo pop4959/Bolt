@@ -7,11 +7,10 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Set;
 
 public class RepeaterMatcher implements BlockMatcher {
-    private static final EnumSet<Material> REPEATERS = EnumSet.of(Material.REPEATER, Material.COMPARATOR);
+    private static final Set<Material> REPEATERS = Set.of(Material.REPEATER, Material.COMPARATOR);
     private boolean enabled;
 
     @Override
