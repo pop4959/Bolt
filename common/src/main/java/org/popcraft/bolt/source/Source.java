@@ -6,6 +6,19 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * A source is an abstract thing that is given access to a protection. A source may be a player, or an entire group of
+ * players, or even non-player things like blocks.
+ * <p>
+ * Sources are like a namespaced key, consisting of a {@link #getType() type} and {@link #getIdentifier() identifier}.
+ * For example, for a player, the {@code type} would be {@code "player"} and the {@code identifier} would be the
+ * player's UUID. For some source types, like {@code "door"}, the identifier does not matter.
+ * <p>
+ * For built-in source types, see {@link SourceTypes}. Note that add-ons may use custom source types, as the system is
+ * designed to be extensible.
+ *
+ * @see SourceResolver
+ */
 public final class Source {
     private final String type;
     private final String identifier;
