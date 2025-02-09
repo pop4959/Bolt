@@ -17,6 +17,7 @@ import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
@@ -61,9 +62,12 @@ public final class Doors {
         if (plugin.isDoorsOpenDouble()) {
             final Block hingedBlock = getHingedBlock(block);
             if (hingedBlock != null && areMatchingDoors(block, hingedBlock) && isDoor(hingedBlock) && isDoorOpenable(hingedBlock, openIron)) {
-                final Protection hingedProtection = plugin.findProtection(hingedBlock);
-                if (hingedProtection != null && plugin.canAccess(hingedProtection, player, Permission.INTERACT)) {
-                    doors.add(hingedBlock);
+                // Don't open matching door when left-clicking on a wooden door
+                if (event.getAction() != Action.LEFT_CLICK_BLOCK || !isDoorOpenableNormally(hingedBlock)) {
+                    final Protection hingedProtection = plugin.findProtection(hingedBlock);
+                    if (hingedProtection != null && plugin.canAccess(hingedProtection, player, Permission.INTERACT)) {
+                        doors.add(hingedBlock);
+                    }
                 }
             }
         }
