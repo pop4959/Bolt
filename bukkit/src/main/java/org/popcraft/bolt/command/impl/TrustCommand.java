@@ -31,6 +31,80 @@ public class TrustCommand extends BoltCommand {
         super(plugin);
     }
 
+    public void trustModify(final CommandSender sender, final UUID uuid, final boolean adding, final Arguments arguments) {
+        final String sourceTypeName = arguments.next().toLowerCase();
+        final SourceType sourceType = plugin.getBolt().getSourceTypeRegistry().getSourceByName(sourceTypeName).orElse(null);
+        if (sourceType == null || !plugin.getBolt().getSourceTypeRegistry().sourceTypes().contains(sourceType)) {
+            BoltComponents.sendMessage(
+                sender,
+                Translation.EDIT_SOURCE_INVALID,
+                Placeholder.component(Translation.Placeholder.SOURCE_TYPE, Component.text(sourceTypeName))
+            );
+            return;
+        }
+        if (sourceType.restricted() && !sender.hasPermission("bolt.type.source.%s".formatted(sourceType.name()))) {
+            BoltComponents.sendMessage(sender, Translation.EDIT_SOURCE_NO_PERMISSION);
+            return;
+        }
+        final String sourceIdentifier = arguments.next();
+        final String accessType = Objects.requireNonNullElse(arguments.next(), plugin.getDefaultAccessType()).toLowerCase();
+        final Access access = plugin.getBolt().getAccessRegistry().getAccessByType(accessType).orElse(null);
+        if (access == null) {
+            BoltComponents.sendMessage(
+                sender,
+                Translation.EDIT_ACCESS_INVALID,
+                Placeholder.component(Translation.Placeholder.ACCESS_TYPE, Component.text(accessType))
+            );
+            return;
+        }
+        if (access.restricted() && !sender.hasPermission("bolt.type.access.%s".formatted(access.type()))) {
+            BoltComponents.sendMessage(sender, Translation.EDIT_ACCESS_NO_PERMISSION);
+            return;
+        }
+        final AccessList accessList = Objects.requireNonNullElse(plugin.getBolt().getStore().loadAccessList(uuid).join(), new AccessList(uuid, new HashMap<>()));
+        final CompletableFuture<Source> editFuture;
+        if (SourceTypes.PLAYER.equals(sourceType.name())) {
+            editFuture = Profiles.findOrLookupProfileByName(sourceIdentifier).thenApply(profile -> {
+                if (profile.uuid() != null) {
+                    return Source.player(profile.uuid());
+                } else {
+                    SchedulerUtil.schedule(plugin, sender, () -> BoltComponents.sendMessage(
+                        sender,
+                        Translation.PLAYER_NOT_FOUND,
+                        Placeholder.component(Translation.Placeholder.PLAYER, Component.text(sourceIdentifier))
+                    ));
+                    return null;
+                }
+            });
+        } else if (SourceTypes.PASSWORD.equals(sourceType.name())) {
+            editFuture = CompletableFuture.completedFuture(Source.password(sourceIdentifier));
+        } else {
+            editFuture = CompletableFuture.completedFuture(Source.of(sourceType.name(), sourceIdentifier));
+        }
+        editFuture.thenAccept(source -> SchedulerUtil.schedule(plugin, sender, () -> {
+            if (source != null) {
+                if (adding) {
+                    accessList.getAccess().put(source.toString(), access.type());
+                } else {
+                    accessList.getAccess().remove(source.toString());
+                }
+                plugin.getBolt().getStore().saveAccessList(accessList);
+                BoltComponents.sendMessage(sender, Translation.TRUST_EDITED);
+            }
+        }));
+    }
+
+    public void trustList(final CommandSender sender, final UUID uuid) {
+        final AccessList accessList = plugin.getBolt().getStore().loadAccessList(uuid).join();
+        final Map<String, String> accessMap = accessList == null ? new HashMap<>() : accessList.getAccess();
+        BoltComponents.sendMessage(
+            sender,
+            Translation.INFO_SELF,
+            Placeholder.component(Translation.Placeholder.ACCESS_LIST_SIZE, Component.text(accessMap.size())),
+            Placeholder.component(Translation.Placeholder.ACCESS_LIST, Protections.accessList(accessMap, sender))
+        );
+    }
+
     @Override
     public void execute(CommandSender sender, Arguments arguments) {
         if (!(sender instanceof final Player player)) {
@@ -44,76 +118,9 @@ public class TrustCommand extends BoltCommand {
                 return;
             }
             final boolean adding = "add".equalsIgnoreCase(action);
-            final String sourceTypeName = arguments.next().toLowerCase();
-            final SourceType sourceType = plugin.getBolt().getSourceTypeRegistry().getSourceByName(sourceTypeName).orElse(null);
-            if (sourceType == null || !plugin.getBolt().getSourceTypeRegistry().sourceTypes().contains(sourceType)) {
-                BoltComponents.sendMessage(
-                        sender,
-                        Translation.EDIT_SOURCE_INVALID,
-                        Placeholder.component(Translation.Placeholder.SOURCE_TYPE, Component.text(sourceTypeName))
-                );
-                return;
-            }
-            if (sourceType.restricted() && !sender.hasPermission("bolt.type.source.%s".formatted(sourceType.name()))) {
-                BoltComponents.sendMessage(sender, Translation.EDIT_SOURCE_NO_PERMISSION);
-                return;
-            }
-            final String sourceIdentifier = arguments.next();
-            final String accessType = Objects.requireNonNullElse(arguments.next(), plugin.getDefaultAccessType()).toLowerCase();
-            final Access access = plugin.getBolt().getAccessRegistry().getAccessByType(accessType).orElse(null);
-            if (access == null) {
-                BoltComponents.sendMessage(
-                        sender,
-                        Translation.EDIT_ACCESS_INVALID,
-                        Placeholder.component(Translation.Placeholder.ACCESS_TYPE, Component.text(accessType))
-                );
-                return;
-            }
-            if (access.restricted() && !sender.hasPermission("bolt.type.access.%s".formatted(access.type()))) {
-                BoltComponents.sendMessage(sender, Translation.EDIT_ACCESS_NO_PERMISSION);
-                return;
-            }
-            final UUID uuid = player.getUniqueId();
-            final AccessList accessList = Objects.requireNonNullElse(plugin.getBolt().getStore().loadAccessList(uuid).join(), new AccessList(uuid, new HashMap<>()));
-            final CompletableFuture<Source> editFuture;
-            if (SourceTypes.PLAYER.equals(sourceType.name())) {
-                editFuture = Profiles.findOrLookupProfileByName(sourceIdentifier).thenApply(profile -> {
-                    if (profile.uuid() != null) {
-                        return Source.player(profile.uuid());
-                    } else {
-                        SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
-                                player,
-                                Translation.PLAYER_NOT_FOUND,
-                                Placeholder.component(Translation.Placeholder.PLAYER, Component.text(sourceIdentifier))
-                        ));
-                        return null;
-                    }
-                });
-            } else if (SourceTypes.PASSWORD.equals(sourceType.name())) {
-                editFuture = CompletableFuture.completedFuture(Source.password(sourceIdentifier));
-            } else {
-                editFuture = CompletableFuture.completedFuture(Source.of(sourceType.name(), sourceIdentifier));
-            }
-            editFuture.thenAccept(source -> SchedulerUtil.schedule(plugin, player, () -> {
-                if (source != null) {
-                    if (adding) {
-                        accessList.getAccess().put(source.toString(), access.type());
-                    } else {
-                        accessList.getAccess().remove(source.toString());
-                    }
-                    plugin.getBolt().getStore().saveAccessList(accessList);
-                    BoltComponents.sendMessage(sender, Translation.TRUST_EDITED);
-                }
-            }));
+            trustModify(sender, player.getUniqueId(), adding, arguments);
         } else {
-            final AccessList accessList = plugin.getBolt().getStore().loadAccessList(player.getUniqueId()).join();
-            final Map<String, String> accessMap = accessList == null ? new HashMap<>() : accessList.getAccess();
-            BoltComponents.sendMessage(
-                    player,
-                    Translation.INFO_SELF,
-                    Placeholder.component(Translation.Placeholder.ACCESS_LIST_SIZE, Component.text(accessMap.size())),
-                    Placeholder.component(Translation.Placeholder.ACCESS_LIST, Protections.accessList(accessMap, sender))
-            );
+            trustList(sender, player.getUniqueId());
         }
     }
 

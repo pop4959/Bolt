@@ -130,7 +130,6 @@ public final class Protections {
             return Component.empty();
         }
         final List<Component> list = new ArrayList<>();
-        final List<String> lines = new ArrayList<>();
         for (final Map.Entry<String, String> accessEntry : accessMap.entrySet()) {
             final String entry = accessEntry.getKey();
             final String access = accessEntry.getValue();
