@@ -6,25 +6,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
-import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.command.Arguments;
-import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.lang.Translation;
-import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceType;
 import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.Profiles;
-import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class AdminTrustCommand extends TrustCommand {
     public AdminTrustCommand(BoltPlugin plugin) {
