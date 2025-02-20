@@ -633,8 +633,7 @@ public final class EntityListener extends InteractionListener implements Listene
         }
         // This event is called for waxing or axing a copper block. We need to update the protection to avoid mismatches.
         // TODO: this might need to be monitor?
-        final BlockProtection blockProtection = plugin.loadProtection(e.getBlock());
-        if (blockProtection != null && e.getBlock().getType() != e.getTo()) {
+        if (protection instanceof final BlockProtection blockProtection && blockProtection.getBlock().equals(e.getBlock().getType().name()) && e.getBlock().getType() != e.getTo()) {
             blockProtection.setBlock(e.getTo().name());
             plugin.saveProtection(blockProtection);
         }
