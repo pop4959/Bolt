@@ -54,6 +54,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
@@ -609,7 +610,8 @@ public final class EntityListener extends InteractionListener implements Listene
 
     @EventHandler
     public void onEntityChangeBlock(final EntityChangeBlockEvent e) {
-        if (Tag.DOORS.isTagged(e.getBlock().getType())) {
+        // This event is called for zombies breaking doors, but it's already handled by EntityBreakDoorEvent.
+        if (Tag.DOORS.isTagged(e.getBlock().getType()) && e.getTo().isAir()) {
             return;
         }
         final Protection protection = plugin.findProtection(e.getBlock());
@@ -628,6 +630,13 @@ public final class EntityListener extends InteractionListener implements Listene
         }
         if (broken) {
             plugin.removeProtection(protection);
+        }
+        // This event is called for waxing or axing a copper block. We need to update the protection to avoid mismatches.
+        // TODO: this might need to be monitor?
+        final BlockProtection blockProtection = plugin.loadProtection(e.getBlock());
+        if (blockProtection != null && e.getBlock().getType() != e.getTo()) {
+            blockProtection.setBlock(e.getTo().name());
+            plugin.saveProtection(blockProtection);
         }
     }
 
