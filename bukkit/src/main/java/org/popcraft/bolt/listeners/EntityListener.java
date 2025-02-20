@@ -631,8 +631,15 @@ public final class EntityListener extends InteractionListener implements Listene
         if (broken) {
             plugin.removeProtection(protection);
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEntityChangeBlockMonitor(final EntityChangeBlockEvent e) {
+        final Protection protection = plugin.findProtection(e.getBlock());
+        if (protection == null || !(e.getEntity() instanceof Player) || e.getTo().isAir()) {
+            return;
+        }
         // This event is called for waxing or axing a copper block. We need to update the protection to avoid mismatches.
-        // TODO: this might need to be monitor?
         if (protection instanceof final BlockProtection blockProtection && blockProtection.getBlock().equals(e.getBlock().getType().name()) && e.getBlock().getType() != e.getTo()) {
             blockProtection.setBlock(e.getTo().name());
             plugin.saveProtection(blockProtection);
