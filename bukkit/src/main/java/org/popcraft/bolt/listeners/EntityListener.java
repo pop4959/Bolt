@@ -633,7 +633,7 @@ public final class EntityListener extends InteractionListener implements Listene
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityChangeBlockMonitor(final EntityChangeBlockEvent e) {
         final Protection protection = plugin.findProtection(e.getBlock());
         if (protection == null || !(e.getEntity() instanceof Player) || e.getTo().isAir()) {
