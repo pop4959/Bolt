@@ -3,6 +3,7 @@ package org.popcraft.bolt.lang;
 public class Translation {
     public static final String ACCESS_LIST_ENTRY = "access_list_entry";
     public static final String ACCESS_LIST_ENTRY_DEFAULT = "access_list_entry_default";
+    public static final String CALLBACK_EXPIRED = "callback_expired";
     public static final String CLEANUP_START = "cleanup_start";
     public static final String CLEANUP_REMOVE = "cleanup_remove";
     public static final String CLEANUP_COMPLETE = "cleanup_complete";

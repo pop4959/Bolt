@@ -31,7 +31,9 @@ public class CallbackManager {
 
     public void execute(final CommandSender sender, final UUID id) {
         final Callback callback = this.callbacks.get(id);
-        if (callback != null) {
+        if (callback == null) {
+            BoltComponents.sendMessage(sender, Translation.CALLBACK_EXPIRED);
+        } else {
             callback.execute(sender);
         }
     }
