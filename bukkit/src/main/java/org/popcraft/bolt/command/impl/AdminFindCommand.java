@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntFunction;
 
 import static org.popcraft.bolt.util.BoltComponents.getLocaleOf;
 import static org.popcraft.bolt.util.BoltComponents.resolveTranslation;
@@ -48,7 +49,6 @@ public class AdminFindCommand extends BoltCommand {
             return;
         }
         final String player = arguments.next();
-        final Integer page = arguments.nextAsInteger();
         Profiles.findOrLookupProfileByName(player).thenAccept(playerProfile -> SchedulerUtil.schedule(plugin, sender, () -> {
             if (!playerProfile.complete()) {
                 BoltComponents.sendMessage(
@@ -62,7 +62,7 @@ public class AdminFindCommand extends BoltCommand {
                     .filter(protection -> playerProfile.uuid().equals(protection.getOwner()))
                     .sorted(Comparator.comparingLong(Protection::getCreated).reversed())
                     .toList();
-            runPage(sender, playerProfile, protectionsFromPlayer, page == null ? 0 : page);
+            runPage(sender, playerProfile, protectionsFromPlayer, 0);
         }));
     }
 
@@ -119,6 +119,8 @@ public class AdminFindCommand extends BoltCommand {
             }
             displayed.incrementAndGet();
         });
+
+        final IntFunction<ClickEvent> pageCallback = newPage -> plugin.getCallbackManager().register(newSender -> runPage(newSender, playerProfile, protectionsFromPlayer, newPage));
         final int numberDisplayed = displayed.get();
         if (numberDisplayed == 0) {
             BoltComponents.sendMessage(sender, Translation.FIND_NONE);
@@ -130,7 +132,7 @@ public class AdminFindCommand extends BoltCommand {
                     firstPage == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
                     sender,
                     Placeholder.component(Translation.Placeholder.PAGE, Component.text(firstPage + 1)
-                            .clickEvent(ClickEvent.runCommand("/bolt admin find %s %s".formatted(playerProfile.name(), firstPage))))
+                            .clickEvent(pageCallback.apply(firstPage)))
             ));
             for (int p = firstPage + 1; p <= lastPage; ++p) {
                 pages = pages.append(resolveTranslation(Translation.FIND_NEXT_NEW_PAGE_SEPARATOR, sender));
@@ -138,7 +140,7 @@ public class AdminFindCommand extends BoltCommand {
                         p == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
                         sender,
                         Placeholder.component(Translation.Placeholder.PAGE, Component.text(p + 1)
-                                .clickEvent(ClickEvent.runCommand("/bolt admin find %s %s".formatted(playerProfile.name(), p))))
+                                .clickEvent(pageCallback.apply(p)))
                 ));
             }
             BoltComponents.sendMessage(
@@ -149,13 +151,13 @@ public class AdminFindCommand extends BoltCommand {
                             totalPages == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
                             sender,
                             Placeholder.component(Translation.Placeholder.PAGE, Component.text(totalPages + 1)
-                                    .clickEvent(ClickEvent.runCommand("/bolt admin find %s %s".formatted(playerProfile.name(), totalPages))))))
+                                    .clickEvent(pageCallback.apply(totalPages)))))
             );
         } else if (numberDisplayed == RESULTS_PER_PAGE) {
             BoltComponents.sendClickableMessage(
                     sender,
                     Translation.FIND_NEXT,
-                    ClickEvent.runCommand("/bolt admin find %s %s".formatted(playerProfile.name(), page + 1))
+                    pageCallback.apply(page + 1)
             );
         }
     }
