@@ -38,6 +38,7 @@ public class Translation {
     public static final String ENTER_PASSWORD_NONE = "enter_password_none";
     public static final String EXPIRE_COMPLETE = "expire_complete";
     public static final String EXPIRE_INVALID_TIME = "expire_invalid_time";
+    public static final String FIND_DISTANCE = "find_distance";
     public static final String FIND_HEADER = "find_header";
     public static final String FIND_HEADER_NEW = "find_header_new";
     public static final String FIND_RESULT = "find_result";

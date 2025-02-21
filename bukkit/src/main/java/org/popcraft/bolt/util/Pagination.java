@@ -2,12 +2,14 @@
 package org.popcraft.bolt.util;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.data.Profile;
 import org.popcraft.bolt.lang.Translation;
@@ -16,6 +18,7 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -73,6 +76,19 @@ public class Pagination {
                 );
             } else {
                 final ClickEvent teleport = plugin.getCallbackManager().registerPlayerOnly(player -> PaperUtil.teleportAsync(player, location));
+                final List<Component> hoverInfo = new ArrayList<>();
+                if (sender instanceof final Player player) {
+                    final Location playerLocation = player.getLocation();
+                    if (Objects.equals(playerLocation.getWorld(), location.getWorld())) {
+                        final int distance = (int) playerLocation.distance(location);
+                        hoverInfo.add(resolveTranslation(
+                                Translation.FIND_DISTANCE,
+                                sender,
+                                Placeholder.component(Translation.Placeholder.NUMBER, Component.text(distance))));
+                    }
+                }
+                hoverInfo.add(resolveTranslation(Translation.FIND_TELEPORT, sender));
+
                 BoltComponents.sendMessage(
                         sender,
                         Translation.FIND_RESULT,
@@ -84,7 +100,7 @@ public class Pagination {
                         Placeholder.component(Translation.Placeholder.X, Component.text(location.getBlockX())),
                         Placeholder.component(Translation.Placeholder.Y, Component.text(location.getBlockY())),
                         Placeholder.component(Translation.Placeholder.Z, Component.text(location.getBlockZ())),
-                        Placeholder.styling(Translation.Placeholder.COMMAND, teleport, HoverEvent.showText(resolveTranslation(Translation.FIND_TELEPORT, sender)))
+                        Placeholder.styling(Translation.Placeholder.COMMAND, teleport, HoverEvent.showText(Component.join(JoinConfiguration.newlines(), hoverInfo)))
                 );
             }
             displayed.incrementAndGet();
