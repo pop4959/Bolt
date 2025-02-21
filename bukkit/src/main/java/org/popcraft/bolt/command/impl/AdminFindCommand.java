@@ -5,17 +5,18 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.data.Profile;
-import org.popcraft.bolt.data.Store;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.lang.Translator;
 import org.popcraft.bolt.protection.BlockProtection;
+import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.Profiles;
@@ -26,6 +27,7 @@ import org.popcraft.bolt.util.Time;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.popcraft.bolt.util.BoltComponents.getLocaleOf;
@@ -56,19 +58,18 @@ public class AdminFindCommand extends BoltCommand {
                 );
                 return;
             }
-            final Store store = plugin.getBolt().getStore();
-            final List<BlockProtection> blockProtectionsFromPlayer = store.loadBlockProtections().join().stream()
-                    .filter(blockProtection -> playerProfile.uuid().equals(blockProtection.getOwner()))
-                    .sorted(Comparator.comparingLong(BlockProtection::getCreated).reversed())
+            final List<Protection> protectionsFromPlayer = plugin.loadProtections().stream()
+                    .filter(protection -> playerProfile.uuid().equals(protection.getOwner()))
+                    .sorted(Comparator.comparingLong(Protection::getCreated).reversed())
                     .toList();
-            runPage(sender, playerProfile, blockProtectionsFromPlayer, page == null ? 0 : page);
+            runPage(sender, playerProfile, protectionsFromPlayer, page == null ? 0 : page);
         }));
     }
 
-    private void runPage(final CommandSender sender, final Profile playerProfile, final List<BlockProtection> blockProtectionsFromPlayer, final int page) {
+    private void runPage(final CommandSender sender, final Profile playerProfile, final List<Protection> protectionsFromPlayer, final int page) {
         final int skip = RESULTS_PER_PAGE * page;
         final boolean newFindFormat = Translator.isTranslated(Translation.FIND_HEADER_NEW, getLocaleOf(sender));
-        final int total = blockProtectionsFromPlayer.size();
+        final int total = protectionsFromPlayer.size();
         final int totalPages = Math.max(0, (int) Math.ceil((double) total / RESULTS_PER_PAGE) - 1);
         if (newFindFormat) {
             BoltComponents.sendMessage(
@@ -82,24 +83,40 @@ public class AdminFindCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, Translation.FIND_HEADER);
         }
         final AtomicInteger displayed = new AtomicInteger();
-        blockProtectionsFromPlayer.stream().skip(skip).limit(RESULTS_PER_PAGE).forEach(blockProtection -> {
-            final World world = plugin.getServer().getWorld(blockProtection.getWorld());
-            final ClickEvent teleport = plugin.getCallbackManager().registerPlayerOnly(player -> {
-                PaperUtil.teleportAsync(player, new Location(world, blockProtection.getX() + 0.5, blockProtection.getY(), blockProtection.getZ() + 0.5));
-            });
-            BoltComponents.sendMessage(
+        protectionsFromPlayer.stream().skip(skip).limit(RESULTS_PER_PAGE).forEach(protection -> {
+            final Location location = switch (protection) {
+                case BlockProtection block -> new Location(plugin.getServer().getWorld(block.getWorld()), block.getX() + 0.5, block.getY(), block.getZ() + 0.5);
+                case EntityProtection entityProtection -> {
+                    final Entity entity = plugin.getServer().getEntity(entityProtection.getId());
+                    yield entity == null ? null : entity.getLocation();
+                }
+            };
+
+            if (location == null) {
+                BoltComponents.sendMessage(
+                    sender,
+                    Translation.FIND_RESULT_UNKNOWN,
+                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, sender)),
+                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, sender)),
+                    Placeholder.component(Translation.Placeholder.PLAYER, Component.text(playerProfile.name())),
+                    Placeholder.component(Translation.Placeholder.TIME, Time.relativeTimestamp(protection.getCreated(), sender, 1))
+                );
+            } else {
+                final ClickEvent teleport = plugin.getCallbackManager().registerPlayerOnly(player -> PaperUtil.teleportAsync(player, location));
+                BoltComponents.sendMessage(
                     sender,
                     Translation.FIND_RESULT,
-                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(blockProtection, sender)),
-                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(blockProtection, sender)),
+                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, sender)),
+                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, sender)),
                     Placeholder.component(Translation.Placeholder.PLAYER, Component.text(playerProfile.name())),
-                    Placeholder.component(Translation.Placeholder.TIME, Time.relativeTimestamp(blockProtection.getCreated(), sender, 1)),
-                    Placeholder.component(Translation.Placeholder.WORLD, Component.text(blockProtection.getWorld())),
-                    Placeholder.component(Translation.Placeholder.X, Component.text(blockProtection.getX())),
-                    Placeholder.component(Translation.Placeholder.Y, Component.text(blockProtection.getY())),
-                    Placeholder.component(Translation.Placeholder.Z, Component.text(blockProtection.getZ())),
+                    Placeholder.component(Translation.Placeholder.TIME, Time.relativeTimestamp(protection.getCreated(), sender, 1)),
+                    Placeholder.component(Translation.Placeholder.WORLD, Component.text(Objects.requireNonNull(location.getWorld()).getName())),
+                    Placeholder.component(Translation.Placeholder.X, Component.text(location.getBlockX())),
+                    Placeholder.component(Translation.Placeholder.Y, Component.text(location.getBlockY())),
+                    Placeholder.component(Translation.Placeholder.Z, Component.text(location.getBlockZ())),
                     Placeholder.styling(Translation.Placeholder.COMMAND, teleport, HoverEvent.showText(resolveTranslation(Translation.FIND_TELEPORT, sender)))
-            );
+                );
+            }
             displayed.incrementAndGet();
         });
         final int numberDisplayed = displayed.get();
