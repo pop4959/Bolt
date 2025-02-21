@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntFunction;
 
@@ -62,14 +63,14 @@ public class AdminFindCommand extends BoltCommand {
                     .filter(protection -> playerProfile.uuid().equals(protection.getOwner()))
                     .sorted(Comparator.comparingLong(Protection::getCreated).reversed())
                     .toList();
-            runPage(sender, playerProfile, protectionsFromPlayer, 0);
+            runPage(sender, protectionsFromPlayer, 0);
         }));
     }
 
-    private void runPage(final CommandSender sender, final Profile playerProfile, final List<Protection> protectionsFromPlayer, final int page) {
+    private void runPage(final CommandSender sender, final List<Protection> protections, final int page) {
         final int skip = RESULTS_PER_PAGE * page;
         final boolean newFindFormat = Translator.isTranslated(Translation.FIND_HEADER_NEW, getLocaleOf(sender));
-        final int total = protectionsFromPlayer.size();
+        final int total = protections.size();
         final int totalPages = Math.max(0, (int) Math.ceil((double) total / RESULTS_PER_PAGE) - 1);
         if (newFindFormat) {
             BoltComponents.sendMessage(
@@ -83,7 +84,7 @@ public class AdminFindCommand extends BoltCommand {
             BoltComponents.sendMessage(sender, Translation.FIND_HEADER);
         }
         final AtomicInteger displayed = new AtomicInteger();
-        protectionsFromPlayer.stream().skip(skip).limit(RESULTS_PER_PAGE).forEach(protection -> {
+        protections.stream().skip(skip).limit(RESULTS_PER_PAGE).forEach(protection -> {
             final Location location = switch (protection) {
                 case BlockProtection block -> new Location(plugin.getServer().getWorld(block.getWorld()), block.getX() + 0.5, block.getY(), block.getZ() + 0.5);
                 case EntityProtection entityProtection -> {
@@ -92,13 +93,17 @@ public class AdminFindCommand extends BoltCommand {
                 }
             };
 
+            // TODO: could use findOrLookupProfileByUniqueId but then we have to deal with futures in loops
+            final Profile profile = Profiles.findProfileByUniqueId(protection.getOwner());
+            final Component name = Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, sender));
+
             if (location == null) {
                 BoltComponents.sendMessage(
                     sender,
                     Translation.FIND_RESULT_UNKNOWN,
                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, sender)),
                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, sender)),
-                    Placeholder.component(Translation.Placeholder.PLAYER, Component.text(playerProfile.name())),
+                    Placeholder.component(Translation.Placeholder.PLAYER, name),
                     Placeholder.component(Translation.Placeholder.TIME, Time.relativeTimestamp(protection.getCreated(), sender, 1))
                 );
             } else {
@@ -108,7 +113,7 @@ public class AdminFindCommand extends BoltCommand {
                     Translation.FIND_RESULT,
                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, sender)),
                     Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, sender)),
-                    Placeholder.component(Translation.Placeholder.PLAYER, Component.text(playerProfile.name())),
+                    Placeholder.component(Translation.Placeholder.PLAYER, name),
                     Placeholder.component(Translation.Placeholder.TIME, Time.relativeTimestamp(protection.getCreated(), sender, 1)),
                     Placeholder.component(Translation.Placeholder.WORLD, Component.text(Objects.requireNonNull(location.getWorld()).getName())),
                     Placeholder.component(Translation.Placeholder.X, Component.text(location.getBlockX())),
@@ -120,7 +125,7 @@ public class AdminFindCommand extends BoltCommand {
             displayed.incrementAndGet();
         });
 
-        final IntFunction<ClickEvent> pageCallback = newPage -> plugin.getCallbackManager().register(newSender -> runPage(newSender, playerProfile, protectionsFromPlayer, newPage));
+        final IntFunction<ClickEvent> pageCallback = newPage -> plugin.getCallbackManager().register(newSender -> runPage(newSender, protections, newPage));
         final int numberDisplayed = displayed.get();
         if (numberDisplayed == 0) {
             BoltComponents.sendMessage(sender, Translation.FIND_NONE);
