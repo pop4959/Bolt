@@ -32,6 +32,7 @@ public class AdminCommand extends BoltCommand {
                 Map.entry("expire", new AdminExpireCommand(plugin)),
                 Map.entry("find", new AdminFindCommand(plugin)),
                 Map.entry("flush", new AdminFlushCommand(plugin)),
+                Map.entry("nearby", new AdminNearbyCommand(plugin)),
                 Map.entry("purge", new AdminPurgeCommand(plugin)),
                 Map.entry("reload", new AdminReloadCommand(plugin)),
                 Map.entry("report", new AdminReportCommand(plugin)),

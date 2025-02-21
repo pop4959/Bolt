@@ -38,6 +38,7 @@ public class Translation {
     public static final String ENTER_PASSWORD_NONE = "enter_password_none";
     public static final String EXPIRE_COMPLETE = "expire_complete";
     public static final String EXPIRE_INVALID_TIME = "expire_invalid_time";
+    public static final String FIND_DISTANCE = "find_distance";
     public static final String FIND_HEADER = "find_header";
     public static final String FIND_HEADER_NEW = "find_header_new";
     public static final String FIND_RESULT = "find_result";
@@ -101,6 +102,7 @@ public class Translation {
     public static final String HELP_COMMAND_SHORT_ADMIN_EXPIRE = "help_command_short_admin_expire";
     public static final String HELP_COMMAND_SHORT_ADMIN_FIND = "help_command_short_admin_find";
     public static final String HELP_COMMAND_SHORT_ADMIN_FLUSH = "help_command_short_admin_flush";
+    public static final String HELP_COMMAND_SHORT_ADMIN_NEARBY = "help_command_short_admin_nearby";
     public static final String HELP_COMMAND_SHORT_ADMIN_PURGE = "help_command_short_admin_purge";
     public static final String HELP_COMMAND_SHORT_ADMIN_RELOAD = "help_command_short_admin_reload";
     public static final String HELP_COMMAND_SHORT_ADMIN_REPORT = "help_command_short_admin_report";
@@ -124,6 +126,7 @@ public class Translation {
     public static final String HELP_COMMAND_LONG_ADMIN_EXPIRE = "help_command_long_admin_expire";
     public static final String HELP_COMMAND_LONG_ADMIN_FIND = "help_command_long_admin_find";
     public static final String HELP_COMMAND_LONG_ADMIN_FLUSH = "help_command_long_admin_flush";
+    public static final String HELP_COMMAND_LONG_ADMIN_NEARBY = "help_command_long_admin_nearby";
     public static final String HELP_COMMAND_LONG_ADMIN_PURGE = "help_command_long_admin_purge";
     public static final String HELP_COMMAND_LONG_ADMIN_RELOAD = "help_command_long_admin_reload";
     public static final String HELP_COMMAND_LONG_ADMIN_REPORT = "help_command_long_admin_report";
