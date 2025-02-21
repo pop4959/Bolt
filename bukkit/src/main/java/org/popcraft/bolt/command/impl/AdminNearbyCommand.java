@@ -57,7 +57,6 @@ public class AdminNearbyCommand extends BoltCommand {
             return;
         }
         final Location playerLocation = player.getLocation();
-        // TODO: could be more efficient with distance calculations
         final List<Protection> closestProtections = plugin.loadProtections().stream()
                 .filter(protection -> {
                     final double d = distance(playerLocation, protection);

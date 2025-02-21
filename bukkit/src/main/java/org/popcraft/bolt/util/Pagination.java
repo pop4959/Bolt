@@ -61,7 +61,6 @@ public class Pagination {
                 }
             };
 
-            // TODO: could use findOrLookupProfileByUniqueId but then we have to deal with futures in loops
             final Profile profile = Profiles.findProfileByUniqueId(protection.getOwner());
             final Component name = Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, sender));
 
