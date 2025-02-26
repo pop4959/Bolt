@@ -1,6 +1,5 @@
 package org.popcraft.bolt.matcher.block;
 
-import com.google.common.collect.Sets;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -9,11 +8,12 @@ import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.util.EnumUtil;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class MossCarpetMatcher implements BlockMatcher {
-    // Future: make immutable (Set.of)
-    private static final Set<Material> MOSS_CARPETS = Sets.newHashSet(Material.MOSS_CARPET);
+    // Future: make immutable
+    private static final Set<Material> MOSS_CARPETS = new HashSet<>(Set.of(Material.MOSS_CARPET));
     private static final Material PALE_MOSS_CARPET = EnumUtil.valueOf(Material.class, "PALE_MOSS_CARPET").orElse(null);
     private boolean enabled;
 

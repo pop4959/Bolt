@@ -1,6 +1,5 @@
 package org.popcraft.bolt.matcher.block;
 
-import com.google.common.collect.Sets;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -15,8 +14,8 @@ import java.util.Set;
 
 public class MultipleFacingMatcher implements BlockMatcher {
     private static final EnumSet<BlockFace> CARTESIAN_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN);
-    // Future: make immutable (Set.of)
-    private static final Set<Material> MULTIPLE_FACING = Sets.newHashSet(Material.SCULK_VEIN, Material.GLOW_LICHEN);
+    // Future: make immutable
+    private static final Set<Material> MULTIPLE_FACING = new HashSet<>(Set.of(Material.SCULK_VEIN, Material.GLOW_LICHEN));
     private static final Material RESIN_CLUMP = EnumUtil.valueOf(Material.class, "RESIN_CLUMP").orElse(null);
     private boolean enabled;
 
