@@ -81,7 +81,6 @@ import org.popcraft.bolt.matcher.block.DoorMatcher;
 import org.popcraft.bolt.matcher.block.FarmlandMatcher;
 import org.popcraft.bolt.matcher.block.FireMatcher;
 import org.popcraft.bolt.matcher.block.FrogspawnMatcher;
-import org.popcraft.bolt.matcher.block.GlowLichenMatcher;
 import org.popcraft.bolt.matcher.block.GrassMatcher;
 import org.popcraft.bolt.matcher.block.HangingRootsMatcher;
 import org.popcraft.bolt.matcher.block.HangingSignMatcher;
@@ -93,6 +92,7 @@ import org.popcraft.bolt.matcher.block.LeashKnotMatcher;
 import org.popcraft.bolt.matcher.block.LilyPadMatcher;
 import org.popcraft.bolt.matcher.block.MangrovePropaguleMatcher;
 import org.popcraft.bolt.matcher.block.MossCarpetMatcher;
+import org.popcraft.bolt.matcher.block.MultipleFacingMatcher;
 import org.popcraft.bolt.matcher.block.MushroomMatcher;
 import org.popcraft.bolt.matcher.block.NetherWartMatcher;
 import org.popcraft.bolt.matcher.block.PaintingMatcher;
@@ -107,7 +107,6 @@ import org.popcraft.bolt.matcher.block.SaplingMatcher;
 import org.popcraft.bolt.matcher.block.ScaffoldingMatcher;
 import org.popcraft.bolt.matcher.block.SeaPickleMatcher;
 import org.popcraft.bolt.matcher.block.SignMatcher;
-import org.popcraft.bolt.matcher.block.SkulkVeinMatcher;
 import org.popcraft.bolt.matcher.block.SmallDripleafMatcher;
 import org.popcraft.bolt.matcher.block.SmallFlowerMatcher;
 import org.popcraft.bolt.matcher.block.SnowMatcher;
@@ -172,8 +171,8 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             new ScaffoldingMatcher(), new MossCarpetMatcher(), new MushroomMatcher(), new NetherWartMatcher(),
             new SweetBerryBushMatcher(), new ChorusMatcher(), new GrassMatcher(), new TallGrassMatcher(),
             new DeadBushMatcher(), new HangingRootsMatcher(), new PointedDripstoneMatcher(), new FireMatcher(),
-            new GlowLichenMatcher(), new LilyPadMatcher(), new RepeaterMatcher(), new SporeBlossomMatcher(),
-            new SoulFireMatcher(), new FrogspawnMatcher(), new MangrovePropaguleMatcher(), new SkulkVeinMatcher(),
+            new LilyPadMatcher(), new RepeaterMatcher(), new SporeBlossomMatcher(),
+            new SoulFireMatcher(), new FrogspawnMatcher(), new MangrovePropaguleMatcher(), new MultipleFacingMatcher(),
             new HangingSignMatcher(), new PinkPetalsMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private static final Source ADMIN_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.admin");
