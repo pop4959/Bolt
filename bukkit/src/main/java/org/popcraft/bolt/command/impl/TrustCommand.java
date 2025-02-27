@@ -10,11 +10,8 @@ import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.lang.Translation;
-import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceType;
-import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BoltComponents;
-import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 
@@ -24,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class TrustCommand extends BoltCommand {
     public TrustCommand(BoltPlugin plugin) {
@@ -62,26 +58,7 @@ public class TrustCommand extends BoltCommand {
             return;
         }
         final AccessList accessList = Objects.requireNonNullElse(plugin.getBolt().getStore().loadAccessList(uuid).join(), new AccessList(uuid, new HashMap<>()));
-        final CompletableFuture<Source> editFuture;
-        if (SourceTypes.PLAYER.equals(sourceType.name())) {
-            editFuture = Profiles.findOrLookupProfileByName(sourceIdentifier).thenApply(profile -> {
-                if (profile.uuid() != null) {
-                    return Source.player(profile.uuid());
-                } else {
-                    SchedulerUtil.schedule(plugin, sender, () -> BoltComponents.sendMessage(
-                        sender,
-                        Translation.PLAYER_NOT_FOUND,
-                        Placeholder.component(Translation.Placeholder.PLAYER, Component.text(sourceIdentifier))
-                    ));
-                    return null;
-                }
-            });
-        } else if (SourceTypes.PASSWORD.equals(sourceType.name())) {
-            editFuture = CompletableFuture.completedFuture(Source.password(sourceIdentifier));
-        } else {
-            editFuture = CompletableFuture.completedFuture(Source.of(sourceType.name(), sourceIdentifier));
-        }
-        editFuture.thenAccept(source -> SchedulerUtil.schedule(plugin, sender, () -> {
+        plugin.transformSource(sourceType.name(), sourceIdentifier, sender).thenAccept(source -> SchedulerUtil.schedule(plugin, sender, () -> {
             if (source != null) {
                 if (adding) {
                     accessList.getAccess().put(source.toString(), access.type());
@@ -142,13 +119,7 @@ public class TrustCommand extends BoltCommand {
         }
         arguments.next();
         if (arguments.remaining() == 0) {
-            if (SourceTypes.PLAYER.equals(sourceType)) {
-                return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
-            } else if (SourceTypes.GROUP.equals(sourceType) && sender instanceof final Player player) {
-                return plugin.getPlayersOwnedGroups(player);
-            } else {
-                return Collections.emptyList();
-            }
+            return plugin.completeSource(sourceType, sender);
         }
         arguments.next();
         if (arguments.remaining() == 0) {
