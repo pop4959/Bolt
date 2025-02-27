@@ -125,8 +125,12 @@ import org.popcraft.bolt.matcher.entity.EntityMatcher;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.source.GroupSourceTransformer;
+import org.popcraft.bolt.source.PasswordSourceTransformer;
+import org.popcraft.bolt.source.PlayerSourceTransformer;
 import org.popcraft.bolt.source.PlayerSourceResolver;
 import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceTransformer;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypeRegistry;
 import org.popcraft.bolt.source.SourceTypes;
@@ -151,6 +155,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -188,6 +193,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private final Set<Mode> defaultModes = new HashSet<>();
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
+    private Map<String, SourceTransformer> sourceTransformers = new HashMap<>();
     private boolean useActionBar;
     private boolean doors;
     private boolean doorsOpenIron;
@@ -254,6 +260,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         registerAccessSources();
         initializeMatchers();
         loadDefaultModes();
+        registerDefaultSourceTransformers();
     }
 
     private void registerCustomCharts(final Metrics metrics, final SQLStore.Configuration databaseConfiguration) {
@@ -896,5 +903,29 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             }
         }
         return null;
+    }
+
+    private void registerDefaultSourceTransformers() {
+        this.sourceTransformers.put(SourceTypes.PLAYER, new PlayerSourceTransformer(this));
+        this.sourceTransformers.put(SourceTypes.PASSWORD, new PasswordSourceTransformer());
+        this.sourceTransformers.put(SourceTypes.GROUP, new GroupSourceTransformer(this));
+    }
+
+    public CompletableFuture<Source> transformSource(String type, String identifier, CommandSender sender) {
+        final SourceTransformer transformer = this.sourceTransformers.get(type);
+        if (transformer != null) {
+            return transformer.transformIdentifier(identifier, sender).thenApply(id -> Source.of(type, id));
+        } else {
+            return CompletableFuture.completedFuture(Source.of(type, identifier));
+        }
+    }
+
+    public List<String> completeSource(String type, CommandSender sender) {
+        final SourceTransformer transformer = this.sourceTransformers.get(type);
+        if (transformer != null) {
+            return transformer.completions(sender);
+        } else {
+            return List.of();
+        }
     }
 }
