@@ -61,9 +61,9 @@ public class TrustCommand extends BoltCommand {
         final AccessList accessList = Objects.requireNonNullElse(plugin.getBolt().getStore().loadAccessList(uuid).join(), new AccessList(uuid, new HashMap<>()));
         plugin.getSourceTransformer(sourceType.name())
                 .transformIdentifier(sourceIdentifier, sender)
-                .thenApply(id -> Source.of(sourceType.name(), id))
-                .thenAccept(source -> SchedulerUtil.schedule(plugin, sender, () -> {
-                    if (source != null) {
+                .thenAccept(id -> SchedulerUtil.schedule(plugin, sender, () -> {
+                    if (id != null) {
+                        final Source source = Source.of(sourceType.name(), id);
                         if (adding) {
                             accessList.getAccess().put(source.toString(), access.type());
                         } else {

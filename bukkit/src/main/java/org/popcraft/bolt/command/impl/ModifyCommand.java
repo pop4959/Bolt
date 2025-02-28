@@ -84,10 +84,9 @@ public class ModifyCommand extends BoltCommand {
         for (final String identifier : identifiers) {
             plugin.getSourceTransformer(sourceType.name())
                     .transformIdentifier(identifier, player)
-                    .thenApply(id -> Source.of(sourceType.name(), id))
-                    .thenAccept(source -> SchedulerUtil.schedule(plugin, player, () -> {
-                        if (source != null) {
-                            boltPlayer.getModifications().put(source, access.type());
+                    .thenAccept(id -> SchedulerUtil.schedule(plugin, player, () -> {
+                        if (id != null) {
+                            boltPlayer.getModifications().put(Source.of(sourceType.name(), id), access.type());
                         }
                     }));
         }
