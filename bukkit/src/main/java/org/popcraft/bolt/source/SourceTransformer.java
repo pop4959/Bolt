@@ -17,4 +17,7 @@ public interface SourceTransformer {
     default String unTransformIdentifier(String identifier, CommandSender sender) {
         return identifier;
     }
+
+    SourceTransformer DEFAULT = new SourceTransformer() {
+    };
 }

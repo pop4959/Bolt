@@ -73,7 +73,7 @@ public class AdminTrustCommand extends TrustCommand {
         }
         arguments.next();
         if (arguments.remaining() == 0) {
-            return plugin.completeSource(sourceType, sender);
+            return plugin.getSourceTransformer(sourceType).completions(sender);
         }
         arguments.next();
         if (arguments.remaining() == 0) {

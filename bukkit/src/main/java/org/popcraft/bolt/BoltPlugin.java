@@ -911,30 +911,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         this.sourceTransformers.put(SourceTypes.GROUP, new GroupSourceTransformer(this));
     }
 
-    public CompletableFuture<Source> transformSource(String type, String identifier, CommandSender sender) {
-        final SourceTransformer transformer = this.sourceTransformers.get(type);
-        if (transformer != null) {
-            return transformer.transformIdentifier(identifier, sender).thenApply(id -> Source.of(type, id));
-        } else {
-            return CompletableFuture.completedFuture(Source.of(type, identifier));
-        }
-    }
-
-    public List<String> completeSource(String type, CommandSender sender) {
-        final SourceTransformer transformer = this.sourceTransformers.get(type);
-        if (transformer != null) {
-            return transformer.completions(sender);
-        } else {
-            return List.of();
-        }
-    }
-
-    public String unTransformSource(Source source, CommandSender sender) {
-        final SourceTransformer transformer = this.sourceTransformers.get(source.getType());
-        if (transformer != null) {
-            return transformer.unTransformIdentifier(source.getIdentifier(), sender);
-        } else {
-            return source.getIdentifier();
-        }
+    public SourceTransformer getSourceTransformer(String type) {
+        return this.sourceTransformers.getOrDefault(type, SourceTransformer.DEFAULT);
     }
 }

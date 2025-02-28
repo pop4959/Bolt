@@ -9,6 +9,7 @@ import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceType;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
@@ -81,11 +82,14 @@ public class ModifyCommand extends BoltCommand {
         }
         boltPlayer.setAction(new Action(Action.Type.EDIT, "bolt.command.edit", Boolean.toString(adding)));
         for (final String identifier : identifiers) {
-            plugin.transformSource(sourceType.name(), identifier, player).thenAccept(source -> SchedulerUtil.schedule(plugin, player, () -> {
-                if (source != null) {
-                    boltPlayer.getModifications().put(source, access.type());
-                }
-            }));
+            plugin.getSourceTransformer(sourceType.name())
+                    .transformIdentifier(identifier, player)
+                    .thenApply(id -> Source.of(sourceType.name(), id))
+                    .thenAccept(source -> SchedulerUtil.schedule(plugin, player, () -> {
+                        if (source != null) {
+                            boltPlayer.getModifications().put(source, access.type());
+                        }
+                    }));
         }
         BoltComponents.sendMessage(
                 player,
@@ -123,7 +127,7 @@ public class ModifyCommand extends BoltCommand {
         while ((added = arguments.next()) != null) {
             alreadyAdded.add(added);
         }
-        return plugin.completeSource(sourceType, sender).stream().filter(name -> !alreadyAdded.contains(name)).toList();
+        return plugin.getSourceTransformer(sourceType).completions(sender).stream().filter(name -> !alreadyAdded.contains(name)).toList();
     }
 
     @Override

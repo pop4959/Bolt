@@ -139,7 +139,7 @@ public final class Protections {
             if (source.getType().equals(source.getIdentifier())) {
                 subject = Strings.toTitleCase(source.getType());
             } else {
-                subject = plugin.unTransformSource(source, sender);
+                subject = plugin.getSourceTransformer(source.getType()).unTransformIdentifier(source.getIdentifier(), sender);
             }
             if (plugin.getDefaultAccessType().equals(access)) {
                 list.add(resolveTranslation(

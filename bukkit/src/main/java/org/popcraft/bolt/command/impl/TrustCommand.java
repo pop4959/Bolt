@@ -10,6 +10,7 @@ import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceType;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.Protections;
@@ -58,17 +59,20 @@ public class TrustCommand extends BoltCommand {
             return;
         }
         final AccessList accessList = Objects.requireNonNullElse(plugin.getBolt().getStore().loadAccessList(uuid).join(), new AccessList(uuid, new HashMap<>()));
-        plugin.transformSource(sourceType.name(), sourceIdentifier, sender).thenAccept(source -> SchedulerUtil.schedule(plugin, sender, () -> {
-            if (source != null) {
-                if (adding) {
-                    accessList.getAccess().put(source.toString(), access.type());
-                } else {
-                    accessList.getAccess().remove(source.toString());
-                }
-                plugin.getBolt().getStore().saveAccessList(accessList);
-                BoltComponents.sendMessage(sender, Translation.TRUST_EDITED);
-            }
-        }));
+        plugin.getSourceTransformer(sourceType.name())
+                .transformIdentifier(sourceIdentifier, sender)
+                .thenApply(id -> Source.of(sourceType.name(), id))
+                .thenAccept(source -> SchedulerUtil.schedule(plugin, sender, () -> {
+                    if (source != null) {
+                        if (adding) {
+                            accessList.getAccess().put(source.toString(), access.type());
+                        } else {
+                            accessList.getAccess().remove(source.toString());
+                        }
+                        plugin.getBolt().getStore().saveAccessList(accessList);
+                        BoltComponents.sendMessage(sender, Translation.TRUST_EDITED);
+                    }
+                }));
     }
 
     public void trustList(final CommandSender sender, final UUID uuid) {
@@ -119,7 +123,7 @@ public class TrustCommand extends BoltCommand {
         }
         arguments.next();
         if (arguments.remaining() == 0) {
-            return plugin.completeSource(sourceType, sender);
+            return plugin.getSourceTransformer(sourceType).completions(sender);
         }
         arguments.next();
         if (arguments.remaining() == 0) {
