@@ -928,4 +928,13 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             return List.of();
         }
     }
+
+    public String unTransformSource(Source source, CommandSender sender) {
+        final SourceTransformer transformer = this.sourceTransformers.get(source.getType());
+        if (transformer != null) {
+            return transformer.unTransformIdentifier(source.getIdentifier(), sender);
+        } else {
+            return source.getIdentifier();
+        }
+    }
 }

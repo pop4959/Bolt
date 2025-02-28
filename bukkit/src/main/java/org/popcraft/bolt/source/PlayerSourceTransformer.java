@@ -12,6 +12,8 @@ import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class PlayerSourceTransformer implements SourceTransformer {
@@ -44,5 +46,12 @@ public class PlayerSourceTransformer implements SourceTransformer {
             list.add(player.getName());
         }
         return list;
+    }
+
+    @Override
+    public String unTransformIdentifier(String identifier, CommandSender sender) {
+        final UUID uuid = UUID.fromString(identifier);
+        final String playerName = Profiles.findProfileByUniqueId(uuid).name();
+        return Optional.ofNullable(playerName).orElse(identifier);
     }
 }

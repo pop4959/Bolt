@@ -134,18 +134,13 @@ public final class Protections {
             final String entry = accessEntry.getKey();
             final String access = accessEntry.getValue();
             final Source source = Source.parse(entry);
+            final BoltPlugin plugin = JavaPlugin.getPlugin(BoltPlugin.class);
             final String subject;
-            if (SourceTypes.PLAYER.equals(source.getType())) {
-                final String playerUuid = source.getIdentifier();
-                final UUID uuid = UUID.fromString(playerUuid);
-                final String playerName = Profiles.findProfileByUniqueId(uuid).name();
-                subject = Optional.ofNullable(playerName).orElse(playerUuid);
-            } else if (SourceTypes.PASSWORD.equals(source.getType()) || source.getType().equals(source.getIdentifier())) {
+            if (source.getType().equals(source.getIdentifier())) {
                 subject = Strings.toTitleCase(source.getType());
             } else {
-                subject = source.getIdentifier();
+                subject = plugin.unTransformSource(source, sender);
             }
-            final BoltPlugin plugin = JavaPlugin.getPlugin(BoltPlugin.class);
             if (plugin.getDefaultAccessType().equals(access)) {
                 list.add(resolveTranslation(
                         Translation.ACCESS_LIST_ENTRY_DEFAULT,

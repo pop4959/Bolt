@@ -9,6 +9,8 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.SchedulerUtil;
 
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class PasswordSourceTransformer implements SourceTransformer {
@@ -16,5 +18,10 @@ public class PasswordSourceTransformer implements SourceTransformer {
     public CompletableFuture<String> transformIdentifier(String identifier, CommandSender sender) {
         final Source password = Source.password(identifier);
         return CompletableFuture.completedFuture(password != null ? password.getIdentifier() : null);
+    }
+
+    @Override
+    public String unTransformIdentifier(String identifier, CommandSender sender) {
+        return "Password";
     }
 }

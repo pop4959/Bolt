@@ -13,4 +13,8 @@ public interface SourceTransformer {
     default List<String> completions(CommandSender sender) {
         return List.of();
     }
+
+    default String unTransformIdentifier(String identifier, CommandSender sender) {
+        return identifier;
+    }
 }
