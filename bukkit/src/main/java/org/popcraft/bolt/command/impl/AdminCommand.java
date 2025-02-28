@@ -12,7 +12,6 @@ import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.BoltComponents;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -70,9 +69,14 @@ public class AdminCommand extends BoltCommand {
     public List<String> suggestions(CommandSender sender, Arguments arguments) {
         final String subcommand = arguments.next();
         if (!SUB_COMMANDS.containsKey(subcommand)) {
-            return new ArrayList<>(SUB_COMMANDS.keySet());
+            return SUB_COMMANDS.entrySet().stream()
+                    .filter(i -> sender.hasPermission(COMMAND_PERMISSION_KEY + i.getKey()) && !i.getValue().hidden())
+                    .map(Map.Entry::getKey)
+                    .toList();
+        } else if (SUB_COMMANDS.containsKey(subcommand) && sender.hasPermission(COMMAND_PERMISSION_KEY + subcommand)) {
+            return SUB_COMMANDS.get(subcommand).suggestions(sender, arguments);
         }
-        return SUB_COMMANDS.get(subcommand).suggestions(sender, arguments);
+        return List.of();
     }
 
     @Override
