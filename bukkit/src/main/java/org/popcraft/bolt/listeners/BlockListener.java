@@ -8,9 +8,11 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ChiseledBookshelf;
+import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Leaves;
+import org.bukkit.block.data.type.Piston;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -64,7 +66,6 @@ import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -343,11 +344,23 @@ public final class BlockListener extends InteractionListener implements Listener
 
     @EventHandler
     public void onBlockPistonExtend(final BlockPistonExtendEvent e) {
+        final Protection pistonProtection = plugin.loadProtection(e.getBlock());
         final List<Block> blocks = e.getBlocks();
         for (final Block block : blocks) {
-            if (plugin.isProtected(block)) {
-                e.setCancelled(true);
-                return;
+            final Protection blockProtection = plugin.findProtection(block);
+            if (blockProtection != null) {
+                // Check for pistons breaking breakable things. Guarded by a paper check because BlockBreakBlockEvent is
+                // paper only, and we need to clean up the protection.
+                final boolean canBreak = pistonProtection != null && PaperUtil.isPaper()
+                        && block.getPistonMoveReaction() == PistonMoveReaction.BREAK
+                        && plugin.canAccess(blockProtection, pistonProtection.getOwner(), Permission.DESTROY);
+
+                // Either something that won't be broken, or something the piston isn't allowed to break. Either way,
+                // don't allow the piston to move.
+                if (!canBreak) {
+                    e.setCancelled(true);
+                    return;
+                }
             }
         }
     }
@@ -514,6 +527,16 @@ public final class BlockListener extends InteractionListener implements Listener
             return;
         }
         cancellable.setCancelled(true);
+    }
+
+    // Called when a piston breaks a block. We can only reach here if BlockPistonExtendEvent allowed the
+    // interaction to happen, so all we need to do here is clean up. Executed at MONITOR priority.
+    public void onBlockBreakBlockEvent(final BlockEvent e, final Block source) {
+        final Block target = e.getBlock();
+        final Protection targetProtection = plugin.findProtection(target);
+        if (source.getBlockData() instanceof Piston && targetProtection != null) {
+            plugin.removeProtection(targetProtection);
+        }
     }
 
     @EventHandler
