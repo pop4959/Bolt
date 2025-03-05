@@ -905,6 +905,11 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return null;
     }
 
+    @Override
+    public void registerSourceTransformer(String sourceType, SourceTransformer sourceTransformer) {
+        this.sourceTransformers.put(sourceType, sourceTransformer);
+    }
+
     private void registerDefaultSourceTransformers() {
         this.sourceTransformers.put(SourceTypes.PLAYER, new PlayerSourceTransformer(this));
         this.sourceTransformers.put(SourceTypes.PASSWORD, new PasswordSourceTransformer());
