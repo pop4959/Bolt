@@ -28,10 +28,10 @@ public final class Metrics {
             final StackTraceElement stackTraceElement = stackTrace[i];
             if (stackTraceElement.getClassName().startsWith(DATA_PACKAGE)) {
                 final String type = stackTraceElement.getMethodName();
-                for (int j = i + 1; j < stackTrace.length - 1; ++j) {
-                    final StackTraceElement nextStackTraceElement = stackTrace[j + 1];
-                    if (!nextStackTraceElement.getClassName().startsWith(REVERSE_DOMAIN)) {
-                        final String consumer = stackTrace[j].getMethodName();
+                for (int j = stackTrace.length - 1; j > i; --j) {
+                    final StackTraceElement revStackTraceElement = stackTrace[j];
+                    if (revStackTraceElement.getClassName().startsWith(REVERSE_DOMAIN)) {
+                        final String consumer = revStackTraceElement.getMethodName();
                         final ProtectionAccess protectionAccess = new ProtectionAccess(type, consumer);
                         protectionAccessCounts.put(protectionAccess, protectionAccessCounts.getOrDefault(protectionAccess, 0L) + 1);
                         return;
