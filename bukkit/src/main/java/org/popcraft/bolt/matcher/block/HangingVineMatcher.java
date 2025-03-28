@@ -21,11 +21,7 @@ public class HangingVineMatcher implements BlockMatcher {
             return true;
         }
         // Future: Replace with Material.PALE_HANGING_MOSS and put into the set with weeping vines
-        if (PALE_HANGING_MOSS == null) {
-            return false;
-        } else {
-            return PALE_HANGING_MOSS.equals(material);
-        }
+        return material.equals(PALE_HANGING_MOSS);
     }
 
     @Override
