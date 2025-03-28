@@ -195,8 +195,23 @@ public final class BlockListener extends InteractionListener implements Listener
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler
     public void onBlockPlace(final BlockPlaceEvent e) {
+        final BlockState replaced = e.getBlockReplacedState();
+        if (replaced.getType().isAir()) {
+            return;
+        }
+        final Block block = replaced.getBlock();
+        final Protection protection = plugin.findProtection(block);
+        if (protection != null) {
+            // Prevent accidental deletion of protected blocks by them getting replaced.
+            // Purposefully not checking for destroy permissions, that logic is for BlockBreakEvent.
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onBlockPlaceMonitor(final BlockPlaceEvent e) {
         final Player player = e.getPlayer();
         if (plugin.player(player.getUniqueId()).hasMode(Mode.NOLOCK)) {
             return;
