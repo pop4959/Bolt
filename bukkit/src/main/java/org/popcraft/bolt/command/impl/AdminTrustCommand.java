@@ -9,7 +9,6 @@ import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.source.SourceType;
-import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.SchedulerUtil;
@@ -74,13 +73,7 @@ public class AdminTrustCommand extends TrustCommand {
         }
         arguments.next();
         if (arguments.remaining() == 0) {
-            if (SourceTypes.PLAYER.equals(sourceType)) {
-                return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
-            } else if (SourceTypes.GROUP.equals(sourceType) && sender instanceof final Player player) {
-                return plugin.getPlayersOwnedGroups(player);
-            } else {
-                return Collections.emptyList();
-            }
+            return plugin.getSourceTransformer(sourceType).completions(sender);
         }
         arguments.next();
         if (arguments.remaining() == 0) {
