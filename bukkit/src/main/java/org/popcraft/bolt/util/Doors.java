@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -27,6 +28,7 @@ import org.popcraft.bolt.source.SourceTypes;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -39,6 +41,7 @@ public final class Doors {
     private static final Tag<Material> MOB_INTERACTABLE_DOORS = Bukkit.getServer().getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("mob_interactable_doors"), Material.class);
     // There is no tag for copper doors
     private static final Function<Material, Boolean> IS_COPPER_DOOR = (material) -> material.name().contains("COPPER_DOOR") || material.name().contains("COPPER_TRAPDOOR");
+    private static final Random RANDOM = new Random();
 
     private Doors() {
     }
@@ -220,6 +223,6 @@ public final class Doors {
         }
         final World world = block.getWorld();
         final Location location = block.getLocation();
-        world.playSound(location, sound, 1, 1);
+        world.playSound(location, sound, SoundCategory.BLOCKS, 1, RANDOM.nextFloat() * 0.1f + 0.9f);
     }
 }
