@@ -60,6 +60,8 @@ public final class Doors {
         final Set<Block> doors = new HashSet<>();
         if (!isDoorOpenableNormally(block)) {
             doors.add(block);
+            event.setUseItemInHand(Event.Result.DENY);
+            event.setUseInteractedBlock(Event.Result.ALLOW);
         }
         if (plugin.isDoorsOpenDouble()) {
             final Block hingedBlock = getHingedBlock(block);
