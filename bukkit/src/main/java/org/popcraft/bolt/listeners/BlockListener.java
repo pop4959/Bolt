@@ -413,17 +413,33 @@ public final class BlockListener extends InteractionListener implements Listener
 
     @EventHandler
     public void onPlayerBucketEmpty(final PlayerBucketEmptyEvent e) {
+        final Protection protection = plugin.findProtection(e.getBlock());
+        if (protection == null) {
+            return;
+        }
         final Player player = e.getPlayer();
-        if (!plugin.canAccess(e.getBlockClicked(), player, Permission.INTERACT) || !plugin.canAccess(e.getBlock(), player, Permission.DESTROY)) {
+        if (e.getBlock().equals(e.getBlockClicked()) && Tag.CAULDRONS.isTagged(e.getBlock().getType())) {
+            if (!plugin.canAccess(e.getBlock(), player, Permission.INTERACT, Permission.DEPOSIT)) {
+                e.setCancelled(true);
+            }
+        } else if (!e.getBlock().equals(e.getBlockClicked())) {
+            // Prevent accidental deletion of protected blocks by them getting replaced.
+            // Purposefully not checking for destroy permissions, that logic is for BlockBreakEvent.
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onPlayerBucketFill(final PlayerBucketFillEvent e) {
+        final Protection protection = plugin.findProtection(e.getBlock());
+        if (protection == null) {
+            return;
+        }
         final Player player = e.getPlayer();
-        if (!plugin.canAccess(e.getBlockClicked(), player, Permission.INTERACT) || !plugin.canAccess(e.getBlock(), player, Permission.DESTROY)) {
-            e.setCancelled(true);
+        if (e.getBlock().equals(e.getBlockClicked()) && Tag.CAULDRONS.isTagged(e.getBlock().getType())) {
+            if (!plugin.canAccess(e.getBlock(), player, Permission.INTERACT, Permission.WITHDRAW)) {
+                e.setCancelled(true);
+            }
         }
     }
 
