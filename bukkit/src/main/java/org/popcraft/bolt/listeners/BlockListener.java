@@ -252,42 +252,46 @@ public final class BlockListener extends InteractionListener implements Listener
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(final BlockBreakEvent e) {
+        if (!plugin.canAccess(e.getBlock(), e.getPlayer(), Permission.DESTROY)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockBreakMonitor(final BlockBreakEvent e) {
         final Block block = e.getBlock();
         final Protection protection = plugin.findProtection(block);
         final Player player = e.getPlayer();
-        if (protection == null) {
+        if (!(protection instanceof final BlockProtection blockProtection)) {
             return;
         }
-        if (plugin.canAccess(protection, player, Permission.DESTROY)) {
-            if (protection instanceof final BlockProtection blockProtection) {
-                // Double chests are a special case where we want to move the protection instead
-                if (plugin.getChestMatcher().canMatch(block)) {
-                    if (!plugin.isProtectedExact(block)) {
-                        return;
-                    }
-                    final Match match = plugin.getChestMatcher().findMatch(block);
-                    final Block newBlock = match == null ? null : match.blocks().stream().findAny().orElse(null);
-                    if (newBlock != null) {
-                        blockProtection.setX(newBlock.getX());
-                        blockProtection.setY(newBlock.getY());
-                        blockProtection.setZ(newBlock.getZ());
-                        plugin.saveProtection(blockProtection);
-                        return;
-                    }
-                }
-                plugin.removeProtection(protection);
-                if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
-                    BoltComponents.sendMessage(
-                            player,
-                            Translation.CLICK_UNLOCKED,
-                            plugin.isUseActionBar(),
-                            Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
-                    );
-                }
+        // If we enter this event, it means we already passed the permission check, so all that's left is to clean
+        // up the protection.
+
+        // Double chests are a special case where we want to move the protection instead
+        if (plugin.getChestMatcher().canMatch(block)) {
+            if (!plugin.isProtectedExact(block)) {
+                return;
             }
-        } else {
-            e.setCancelled(true);
+            final Match match = plugin.getChestMatcher().findMatch(block);
+            final Block newBlock = match == null ? null : match.blocks().stream().findAny().orElse(null);
+            if (newBlock != null) {
+                blockProtection.setX(newBlock.getX());
+                blockProtection.setY(newBlock.getY());
+                blockProtection.setZ(newBlock.getZ());
+                plugin.saveProtection(blockProtection);
+                return;
+            }
+        }
+        plugin.removeProtection(protection);
+        if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
+            BoltComponents.sendMessage(
+                    player,
+                    Translation.CLICK_UNLOCKED,
+                    plugin.isUseActionBar(),
+                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
+                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
+            );
         }
     }
 
