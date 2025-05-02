@@ -419,7 +419,7 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         final Player player = e.getPlayer();
         if (e.getBlock().equals(e.getBlockClicked()) && Tag.CAULDRONS.isTagged(e.getBlock().getType())) {
-            if (!plugin.canAccess(e.getBlock(), player, Permission.INTERACT, Permission.DEPOSIT)) {
+            if (!plugin.canAccess(protection, player, Permission.INTERACT, Permission.DEPOSIT)) {
                 e.setCancelled(true);
             }
         } else if (!e.getBlock().equals(e.getBlockClicked())) {
@@ -437,7 +437,7 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         final Player player = e.getPlayer();
         if (e.getBlock().equals(e.getBlockClicked()) && Tag.CAULDRONS.isTagged(e.getBlock().getType())) {
-            if (!plugin.canAccess(e.getBlock(), player, Permission.INTERACT, Permission.WITHDRAW)) {
+            if (!plugin.canAccess(protection, player, Permission.INTERACT, Permission.WITHDRAW)) {
                 e.setCancelled(true);
             }
         }
