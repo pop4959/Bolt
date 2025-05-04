@@ -3,7 +3,7 @@ version: ${version}
 main: ${group}.bolt.BoltPlugin
 api-version: "1.20.6"
 folia-supported: true
-authors: [ ${ author } ]
+authors: [ pop4959, rymiel ]
 description: ${description}
 commands:
   bolt:
