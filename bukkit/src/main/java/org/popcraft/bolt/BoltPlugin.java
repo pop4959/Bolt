@@ -617,6 +617,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return DEBUG || protectableBlocks.containsKey(block.getType());
     }
 
+    public boolean isProtectable(final Material material) {
+        return DEBUG || protectableBlocks.containsKey(material);
+    }
+
     @Override
     public boolean isProtectable(final Entity entity) {
         return DEBUG || protectableEntities.containsKey(entity.getType());

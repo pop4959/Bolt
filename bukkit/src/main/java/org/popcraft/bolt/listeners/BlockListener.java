@@ -510,28 +510,28 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         if (!plugin.canAccess(existingProtection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
             e.setCancelled(true);
-            return;
         }
-        final BlockData blockData = block.getBlockData();
-        if (!(blockData instanceof final Directional directional)) {
-            return;
-        }
-        final Block placing = block.getRelative(directional.getFacing());
-        if (!Material.AIR.equals(placing.getType())) {
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockDispenseMonitor(final BlockDispenseEvent e) {
+        final Block block = e.getBlock();
+        final Protection existingProtection = plugin.findProtection(block);
+        if (existingProtection == null) {
             return;
         }
         final Material placingType = e.getItem().getType();
-        SchedulerUtil.schedule(plugin, block.getLocation(), () -> {
-            final Block placed = placing.getWorld().getBlockAt(placing.getLocation());
-            if (!placed.getType().equals(placingType)) {
+        if (Tag.SHULKER_BOXES.isTagged(placingType) && plugin.isProtectable(placingType) && block.getBlockData() instanceof Directional directional) {
+            // Dispensing a shulker places it. If the dispenser was locked, transfer the owner to the shulker.
+            // This event doesn't let us access the placed block, so we end up creating the protection before the block actually exists, by anticipating where it will be placed.
+            final Block placeTo = block.getRelative(directional.getFacing());
+            if (!placeTo.getType().isAir()) {
                 return;
             }
-            if (!plugin.isProtectable(placed)) {
-                return;
-            }
-            final BlockProtection newProtection = plugin.createProtection(placed, existingProtection.getOwner(), existingProtection.getType());
+            final BlockProtection newProtection = plugin.createProtection(placeTo, existingProtection.getOwner(), existingProtection.getType());
+            newProtection.setBlock(placingType.name());
             plugin.saveProtection(newProtection);
-        });
+        }
     }
 
     public void onBlockPreDispense(final BlockEvent e) {
