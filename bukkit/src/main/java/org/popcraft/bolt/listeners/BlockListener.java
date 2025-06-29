@@ -203,10 +203,19 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         final Block block = replaced.getBlock();
         final Protection protection = plugin.findProtection(block);
-        if (protection != null) {
+        if (protection == null) {
+            return;
+        }
+        if (Tag.REPLACEABLE.isTagged(e.getBlockReplacedState().getType())) {
             // Prevent accidental deletion of protected blocks by them getting replaced.
             // Purposefully not checking for destroy permissions, that logic is for BlockBreakEvent.
             e.setCancelled(true);
+        } else {
+            // This is, bafflingly, fired in cases like stripping a log (which *also* called EntityChangeBlockEvent)
+            // but also fired in other cases, like placing a slab on top of another.
+            if (!plugin.canAccess(block, e.getPlayer(), Permission.INTERACT)) {
+                e.setCancelled(true);
+            }
         }
     }
 
