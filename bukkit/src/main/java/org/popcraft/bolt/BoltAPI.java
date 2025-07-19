@@ -11,6 +11,7 @@ import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.PlayerSourceResolver;
 import org.popcraft.bolt.source.SourceResolver;
+import org.popcraft.bolt.source.SourceTransformer;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -184,4 +185,12 @@ public interface BoltAPI {
      * Registers an event listener for the given event class.
      */
     <T extends Event> void registerListener(final Class<T> clazz, final Consumer<? super T> listener);
+
+    /**
+     * Registers a source transformer for the provided source type. This allows for custom source types with ergonomic
+     * command usage.
+     *
+     * @see SourceTransformer
+     */
+    void registerSourceTransformer(final String sourceType, final SourceTransformer sourceTransformer);
 }
