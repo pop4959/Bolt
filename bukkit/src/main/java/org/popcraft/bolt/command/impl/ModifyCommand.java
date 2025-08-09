@@ -87,7 +87,7 @@ public class ModifyCommand extends BoltCommand {
             sourceTransformer.transformIdentifier(identifier)
                     .thenAccept(id -> SchedulerUtil.schedule(plugin, player, () -> {
                         if (id == null) {
-                            sourceTransformer.errorNotFound(identifier, player);
+                            sourceTransformer.sendErrorNotFound(identifier, player);
                         } else {
                             boltPlayer.getModifications().put(Source.of(sourceType.name(), id), access.type());
                         }

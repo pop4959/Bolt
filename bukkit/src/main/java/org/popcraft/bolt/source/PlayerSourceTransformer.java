@@ -33,7 +33,7 @@ public class PlayerSourceTransformer implements SourceTransformer {
     }
 
     @Override
-    public void errorNotFound(String identifier, CommandSender sender) {
+    public void sendErrorNotFound(String identifier, CommandSender sender) {
         BoltComponents.sendMessage(
                 sender,
                 Translation.PLAYER_NOT_FOUND,

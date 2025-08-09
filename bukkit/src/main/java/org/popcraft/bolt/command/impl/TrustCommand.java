@@ -64,7 +64,7 @@ public class TrustCommand extends BoltCommand {
         sourceTransformer.transformIdentifier(sourceIdentifier)
                 .thenAccept(id -> SchedulerUtil.schedule(plugin, sender, () -> {
                     if (id == null) {
-                        sourceTransformer.errorNotFound(sourceIdentifier, sender);
+                        sourceTransformer.sendErrorNotFound(sourceIdentifier, sender);
                     } else {
                         final Source source = Source.of(sourceType.name(), id);
                         if (adding) {

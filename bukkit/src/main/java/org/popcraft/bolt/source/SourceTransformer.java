@@ -35,7 +35,7 @@ public interface SourceTransformer {
      * @param identifier user input which failed to be transformed.
      * @param sender     the sender to provide feedback to
      */
-    default void errorNotFound(String identifier, CommandSender sender) {
+    default void sendErrorNotFound(String identifier, CommandSender sender) {
         BoltComponents.sendMessage(
                 sender,
                 Translation.GENERIC_NOT_FOUND,
