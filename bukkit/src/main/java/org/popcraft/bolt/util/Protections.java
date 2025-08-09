@@ -19,14 +19,11 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
-import org.popcraft.bolt.source.SourceTypes;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.popcraft.bolt.lang.Translator.isTranslatable;
 import static org.popcraft.bolt.util.BoltComponents.getLocaleOf;
@@ -139,7 +136,7 @@ public final class Protections {
             if (source.getType().equals(source.getIdentifier())) {
                 subject = Strings.toTitleCase(source.getType());
             } else {
-                subject = plugin.getSourceTransformer(source.getType()).unTransformIdentifier(source.getIdentifier(), sender);
+                subject = plugin.getSourceTransformer(source.getType()).unTransformIdentifier(source.getIdentifier());
             }
             if (plugin.getDefaultAccessType().equals(access)) {
                 list.add(resolveTranslation(

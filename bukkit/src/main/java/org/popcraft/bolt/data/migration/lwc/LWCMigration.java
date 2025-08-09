@@ -183,7 +183,7 @@ public class LWCMigration {
                         }
 
                         if (sourceType != null) {
-                            final String sourceIdentifier = plugin.getSourceTransformer(sourceType).transformIdentifier(identifier, plugin.getServer().getConsoleSender()).join();
+                            final String sourceIdentifier = plugin.getSourceTransformer(sourceType).transformIdentifier(identifier).join();
                             if (sourceIdentifier != null) {
                                 access.put(Source.of(sourceType, sourceIdentifier).toString(), accessType);
                             }

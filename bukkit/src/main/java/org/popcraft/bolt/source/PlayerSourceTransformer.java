@@ -8,7 +8,6 @@ import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.Profiles;
-import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,19 +23,22 @@ public class PlayerSourceTransformer implements SourceTransformer {
     }
 
     @Override
-    public CompletableFuture<String> transformIdentifier(String identifier, CommandSender sender) {
+    public CompletableFuture<String> transformIdentifier(String identifier) {
         return Profiles.findOrLookupProfileByName(identifier).thenApply(profile -> {
             if (profile.uuid() != null) {
                 return profile.uuid().toString();
-            } else {
-                SchedulerUtil.schedule(plugin, sender, () -> BoltComponents.sendMessage(
-                        sender,
-                        Translation.PLAYER_NOT_FOUND,
-                        Placeholder.component(Translation.Placeholder.PLAYER, Component.text(identifier))
-                ));
-                return null;
             }
+            return null;
         });
+    }
+
+    @Override
+    public void errorNotFound(String identifier, CommandSender sender) {
+        BoltComponents.sendMessage(
+                sender,
+                Translation.PLAYER_NOT_FOUND,
+                Placeholder.component(Translation.Placeholder.PLAYER, Component.text(identifier))
+        );
     }
 
     @Override
@@ -49,7 +51,7 @@ public class PlayerSourceTransformer implements SourceTransformer {
     }
 
     @Override
-    public String unTransformIdentifier(String identifier, CommandSender sender) {
+    public String unTransformIdentifier(String identifier) {
         final UUID uuid = UUID.fromString(identifier);
         final String playerName = Profiles.findProfileByUniqueId(uuid).name();
         return Optional.ofNullable(playerName).orElse(identifier);

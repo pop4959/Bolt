@@ -10,6 +10,7 @@ import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceTransformer;
 import org.popcraft.bolt.source.SourceType;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
@@ -82,10 +83,12 @@ public class ModifyCommand extends BoltCommand {
         }
         boltPlayer.setAction(new Action(Action.Type.EDIT, "bolt.command.edit", Boolean.toString(adding)));
         for (final String identifier : identifiers) {
-            plugin.getSourceTransformer(sourceType.name())
-                    .transformIdentifier(identifier, player)
+            final SourceTransformer sourceTransformer = plugin.getSourceTransformer(sourceType.name());
+            sourceTransformer.transformIdentifier(identifier)
                     .thenAccept(id -> SchedulerUtil.schedule(plugin, player, () -> {
-                        if (id != null) {
+                        if (id == null) {
+                            sourceTransformer.errorNotFound(identifier, player);
+                        } else {
                             boltPlayer.getModifications().put(Source.of(sourceType.name(), id), access.type());
                         }
                     }));

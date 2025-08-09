@@ -11,6 +11,7 @@ import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceTransformer;
 import org.popcraft.bolt.source.SourceType;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.Protections;
@@ -59,10 +60,12 @@ public class TrustCommand extends BoltCommand {
             return;
         }
         final AccessList accessList = Objects.requireNonNullElse(plugin.getBolt().getStore().loadAccessList(uuid).join(), new AccessList(uuid, new HashMap<>()));
-        plugin.getSourceTransformer(sourceType.name())
-                .transformIdentifier(sourceIdentifier, sender)
+        final SourceTransformer sourceTransformer = plugin.getSourceTransformer(sourceType.name());
+        sourceTransformer.transformIdentifier(sourceIdentifier)
                 .thenAccept(id -> SchedulerUtil.schedule(plugin, sender, () -> {
-                    if (id != null) {
+                    if (id == null) {
+                        sourceTransformer.errorNotFound(sourceIdentifier, sender);
+                    } else {
                         final Source source = Source.of(sourceType.name(), id);
                         if (adding) {
                             accessList.getAccess().put(source.toString(), access.type());

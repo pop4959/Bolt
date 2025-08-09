@@ -1,6 +1,10 @@
 package org.popcraft.bolt.source;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
+import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.util.BoltComponents;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -16,16 +20,32 @@ import java.util.concurrent.CompletableFuture;
 public interface SourceTransformer {
     /**
      * Converts a user's input into the stored format
+     *
      * @param identifier user input
-     * @param sender the user making the input. This may be used to send error messages in case of invalid format.
      * @return identifier to store in a future. The future may contain {@code null} if an invalid input was given.
      */
-    default CompletableFuture<String> transformIdentifier(String identifier, CommandSender sender) {
+    default CompletableFuture<String> transformIdentifier(String identifier) {
         return CompletableFuture.completedFuture(identifier);
     }
 
     /**
+     * Reports an error to the sender. This may be called by a command when {@link #transformIdentifier(String)} returns
+     * {@code null}.
+     *
+     * @param identifier user input which failed to be transformed.
+     * @param sender     the sender to provide feedback to
+     */
+    default void errorNotFound(String identifier, CommandSender sender) {
+        BoltComponents.sendMessage(
+                sender,
+                Translation.GENERIC_NOT_FOUND,
+                Placeholder.component(Translation.Placeholder.X, Component.text(identifier))
+        );
+    }
+
+    /**
      * TAB completion suggestions for this source type.
+     *
      * @param sender the user making the input
      * @return list of TAB completions
      */
@@ -35,11 +55,11 @@ public interface SourceTransformer {
 
     /**
      * Converts a stored identifier back into what should be displayed to the user.
+     *
      * @param identifier stored format
-     * @param sender user to display to
      * @return what to display
      */
-    default String unTransformIdentifier(String identifier, CommandSender sender) {
+    default String unTransformIdentifier(String identifier) {
         return identifier;
     }
 
