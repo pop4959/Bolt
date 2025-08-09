@@ -165,20 +165,28 @@ public class LWCMigration {
                 if (dataRights != null) {
                     for (DataRights rights : data.getRights()) {
                         final String accessType = rights.getRights() == Permission.Access.ADMIN.ordinal() ? defaultAccessAdmin : defaultAccessNormal;
+                        final String sourceType;
+                        String identifier = rights.getName();
                         if (rights.getType() == Permission.Type.GROUP.ordinal()) {
-                            access.put(Source.of(SourceTypes.PERMISSION, "group.%s".formatted(rights.getName())).toString(), accessType);
+                            sourceType = SourceTypes.PERMISSION;
+                            identifier = "group.%s".formatted(identifier);
                         } else if (rights.getType() == Permission.Type.PLAYER.ordinal()) {
-                            final UUID uuid = Optional.ofNullable(Profiles.findProfileByName(rights.getName()).uuid())
-                                    .orElseGet(() -> Profiles.lookupProfileByName(rights.getName()).join().uuid());
-                            if (uuid != null) {
-                                access.put(Source.player(uuid).toString(), accessType);
-                            }
+                            sourceType = SourceTypes.PLAYER;
                         } else if (rights.getType() == Permission.Type.TOWN.ordinal()) {
-                            access.put(Source.of(SourceTypes.TOWN, rights.getName()).toString(), accessType);
+                            sourceType = SourceTypes.TOWN;
                         } else if (rights.getType() == Permission.Type.REGION.ordinal()) {
-                            access.put(Source.of(SourceTypes.REGION, rights.getName()).toString(), accessType);
+                            sourceType = SourceTypes.REGION;
                         } else if (rights.getType() == Permission.Type.FACTION.ordinal()) {
-                            access.put(Source.of(SourceTypes.FACTION, rights.getName()).toString(), accessType);
+                            sourceType = SourceTypes.FACTION;
+                        } else {
+                            sourceType = null;
+                        }
+
+                        if (sourceType != null) {
+                            final String sourceIdentifier = plugin.getSourceTransformer(sourceType).transformIdentifier(identifier).join();
+                            if (sourceIdentifier != null) {
+                                access.put(Source.of(sourceType, sourceIdentifier).toString(), accessType);
+                            }
                         }
                     }
                 }

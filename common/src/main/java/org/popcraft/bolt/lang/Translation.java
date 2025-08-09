@@ -51,6 +51,7 @@ public class Translation {
     public static final String FIND_NEXT_NEW_PAGE_SEPARATOR = "find_next_new_page_separator";
     public static final String FIND_NONE = "find_none";
     public static final String FLUSH = "flush";
+    public static final String GENERIC_NOT_FOUND = "generic_not_found";
     public static final String GROUP_ALREADY_EXISTS = "group_already_exists";
     public static final String GROUP_CREATED = "group_created";
     public static final String GROUP_DELETED = "group_deleted";

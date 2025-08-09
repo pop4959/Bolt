@@ -10,12 +10,11 @@ import org.popcraft.bolt.command.Arguments;
 import org.popcraft.bolt.command.BoltCommand;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.source.Source;
+import org.popcraft.bolt.source.SourceTransformer;
 import org.popcraft.bolt.source.SourceType;
-import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.Action;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
-import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.ArrayList;
@@ -23,7 +22,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 public class ModifyCommand extends BoltCommand {
     public ModifyCommand(BoltPlugin plugin) {
@@ -85,30 +83,15 @@ public class ModifyCommand extends BoltCommand {
         }
         boltPlayer.setAction(new Action(Action.Type.EDIT, "bolt.command.edit", Boolean.toString(adding)));
         for (final String identifier : identifiers) {
-            final CompletableFuture<Source> editFuture;
-            if (SourceTypes.PLAYER.equals(sourceType.name())) {
-                editFuture = Profiles.findOrLookupProfileByName(identifier).thenApply(profile -> {
-                    if (profile.uuid() != null) {
-                        return Source.player(profile.uuid());
-                    } else {
-                        SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
-                                player,
-                                Translation.PLAYER_NOT_FOUND,
-                                Placeholder.component(Translation.Placeholder.PLAYER, Component.text(identifier))
-                        ));
-                        return null;
-                    }
-                });
-            } else if (SourceTypes.PASSWORD.equals(sourceType.name())) {
-                editFuture = CompletableFuture.completedFuture(Source.password(identifier));
-            } else {
-                editFuture = CompletableFuture.completedFuture(Source.of(sourceType.name(), identifier));
-            }
-            editFuture.thenAccept(source -> SchedulerUtil.schedule(plugin, player, () -> {
-                if (source != null) {
-                    boltPlayer.getModifications().put(source, access.type());
-                }
-            }));
+            final SourceTransformer sourceTransformer = plugin.getSourceTransformer(sourceType.name());
+            sourceTransformer.transformIdentifier(identifier)
+                    .thenAccept(id -> SchedulerUtil.schedule(plugin, player, () -> {
+                        if (id == null) {
+                            sourceTransformer.sendErrorNotFound(identifier, player);
+                        } else {
+                            boltPlayer.getModifications().put(Source.of(sourceType.name(), id), access.type());
+                        }
+                    }));
         }
         BoltComponents.sendMessage(
                 player,
@@ -146,12 +129,7 @@ public class ModifyCommand extends BoltCommand {
         while ((added = arguments.next()) != null) {
             alreadyAdded.add(added);
         }
-        if (SourceTypes.PLAYER.equals(sourceType)) {
-            return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).filter(name -> !alreadyAdded.contains(name)).toList();
-        } else if (SourceTypes.GROUP.equals(sourceType) && sender instanceof final Player player) {
-            return plugin.getPlayersOwnedGroups(player).stream().filter(name -> !alreadyAdded.contains(name)).toList();
-        }
-        return Collections.emptyList();
+        return plugin.getSourceTransformer(sourceType).completions(sender).stream().filter(name -> !alreadyAdded.contains(name)).toList();
     }
 
     @Override

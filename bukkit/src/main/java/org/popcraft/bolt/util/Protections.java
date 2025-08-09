@@ -19,14 +19,11 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.source.Source;
-import org.popcraft.bolt.source.SourceTypes;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.popcraft.bolt.lang.Translator.isTranslatable;
 import static org.popcraft.bolt.util.BoltComponents.getLocaleOf;
@@ -134,18 +131,13 @@ public final class Protections {
             final String entry = accessEntry.getKey();
             final String access = accessEntry.getValue();
             final Source source = Source.parse(entry);
+            final BoltPlugin plugin = JavaPlugin.getPlugin(BoltPlugin.class);
             final String subject;
-            if (SourceTypes.PLAYER.equals(source.getType())) {
-                final String playerUuid = source.getIdentifier();
-                final UUID uuid = UUID.fromString(playerUuid);
-                final String playerName = Profiles.findProfileByUniqueId(uuid).name();
-                subject = Optional.ofNullable(playerName).orElse(playerUuid);
-            } else if (SourceTypes.PASSWORD.equals(source.getType()) || source.getType().equals(source.getIdentifier())) {
+            if (source.getType().equals(source.getIdentifier())) {
                 subject = Strings.toTitleCase(source.getType());
             } else {
-                subject = source.getIdentifier();
+                subject = plugin.getSourceTransformer(source.getType()).unTransformIdentifier(source.getIdentifier());
             }
-            final BoltPlugin plugin = JavaPlugin.getPlugin(BoltPlugin.class);
             if (plugin.getDefaultAccessType().equals(access)) {
                 list.add(resolveTranslation(
                         Translation.ACCESS_LIST_ENTRY_DEFAULT,
