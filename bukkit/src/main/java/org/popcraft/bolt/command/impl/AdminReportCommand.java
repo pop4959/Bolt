@@ -87,6 +87,9 @@ public class AdminReportCommand extends BoltCommand {
 
     @Override
     public List<String> suggestions(CommandSender sender, Arguments arguments) {
+        if (Metrics.isEnabled()) {
+            return List.of("disable");
+        }
         return Collections.emptyList();
     }
 
