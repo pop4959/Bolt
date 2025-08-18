@@ -9,7 +9,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ChiseledBookshelf;
 import org.bukkit.block.PistonMoveReaction;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Leaves;
 import org.bukkit.block.data.type.Piston;
@@ -47,6 +46,7 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.util.Vector;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
+import org.popcraft.bolt.event.LockBlockEvent;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.protection.BlockProtection;
@@ -244,6 +244,11 @@ public final class BlockListener extends InteractionListener implements Listener
             return;
         }
         if (plugin.isProtected(block)) {
+            return;
+        }
+        final LockBlockEvent event = new LockBlockEvent(player, block, true);
+        plugin.getEventBus().post(event);
+        if (event.isCancelled()) {
             return;
         }
         final BlockProtection newProtection = plugin.createProtection(block, player.getUniqueId(), access.type());

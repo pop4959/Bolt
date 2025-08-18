@@ -53,6 +53,7 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
+import org.popcraft.bolt.event.LockEntityEvent;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
@@ -153,6 +154,11 @@ public final class EntityListener extends InteractionListener implements Listene
             return;
         }
         if (access.restricted() && !player.hasPermission("bolt.type.protection.%s".formatted(access.type()))) {
+            return;
+        }
+        final LockEntityEvent event = new LockEntityEvent(player, entity, true);
+        plugin.getEventBus().post(event);
+        if (event.isCancelled()) {
             return;
         }
         final EntityProtection newProtection = plugin.createProtection(entity, player.getUniqueId(), access.type());
