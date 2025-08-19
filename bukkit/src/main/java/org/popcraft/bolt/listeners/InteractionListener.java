@@ -66,9 +66,9 @@ abstract class InteractionListener {
             case LOCK -> {
                 final Cancellable event;
                 if (object instanceof final Block block) {
-                    event = new LockBlockEvent(player, block);
+                    event = new LockBlockEvent(player, block, false);
                 } else if (object instanceof final Entity entity) {
-                    event = new LockEntityEvent(player, entity);
+                    event = new LockEntityEvent(player, entity, false);
                 } else {
                     throw new IllegalStateException("Protection is not a block or entity");
                 }

@@ -6,10 +6,12 @@ import org.bukkit.entity.Player;
 public class LockBlockEvent extends Cancellable implements Event {
     private final Player player;
     private final Block block;
+    private final boolean autoprotect;
 
-    public LockBlockEvent(Player player, Block block) {
+    public LockBlockEvent(Player player, Block block, boolean autoprotect) {
         this.player = player;
         this.block = block;
+        this.autoprotect = autoprotect;
     }
 
     public Player getPlayer() {
@@ -18,5 +20,10 @@ public class LockBlockEvent extends Cancellable implements Event {
 
     public Block getBlock() {
         return this.block;
+    }
+
+    /** Whether this event was fired from a player placing a block with autoprotect enabled */
+    public boolean isAutoprotect() {
+        return this.autoprotect;
     }
 }
