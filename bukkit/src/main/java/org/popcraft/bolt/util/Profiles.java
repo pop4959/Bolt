@@ -53,7 +53,7 @@ public final class Profiles {
         }
         final PlayerProfile playerProfile;
         try {
-            playerProfile = Bukkit.createPlayerProfile(name);
+            playerProfile = Bukkit.createPlayerProfile(NIL_UUID, name);
         } catch (final IllegalArgumentException ignored) {
             return CompletableFuture.completedFuture(SimpleProfileCache.EMPTY_PROFILE);
         }
@@ -105,7 +105,7 @@ public final class Profiles {
         }
         final PlayerProfile playerProfile;
         try {
-            playerProfile = Bukkit.createPlayerProfile(uuid);
+            playerProfile = Bukkit.createPlayerProfile(uuid, "");
         } catch (final IllegalArgumentException ignored) {
             return CompletableFuture.completedFuture(SimpleProfileCache.EMPTY_PROFILE);
         }
