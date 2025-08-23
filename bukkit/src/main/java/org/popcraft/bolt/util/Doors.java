@@ -207,19 +207,75 @@ public final class Doors {
         final Material type = block.getType();
         final Sound sound;
         if (Tag.DOORS.isTagged(type)) {
-            if (Tag.WOODEN_DOORS.isTagged(type)) {
-                sound = open ? Sound.BLOCK_WOODEN_DOOR_OPEN : Sound.BLOCK_WOODEN_DOOR_CLOSE;
+            if (open) {
+                sound = switch (type) {
+                    case CHERRY_DOOR -> Sound.BLOCK_CHERRY_WOOD_DOOR_OPEN;
+                    case BAMBOO_DOOR -> Sound.BLOCK_BAMBOO_WOOD_DOOR_OPEN;
+                    case CRIMSON_DOOR, WARPED_DOOR -> Sound.BLOCK_NETHER_WOOD_DOOR_OPEN;
+                    case IRON_DOOR -> Sound.BLOCK_IRON_DOOR_OPEN;
+                    case COPPER_DOOR, EXPOSED_COPPER_DOOR, WEATHERED_COPPER_DOOR, OXIDIZED_COPPER_DOOR,
+                         WAXED_COPPER_DOOR, WAXED_EXPOSED_COPPER_DOOR, WAXED_WEATHERED_COPPER_DOOR,
+                         WAXED_OXIDIZED_COPPER_DOOR -> Sound.BLOCK_COPPER_DOOR_OPEN;
+                    default ->
+                            Sound.BLOCK_WOODEN_DOOR_OPEN; // OAK_DOOR, SPRUCE_DOOR, BIRCH_DOOR, JUNGLE_DOOR, ACACIA_DOOR, DARK_OAK_DOOR, MANGROVE_DOOR, PALE_OAK_DOOR
+                };
             } else {
-                sound = open ? Sound.BLOCK_IRON_DOOR_OPEN : Sound.BLOCK_IRON_DOOR_CLOSE;
+                sound = switch (type) {
+                    case CHERRY_DOOR -> Sound.BLOCK_CHERRY_WOOD_DOOR_CLOSE;
+                    case BAMBOO_DOOR -> Sound.BLOCK_BAMBOO_WOOD_DOOR_CLOSE;
+                    case CRIMSON_DOOR, WARPED_DOOR -> Sound.BLOCK_NETHER_WOOD_DOOR_CLOSE;
+                    case IRON_DOOR -> Sound.BLOCK_IRON_DOOR_CLOSE;
+                    case COPPER_DOOR, EXPOSED_COPPER_DOOR, WEATHERED_COPPER_DOOR, OXIDIZED_COPPER_DOOR,
+                         WAXED_COPPER_DOOR, WAXED_EXPOSED_COPPER_DOOR, WAXED_WEATHERED_COPPER_DOOR,
+                         WAXED_OXIDIZED_COPPER_DOOR -> Sound.BLOCK_COPPER_DOOR_CLOSE;
+                    default ->
+                            Sound.BLOCK_WOODEN_DOOR_CLOSE; // OAK_DOOR, SPRUCE_DOOR, BIRCH_DOOR, JUNGLE_DOOR, ACACIA_DOOR, DARK_OAK_DOOR, MANGROVE_DOOR, PALE_OAK_DOOR
+                };
             }
         } else if (Tag.TRAPDOORS.isTagged(type)) {
-            if (Tag.WOODEN_TRAPDOORS.isTagged(type)) {
-                sound = open ? Sound.BLOCK_WOODEN_TRAPDOOR_OPEN : Sound.BLOCK_WOODEN_TRAPDOOR_CLOSE;
+            if (open) {
+                sound = switch (type) {
+                    case CHERRY_TRAPDOOR -> Sound.BLOCK_CHERRY_WOOD_TRAPDOOR_OPEN;
+                    case BAMBOO_TRAPDOOR -> Sound.BLOCK_BAMBOO_WOOD_TRAPDOOR_OPEN;
+                    case CRIMSON_TRAPDOOR, WARPED_TRAPDOOR -> Sound.BLOCK_NETHER_WOOD_TRAPDOOR_OPEN;
+                    case IRON_TRAPDOOR -> Sound.BLOCK_IRON_TRAPDOOR_OPEN;
+                    case COPPER_TRAPDOOR, EXPOSED_COPPER_TRAPDOOR, WEATHERED_COPPER_TRAPDOOR, OXIDIZED_COPPER_TRAPDOOR,
+                         WAXED_COPPER_TRAPDOOR, WAXED_EXPOSED_COPPER_TRAPDOOR, WAXED_WEATHERED_COPPER_TRAPDOOR,
+                         WAXED_OXIDIZED_COPPER_TRAPDOOR -> Sound.BLOCK_COPPER_TRAPDOOR_OPEN;
+                    default ->
+                            Sound.BLOCK_WOODEN_TRAPDOOR_OPEN; // OAK_TRAPDOOR, SPRUCE_TRAPDOOR, BIRCH_TRAPDOOR, JUNGLE_TRAPDOOR, ACACIA_TRAPDOOR, DARK_OAK_TRAPDOOR, MANGROVE_TRAPDOOR, PALE_OAK_TRAPDOOR
+                };
             } else {
-                sound = open ? Sound.BLOCK_IRON_TRAPDOOR_OPEN : Sound.BLOCK_IRON_TRAPDOOR_CLOSE;
+                sound = switch (type) {
+                    case CHERRY_TRAPDOOR -> Sound.BLOCK_CHERRY_WOOD_TRAPDOOR_CLOSE;
+                    case BAMBOO_TRAPDOOR -> Sound.BLOCK_BAMBOO_WOOD_TRAPDOOR_CLOSE;
+                    case CRIMSON_TRAPDOOR, WARPED_TRAPDOOR -> Sound.BLOCK_NETHER_WOOD_TRAPDOOR_CLOSE;
+                    case IRON_TRAPDOOR -> Sound.BLOCK_IRON_TRAPDOOR_CLOSE;
+                    case COPPER_TRAPDOOR, EXPOSED_COPPER_TRAPDOOR, WEATHERED_COPPER_TRAPDOOR, OXIDIZED_COPPER_TRAPDOOR,
+                         WAXED_COPPER_TRAPDOOR, WAXED_EXPOSED_COPPER_TRAPDOOR, WAXED_WEATHERED_COPPER_TRAPDOOR,
+                         WAXED_OXIDIZED_COPPER_TRAPDOOR -> Sound.BLOCK_COPPER_TRAPDOOR_CLOSE;
+                    default ->
+                            Sound.BLOCK_WOODEN_TRAPDOOR_CLOSE; // OAK_TRAPDOOR, SPRUCE_TRAPDOOR, BIRCH_TRAPDOOR, JUNGLE_TRAPDOOR, ACACIA_TRAPDOOR, DARK_OAK_TRAPDOOR, MANGROVE_TRAPDOOR, PALE_OAK_TRAPDOOR
+                };
             }
         } else if (Tag.FENCE_GATES.isTagged(type)) {
-            sound = open ? Sound.BLOCK_FENCE_GATE_OPEN : Sound.BLOCK_FENCE_GATE_CLOSE;
+            if (open) {
+                sound = switch (type) {
+                    case CHERRY_FENCE_GATE -> Sound.BLOCK_CHERRY_WOOD_FENCE_GATE_OPEN;
+                    case BAMBOO_FENCE_GATE -> Sound.BLOCK_BAMBOO_WOOD_FENCE_GATE_OPEN;
+                    case CRIMSON_FENCE_GATE, WARPED_FENCE_GATE -> Sound.BLOCK_NETHER_WOOD_FENCE_GATE_OPEN;
+                    default ->
+                            Sound.BLOCK_FENCE_GATE_OPEN; // OAK_FENCE_GATE, SPRUCE_FENCE_GATE, BIRCH_FENCE_GATE, JUNGLE_FENCE_GATE, ACACIA_FENCE_GATE, DARK_OAK_FENCE_GATE, MANGROVE_FENCE_GATE, PALE_OAK_FENCE_GATE
+                };
+            } else {
+                sound = switch (type) {
+                    case CHERRY_FENCE_GATE -> Sound.BLOCK_CHERRY_WOOD_FENCE_GATE_CLOSE;
+                    case BAMBOO_FENCE_GATE -> Sound.BLOCK_BAMBOO_WOOD_FENCE_GATE_CLOSE;
+                    case CRIMSON_FENCE_GATE, WARPED_FENCE_GATE -> Sound.BLOCK_NETHER_WOOD_FENCE_GATE_CLOSE;
+                    default ->
+                            Sound.BLOCK_FENCE_GATE_CLOSE; // OAK_FENCE_GATE, SPRUCE_FENCE_GATE, BIRCH_FENCE_GATE, JUNGLE_FENCE_GATE, ACACIA_FENCE_GATE, DARK_OAK_FENCE_GATE, MANGROVE_FENCE_GATE, PALE_OAK_FENCE_GATE
+                };
+            }
         } else {
             return;
         }
