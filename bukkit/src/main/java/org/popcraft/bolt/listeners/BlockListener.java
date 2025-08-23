@@ -2,6 +2,7 @@ package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -19,6 +20,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -545,6 +547,21 @@ public final class BlockListener extends InteractionListener implements Listener
             final BlockProtection newProtection = plugin.createProtection(placeTo, existingProtection.getOwner(), existingProtection.getType());
             newProtection.setBlock(placingType.name());
             plugin.saveProtection(newProtection);
+        }
+    }
+
+    @EventHandler
+    public void onBlockDispenseArmorEvent(final BlockDispenseArmorEvent e) {
+        final Protection blockProtection = plugin.findProtection(e.getBlock());
+        if (blockProtection == null) {
+            return;
+        }
+        final Protection entityProtection = plugin.findProtection(e.getTargetEntity());
+        if (entityProtection == null) {
+            return;
+        }
+        if (!plugin.canAccess(entityProtection, blockProtection.getOwner(), Permission.INTERACT)) {
+            e.setCancelled(true);
         }
     }
 
