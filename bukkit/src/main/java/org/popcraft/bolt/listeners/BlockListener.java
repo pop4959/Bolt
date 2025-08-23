@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -72,6 +73,7 @@ import java.util.Set;
 import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 
 public final class BlockListener extends InteractionListener implements Listener {
+    private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private static final Set<Material> DYES = Set.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
 
@@ -545,6 +547,20 @@ public final class BlockListener extends InteractionListener implements Listener
             final BlockProtection newProtection = plugin.createProtection(placeTo, existingProtection.getOwner(), existingProtection.getType());
             newProtection.setBlock(placingType.name());
             plugin.saveProtection(newProtection);
+        }
+    }
+
+    @EventHandler
+    public void onBlockDispenseArmorEvent(final BlockDispenseArmorEvent e) {
+        final Protection entityProtection = plugin.findProtection(e.getTargetEntity());
+        if (entityProtection == null) {
+            return;
+        }
+        final Protection blockProtection = plugin.findProtection(e.getBlock());
+        if (blockProtection != null && !plugin.canAccess(entityProtection, blockProtection.getOwner(), Permission.INTERACT)) {
+            e.setCancelled(true);
+        } else if (blockProtection == null && !plugin.canAccess(entityProtection, BLOCK_SOURCE_RESOLVER, Permission.INTERACT)) {
+            e.setCancelled(true);
         }
     }
 
