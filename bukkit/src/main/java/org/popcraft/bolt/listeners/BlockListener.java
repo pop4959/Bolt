@@ -552,15 +552,12 @@ public final class BlockListener extends InteractionListener implements Listener
 
     @EventHandler
     public void onBlockDispenseArmorEvent(final BlockDispenseArmorEvent e) {
-        final Protection blockProtection = plugin.findProtection(e.getBlock());
-        if (blockProtection == null) {
-            return;
-        }
         final Protection entityProtection = plugin.findProtection(e.getTargetEntity());
         if (entityProtection == null) {
             return;
         }
-        if (!plugin.canAccess(entityProtection, blockProtection.getOwner(), Permission.INTERACT)) {
+        final Protection blockProtection = plugin.findProtection(e.getBlock());
+        if (blockProtection == null || !plugin.canAccess(entityProtection, blockProtection.getOwner(), Permission.INTERACT)) {
             e.setCancelled(true);
         }
     }
