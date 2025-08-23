@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public class ModifyCommand extends BoltCommand {
     public ModifyCommand(BoltPlugin plugin) {
@@ -81,24 +82,34 @@ public class ModifyCommand extends BoltCommand {
                 identifiers.add(identifier);
             }
         }
-        boltPlayer.setAction(new Action(Action.Type.EDIT, "bolt.command.edit", Boolean.toString(adding)));
+        final List<CompletableFuture<?>> futures = new ArrayList<>();
         for (final String identifier : identifiers) {
             final SourceTransformer sourceTransformer = plugin.getSourceTransformer(sourceType.name());
-            sourceTransformer.transformIdentifier(identifier)
+            futures.add(
+                    sourceTransformer.transformIdentifier(identifier)
                     .thenAccept(id -> SchedulerUtil.schedule(plugin, player, () -> {
                         if (id == null) {
                             sourceTransformer.sendErrorNotFound(identifier, player);
                         } else {
                             boltPlayer.getModifications().put(Source.of(sourceType.name(), id), access.type());
                         }
-                    }));
+                    }))
+            );
         }
-        BoltComponents.sendMessage(
-                player,
-                Translation.CLICK_ACTION,
-                plugin.isUseActionBar(),
-                Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.EDIT, player))
-        );
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> SchedulerUtil.schedule(plugin, player, () -> {
+            // Nothing to do, all parameters were invalid
+            if (boltPlayer.getModifications().isEmpty()) {
+                return;
+            }
+            boltPlayer.setAction(new Action(Action.Type.EDIT, "bolt.command.edit", Boolean.toString(adding)));
+            BoltComponents.sendMessage(
+                    player,
+                    Translation.CLICK_ACTION,
+                    plugin.isUseActionBar(),
+                    Placeholder.component(Translation.Placeholder.ACTION, BoltComponents.resolveTranslation(Translation.EDIT, player))
+            );
+        }));
+
     }
 
     @Override
