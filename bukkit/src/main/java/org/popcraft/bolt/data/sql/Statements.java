@@ -11,7 +11,7 @@ public enum Statements {
     ),
     CREATE_TABLE_GROUPS(
             "CREATE TABLE IF NOT EXISTS %sgroups (name varchar(128) PRIMARY KEY, owner varchar(36), members text);",
-            "CREATE TABLE IF NOT EXISTS %sgroups (name varchar(128) PRIMARY KEY, owner varchar(36), members text, INDEX group_owner(owner));"
+            "CREATE TABLE IF NOT EXISTS `%sgroups` (name varchar(128) PRIMARY KEY, owner varchar(36), members text, INDEX group_owner(owner));"
     ),
     CREATE_TABLE_ACCESS(
             "CREATE TABLE IF NOT EXISTS %saccess (owner varchar(36) PRIMARY KEY, access text);"
@@ -26,7 +26,7 @@ public enum Statements {
             "CREATE INDEX IF NOT EXISTS entity_owner ON %sentities(owner);"
     ),
     CREATE_INDEX_GROUP_OWNER(
-            "CREATE INDEX IF NOT EXISTS group_owner ON %sgroups(owner);"
+            "CREATE INDEX IF NOT EXISTS group_owner ON `%sgroups`(owner);"
     ),
     SELECT_BLOCK_BY_LOCATION(
             "SELECT * FROM %sblocks WHERE world = ? AND x = ? AND y = ? AND z = ?;"
@@ -53,16 +53,16 @@ public enum Statements {
             "DELETE FROM %sentities WHERE id = ?;"
     ),
     SELECT_GROUP_BY_NAME(
-            "SELECT * FROM %sgroups WHERE name = ?;"
+            "SELECT * FROM `%sgroups` WHERE name = ?;"
     ),
     SELECT_ALL_GROUPS(
-            "SELECT * FROM %sgroups;"
+            "SELECT * FROM `%sgroups`;"
     ),
     REPLACE_GROUP(
-            "REPLACE INTO %sgroups VALUES (?, ?, ?);"
+            "REPLACE INTO `%sgroups` VALUES (?, ?, ?);"
     ),
     DELETE_GROUP(
-            "DELETE FROM %sgroups WHERE name = ?;"
+            "DELETE FROM `%sgroups` WHERE name = ?;"
     ),
     SELECT_ACCESS_LIST_BY_UUID(
             "SELECT * FROM %saccess WHERE owner = ?;"
