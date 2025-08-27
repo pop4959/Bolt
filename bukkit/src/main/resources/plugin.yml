@@ -44,6 +44,8 @@ permissions:
     default: op
   bolt.command.admin.report:
     default: op
+  bolt.command.admin.storage:
+    default: op
   bolt.command.admin.transfer:
     default: op
   bolt.command.admin.trust:
