@@ -114,6 +114,15 @@ public class SQLStore implements Store {
         }
     }
 
+    public void close() {
+        this.executor.close();
+        try {
+            this.connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public CompletableFuture<BlockProtection> loadBlockProtection(BlockLocation location) {
         final CompletableFuture<BlockProtection> future = new CompletableFuture<>();

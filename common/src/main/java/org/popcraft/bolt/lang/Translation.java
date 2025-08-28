@@ -87,6 +87,13 @@ public class Translation {
     public static final String PURGE = "purge";
     public static final String RELOAD = "reload";
     public static final String STATUS = "status";
+    public static final String STORAGE_EXPORT_EXISTS = "storage_export_exists";
+    public static final String STORAGE_EXPORT_STARTED = "storage_export_started";
+    public static final String STORAGE_EXPORT_COMPLETED = "storage_export_completed";
+    public static final String STORAGE_IMPORT_DOESNT_EXIST = "storage_import_doesnt_exist";
+    public static final String STORAGE_IMPORT_STARTED = "storage_import_started";
+    public static final String STORAGE_IMPORT_COMPLETED = "storage_import_completed";
+    public static final String STORAGE_IN_PROGRESS = "storage_in_progress";
     public static final String TRUST = "trust";
     public static final String TRUST_ADD = "trust_add";
     public static final String TRUST_REMOVE = "trust_remove";
@@ -107,6 +114,7 @@ public class Translation {
     public static final String HELP_COMMAND_SHORT_ADMIN_PURGE = "help_command_short_admin_purge";
     public static final String HELP_COMMAND_SHORT_ADMIN_RELOAD = "help_command_short_admin_reload";
     public static final String HELP_COMMAND_SHORT_ADMIN_REPORT = "help_command_short_admin_report";
+    public static final String HELP_COMMAND_SHORT_ADMIN_STORAGE = "help_command_short_admin_storage";
     public static final String HELP_COMMAND_SHORT_ADMIN_TRANSFER = "help_command_short_admin_transfer";
     public static final String HELP_COMMAND_SHORT_ADMIN_TRUST = "help_command_short_admin_trust";
     public static final String HELP_COMMAND_SHORT_EDIT = "help_command_short_edit";
@@ -131,6 +139,7 @@ public class Translation {
     public static final String HELP_COMMAND_LONG_ADMIN_PURGE = "help_command_long_admin_purge";
     public static final String HELP_COMMAND_LONG_ADMIN_RELOAD = "help_command_long_admin_reload";
     public static final String HELP_COMMAND_LONG_ADMIN_REPORT = "help_command_long_admin_report";
+    public static final String HELP_COMMAND_LONG_ADMIN_STORAGE = "help_command_long_admin_storage";
     public static final String HELP_COMMAND_LONG_ADMIN_TRANSFER = "help_command_long_admin_transfer";
     public static final String HELP_COMMAND_LONG_ADMIN_TRUST = "help_command_long_admin_trust";
     public static final String HELP_COMMAND_LONG_EDIT = "help_command_long_edit";
