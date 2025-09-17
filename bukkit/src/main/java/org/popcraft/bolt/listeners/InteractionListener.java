@@ -10,6 +10,7 @@ import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.event.Cancellable;
 import org.popcraft.bolt.event.LockBlockEvent;
 import org.popcraft.bolt.event.LockEntityEvent;
+import org.popcraft.bolt.event.ProtectionInteractEvent;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.Protection;
 import org.popcraft.bolt.util.Action;
@@ -39,16 +40,20 @@ abstract class InteractionListener {
         final boolean protectable = plugin.isProtectable(block);
         final ProtectableConfig config = plugin.getProtectableConfig(block);
         final Component displayName = Protections.displayType(block, player);
+        ProtectionInteractEvent protectionInteractEvent = new ProtectionInteractEvent(protection, displayName);
+        plugin.getEventBus().post(protectionInteractEvent);
         final String lockPermission = "bolt.protection.lock.%s".formatted(block.getType().name().toLowerCase());
-        return triggerAction(player, protection, block, protectable, config, displayName, lockPermission);
+        return triggerAction(player, protection, block, protectable, config, protectionInteractEvent.getProtectionName(), lockPermission);
     }
 
     protected boolean triggerAction(final Player player, final Protection protection, final Entity entity) {
         final boolean protectable = plugin.isProtectable(entity);
         final ProtectableConfig config = plugin.getProtectableConfig(entity);
         final Component displayName = Protections.displayType(entity, player);
+        ProtectionInteractEvent protectionInteractEvent = new ProtectionInteractEvent(protection, displayName);
+        plugin.getEventBus().post(protectionInteractEvent);
         final String lockPermission = "bolt.protection.lock.%s".formatted(entity.getType().name().toLowerCase());
-        return triggerAction(player, protection, entity, protectable, config, displayName, lockPermission);
+        return triggerAction(player, protection, entity, protectable, config, protectionInteractEvent.getProtectionName(), lockPermission);
     }
 
     private boolean triggerAction(final Player player, final Protection protection, final Object object, final boolean protectable, final ProtectableConfig config, final Component displayName, final String lockPermission) {
@@ -102,7 +107,7 @@ abstract class InteractionListener {
                                 player,
                                 Translation.CLICK_LOCKED_ALREADY,
                                 plugin.isUseActionBar(),
-                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
+                                Placeholder.component(Translation.Placeholder.PROTECTION, displayName)
                         );
                     }
                 } else if ((protectable || action.isAdmin()) && (!requiresLockPermission || player.hasPermission(lockPermission))) {
@@ -142,7 +147,7 @@ abstract class InteractionListener {
                                 Translation.CLICK_UNLOCKED,
                                 plugin.isUseActionBar(),
                                 Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
+                                Placeholder.component(Translation.Placeholder.PROTECTION, displayName)
                         );
                     } else {
                         BoltComponents.sendMessage(
@@ -169,7 +174,7 @@ abstract class InteractionListener {
                                     player,
                                     showFull ? (showAccessList ? Translation.INFO_FULL_ACCESS : Translation.INFO_FULL_NO_ACCESS) : Translation.INFO,
                                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player)),
+                                    Placeholder.component(Translation.Placeholder.PROTECTION, displayName),
                                     Placeholder.component(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, player))),
                                     Placeholder.component(Translation.Placeholder.ACCESS_LIST_SIZE, Component.text(protection.getAccess().size())),
                                     Placeholder.component(Translation.Placeholder.ACCESS_LIST, Protections.accessList(protection.getAccess(), player)),
@@ -201,7 +206,7 @@ abstract class InteractionListener {
                                 Translation.CLICK_EDITED,
                                 plugin.isUseActionBar(),
                                 Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                                Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
+                                Placeholder.component(Translation.Placeholder.PROTECTION, displayName)
                         );
                     } else {
                         BoltComponents.sendMessage(
@@ -235,7 +240,7 @@ abstract class InteractionListener {
                                         Translation.CLICK_TRANSFER_CONFIRM,
                                         plugin.isUseActionBar(),
                                         Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player)),
+                                        Placeholder.component(Translation.Placeholder.PROTECTION, displayName),
                                         Placeholder.component(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, player)))
                                 )));
                     } else {

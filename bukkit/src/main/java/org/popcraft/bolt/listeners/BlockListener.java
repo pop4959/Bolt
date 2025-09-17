@@ -48,6 +48,7 @@ import org.bukkit.util.Vector;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.event.LockBlockEvent;
+import org.popcraft.bolt.event.ProtectionInteractEvent;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.protection.BlockProtection;
@@ -105,6 +106,8 @@ public final class BlockListener extends InteractionListener implements Listener
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
             shouldCancel = true;
         } else if (protection != null) {
+            ProtectionInteractEvent protectionInteractEvent = new ProtectionInteractEvent(protection, Protections.displayType(protection, player));
+            plugin.getEventBus().post(protectionInteractEvent);
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
             final boolean canInteract = plugin.canAccess(protection, player, Permission.INTERACT);
             if (canInteract && protection instanceof final BlockProtection blockProtection) {
@@ -118,7 +121,7 @@ public final class BlockListener extends InteractionListener implements Listener
                             player,
                             Translation.LOCKED,
                             plugin.isUseActionBar(),
-                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
+                            Placeholder.component(Translation.Placeholder.PROTECTION, protectionInteractEvent.getProtectionName())
                     );
                 }
             }
@@ -143,7 +146,7 @@ public final class BlockListener extends InteractionListener implements Listener
                                     Translation.PROTECTION_NOTIFY_GENERIC,
                                     plugin.isUseActionBar(),
                                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
+                                    Placeholder.component(Translation.Placeholder.PROTECTION, protectionInteractEvent.getProtectionName())
                             );
                         });
                     } else if (!isYou || player.hasPermission("bolt.protection.notify.self")) {
@@ -156,7 +159,7 @@ public final class BlockListener extends InteractionListener implements Listener
                                     Translation.PROTECTION_NOTIFY,
                                     plugin.isUseActionBar(),
                                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player)),
+                                    Placeholder.component(Translation.Placeholder.PROTECTION, protectionInteractEvent.getProtectionName()),
                                     Placeholder.component(Translation.Placeholder.PLAYER, Component.text(owner))
                             );
                         });
@@ -255,13 +258,15 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         final BlockProtection newProtection = plugin.createProtection(block, player.getUniqueId(), access.type());
         plugin.saveProtection(newProtection);
+        ProtectionInteractEvent protectionInteractEvent = new ProtectionInteractEvent(newProtection, Protections.protectionType(newProtection, player));
+        plugin.getEventBus().post(protectionInteractEvent);
         if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
             BoltComponents.sendMessage(
                     player,
                     Translation.CLICK_LOCKED,
                     plugin.isUseActionBar(),
                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(newProtection, player)),
-                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(block, player))
+                    Placeholder.component(Translation.Placeholder.PROTECTION, protectionInteractEvent.getProtectionName())
             );
         }
     }
@@ -300,13 +305,15 @@ public final class BlockListener extends InteractionListener implements Listener
             }
         }
         plugin.removeProtection(protection);
+        ProtectionInteractEvent protectionInteractEvent = new ProtectionInteractEvent(protection, Protections.protectionType(protection, player));
+        plugin.getEventBus().post(protectionInteractEvent);
         if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
             BoltComponents.sendMessage(
                     player,
                     Translation.CLICK_UNLOCKED,
                     plugin.isUseActionBar(),
                     Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
+                    Placeholder.component(Translation.Placeholder.PROTECTION, protectionInteractEvent.getProtectionName())
             );
         }
     }
