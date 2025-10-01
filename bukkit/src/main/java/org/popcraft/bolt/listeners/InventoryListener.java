@@ -30,18 +30,20 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Permission;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public final class InventoryListener implements Listener {
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
+    private static final Material COPPER_CHEST = EnumUtil.valueOf(Material.class, "COPPER_CHEST").orElse(null);
     @SuppressWarnings("UnstableApiUsage")
     private static final Map<InventoryType, Set<Material>> INVENTORY_TYPE_BLOCKS = Map.ofEntries(
             Map.entry(InventoryType.ANVIL, Set.of(Material.ANVIL, Material.CHIPPED_ANVIL, Material.DAMAGED_ANVIL)),
             Map.entry(InventoryType.BARREL, Set.of(Material.BARREL)),
             Map.entry(InventoryType.BLAST_FURNACE, Set.of(Material.BLAST_FURNACE)),
-            Map.entry(InventoryType.CHEST, Set.of(Material.CHEST, Material.TRAPPED_CHEST)),
+            Map.entry(InventoryType.CHEST, new HashSet<>(Set.of(Material.CHEST, Material.TRAPPED_CHEST))),
             Map.entry(InventoryType.CRAFTER, Set.of(Material.CRAFTER)),
             Map.entry(InventoryType.DISPENSER, Set.of(Material.DISPENSER)),
             Map.entry(InventoryType.DROPPER, Set.of(Material.DROPPER)),
@@ -50,6 +52,13 @@ public final class InventoryListener implements Listener {
             Map.entry(InventoryType.SHULKER_BOX, Set.of(Material.SHULKER_BOX)),
             Map.entry(InventoryType.SMOKER, Set.of(Material.SMOKER))
     );
+
+    static {
+        // Future: Replace with Material.COPPER_CHEST, and merge into map above (and remove new HashMap)
+        if (COPPER_CHEST != null) {
+            INVENTORY_TYPE_BLOCKS.get(InventoryType.CHEST).add(COPPER_CHEST);
+        }
+    }
 
     // These exist only in newer versions of 1.21.4 and only in Paper.
     private static final InventoryAction PICKUP_FROM_BUNDLE = EnumUtil.valueOf(InventoryAction.class, "PICKUP_FROM_BUNDLE").orElse(null);

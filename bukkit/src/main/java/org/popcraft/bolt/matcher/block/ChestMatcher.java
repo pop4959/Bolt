@@ -1,6 +1,9 @@
 package org.popcraft.bolt.matcher.block;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Chest;
@@ -8,11 +11,21 @@ import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ChestMatcher implements BlockMatcher {
-    private static final Set<Material> CHESTS = Set.of(Material.CHEST, Material.TRAPPED_CHEST);
+    // Future: make immutable
+    private static final Set<Material> CHESTS = new HashSet<>(Set.of(Material.CHEST, Material.TRAPPED_CHEST));
+    private static final Tag<Material> COPPER_CHESTS = Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("copper_chests"), Material.class);
+
     private boolean enabled;
+    static {
+        // Future: Replace with Tag.COPPER_CHESTS
+        if (COPPER_CHESTS != null) {
+            CHESTS.addAll(COPPER_CHESTS.getValues());
+        }
+    }
 
     @Override
     public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
@@ -46,7 +59,7 @@ public class ChestMatcher implements BlockMatcher {
             };
             if (adjacentFace != null) {
                 final Block adjacent = block.getRelative(adjacentFace);
-                if (block.getType().equals(adjacent.getType())) {
+                if (adjacent.getBlockData() instanceof Chest) {
                     return Match.ofBlocks(Collections.singleton(adjacent));
                 }
             }
