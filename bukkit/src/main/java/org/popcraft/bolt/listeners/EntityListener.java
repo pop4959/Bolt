@@ -2,6 +2,8 @@ package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
@@ -63,6 +65,7 @@ import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.source.SourceTypes;
+import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitPlayerResolver;
@@ -87,7 +90,9 @@ import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 public final class EntityListener extends InteractionListener implements Listener {
     private static final SourceResolver ENTITY_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.ENTITY));
     private static final EntityType COPPER_GOLEM = EnumUtil.valueOf(EntityType.class, "COPPER_GOLEM").orElse(null);
+    private static final Tag<Material> COPPER_GOLEM_STATUES = Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("copper_golem_statues"), Material.class);
     private final Map<NamespacedKey, UUID> spawnEggPlayers = new HashMap<>();
+    private final Map<BlockLocation, BlockProtection> reanimatedCopperGolems = new HashMap<>();
 
     public EntityListener(final BoltPlugin plugin) {
         super(plugin);
@@ -111,17 +116,28 @@ public final class EntityListener extends InteractionListener implements Listene
 
     @EventHandler
     public void onCreatureSpawn(final CreatureSpawnEvent e) {
-        if (!CreatureSpawnEvent.SpawnReason.SPAWNER_EGG.equals(e.getSpawnReason())) {
-            return;
-        }
         final Entity entity = e.getEntity();
-        final UUID uuid = spawnEggPlayers.remove(entity.getType().getKey());
-        if (uuid == null) {
-            return;
-        }
-        final Player player = plugin.getServer().getPlayer(uuid);
-        if (player != null) {
-            handleEntityPlacementByPlayer(entity, player);
+        if (CreatureSpawnEvent.SpawnReason.SPAWNER_EGG.equals(e.getSpawnReason())) {
+            final UUID uuid = spawnEggPlayers.remove(entity.getType().getKey());
+            if (uuid == null) {
+                return;
+            }
+            final Player player = plugin.getServer().getPlayer(uuid);
+            if (player != null) {
+                handleEntityPlacementByPlayer(entity, player);
+            }
+        } else if (entity.getType() == COPPER_GOLEM && CreatureSpawnEvent.SpawnReason.DEFAULT.equals(e.getSpawnReason())) { // todo: change to SpawnReason.REANIMATE
+            // Future: use instanceof CopperGolem or something
+            // A copper golem statue was reanimated. Transfer the protection over to the golem.
+            final Location location = e.getLocation();
+            final BlockLocation blockLocation = new BlockLocation(entity.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            final BlockProtection blockProtection = reanimatedCopperGolems.remove(blockLocation);
+            if (blockProtection == null) {
+                return;
+            }
+            final EntityProtection newProtection = plugin.createProtection(entity, blockProtection.getOwner(), blockProtection.getType());
+            newProtection.setAccess(blockProtection.getAccess());
+            plugin.saveProtection(newProtection);
         }
     }
 
@@ -638,23 +654,42 @@ public final class EntityListener extends InteractionListener implements Listene
         final boolean broken = e.getTo().equals(Material.AIR) || e.getTo().equals(Material.WATER);
         if (!(getDamagerSource(e.getEntity()) instanceof final Player player) || !plugin.canAccess(protection, player, broken ? Permission.DESTROY : Permission.INTERACT)) {
             e.setCancelled(true);
-            return;
-        }
-        if (broken) {
-            plugin.removeProtection(protection);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityChangeBlockMonitor(final EntityChangeBlockEvent e) {
-        final Protection protection = plugin.findProtection(e.getBlock());
-        if (protection == null || !(e.getEntity() instanceof Player) || e.getTo().isAir()) {
-            return;
-        }
+        final boolean broken = e.getTo().equals(Material.AIR) || e.getTo().equals(Material.WATER);
         // This event is called for waxing or axing a copper block. We need to update the protection to avoid mismatches.
-        if (protection instanceof final BlockProtection blockProtection && blockProtection.getBlock().equals(e.getBlock().getType().name()) && e.getBlock().getType() != e.getTo()) {
-            blockProtection.setBlock(e.getTo().name());
-            plugin.saveProtection(blockProtection);
+        final Protection findBlock = plugin.findProtection(e.getBlock());
+        if (findBlock instanceof final BlockProtection blockProtection && e.getEntity() instanceof Player) {
+            if (!broken && blockProtection.getBlock().equals(e.getBlock().getType().name()) && e.getBlock().getType() != e.getTo()) {
+                blockProtection.setBlock(e.getTo().name());
+                plugin.saveProtection(blockProtection);
+            }
+        }
+
+        final BlockProtection blockProtection = plugin.loadProtection(e.getBlock());
+        if (blockProtection != null && broken && e.getEntity() instanceof Player) {
+            // This event is called for axing copper golems. This could cause it to reanimate to we need to keep track of it.
+            // Future: use Tag.COPPER_GOLEM_STATUES
+            if (COPPER_GOLEM_STATUES != null && COPPER_GOLEM_STATUES.isTagged(e.getBlock().getType())) {
+                final BlockLocation location = BlockLocation.fromProtection(blockProtection);
+                reanimatedCopperGolems.put(location, blockProtection);
+                SchedulerUtil.schedule(plugin, e.getEntity(), () -> reanimatedCopperGolems.remove(location));
+            }
+            plugin.removeProtection(blockProtection);
+        }
+
+        // This event is called for copper golems solidifying. Transfer the protection over to the statue.
+        final EntityProtection entityProtection = plugin.loadProtection(e.getEntity());
+        // Future: can just instanceof CopperGolem or something. also use Tag.COPPER_GOLEM_STATUES
+        if (entityProtection != null && e.getEntity().getType() == COPPER_GOLEM && COPPER_GOLEM_STATUES != null && COPPER_GOLEM_STATUES.isTagged(e.getTo())) {
+            final BlockProtection newProtection = plugin.createProtection(e.getBlock(), entityProtection.getOwner(), entityProtection.getType());
+            newProtection.setBlock(e.getTo().name());
+            newProtection.setAccess(entityProtection.getAccess());
+            plugin.saveProtection(newProtection);
+            plugin.removeProtection(entityProtection);
         }
     }
 
