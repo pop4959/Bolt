@@ -2,8 +2,10 @@ package org.popcraft.bolt.listeners;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -76,6 +78,7 @@ public final class BlockListener extends InteractionListener implements Listener
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private static final Set<Material> DYES = Set.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
+    private static final Tag<Material> WOODEN_SHELVES = Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("wooden_shelves"), Material.class);
 
     public BlockListener(final BoltPlugin plugin) {
         super(plugin);
@@ -181,6 +184,15 @@ public final class BlockListener extends InteractionListener implements Listener
                         e.setUseItemInHand(Event.Result.DENY);
                         e.setUseInteractedBlock(Event.Result.DENY);
                     }
+                }
+            }
+            // Future: use Tag.WOODEN_SHELVES
+            // todo: get slot once api is added for it. hopefully that api is shared with chiseled bookshelves and all this can just be merged above.
+            //       but then need to watch out for powered shelves, which always make a swap operation
+            if (WOODEN_SHELVES != null && WOODEN_SHELVES.isTagged(clicked.getType()) ) {
+                if (!plugin.canAccess(protection, player, Permission.DEPOSIT, Permission.WITHDRAW)) {
+                    e.setUseItemInHand(Event.Result.DENY);
+                    e.setUseInteractedBlock(Event.Result.DENY);
                 }
             }
             if (Material.DECORATED_POT.equals(clicked.getType()) && e.getItem() != null) {
