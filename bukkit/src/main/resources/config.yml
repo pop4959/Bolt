@@ -50,6 +50,8 @@ blocks:
     autoProtect: private
   trapped_chest:
     autoProtect: private
+  '#copper_chests':
+    autoProtect: private
   furnace:
     autoProtect: private
   blast_furnace:
