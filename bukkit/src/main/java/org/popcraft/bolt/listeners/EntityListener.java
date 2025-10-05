@@ -681,7 +681,6 @@ public final class EntityListener extends InteractionListener implements Listene
                 setAllowed.accept(false);
             }
         }
-
     }
 
     private Entity getDamagerSource(final Entity damager) {
