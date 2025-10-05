@@ -18,11 +18,11 @@ public final class BoltComponents {
     }
 
     public static void enable() {
-            miniMessage = MiniMessage.miniMessage();
+        miniMessage = MiniMessage.miniMessage();
     }
 
     public static void disable() {
-            miniMessage = null;
+        miniMessage = null;
     }
 
     private static void sendMessage(final CommandSender sender, final Component component) {
