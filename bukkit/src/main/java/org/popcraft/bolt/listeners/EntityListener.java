@@ -5,6 +5,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
@@ -64,6 +65,8 @@ import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
+import org.popcraft.bolt.util.BukkitPlayerResolver;
+import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
@@ -75,12 +78,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 
 public final class EntityListener extends InteractionListener implements Listener {
     private static final SourceResolver ENTITY_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.ENTITY));
+    private static final EntityType COPPER_GOLEM = EnumUtil.valueOf(EntityType.class, "COPPER_GOLEM").orElse(null);
     private final Map<NamespacedKey, UUID> spawnEggPlayers = new HashMap<>();
 
     public EntityListener(final BoltPlugin plugin) {
@@ -649,6 +655,31 @@ public final class EntityListener extends InteractionListener implements Listene
         if (protection instanceof final BlockProtection blockProtection && blockProtection.getBlock().equals(e.getBlock().getType().name()) && e.getBlock().getType() != e.getTo()) {
             blockProtection.setBlock(e.getTo().name());
             plugin.saveProtection(blockProtection);
+        }
+    }
+
+    public void onItemTransportingEntityValidateTarget(Entity entity, Block block, Consumer<Boolean> setAllowed) {
+        final Protection blockProtection = plugin.findProtection(block);
+        if (blockProtection == null) {
+            return;
+        }
+        final Protection entityProtection = plugin.findProtection(entity);
+        final SourceResolver resolver =
+                entityProtection != null ? new BukkitPlayerResolver(this.plugin.getBolt(), entityProtection.getOwner()) : ENTITY_SOURCE_RESOLVER;
+        // Future: replace with entity instanceof CopperGolem or something
+        if (entity instanceof LivingEntity livingEntity && entity.getType() == COPPER_GOLEM) {
+            // For copper golems, we know if they're depositing or withdrawing based on if they're holding something.
+            final boolean isPickingUpItem = Objects.requireNonNull(livingEntity.getEquipment()).getItemInMainHand().getAmount() == 0;
+            final String permission = isPickingUpItem ? Permission.WITHDRAW : Permission.DEPOSIT;
+            if (!plugin.canAccess(blockProtection, resolver, permission)) {
+                setAllowed.accept(false);
+            }
+        } else {
+            // A plugin has added the item transporting goal to some other entity. Apparently according to Paper this is
+            // valid, but Bolt can't really know what the entity is doing, so just assume both withdrawing and depositing.
+            if (!plugin.canAccess(blockProtection, resolver, Permission.WITHDRAW, Permission.DEPOSIT)) {
+                setAllowed.accept(false);
+            }
         }
     }
 
