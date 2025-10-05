@@ -453,12 +453,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         final PluginManager pluginManager = getServer().getPluginManager();
         final BlockListener blockListener = new BlockListener(this);
         pluginManager.registerEvents(blockListener, this);
-        if (PaperUtil.isPaper()) {
-            pluginManager.registerEvents(new PlayerRecipeBookClickListener(blockListener::onPlayerRecipeBookClick), this);
-            pluginManager.registerEvents(new BlockPreDispenseListener(blockListener::onBlockPreDispense), this);
-            pluginManager.registerEvents(new BlockDestroyListener(blockListener::onBlockDestroy), this);
-            pluginManager.registerEvents(new BlockBreakBlockEventListener(blockListener::onBlockBreakBlockEvent), this);
-        }
+        pluginManager.registerEvents(new PlayerRecipeBookClickListener(blockListener::onPlayerRecipeBookClick), this);
+        pluginManager.registerEvents(new BlockPreDispenseListener(blockListener::onBlockPreDispense), this);
+        pluginManager.registerEvents(new BlockDestroyListener(blockListener::onBlockDestroy), this);
+        pluginManager.registerEvents(new BlockBreakBlockEventListener(blockListener::onBlockBreakBlockEvent), this);
         final EntityListener entityListener = new EntityListener(this);
         pluginManager.registerEvents(entityListener, this);
         if (ItemTransportingEntityValidateTargetEventListener.canUse()) {
@@ -466,9 +464,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         }
         final InventoryListener inventoryListener = new InventoryListener(this);
         pluginManager.registerEvents(inventoryListener, this);
-        if (PaperUtil.isPaper()) {
-            pluginManager.registerEvents(new AnvilDamagedListener(inventoryListener::onAnvilBreak), this);
-        }
+        pluginManager.registerEvents(new AnvilDamagedListener(inventoryListener::onAnvilBreak), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
     }
 

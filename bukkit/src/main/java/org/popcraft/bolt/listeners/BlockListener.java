@@ -385,9 +385,8 @@ public final class BlockListener extends InteractionListener implements Listener
         for (final Block block : blocks) {
             final Protection blockProtection = plugin.findProtection(block);
             if (blockProtection != null) {
-                // Check for pistons breaking breakable things. Guarded by a paper check because BlockBreakBlockEvent is
-                // paper only, and we need to clean up the protection.
-                final boolean canBreak = pistonProtection != null && PaperUtil.isPaper()
+                // Check for pistons breaking breakable things.
+                final boolean canBreak = pistonProtection != null
                         && block.getPistonMoveReaction() == PistonMoveReaction.BREAK
                         && plugin.canAccess(blockProtection, pistonProtection.getOwner(), Permission.DESTROY);
 
