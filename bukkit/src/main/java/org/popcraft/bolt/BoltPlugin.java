@@ -58,12 +58,7 @@ import org.popcraft.bolt.listeners.BlockListener;
 import org.popcraft.bolt.listeners.EntityListener;
 import org.popcraft.bolt.listeners.InventoryListener;
 import org.popcraft.bolt.listeners.PlayerListener;
-import org.popcraft.bolt.listeners.adapter.AnvilDamagedListener;
-import org.popcraft.bolt.listeners.adapter.BlockBreakBlockEventListener;
-import org.popcraft.bolt.listeners.adapter.BlockDestroyListener;
-import org.popcraft.bolt.listeners.adapter.BlockPreDispenseListener;
 import org.popcraft.bolt.listeners.adapter.ItemTransportingEntityValidateTargetEventListener;
-import org.popcraft.bolt.listeners.adapter.PlayerRecipeBookClickListener;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.matcher.block.AmethystClusterMatcher;
 import org.popcraft.bolt.matcher.block.BannerMatcher;
@@ -450,20 +445,13 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     private void registerEvents() {
         final PluginManager pluginManager = getServer().getPluginManager();
-        final BlockListener blockListener = new BlockListener(this);
-        pluginManager.registerEvents(blockListener, this);
-        pluginManager.registerEvents(new PlayerRecipeBookClickListener(blockListener::onPlayerRecipeBookClick), this);
-        pluginManager.registerEvents(new BlockPreDispenseListener(blockListener::onBlockPreDispense), this);
-        pluginManager.registerEvents(new BlockDestroyListener(blockListener::onBlockDestroy), this);
-        pluginManager.registerEvents(new BlockBreakBlockEventListener(blockListener::onBlockBreakBlockEvent), this);
+        pluginManager.registerEvents(new BlockListener(this), this);
         final EntityListener entityListener = new EntityListener(this);
         pluginManager.registerEvents(entityListener, this);
         if (ItemTransportingEntityValidateTargetEventListener.canUse()) {
             pluginManager.registerEvents(new ItemTransportingEntityValidateTargetEventListener(entityListener::onItemTransportingEntityValidateTarget), this);
         }
-        final InventoryListener inventoryListener = new InventoryListener(this);
-        pluginManager.registerEvents(inventoryListener, this);
-        pluginManager.registerEvents(new AnvilDamagedListener(inventoryListener::onAnvilBreak), this);
+        pluginManager.registerEvents(new InventoryListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
     }
 
