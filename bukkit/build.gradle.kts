@@ -20,7 +20,6 @@ dependencies {
     implementation(group = "org.bstats", name = "bstats-bukkit", version = "3.0.2")
     implementation(group = "org.popcraft", name = "chunky-nbt", version = "1.3.127")
     api(project(":bolt-common"))
-    implementation(project(":bolt-paper"))
     implementation(project(":bolt-folia"))
 }
 
@@ -39,7 +38,6 @@ tasks {
     shadowJar {
         minimize {
             exclude(project(":bolt-common"))
-            exclude(project(":bolt-paper"))
             exclude(project(":bolt-folia"))
         }
         relocate("net.kyori.event", "${project.group}.${rootProject.name}.lib.net.kyori.event")
