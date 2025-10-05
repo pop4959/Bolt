@@ -3,5 +3,5 @@ repositories {
 }
 
 dependencies {
-    compileOnly(group = "io.papermc.paper", name = "paper-api", version = "1.20.6-R0.1-SNAPSHOT")
+    compileOnly(group = "io.papermc.paper", name = "paper-api", version = "1.21.9-R0.1-SNAPSHOT")
 }

@@ -62,6 +62,7 @@ import org.popcraft.bolt.listeners.adapter.AnvilDamagedListener;
 import org.popcraft.bolt.listeners.adapter.BlockBreakBlockEventListener;
 import org.popcraft.bolt.listeners.adapter.BlockDestroyListener;
 import org.popcraft.bolt.listeners.adapter.BlockPreDispenseListener;
+import org.popcraft.bolt.listeners.adapter.ItemTransportingEntityValidateTargetEventListener;
 import org.popcraft.bolt.listeners.adapter.PlayerRecipeBookClickListener;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.matcher.block.AmethystClusterMatcher;
@@ -156,7 +157,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -459,7 +459,11 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             pluginManager.registerEvents(new BlockDestroyListener(blockListener::onBlockDestroy), this);
             pluginManager.registerEvents(new BlockBreakBlockEventListener(blockListener::onBlockBreakBlockEvent), this);
         }
-        pluginManager.registerEvents(new EntityListener(this), this);
+        final EntityListener entityListener = new EntityListener(this);
+        pluginManager.registerEvents(entityListener, this);
+        if (ItemTransportingEntityValidateTargetEventListener.canUse()) {
+            pluginManager.registerEvents(new ItemTransportingEntityValidateTargetEventListener(entityListener::onItemTransportingEntityValidateTarget), this);
+        }
         final InventoryListener inventoryListener = new InventoryListener(this);
         pluginManager.registerEvents(inventoryListener, this);
         if (PaperUtil.isPaper()) {
