@@ -39,7 +39,7 @@ public final class Profiles {
             if (cached.complete()) {
                 return cached;
             }
-            final OfflinePlayer offlinePlayer = PaperUtil.getOfflinePlayer(name);
+            final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayerIfCached(name);
             if (offlinePlayer != null) {
                 profileCache.add(offlinePlayer.getUniqueId(), offlinePlayer.getName());
             }

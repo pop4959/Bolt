@@ -13,16 +13,9 @@ import java.util.concurrent.CompletableFuture;
 
 public class PaperUtil {
     private static final boolean CONFIG_EXISTS = classExists("com.destroystokyo.paper.PaperConfig") || classExists("io.papermc.paper.configuration.Configuration");
-    private static boolean getOfflinePlayerIfCachedExists;
     private static boolean teleportAsyncExists;
 
     static {
-        try {
-            Bukkit.class.getMethod("getOfflinePlayerIfCached", String.class);
-            getOfflinePlayerIfCachedExists = true;
-        } catch (NoSuchMethodException e) {
-            getOfflinePlayerIfCachedExists = false;
-        }
         try {
             Entity.class.getMethod("teleportAsync", Location.class);
             teleportAsyncExists = true;
@@ -36,14 +29,6 @@ public class PaperUtil {
 
     public static boolean isPaper() {
         return CONFIG_EXISTS;
-    }
-
-    public static OfflinePlayer getOfflinePlayer(final String name) {
-        if (getOfflinePlayerIfCachedExists) {
-            return Bukkit.getOfflinePlayerIfCached(name);
-        } else {
-            return Bukkit.getOfflinePlayer(name);
-        }
     }
 
     public static CompletableFuture<Boolean> teleportAsync(final Entity entity, final Location location) {
