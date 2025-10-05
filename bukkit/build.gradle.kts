@@ -11,9 +11,8 @@ repositories {
 
 dependencies {
     compileOnly(group = "io.papermc.paper", name = "paper-api", version = "1.20.6-R0.1-SNAPSHOT")
-    implementation(group = "net.kyori", name = "adventure-api", version = "4.24.0")
-    implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.24.0")
-    implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.4.1")
+    compileOnly(group = "net.kyori", name = "adventure-api", version = "4.24.0")
+    compileOnly(group = "net.kyori", name = "adventure-text-minimessage", version = "4.24.0")
     implementation(group = "net.kyori", name = "event-api", version = "3.0.0") {
         exclude(module = "guava")
         exclude(module = "checker-qual")
@@ -43,7 +42,7 @@ tasks {
             exclude(project(":bolt-paper"))
             exclude(project(":bolt-folia"))
         }
-        relocate("net.kyori", "${project.group}.${rootProject.name}.lib.net.kyori")
+        relocate("net.kyori.event", "${project.group}.${rootProject.name}.lib.net.kyori.event")
         relocate("org.bstats", "${project.group}.${rootProject.name}.lib.org.bstats")
         relocate("org.popcraft.chunky.nbt", "${project.group}.${rootProject.name}.lib.org.popcraft.chunky.nbt")
         manifest {

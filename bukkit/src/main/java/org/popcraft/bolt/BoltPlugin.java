@@ -223,7 +223,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         );
         this.bolt = new Bolt(new SimpleProtectionCache(new SQLStore(databaseConfiguration)));
         reload();
-        BoltComponents.enable(this);
+        BoltComponents.enable();
         registerEvents();
         registerCommands();
         this.callbackManager = new CallbackManager(this);
