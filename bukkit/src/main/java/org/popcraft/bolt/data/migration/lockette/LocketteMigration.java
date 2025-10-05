@@ -96,7 +96,7 @@ public class LocketteMigration {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
-                    PaperUtil.getChunkAtAsync(world, chunkX, chunkZ)
+                    world.getChunkAtAsync(chunkX, chunkZ)
                             .thenAccept(ignored -> {
                                 final Block signBlock = world.getBlockAt(locketteProtection.x(), locketteProtection.y(), locketteProtection.z());
                                 if (signBlock.getBlockData() instanceof final WallSign wallSign) {

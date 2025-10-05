@@ -74,7 +74,7 @@ public class AdminCleanup extends BoltCommand {
                 final World world = worlds.get(chunkPos.world());
                 final int x = chunkPos.x();
                 final int z = chunkPos.z();
-                PaperUtil.getChunkAtAsync(world, x, z)
+                world.getChunkAtAsync(x, z)
                         .thenAccept(ignored -> {
                             for (BlockProtection blockProtection : blockProtections) {
                                 final Block block = world.getBlockAt(blockProtection.getX(), blockProtection.getY(), blockProtection.getZ());
