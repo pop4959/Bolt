@@ -73,9 +73,9 @@ public final class BoltComponents {
      */
     public static Locale getLocaleOf(CommandSender sender) {
         if (sender instanceof Player player) {
-            return Translator.parseLocale(player.getLocale());
+            return player.locale();
         } else {
-            return new Locale("");
+            return Locale.ROOT;
         }
     }
 }
