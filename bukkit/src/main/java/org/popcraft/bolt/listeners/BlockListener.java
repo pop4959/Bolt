@@ -60,7 +60,6 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Doors;
 import org.popcraft.bolt.util.Mode;
-import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.ProtectableConfig;

@@ -143,7 +143,6 @@ import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Mode;
-import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.ProtectableConfig;
 
 import java.nio.file.Path;

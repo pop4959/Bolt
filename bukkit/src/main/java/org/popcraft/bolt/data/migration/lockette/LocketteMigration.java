@@ -11,7 +11,6 @@ import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.ChunkPos;
-import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.chunky.nbt.ByteTag;
 import org.popcraft.chunky.nbt.CompoundTag;

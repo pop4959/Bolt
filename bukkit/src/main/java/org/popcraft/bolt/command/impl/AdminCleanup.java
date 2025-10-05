@@ -13,7 +13,6 @@ import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.ChunkPos;
-import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 
