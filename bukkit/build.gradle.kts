@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(group = "io.papermc.paper", name = "paper-api", version = "1.20.6-R0.1-SNAPSHOT")
+    compileOnly(group = "io.papermc.paper", name = "paper-api", version = "1.21.9-R0.1-SNAPSHOT")
     compileOnly(group = "net.kyori", name = "adventure-api", version = "4.24.0")
     compileOnly(group = "net.kyori", name = "adventure-text-minimessage", version = "4.24.0")
     implementation(group = "net.kyori", name = "event-api", version = "3.0.0") {
