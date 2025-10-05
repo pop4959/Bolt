@@ -37,7 +37,7 @@ public final class Translator {
         }
 
         return tryGetProperty(key, locale) != null
-            || tryGetProperty(key, new Locale(locale.getLanguage())) != null
+            || tryGetProperty(key, Locale.of(locale.getLanguage())) != null
             || translation.containsKey(key)
             || fallback.containsKey(key);
     }
@@ -48,7 +48,7 @@ public final class Translator {
         }
 
         return tryGetProperty(key, locale) != null
-                || tryGetProperty(key, new Locale(locale.getLanguage())) != null
+                || tryGetProperty(key, Locale.of(locale.getLanguage())) != null
                 || translation.containsKey(key);
     }
 
@@ -59,7 +59,7 @@ public final class Translator {
         }
 
         return Objects.requireNonNullElseGet(tryGetProperty(key, locale),
-            () -> Objects.requireNonNullElseGet(tryGetProperty(key, new Locale(locale.getLanguage())),
+            () -> Objects.requireNonNullElseGet(tryGetProperty(key, Locale.of(locale.getLanguage())),
                 () -> Objects.requireNonNullElseGet(translation.getProperty(key),
                     () -> Objects.requireNonNullElse(fallback.getProperty(key), key))));
     }
@@ -168,10 +168,10 @@ public final class Translator {
     public static Locale parseLocale(final String string) {
         final String[] segments = string.split("_", 3);
         return switch (segments.length) {
-            case 1 -> new Locale(string);
-            case 2 -> new Locale(segments[0], segments[1]);
-            case 3 -> new Locale(segments[0], segments[1], segments[2]);
-            default -> new Locale("");
+            case 1 -> Locale.of(string);
+            case 2 -> Locale.of(segments[0], segments[1]);
+            case 3 -> Locale.of(segments[0], segments[1], segments[2]);
+            default -> Locale.ROOT;
         };
     }
 }
