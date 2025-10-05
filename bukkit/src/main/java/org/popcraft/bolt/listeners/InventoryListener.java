@@ -1,7 +1,10 @@
 package org.popcraft.bolt.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Entity;
@@ -37,7 +40,7 @@ import java.util.Set;
 public final class InventoryListener implements Listener {
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
-    private static final Material COPPER_CHEST = EnumUtil.valueOf(Material.class, "COPPER_CHEST").orElse(null);
+    private static final Tag<Material> COPPER_CHESTS = Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("copper_chests"), Material.class);
     @SuppressWarnings("UnstableApiUsage")
     private static final Map<InventoryType, Set<Material>> INVENTORY_TYPE_BLOCKS = Map.ofEntries(
             Map.entry(InventoryType.ANVIL, Set.of(Material.ANVIL, Material.CHIPPED_ANVIL, Material.DAMAGED_ANVIL)),
@@ -54,9 +57,9 @@ public final class InventoryListener implements Listener {
     );
 
     static {
-        // Future: Replace with Material.COPPER_CHEST, and merge into map above (and remove new HashMap)
-        if (COPPER_CHEST != null) {
-            INVENTORY_TYPE_BLOCKS.get(InventoryType.CHEST).add(COPPER_CHEST);
+        // Future: Replace with Tag.COPPER_CHESTS, and merge into map above (and remove new HashMap)
+        if (COPPER_CHESTS != null) {
+            INVENTORY_TYPE_BLOCKS.get(InventoryType.CHEST).addAll(COPPER_CHESTS.getValues());
         }
     }
 
