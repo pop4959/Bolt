@@ -173,7 +173,8 @@ public final class BlockListener extends InteractionListener implements Listener
                 }
             }
             if (Material.CHISELED_BOOKSHELF.equals(clicked.getType()) && clicked.getState() instanceof final ChiseledBookshelf chiseledBookshelf && clicked.getBlockData() instanceof final org.bukkit.block.data.type.ChiseledBookshelf chiseledBookshelfBlockData && chiseledBookshelfBlockData.getFacing() == e.getBlockFace()) {
-                final Vector clickedPosition = PaperUtil.getClickedPosition(e);
+                @SuppressWarnings("deprecation") // Paper deprecating things with no alternatives
+                final Vector clickedPosition = e.getClickedPosition();
                 if (clickedPosition != null) {
                     final int slot = chiseledBookshelf.getSlot(clickedPosition);
                     final boolean isOccupied = chiseledBookshelfBlockData.isSlotOccupied(slot);

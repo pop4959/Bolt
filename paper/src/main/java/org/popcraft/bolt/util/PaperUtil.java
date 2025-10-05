@@ -15,7 +15,6 @@ public class PaperUtil {
     private static final boolean CONFIG_EXISTS = classExists("com.destroystokyo.paper.PaperConfig") || classExists("io.papermc.paper.configuration.Configuration");
     private static boolean getOfflinePlayerIfCachedExists;
     private static boolean getChunkAtAsyncExists;
-    private static boolean getClickedPositionExists;
     private static boolean teleportAsyncExists;
 
     static {
@@ -30,12 +29,6 @@ public class PaperUtil {
             getChunkAtAsyncExists = true;
         } catch (NoSuchMethodException e) {
             getChunkAtAsyncExists = false;
-        }
-        try {
-            PlayerInteractEvent.class.getMethod("getClickedPosition");
-            getClickedPositionExists = true;
-        } catch (NoSuchMethodException e) {
-            getClickedPositionExists = false;
         }
         try {
             Entity.class.getMethod("teleportAsync", Location.class);
@@ -65,15 +58,6 @@ public class PaperUtil {
             return world.getChunkAtAsync(x, z);
         } else {
             return CompletableFuture.completedFuture(world.getChunkAt(x, z));
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    public static Vector getClickedPosition(final PlayerInteractEvent e) {
-        if (getClickedPositionExists) {
-            return e.getClickedPosition();
-        } else {
-            return null;
         }
     }
 
