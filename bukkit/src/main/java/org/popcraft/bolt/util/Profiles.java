@@ -57,7 +57,7 @@ public final class Profiles {
         } catch (final IllegalArgumentException ignored) {
             return CompletableFuture.completedFuture(SimpleProfileCache.EMPTY_PROFILE);
         }
-        final CompletableFuture<PlayerProfile> updatedProfile = playerProfile.update();
+        final CompletableFuture<? extends PlayerProfile> updatedProfile = playerProfile.update();
         final ProfileCache profileCache = JavaPlugin.getPlugin(BoltPlugin.class).getProfileCache();
         updatedProfile.thenAccept(profile -> {
             if (profile.isComplete()) {
@@ -109,7 +109,7 @@ public final class Profiles {
         } catch (final IllegalArgumentException ignored) {
             return CompletableFuture.completedFuture(SimpleProfileCache.EMPTY_PROFILE);
         }
-        final CompletableFuture<PlayerProfile> updatedProfile = playerProfile.update();
+        final CompletableFuture<? extends PlayerProfile> updatedProfile = playerProfile.update();
         final ProfileCache profileCache = JavaPlugin.getPlugin(BoltPlugin.class).getProfileCache();
         updatedProfile.thenAccept(profile -> {
             if (profile.isComplete()) {

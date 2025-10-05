@@ -4,14 +4,13 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.codemc.io/repository/maven-public/")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
-    compileOnly(group = "org.spigotmc", name = "spigot-api", version = "1.20.6-R0.1-SNAPSHOT")
+    compileOnly(group = "io.papermc.paper", name = "paper-api", version = "1.20.6-R0.1-SNAPSHOT")
     implementation(group = "net.kyori", name = "adventure-api", version = "4.24.0")
     implementation(group = "net.kyori", name = "adventure-text-minimessage", version = "4.24.0")
     implementation(group = "net.kyori", name = "adventure-platform-bukkit", version = "4.4.1")
