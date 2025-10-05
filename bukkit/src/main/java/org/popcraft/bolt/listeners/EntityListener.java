@@ -671,7 +671,7 @@ public final class EntityListener extends InteractionListener implements Listene
 
         final BlockProtection blockProtection = plugin.loadProtection(e.getBlock());
         if (blockProtection != null && broken && e.getEntity() instanceof Player) {
-            // This event is called for axing copper golems. This could cause it to reanimate to we need to keep track of it.
+            // This event is called for axing copper golems. This could cause it to reanimate so we need to keep track of it.
             // Future: use Tag.COPPER_GOLEM_STATUES
             if (COPPER_GOLEM_STATUES != null && COPPER_GOLEM_STATUES.isTagged(e.getBlock().getType())) {
                 final BlockLocation location = BlockLocation.fromProtection(blockProtection);
