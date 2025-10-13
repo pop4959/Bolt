@@ -213,7 +213,7 @@ public final class BlockListener extends InteractionListener implements Listener
         if (protection == null) {
             return;
         }
-        if (e.getBlockReplacedState().getBlock().isReplaceable()) {
+        if (Tag.REPLACEABLE.isTagged(e.getBlockReplacedState().getType())) {
             // Prevent accidental deletion of protected blocks by them getting replaced.
             // Purposefully not checking for destroy permissions, that logic is for BlockBreakEvent.
             e.setCancelled(true);
