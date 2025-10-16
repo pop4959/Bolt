@@ -105,7 +105,7 @@ public final class Protections {
         if (!blockTranslationKey.equals(blockTranslation)) {
             return Component.text(blockTranslation);
         }
-        return Component.translatable(material.getTranslationKey());
+        return Component.translatable(material);
     }
 
     public static Component displayType(final Entity entity, final CommandSender sender) {
@@ -119,7 +119,7 @@ public final class Protections {
         if (!entityTranslationKey.equals(entityTranslation)) {
             return Component.text(entityTranslation);
         }
-        return Component.translatable(entityType.getTranslationKey());
+        return Component.translatable(entityType);
     }
 
     public static Component accessList(final Map<String, String> accessMap, final CommandSender sender) {
