@@ -90,6 +90,8 @@ blocks:
     autoProtect: private
   '#cauldrons':
     autoProtect: private
+  '#wooden_shelves':
+    autoProtect: private
   ender_chest:
     autoProtect: public
   '#standing_signs':
