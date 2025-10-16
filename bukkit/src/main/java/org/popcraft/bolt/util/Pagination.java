@@ -74,7 +74,7 @@ public class Pagination {
                         Placeholder.component(Translation.Placeholder.TIME, Time.relativeTimestamp(protection.getCreated(), sender, 1))
                 );
             } else {
-                final ClickEvent teleport = plugin.getCallbackManager().registerPlayerOnly(player -> PaperUtil.teleportAsync(player, location));
+                final ClickEvent teleport = plugin.getCallbackManager().registerPlayerOnly(player -> player.teleportAsync(location));
                 final List<Component> hoverInfo = new ArrayList<>();
                 if (sender instanceof final Player player) {
                     final Location playerLocation = player.getLocation();

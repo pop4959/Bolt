@@ -1,5 +1,9 @@
 package org.popcraft.bolt.listeners;
 
+import com.destroystokyo.paper.event.block.BlockDestroyEvent;
+import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
+import io.papermc.paper.event.block.BlockBreakBlockEvent;
+import io.papermc.paper.event.block.BlockPreDispenseEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -47,6 +51,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.event.LockBlockEvent;
@@ -62,7 +67,6 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Doors;
 import org.popcraft.bolt.util.Mode;
-import org.popcraft.bolt.util.PaperUtil;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.ProtectableConfig;
@@ -176,7 +180,8 @@ public final class BlockListener extends InteractionListener implements Listener
                 }
             }
             if (Material.CHISELED_BOOKSHELF.equals(clicked.getType()) && clicked.getState() instanceof final ChiseledBookshelf chiseledBookshelf && clicked.getBlockData() instanceof final org.bukkit.block.data.type.ChiseledBookshelf chiseledBookshelfBlockData && chiseledBookshelfBlockData.getFacing() == e.getBlockFace()) {
-                final Vector clickedPosition = PaperUtil.getClickedPosition(e);
+                @SuppressWarnings("deprecation") // Paper deprecating things with no alternatives
+                final Vector clickedPosition = e.getClickedPosition();
                 if (clickedPosition != null) {
                     final int slot = chiseledBookshelf.getSlot(clickedPosition);
                     final boolean isOccupied = chiseledBookshelfBlockData.isSlotOccupied(slot);
@@ -396,9 +401,8 @@ public final class BlockListener extends InteractionListener implements Listener
         for (final Block block : blocks) {
             final Protection blockProtection = plugin.findProtection(block);
             if (blockProtection != null) {
-                // Check for pistons breaking breakable things. Guarded by a paper check because BlockBreakBlockEvent is
-                // paper only, and we need to clean up the protection.
-                final boolean canBreak = pistonProtection != null && PaperUtil.isPaper()
+                // Check for pistons breaking breakable things.
+                final boolean canBreak = pistonProtection != null
                         && block.getPistonMoveReaction() == PistonMoveReaction.BREAK
                         && plugin.canAccess(blockProtection, pistonProtection.getOwner(), Permission.DESTROY);
 
@@ -518,14 +522,12 @@ public final class BlockListener extends InteractionListener implements Listener
         }
     }
 
-    public void onPlayerRecipeBookClick(final PlayerEvent e) {
-        if (!(e instanceof Cancellable cancellable)) {
-            return;
-        }
+    @EventHandler
+    public void onPlayerRecipeBookClick(final PlayerRecipeBookClickEvent e) {
         final Player player = e.getPlayer();
         final Location location = player.getOpenInventory().getTopInventory().getLocation();
         if (location != null && !plugin.canAccess(location.getBlock(), player, Permission.DEPOSIT, Permission.WITHDRAW)) {
-            cancellable.setCancelled(true);
+            e.setCancelled(true);
         }
     }
 
@@ -576,17 +578,15 @@ public final class BlockListener extends InteractionListener implements Listener
         }
     }
 
-    public void onBlockPreDispense(final BlockEvent e) {
-        if (!(e instanceof Cancellable cancellable)) {
-            return;
-        }
+    @EventHandler
+    public void onBlockPreDispense(final BlockPreDispenseEvent e) {
         final Block block = e.getBlock();
         final Protection existingProtection = plugin.findProtection(block);
         if (existingProtection == null) {
             return;
         }
         if (!plugin.canAccess(existingProtection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
-            cancellable.setCancelled(true);
+            e.setCancelled(true);
         }
     }
 
@@ -594,24 +594,23 @@ public final class BlockListener extends InteractionListener implements Listener
     // from becoming destroyed involuntarily, for example, because it is a door and its support was removed. For other
     // cases, like just breaking the door itself, it will go through other events and be handled properly.
     // This is a last resort event.
-    public void onBlockDestroy(final BlockEvent e) {
-        if (!(e instanceof Cancellable cancellable)) {
-            return;
-        }
+    @EventHandler
+    public void onBlockDestroy(final BlockDestroyEvent e) {
         final Block block = e.getBlock();
         final Protection existingProtection = plugin.findProtection(block);
         if (existingProtection == null) {
             return;
         }
-        cancellable.setCancelled(true);
+        e.setCancelled(true);
     }
 
     // Called when a piston breaks a block. We can only reach here if BlockPistonExtendEvent allowed the
-    // interaction to happen, so all we need to do here is clean up. Executed at MONITOR priority.
-    public void onBlockBreakBlockEvent(final BlockEvent e, final Block source) {
+    // interaction to happen, so all we need to do here is clean up.
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockBreakBlock(final BlockBreakBlockEvent e) {
         final Block target = e.getBlock();
         final Protection targetProtection = plugin.findProtection(target);
-        if (source.getBlockData() instanceof Piston && targetProtection != null) {
+        if (e.getSource().getBlockData() instanceof Piston && targetProtection != null) {
             plugin.removeProtection(targetProtection);
         }
     }

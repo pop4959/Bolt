@@ -1,5 +1,6 @@
 package org.popcraft.bolt.listeners;
 
+import com.destroystokyo.paper.event.block.AnvilDamagedEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,6 +11,7 @@ import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -202,7 +204,11 @@ public final class InventoryListener implements Listener {
         }
     }
 
-    public void onAnvilBreak(final InventoryEvent e) {
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onAnvilDamaged(final AnvilDamagedEvent e) {
+        if (!e.isBreaking()) {
+            return;
+        }
         final Protection anvilProtection = getInventoryProtection(e.getInventory());
         if (anvilProtection == null) {
             return;
