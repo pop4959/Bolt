@@ -91,6 +91,7 @@ public final class EntityListener extends InteractionListener implements Listene
     private static final SourceResolver ENTITY_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.ENTITY));
     private static final EntityType COPPER_GOLEM = EnumUtil.valueOf(EntityType.class, "COPPER_GOLEM").orElse(null);
     private static final Tag<Material> COPPER_GOLEM_STATUES = Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("copper_golem_statues"), Material.class);
+    private static final CreatureSpawnEvent.SpawnReason REANIMATE = EnumUtil.valueOf(CreatureSpawnEvent.SpawnReason.class, "REANIMATE").orElse(null);
     private final Map<NamespacedKey, UUID> spawnEggPlayers = new HashMap<>();
     private final Map<BlockLocation, BlockProtection> reanimatedCopperGolems = new HashMap<>();
 
@@ -126,8 +127,8 @@ public final class EntityListener extends InteractionListener implements Listene
             if (player != null) {
                 handleEntityPlacementByPlayer(entity, player);
             }
-        } else if (entity.getType() == COPPER_GOLEM && CreatureSpawnEvent.SpawnReason.DEFAULT.equals(e.getSpawnReason())) { // todo: change to SpawnReason.REANIMATE
-            // Future: use instanceof CopperGolem or something
+        } else if (entity.getType() == COPPER_GOLEM && e.getSpawnReason().equals(REANIMATE)) {
+            // Future: use instanceof CopperGolem or something. Also, CreatureSpawnEvent.SpawnReason.REANIMATE
             // A copper golem statue was reanimated. Transfer the protection over to the golem.
             final Location location = e.getLocation();
             final BlockLocation blockLocation = new BlockLocation(entity.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
