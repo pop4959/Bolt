@@ -652,7 +652,7 @@ public final class EntityListener extends InteractionListener implements Listene
             return;
         }
         // This event is called for decorated pots broken by an arrow. WATER is needed for waterlogged decorated pots.
-        final boolean broken = e.getTo().equals(Material.AIR) || e.getTo().equals(Material.WATER);
+        final boolean broken = e.getTo().isAir() || e.getTo().equals(Material.WATER);
         if (!(getDamagerSource(e.getEntity()) instanceof final Player player) || !plugin.canAccess(protection, player, broken ? Permission.DESTROY : Permission.INTERACT)) {
             e.setCancelled(true);
         }
@@ -660,7 +660,7 @@ public final class EntityListener extends InteractionListener implements Listene
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityChangeBlockMonitor(final EntityChangeBlockEvent e) {
-        final boolean broken = e.getTo().equals(Material.AIR) || e.getTo().equals(Material.WATER);
+        final boolean broken = e.getTo().isAir() || e.getTo().equals(Material.WATER);
         // This event is called for waxing or axing a copper block. We need to update the protection to avoid mismatches.
         final Protection findBlock = plugin.findProtection(e.getBlock());
         if (findBlock instanceof final BlockProtection blockProtection && e.getEntity() instanceof Player) {
