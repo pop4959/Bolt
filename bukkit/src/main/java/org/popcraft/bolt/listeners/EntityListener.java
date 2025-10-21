@@ -12,7 +12,6 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -381,7 +380,7 @@ public final class EntityListener extends InteractionListener implements Listene
         }
         if (e.getRightClicked() instanceof final ItemFrame itemFrame) {
             final boolean noItemInFrame = itemFrame.getItem().getType().isAir();
-            final boolean hasItemInHand = e.getPlayer().getInventory().getItem(e.getHand()) != null;
+            final boolean hasItemInHand = !e.getPlayer().getInventory().getItem(e.getHand()).isEmpty();
             if (noItemInFrame && hasItemInHand && !plugin.canAccess(entity, player, Permission.DEPOSIT)) {
                 e.setCancelled(true);
             }
@@ -494,11 +493,11 @@ public final class EntityListener extends InteractionListener implements Listene
             return;
         }
         if (EntityUnleashEvent.UnleashReason.DISTANCE.equals(e.getReason())) {
-            if (!(e instanceof final Cancellable c) || entity.getPassengers().stream().anyMatch(passenger -> plugin.canAccess(protection, passenger.getUniqueId(), Permission.DESTROY))) {
+            if (entity.getPassengers().stream().anyMatch(passenger -> plugin.canAccess(protection, passenger.getUniqueId(), Permission.DESTROY))) {
                 plugin.removeProtection(protection);
             } else {
                 entity.eject();
-                c.setCancelled(true);
+                e.setCancelled(true);
             }
         } else {
             plugin.removeProtection(protection);
