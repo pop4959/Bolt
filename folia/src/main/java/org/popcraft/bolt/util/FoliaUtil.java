@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class FoliaUtil {
-    private static final boolean CONFIG_EXISTS = classExists("io.papermc.paper.threadedregions.RegionizedServer") || classExists("io.papermc.paper.threadedregions.RegionizedServerInitEvent");
+    private static final boolean CONFIG_EXISTS = classExists("io.papermc.paper.threadedregions.RegionizedServer");
 
     private FoliaUtil() {
     }
