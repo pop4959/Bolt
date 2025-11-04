@@ -363,10 +363,21 @@ public final class BlockListener extends InteractionListener implements Listener
 
     @EventHandler
     public void onBlockMultiPlace(final BlockMultiPlaceEvent e) {
-        for (final BlockState blockState : e.getReplacedBlockStates()) {
-            if (plugin.isProtected(blockState.getBlock())) {
-                e.setCancelled(true);
-                return;
+        // This event is fired when placing a shelf that would immediately connect to another shelf.
+        if (WOODEN_SHELVES != null && WOODEN_SHELVES.isTagged(e.getBlock().getType())) {
+            for (final BlockState blockState : e.getReplacedBlockStates()) {
+                final Protection protection = plugin.findProtection(blockState.getBlock());
+                if (!plugin.canAccess(protection, e.getPlayer(), Permission.DESTROY)) {
+                    e.setCancelled(true);
+                    return;
+                }
+            }
+        } else {
+            for (final BlockState blockState : e.getReplacedBlockStates()) {
+                if (plugin.isProtected(blockState.getBlock())) {
+                    e.setCancelled(true);
+                    return;
+                }
             }
         }
     }
