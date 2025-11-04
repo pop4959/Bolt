@@ -1,5 +1,6 @@
 package org.popcraft.bolt.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -32,6 +33,9 @@ public class FoliaUtil {
             for (int chunkX = minChunkX; chunkX <= maxChunkX; ++chunkX) {
                 for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; ++chunkZ) {
                     if (!world.isChunkLoaded(chunkX, chunkZ)) {
+                        continue;
+                    }
+                    if (!Bukkit.getServer().isOwnedByCurrentRegion(world, chunkX, chunkZ)) {
                         continue;
                     }
                     final Chunk chunk = world.getChunkAt(chunkX, chunkZ);
