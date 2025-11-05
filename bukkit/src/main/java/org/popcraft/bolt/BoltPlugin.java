@@ -16,6 +16,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -140,6 +141,7 @@ import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.ProtectableConfig;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -252,6 +254,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         this.doorsFixPlugins = getConfig().getBoolean("doors.fix-plugins", false);
         registerAccessTypes();
         registerProtectableAccess();
+        nagInvalidHopperConfig();
         registerAccessSources();
         initializeMatchers();
         loadDefaultModes();
@@ -378,6 +381,17 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
                     EnumUtil.valueOf(EntityType.class, key.toUpperCase()).ifPresentOrElse(entity -> protectableEntities.put(entity, new ProtectableConfig(defaultAccess, lockPermission, autoProtectPermission)), () -> getLogger().warning(() -> "Invalid entity defined in config: %s. Skipping.".formatted(key)));
                 }
             }
+        }
+    }
+
+    private void nagInvalidHopperConfig() {
+        if (getConfig().getBoolean("settings.ignore-hopper-nag", false) || !protectableBlocks.containsKey(Material.HOPPER)) {
+            return;
+        }
+        final File paperWorldDefaultsFile = Path.of(".").resolve("config/paper-world-defaults.yml").toFile();
+        final YamlConfiguration paperWorldDefaults = YamlConfiguration.loadConfiguration(paperWorldDefaultsFile);
+        if (paperWorldDefaults.getBoolean("hopper.disable-move-event", false)) {
+            getLogger().warning(() -> "The server's Paper config has disable-move-event enabled. As a result, Hopper protections will not function properly. To resolve this issue, please either disable this in the Paper config, or remove hoppers from the blocks list in your Bolt config if you do not want hoppers protected.");
         }
     }
 
