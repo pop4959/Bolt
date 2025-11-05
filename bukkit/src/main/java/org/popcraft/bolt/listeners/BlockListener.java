@@ -19,7 +19,6 @@ import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Leaves;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,7 +26,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
-import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
@@ -46,16 +44,15 @@ import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.event.LockBlockEvent;
 import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.listeners.adapter.ConnectedShelves;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
@@ -191,15 +188,6 @@ public final class BlockListener extends InteractionListener implements Listener
                     }
                 }
             }
-            // Future: use Tag.WOODEN_SHELVES
-            // todo: get slot once api is added for it. hopefully that api is shared with chiseled bookshelves and all this can just be merged above.
-            //       but then need to watch out for powered shelves, which always make a swap operation
-            if (WOODEN_SHELVES != null && WOODEN_SHELVES.isTagged(clicked.getType()) ) {
-                if (!plugin.canAccess(protection, player, Permission.DEPOSIT, Permission.WITHDRAW)) {
-                    e.setUseItemInHand(Event.Result.DENY);
-                    e.setUseInteractedBlock(Event.Result.DENY);
-                }
-            }
             if (Material.DECORATED_POT.equals(clicked.getType()) && e.getItem() != null) {
                 if (!plugin.canAccess(protection, player, Permission.DEPOSIT)) {
                     e.setUseItemInHand(Event.Result.DENY);
@@ -208,6 +196,19 @@ public final class BlockListener extends InteractionListener implements Listener
             }
             boltPlayer.setInteracted(shouldCancel);
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
+        }
+        // Future: use Tag.WOODEN_SHELVES
+        // todo: get slot once api is added for it, but then need to watch out for powered shelves, which always make a swap operation
+        if (WOODEN_SHELVES != null && WOODEN_SHELVES.isTagged(clicked.getType()) && ConnectedShelves.canUse()) {
+            // Require the player to be able to access all connected shelves
+            final List<Block> connected = ConnectedShelves.connectedShelves(clicked);
+            for (Block shelf : connected) {
+                final Protection shelfProtection = plugin.loadProtection(shelf);
+                if (!plugin.canAccess(shelfProtection, player, Permission.DEPOSIT, Permission.WITHDRAW)) {
+                    e.setUseItemInHand(Event.Result.DENY);
+                    e.setUseInteractedBlock(Event.Result.DENY);
+                }
+            }
         }
         if (shouldCancel) {
             e.setCancelled(true);
@@ -362,10 +363,21 @@ public final class BlockListener extends InteractionListener implements Listener
 
     @EventHandler
     public void onBlockMultiPlace(final BlockMultiPlaceEvent e) {
-        for (final BlockState blockState : e.getReplacedBlockStates()) {
-            if (plugin.isProtected(blockState.getBlock())) {
-                e.setCancelled(true);
-                return;
+        // This event is fired when placing a shelf that would immediately connect to another shelf.
+        if (WOODEN_SHELVES != null && WOODEN_SHELVES.isTagged(e.getBlock().getType())) {
+            for (final BlockState blockState : e.getReplacedBlockStates()) {
+                final Protection protection = plugin.findProtection(blockState.getBlock());
+                if (!plugin.canAccess(protection, e.getPlayer(), Permission.DESTROY)) {
+                    e.setCancelled(true);
+                    return;
+                }
+            }
+        } else {
+            for (final BlockState blockState : e.getReplacedBlockStates()) {
+                if (plugin.isProtected(blockState.getBlock())) {
+                    e.setCancelled(true);
+                    return;
+                }
             }
         }
     }
