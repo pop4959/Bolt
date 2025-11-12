@@ -563,7 +563,7 @@ public final class BlockListener extends InteractionListener implements Listener
             return;
         }
         final Material placingType = e.getItem().getType();
-        if (Tag.SHULKER_BOXES.isTagged(placingType) && plugin.isProtectable(placingType) && block.getBlockData() instanceof Directional directional) {
+        if (block.getType().equals(Material.DISPENSER) && Tag.SHULKER_BOXES.isTagged(placingType) && plugin.isProtectable(placingType) && block.getBlockData() instanceof Directional directional) {
             // Dispensing a shulker places it. If the dispenser was locked, transfer the owner to the shulker.
             // This event doesn't let us access the placed block, so we end up creating the protection before the block actually exists, by anticipating where it will be placed.
             final Block placeTo = block.getRelative(directional.getFacing());
