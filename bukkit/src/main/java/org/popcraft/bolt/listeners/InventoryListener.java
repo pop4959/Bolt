@@ -1,12 +1,6 @@
 package org.popcraft.bolt.listeners;
 
 import com.destroystokyo.paper.event.block.AnvilDamagedEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Tag;
-import org.bukkit.block.Block;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -16,7 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -35,35 +28,9 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Permission;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 public final class InventoryListener implements Listener {
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
     private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
-    private static final Tag<Material> COPPER_CHESTS = Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("copper_chests"), Material.class);
-    @SuppressWarnings("UnstableApiUsage")
-    private static final Map<InventoryType, Set<Material>> INVENTORY_TYPE_BLOCKS = Map.ofEntries(
-            Map.entry(InventoryType.ANVIL, Set.of(Material.ANVIL, Material.CHIPPED_ANVIL, Material.DAMAGED_ANVIL)),
-            Map.entry(InventoryType.BARREL, Set.of(Material.BARREL)),
-            Map.entry(InventoryType.BLAST_FURNACE, Set.of(Material.BLAST_FURNACE)),
-            Map.entry(InventoryType.CHEST, new HashSet<>(Set.of(Material.CHEST, Material.TRAPPED_CHEST))),
-            Map.entry(InventoryType.CRAFTER, Set.of(Material.CRAFTER)),
-            Map.entry(InventoryType.DISPENSER, Set.of(Material.DISPENSER)),
-            Map.entry(InventoryType.DROPPER, Set.of(Material.DROPPER)),
-            Map.entry(InventoryType.FURNACE, Set.of(Material.FURNACE)),
-            Map.entry(InventoryType.HOPPER, Set.of(Material.HOPPER)),
-            Map.entry(InventoryType.SHULKER_BOX, Set.of(Material.SHULKER_BOX)),
-            Map.entry(InventoryType.SMOKER, Set.of(Material.SMOKER))
-    );
-
-    static {
-        // Future: Replace with Tag.COPPER_CHESTS, and merge into map above (and remove new HashMap)
-        if (COPPER_CHESTS != null) {
-            INVENTORY_TYPE_BLOCKS.get(InventoryType.CHEST).addAll(COPPER_CHESTS.getValues());
-        }
-    }
 
     // These exist only in newer versions of 1.21.4 and only in Paper.
     private static final InventoryAction PICKUP_FROM_BUNDLE = EnumUtil.valueOf(InventoryAction.class, "PICKUP_FROM_BUNDLE").orElse(null);
@@ -217,29 +184,12 @@ public final class InventoryListener implements Listener {
     }
 
     private Protection getInventoryProtection(final Inventory inventory) {
-        final InventoryType inventoryType = inventory.getType();
-        final Set<Material> blockTypes = INVENTORY_TYPE_BLOCKS.get(inventoryType);
-        if (blockTypes != null) {
-            final Location inventoryLocation = inventory.getLocation();
-            if (inventoryLocation != null) {
-                final Block block = inventoryLocation.getBlock();
-                if (blockTypes.contains(block.getType())) {
-                    return plugin.findProtection(block);
-                }
-            }
-        }
-        return getHolderProtection(inventory.getHolder());
-    }
-
-    private Protection getHolderProtection(final InventoryHolder inventoryHolder) {
-        if (inventoryHolder instanceof final Entity entity) {
-            return plugin.findProtection(entity);
-        } else if (inventoryHolder instanceof final BlockInventoryHolder blockInventoryHolder) {
-            return plugin.findProtection(blockInventoryHolder.getBlock());
-        } else if (inventoryHolder instanceof final DoubleChest doubleChest) {
-            return plugin.findProtection(doubleChest.getLocation().getBlock());
-        } else {
-            return null;
-        }
+        final InventoryHolder holder = inventory.getHolder(false);
+        return switch (holder) {
+            case final Entity entity -> plugin.findProtection(entity);
+            case final BlockInventoryHolder blockInventoryHolder -> plugin.findProtection(blockInventoryHolder.getBlock());
+            case final DoubleChest doubleChest -> plugin.findProtection(doubleChest.getLocation().getBlock());
+            case null, default -> null;
+        };
     }
 }
