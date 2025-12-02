@@ -16,6 +16,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.ChiseledBookshelf;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Leaves;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.entity.Player;
@@ -470,6 +471,11 @@ public final class BlockListener extends InteractionListener implements Listener
             if (!plugin.canAccess(protection, player, Permission.INTERACT, Permission.DEPOSIT)) {
                 e.setCancelled(true);
             }
+        } else if (e.getBlock().getBlockData() instanceof Waterlogged) {
+            // Blocks which can be waterlogged won't be replaced, but their data will change
+            if (!plugin.canAccess(protection, player, Permission.INTERACT)) {
+                e.setCancelled(true);
+            }
         } else if (!e.getBlock().equals(e.getBlockClicked())) {
             // Prevent accidental deletion of protected blocks by them getting replaced.
             // Purposefully not checking for destroy permissions, that logic is for BlockBreakEvent.
@@ -486,6 +492,10 @@ public final class BlockListener extends InteractionListener implements Listener
         final Player player = e.getPlayer();
         if (e.getBlock().equals(e.getBlockClicked()) && Tag.CAULDRONS.isTagged(e.getBlock().getType())) {
             if (!plugin.canAccess(protection, player, Permission.INTERACT, Permission.WITHDRAW)) {
+                e.setCancelled(true);
+            }
+        } else if (e.getBlock().getBlockData() instanceof Waterlogged) {
+            if (!plugin.canAccess(protection, player, Permission.INTERACT)) {
                 e.setCancelled(true);
             }
         }
