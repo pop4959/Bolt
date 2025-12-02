@@ -494,6 +494,10 @@ public final class BlockListener extends InteractionListener implements Listener
             if (!plugin.canAccess(protection, player, Permission.INTERACT, Permission.WITHDRAW)) {
                 e.setCancelled(true);
             }
+        } else if (e.getBlock().getBlockData() instanceof Waterlogged) {
+            if (!plugin.canAccess(protection, player, Permission.INTERACT)) {
+                e.setCancelled(true);
+            }
         }
     }
 
