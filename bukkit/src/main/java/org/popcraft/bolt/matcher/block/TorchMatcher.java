@@ -6,16 +6,32 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
+import org.popcraft.bolt.util.EnumUtil;
 
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 public class TorchMatcher implements BlockMatcher {
+    private static final Material COPPER_TORCH = EnumUtil.valueOf(Material.class, "COPPER_TORCH").orElse(null);
+    private static final Material COPPER_WALL_TORCH = EnumUtil.valueOf(Material.class, "COPPER_WALL_TORCH").orElse(null);
     private static final EnumSet<BlockFace> CARDINAL_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
-    private static final Set<Material> TORCHES = Set.of(Material.TORCH, Material.REDSTONE_TORCH, Material.SOUL_TORCH);
-    private static final Set<Material> WALL_TORCHES = Set.of(Material.WALL_TORCH, Material.REDSTONE_WALL_TORCH, Material.SOUL_WALL_TORCH);
+    // Future: make immutable
+    private static final Set<Material> TORCHES = new HashSet<>(Set.of(Material.TORCH, Material.REDSTONE_TORCH, Material.SOUL_TORCH));
+    private static final Set<Material> WALL_TORCHES = new HashSet<>(Set.of(Material.WALL_TORCH, Material.REDSTONE_WALL_TORCH, Material.SOUL_WALL_TORCH));
     private boolean enabled;
+
+    static {
+        // Future: Replace with Material.COPPER_TORCH
+        if (COPPER_TORCH != null) {
+            TORCHES.add(COPPER_TORCH);
+        }
+        // Future: Replace with Material.COPPER_WALL_TORCH
+        if (COPPER_WALL_TORCH != null) {
+            WALL_TORCHES.add(COPPER_WALL_TORCH);
+        }
+    }
 
     @Override
     public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
