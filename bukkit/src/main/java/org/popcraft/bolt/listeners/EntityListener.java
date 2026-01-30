@@ -8,6 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.EndPortalFrame;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
@@ -78,9 +80,11 @@ import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -638,9 +642,21 @@ public final class EntityListener extends InteractionListener implements Listene
 
     @EventHandler
     public void onEntityChangeBlock(final EntityChangeBlockEvent e) {
+        final Block block = e.getBlock();
+        final Material type = block.getType();
         // This event is called for zombies breaking doors, but it's already handled by EntityBreakDoorEvent.
-        if (Tag.DOORS.isTagged(e.getBlock().getType()) && e.getTo().isAir()) {
+        if (Tag.DOORS.isTagged(type) && e.getTo().isAir()) {
             return;
+        }
+        // Check for ender portal creation destroying protections
+        if (Material.END_PORTAL_FRAME.equals(type) && e.getBlockData() instanceof final EndPortalFrame frame) {
+            final Set<Block> frames = findEndPortalFrames(block, frame.getFacing(), new HashSet<>());
+            if (frames.stream().filter(b -> b.getBlockData() instanceof final EndPortalFrame f && f.hasEye()).count() == 11) {
+                if (getEndPortalCenterBlocks(frames).stream().anyMatch(plugin::isProtected)) {
+                    e.setCancelled(true);
+                    return;
+                }
+            }
         }
         final Protection protection = plugin.findProtection(e.getBlock());
         if (protection == null) {
@@ -655,6 +671,43 @@ public final class EntityListener extends InteractionListener implements Listene
         if (!(getDamagerSource(e.getEntity()) instanceof final Player player) || !plugin.canAccess(protection, player, broken ? Permission.DESTROY : Permission.INTERACT)) {
             e.setCancelled(true);
         }
+    }
+
+    private Set<Block> findEndPortalFrames(final Block current, final BlockFace direction, final Set<Block> found) {
+        if (current.getBlockData() instanceof final EndPortalFrame frame) {
+            found.add(current);
+            if (found.size() == 12) {
+                return found;
+            }
+            final Block next = switch (frame.getFacing()) {
+                case NORTH -> current.getRelative(BlockFace.WEST);
+                case EAST -> current.getRelative(BlockFace.NORTH);
+                case SOUTH -> current.getRelative(BlockFace.EAST);
+                case WEST -> current.getRelative(BlockFace.SOUTH);
+                default -> null;
+            };
+            if (next != null) {
+                findEndPortalFrames(next, direction, found);
+            }
+        } else {
+            final Block next = current.getRelative(direction);
+            if (next.getBlockData() instanceof final EndPortalFrame frame) {
+                findEndPortalFrames(next, frame.getFacing(), found);
+            }
+        }
+        return found;
+    }
+
+    private Set<Block> getEndPortalCenterBlocks(final Set<Block> endPortalFrames) {
+        final Set<Block> centerBlocks = new HashSet<>();
+        for (final Block block : endPortalFrames) {
+            if (block.getBlockData() instanceof final EndPortalFrame frame) {
+                final BlockFace direction = frame.getFacing();
+                centerBlocks.add(block.getRelative(direction));
+                centerBlocks.add(block.getRelative(direction, 2));
+            }
+        }
+        return centerBlocks;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
