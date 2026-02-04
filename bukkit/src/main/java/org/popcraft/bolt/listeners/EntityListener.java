@@ -1,5 +1,7 @@
 package org.popcraft.bolt.listeners;
 
+import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
+import io.papermc.paper.event.entity.EntityKnockbackEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -238,6 +240,22 @@ public final class EntityListener extends InteractionListener implements Listene
             return;
         }
         if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) || (!(damager instanceof Player) && plugin.isProtected(entity))) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityKnockbackByEntity(final EntityKnockbackByEntityEvent e) {
+        // We reach here attacks with piercing_weapon and kinetic_weapon, present by default on spears, even when cancelled.
+        // Working around a Paper bug.
+        final Entity damager = getDamagerSource(e.getHitBy());
+        if (!(damager instanceof final Player player) || e.getCause() != EntityKnockbackEvent.Cause.ENTITY_ATTACK) {
+            return;
+        }
+        final LivingEntity entity = e.getEntity();
+        final Protection protection = plugin.findProtection(entity);
+        // The player couldn't have attacked the entity, so they also shouldn't be able to knockback it.
+        if (!plugin.canAccess(protection, player, Permission.DESTROY)) {
             e.setCancelled(true);
         }
     }
