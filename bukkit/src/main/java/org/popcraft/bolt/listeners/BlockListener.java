@@ -615,18 +615,14 @@ public final class BlockListener extends InteractionListener implements Listener
         }
     }
 
-    // BlockDestroyEvent is called when a block is about to be destroyed. We use it here to prevent a protected block
-    // from becoming destroyed involuntarily, for example, because it is a door and its support was removed. For other
-    // cases, like just breaking the door itself, it will go through other events and be handled properly.
-    // This is a last resort event.
+    // Avoid ghost protection, for example, when a door loses its support block, and we can no longer salvage it. For
+    // other cases, like just breaking the door itself, it will go through other events and be handled properly with
+    // permission checks. This is a last resort event.
     @EventHandler
     public void onBlockDestroy(final BlockDestroyEvent e) {
         final Block block = e.getBlock();
-        final Protection existingProtection = plugin.findProtection(block);
-        if (existingProtection == null) {
-            return;
-        }
-        e.setCancelled(true);
+        final Protection protection = plugin.loadProtection(block);
+        plugin.removeProtection(protection);
     }
 
     // Called when a piston breaks a block. We can only reach here if BlockPistonExtendEvent allowed the
