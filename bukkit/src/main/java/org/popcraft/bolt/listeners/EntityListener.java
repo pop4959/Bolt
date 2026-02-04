@@ -246,7 +246,7 @@ public final class EntityListener extends InteractionListener implements Listene
 
     @EventHandler
     public void onEntityKnockbackByEntity(final EntityKnockbackByEntityEvent e) {
-        // We reach here attacks with piercing_weapon and kinetic_weapon, present by default on spears, even when cancelled.
+        // We reach here after attacks with piercing_weapon or kinetic_weapon, present by default on spears, even when cancelled.
         // Working around a Paper bug.
         final Entity damager = getDamagerSource(e.getHitBy());
         if (!(damager instanceof final Player player) || e.getCause() != EntityKnockbackEvent.Cause.ENTITY_ATTACK) {
