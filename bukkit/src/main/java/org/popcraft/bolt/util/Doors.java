@@ -18,6 +18,7 @@ import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.protection.Protection;
@@ -60,7 +61,9 @@ public final class Doors {
         final Set<Block> doors = new HashSet<>();
         if (!isDoorOpenableNormally(block)) {
             doors.add(block);
-            event.setUseItemInHand(Event.Result.DENY);
+            if (event.getAction() == Action.RIGHT_CLICK_BLOCK) { // Prevent placing blocks when opening iron doors
+                event.setUseItemInHand(Event.Result.DENY);
+            }
             event.setUseInteractedBlock(Event.Result.ALLOW);
         }
         if (plugin.isDoorsOpenDouble()) {
@@ -108,7 +111,7 @@ public final class Doors {
             return true;
         }
 
-        final boolean leftClick = org.bukkit.event.block.Action.LEFT_CLICK_BLOCK.equals(event.getAction());
+        final boolean leftClick = Action.LEFT_CLICK_BLOCK.equals(event.getAction());
         final boolean ironDoor = plugin.isDoorsOpenIron() && !isDoorOpenableNormally(block);
 
         if (leftClick || ironDoor) {
@@ -118,7 +121,7 @@ public final class Doors {
             }
             final PlayerInteractEvent fakeInteract = new PlayerInteractEvent(
                     event.getPlayer(),
-                    org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK,
+                    Action.RIGHT_CLICK_BLOCK,
                     event.getItem(),
                     event.getClickedBlock(),
                     event.getBlockFace()
