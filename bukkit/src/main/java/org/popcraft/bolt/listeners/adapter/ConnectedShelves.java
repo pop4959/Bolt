@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 // In its separate file so we can use Shelf and SideChaining which only exist in 1.21.9 and above
 public class ConnectedShelves {
