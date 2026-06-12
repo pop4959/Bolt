@@ -7,11 +7,10 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.codemc.io/repository/maven-public/")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-    mavenLocal()
 }
 
 dependencies {
-    compileOnly(group = "io.papermc.paper", name = "paper-api", version = "26.2-pre-4.local-SNAPSHOT")
+    compileOnly(group = "io.papermc.paper", name = "paper-api", version = "26.2-rc-2.build.+")
     implementation(group = "net.kyori", name = "event-api", version = "3.0.0") {
         exclude(module = "guava")
         exclude(module = "checker-qual")
