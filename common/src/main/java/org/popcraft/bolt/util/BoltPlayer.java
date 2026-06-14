@@ -16,7 +16,6 @@ public class BoltPlayer {
     private Action action;
     private Action lastAction;
     private boolean interacted;
-    private boolean interactionCancelled;
     private boolean trusting;
     private boolean trustingSilently;
     private boolean lockNil;
@@ -54,19 +53,13 @@ public class BoltPlayer {
         return interacted;
     }
 
-    public boolean isInteractionCancelled() {
-        return interactionCancelled;
-    }
-
-    public void setInteracted(final boolean cancelled) {
+    public void setInteracted() {
         this.interacted = true;
-        this.interactionCancelled = cancelled;
     }
 
     public void clearInteraction() {
         this.lastAction = null;
         this.interacted = false;
-        this.interactionCancelled = false;
     }
 
     public boolean hasMode(final Mode mode) {

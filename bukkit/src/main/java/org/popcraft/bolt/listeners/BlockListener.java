@@ -97,29 +97,25 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         final Player player = e.getPlayer();
         final BoltPlayer boltPlayer = plugin.player(player);
-        if (boltPlayer.hasInteracted()) {
-            if (boltPlayer.isInteractionCancelled()) {
-                e.setCancelled(true);
-            }
-            return;
-        }
+        // First interaction in this tick, to avoid some double actions when both hands are sent as events.
+        final boolean firstInteraction = !boltPlayer.hasInteracted();
         final Protection protection = plugin.findProtection(clicked);
         boolean shouldCancel = false;
         boolean interacted = false;
-        if (triggerAction(player, protection, clicked)) {
+        if (firstInteraction && triggerAction(player, protection, clicked)) {
             interacted = true;
             shouldCancel = true;
         } else if (protection != null) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
             final boolean canInteract = plugin.canAccess(protection, player, Permission.INTERACT);
             interacted = true;
-            if (canInteract && protection instanceof final BlockProtection blockProtection) {
+            if (canInteract && firstInteraction && protection instanceof final BlockProtection blockProtection) {
                 protection.setAccessed(System.currentTimeMillis());
                 plugin.saveProtection(blockProtection);
             }
             if (!canInteract) {
                 shouldCancel = true;
-                if (!hasNotifyPermission) {
+                if (!hasNotifyPermission && firstInteraction) {
                     BoltComponents.sendMessage(
                             player,
                             Translation.LOCKED,
@@ -128,10 +124,10 @@ public final class BlockListener extends InteractionListener implements Listener
                     );
                 }
             }
-            if (plugin.isDoors() && canInteract) {
+            if (plugin.isDoors() && firstInteraction && canInteract) {
                 Doors.handlePlayerInteract(plugin, e);
             }
-            if (hasNotifyPermission) {
+            if (hasNotifyPermission && firstInteraction) {
                 Profiles.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> {
                     final boolean noSpam = plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM);
                     if (noSpam) {
@@ -213,7 +209,7 @@ public final class BlockListener extends InteractionListener implements Listener
             }
         }
         if (interacted) {
-            boltPlayer.setInteracted(shouldCancel);
+            boltPlayer.setInteracted();
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
         }
         if (shouldCancel) {
