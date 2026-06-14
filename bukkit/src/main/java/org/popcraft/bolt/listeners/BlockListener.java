@@ -105,13 +105,14 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         final Protection protection = plugin.findProtection(clicked);
         boolean shouldCancel = false;
+        boolean interacted = false;
         if (triggerAction(player, protection, clicked)) {
-            boltPlayer.setInteracted(true);
-            SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
+            interacted = true;
             shouldCancel = true;
         } else if (protection != null) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
             final boolean canInteract = plugin.canAccess(protection, player, Permission.INTERACT);
+            interacted = true;
             if (canInteract && protection instanceof final BlockProtection blockProtection) {
                 protection.setAccessed(System.currentTimeMillis());
                 plugin.saveProtection(blockProtection);
@@ -195,8 +196,6 @@ public final class BlockListener extends InteractionListener implements Listener
                     e.setUseInteractedBlock(Event.Result.DENY);
                 }
             }
-            boltPlayer.setInteracted(shouldCancel);
-            SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
         }
         // Future: use Tag.WOODEN_SHELVES
         // todo: get slot once api is added for it, but then need to watch out for powered shelves, which always make a swap operation
@@ -205,11 +204,17 @@ public final class BlockListener extends InteractionListener implements Listener
             final List<Block> connected = ConnectedShelves.connectedShelves(clicked);
             for (Block shelf : connected) {
                 final Protection shelfProtection = plugin.loadProtection(shelf);
+                if (shelfProtection != null) {
+                    interacted = true;
+                }
                 if (!plugin.canAccess(shelfProtection, player, Permission.DEPOSIT, Permission.WITHDRAW)) {
-                    e.setUseItemInHand(Event.Result.DENY);
-                    e.setUseInteractedBlock(Event.Result.DENY);
+                    shouldCancel = true;
                 }
             }
+        }
+        if (interacted) {
+            boltPlayer.setInteracted(shouldCancel);
+            SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
         }
         if (shouldCancel) {
             e.setCancelled(true);
