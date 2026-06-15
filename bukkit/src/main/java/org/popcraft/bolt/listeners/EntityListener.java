@@ -301,26 +301,25 @@ public final class EntityListener extends InteractionListener implements Listene
             return false;
         }
         final BoltPlayer boltPlayer = plugin.player(player);
-        if (boltPlayer.hasInteracted()) {
-            return true;
-        }
+        // First interaction in this tick, to avoid some double actions when both hands are sent as events.
+        final boolean firstInteraction = !boltPlayer.hasInteracted();
         boolean shouldCancel = false;
         final Protection protection = plugin.findProtection(entity);
-        if (triggerAction(player, protection, entity)) {
-            boltPlayer.setInteracted(true);
+        if (firstInteraction && triggerAction(player, protection, entity)) {
+            boltPlayer.setInteracted();
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
             shouldCancel = true;
         } else if (protection != null) {
             final boolean hasNotifyPermission = player.hasPermission("bolt.protection.notify");
             final boolean canAccess = plugin.canAccess(protection, player, permission);
             final boolean canInteract = canAccess && Permission.INTERACT.equals(permission);
-            if (canInteract && protection instanceof final EntityProtection entityProtection) {
+            if (canInteract && firstInteraction && protection instanceof final EntityProtection entityProtection) {
                 protection.setAccessed(System.currentTimeMillis());
                 plugin.saveProtection(entityProtection);
             }
             if (!canAccess) {
                 shouldCancel = true;
-                if (shouldSendMessage && !hasNotifyPermission) {
+                if (shouldSendMessage && firstInteraction && !hasNotifyPermission) {
                     BoltComponents.sendMessage(
                             player,
                             Translation.LOCKED,
@@ -329,7 +328,7 @@ public final class EntityListener extends InteractionListener implements Listene
                     );
                 }
             }
-            if (shouldSendMessage && hasNotifyPermission) {
+            if (shouldSendMessage && firstInteraction && hasNotifyPermission) {
                 Profiles.findOrLookupProfileByUniqueId(protection.getOwner()).thenAccept(profile -> {
                     final boolean noSpam = plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM);
                     if (noSpam) {
@@ -367,7 +366,7 @@ public final class EntityListener extends InteractionListener implements Listene
                     }
                 });
             }
-            boltPlayer.setInteracted(shouldCancel);
+            boltPlayer.setInteracted();
             SchedulerUtil.schedule(plugin, player, boltPlayer::clearInteraction);
         }
         return shouldCancel;
