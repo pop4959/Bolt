@@ -109,6 +109,7 @@ import org.popcraft.bolt.matcher.block.SmallDripleafMatcher;
 import org.popcraft.bolt.matcher.block.SmallFlowerMatcher;
 import org.popcraft.bolt.matcher.block.SnowMatcher;
 import org.popcraft.bolt.matcher.block.SoulFireMatcher;
+import org.popcraft.bolt.matcher.block.SpeleothemMatcher;
 import org.popcraft.bolt.matcher.block.SporeBlossomMatcher;
 import org.popcraft.bolt.matcher.block.SweetBerryBushMatcher;
 import org.popcraft.bolt.matcher.block.SwitchMatcher;
@@ -173,7 +174,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             new ScaffoldingMatcher(), new MossCarpetMatcher(), new MushroomMatcher(), new NetherWartMatcher(),
             new SweetBerryBushMatcher(), new ChorusMatcher(), new GrassMatcher(), new TallGrassMatcher(),
             new DeadBushMatcher(), new HangingRootsMatcher(), new PointedDripstoneMatcher(), new FireMatcher(),
-            new LilyPadMatcher(), new RepeaterMatcher(), new SporeBlossomMatcher(),
+            new LilyPadMatcher(), new RepeaterMatcher(), new SpeleothemMatcher(), new SporeBlossomMatcher(),
             new SoulFireMatcher(), new FrogspawnMatcher(), new MangrovePropaguleMatcher(), new MultipleFacingMatcher(),
             new HangingSignMatcher(), new PinkPetalsMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();

@@ -10,6 +10,7 @@ import org.popcraft.bolt.matcher.Match;
 import java.util.HashSet;
 import java.util.Set;
 
+// Future: remove when Speleothem is always available
 public class PointedDripstoneMatcher implements BlockMatcher {
     private boolean enabled;
 
