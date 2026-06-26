@@ -230,6 +230,7 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         final Player player = e.getPlayer();
         // The below handles only special cases for block placement (replacing and placement causing modification)
+        // Future: use BlockData.isReplaceable, which is only available from Paper 1.21.10 onwards.
         if (Tag.REPLACEABLE.isTagged(replaced.getType())) {
             // Prevent deletion of protected blocks by them getting replaced.
             if (!plugin.canAccess(block, player, Permission.DESTROY)) {
@@ -252,6 +253,12 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         final Block block = e.getBlock();
         if (!plugin.isProtectable(block)) {
+            return;
+        }
+        final BlockState replaced = e.getBlockReplacedState();
+        // This is actually a block modification, not a replacement, and the block wasn't protected, so don't autoprotect it.
+        // Future: use BlockData.isReplaceable, which is only available from Paper 1.21.10 onwards.
+        if (!plugin.isProtected(block) && !replaced.getType().isAir() && !Tag.REPLACEABLE.isTagged(replaced.getType())) {
             return;
         }
         final ProtectableConfig protectableConfig = plugin.getProtectableConfig(block);
