@@ -190,7 +190,7 @@ public final class Doors {
     }
 
     public static void toggleDoor(final BoltPlugin plugin, final PlayerInteractEvent event, final Block block, final boolean canOpen) {
-        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+        SchedulerUtil.schedule(plugin, block.getLocation(), () -> {
             if (Event.Result.DENY.equals(event.useInteractedBlock())) {
                 return;
             }
