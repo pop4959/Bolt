@@ -47,6 +47,7 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.util.Vector;
 import org.popcraft.bolt.BoltPlugin;
@@ -659,6 +660,15 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         if (!plugin.canAccess(protection, player, Permission.INTERACT)) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPortalCreate(final PortalCreateEvent e) {
+        for (final BlockState newBlock : e.getBlocks()) {
+            if (plugin.isProtected(newBlock.getBlock())) {
+                e.setCancelled(true);
+            }
         }
     }
 }
