@@ -3,6 +3,7 @@ package org.popcraft.bolt.matcher.block;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.Speleothem;
 import org.bukkit.block.data.type.PointedDripstone;
 import org.bukkit.entity.EntityType;
 import org.popcraft.bolt.matcher.Match;
@@ -10,13 +11,12 @@ import org.popcraft.bolt.matcher.Match;
 import java.util.HashSet;
 import java.util.Set;
 
-// Future: remove when Speleothem is always available
 public class PointedDripstoneMatcher implements BlockMatcher {
     private boolean enabled;
 
     @Override
     public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
-        enabled = protectableBlocks.stream().anyMatch(material -> material.createBlockData() instanceof PointedDripstone);
+        enabled = protectableBlocks.stream().anyMatch(material -> material.createBlockData() instanceof Speleothem);
     }
 
     @Override
@@ -31,26 +31,26 @@ public class PointedDripstoneMatcher implements BlockMatcher {
 
     @Override
     public Match findMatch(Block block) {
-        if (block.getBlockData() instanceof final PointedDripstone pointedDripstone) {
+        if (block.getBlockData() instanceof final Speleothem speleothem) {
             final Set<Block> blocks = new HashSet<>();
-            final BlockFace verticalDirection = pointedDripstone.getVerticalDirection();
-            for (Block next = block.getRelative(verticalDirection); next.getBlockData() instanceof final PointedDripstone nextDripstone && verticalDirection.equals(nextDripstone.getVerticalDirection()); next = next.getRelative(verticalDirection)) {
+            final BlockFace verticalDirection = speleothem.getVerticalDirection();
+            for (Block next = block.getRelative(verticalDirection); next.getBlockData() instanceof final Speleothem nextSpeleothem && verticalDirection.equals(nextSpeleothem.getVerticalDirection()); next = next.getRelative(verticalDirection)) {
                 blocks.add(next);
             }
             return Match.ofBlocks(blocks);
         }
         final Block above = block.getRelative(BlockFace.UP);
-        if (above.getBlockData() instanceof final PointedDripstone pointedDripstone && BlockFace.UP.equals(pointedDripstone.getVerticalDirection())) {
+        if (above.getBlockData() instanceof final Speleothem speleothem && BlockFace.UP.equals(speleothem.getVerticalDirection())) {
             final Set<Block> blocks = new HashSet<>();
-            for (Block next = above; next.getBlockData() instanceof final PointedDripstone nextDripstone && BlockFace.UP.equals(nextDripstone.getVerticalDirection()); next = next.getRelative(BlockFace.UP)) {
+            for (Block next = above; next.getBlockData() instanceof final Speleothem nextSpeleothem && BlockFace.UP.equals(nextSpeleothem.getVerticalDirection()); next = next.getRelative(BlockFace.UP)) {
                 blocks.add(next);
             }
             return Match.ofBlocks(blocks);
         }
         final Block below = block.getRelative(BlockFace.DOWN);
-        if (below.getBlockData() instanceof final PointedDripstone pointedDripstone && BlockFace.DOWN.equals(pointedDripstone.getVerticalDirection())) {
+        if (below.getBlockData() instanceof final Speleothem speleothem && BlockFace.DOWN.equals(speleothem.getVerticalDirection())) {
             final Set<Block> blocks = new HashSet<>();
-            for (Block next = below; next.getBlockData() instanceof final PointedDripstone nextDripstone && BlockFace.DOWN.equals(nextDripstone.getVerticalDirection()); next = next.getRelative(BlockFace.DOWN)) {
+            for (Block next = below; next.getBlockData() instanceof final Speleothem nextSpeleothem && BlockFace.DOWN.equals(nextSpeleothem.getVerticalDirection()); next = next.getRelative(BlockFace.DOWN)) {
                 blocks.add(next);
             }
             return Match.ofBlocks(blocks);

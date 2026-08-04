@@ -4,7 +4,6 @@ import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import io.papermc.paper.event.entity.EntityKnockbackEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -12,6 +11,7 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.EndPortalFrame;
+import org.bukkit.entity.CopperGolem;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
@@ -72,7 +72,6 @@ import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitPlayerResolver;
-import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
@@ -94,9 +93,6 @@ import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 
 public final class EntityListener extends InteractionListener implements Listener {
     private static final SourceResolver ENTITY_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.ENTITY));
-    private static final EntityType COPPER_GOLEM = EnumUtil.valueOf(EntityType.class, "COPPER_GOLEM").orElse(null);
-    private static final Tag<Material> COPPER_GOLEM_STATUES = Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("copper_golem_statues"), Material.class);
-    private static final CreatureSpawnEvent.SpawnReason REANIMATE = EnumUtil.valueOf(CreatureSpawnEvent.SpawnReason.class, "REANIMATE").orElse(null);
     private final Map<NamespacedKey, UUID> spawnEggPlayers = new HashMap<>();
     private final Map<BlockLocation, BlockProtection> reanimatedCopperGolems = new HashMap<>();
 
@@ -132,8 +128,7 @@ public final class EntityListener extends InteractionListener implements Listene
             if (player != null) {
                 handleEntityPlacementByPlayer(entity, player);
             }
-        } else if (entity.getType() == COPPER_GOLEM && e.getSpawnReason().equals(REANIMATE)) {
-            // Future: use instanceof CopperGolem or something. Also, CreatureSpawnEvent.SpawnReason.REANIMATE
+        } else if (entity instanceof CopperGolem && e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.REANIMATE) {
             // A copper golem statue was reanimated. Transfer the protection over to the golem.
             final Location location = e.getLocation();
             final BlockLocation blockLocation = new BlockLocation(entity.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -742,8 +737,7 @@ public final class EntityListener extends InteractionListener implements Listene
         final BlockProtection blockProtection = plugin.loadProtection(e.getBlock());
         if (blockProtection != null && broken && e.getEntity() instanceof Player) {
             // This event is called for axing copper golems. This could cause it to reanimate so we need to keep track of it.
-            // Future: use Tag.COPPER_GOLEM_STATUES
-            if (COPPER_GOLEM_STATUES != null && COPPER_GOLEM_STATUES.isTagged(e.getBlock().getType())) {
+            if (Tag.COPPER_GOLEM_STATUES.isTagged(e.getBlock().getType())) {
                 final BlockLocation location = BlockLocation.fromProtection(blockProtection);
                 reanimatedCopperGolems.put(location, blockProtection);
                 SchedulerUtil.schedule(plugin, e.getEntity(), () -> reanimatedCopperGolems.remove(location));
@@ -753,8 +747,7 @@ public final class EntityListener extends InteractionListener implements Listene
 
         // This event is called for copper golems solidifying. Transfer the protection over to the statue.
         final EntityProtection entityProtection = plugin.loadProtection(e.getEntity());
-        // Future: can just instanceof CopperGolem or something. also use Tag.COPPER_GOLEM_STATUES
-        if (entityProtection != null && e.getEntity().getType() == COPPER_GOLEM && COPPER_GOLEM_STATUES != null && COPPER_GOLEM_STATUES.isTagged(e.getTo())) {
+        if (entityProtection != null && e.getEntity() instanceof CopperGolem && Tag.COPPER_GOLEM_STATUES.isTagged(e.getTo())) {
             final BlockProtection newProtection = plugin.createProtection(e.getBlock(), entityProtection.getOwner(), entityProtection.getType());
             newProtection.setBlock(e.getTo().name());
             newProtection.setAccess(entityProtection.getAccess());
@@ -771,8 +764,7 @@ public final class EntityListener extends InteractionListener implements Listene
         final Protection entityProtection = plugin.findProtection(entity);
         final SourceResolver resolver =
                 entityProtection != null ? new BukkitPlayerResolver(this.plugin.getBolt(), entityProtection.getOwner()) : ENTITY_SOURCE_RESOLVER;
-        // Future: replace with entity instanceof CopperGolem or something
-        if (entity instanceof LivingEntity livingEntity && entity.getType() == COPPER_GOLEM) {
+        if (entity instanceof CopperGolem livingEntity) {
             // For copper golems, we know if they're depositing or withdrawing based on if they're holding something.
             final boolean isPickingUpItem = Objects.requireNonNull(livingEntity.getEquipment()).getItemInMainHand().getAmount() == 0;
             final String permission = isPickingUpItem ? Permission.WITHDRAW : Permission.DEPOSIT;
