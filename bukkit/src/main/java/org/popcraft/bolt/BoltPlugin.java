@@ -123,7 +123,12 @@ import org.popcraft.bolt.matcher.block.VineMatcher;
 import org.popcraft.bolt.matcher.entity.EntityMatcher;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.ProtectableResolverRegistry;
+import org.popcraft.bolt.protection.ProtectableResult;
+import org.popcraft.bolt.protection.ProtectableTarget;
+import org.popcraft.bolt.protection.ProtectableTargetResolver;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.protection.ProtectionNameResolver;
 import org.popcraft.bolt.source.GroupSourceTransformer;
 import org.popcraft.bolt.source.PasswordSourceTransformer;
 import org.popcraft.bolt.source.PlayerSourceTransformer;
@@ -141,6 +146,7 @@ import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.ProtectableConfig;
+import org.popcraft.bolt.util.ResolvedProtectable;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -188,6 +194,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private final Map<Material, ProtectableConfig> protectableBlocks = new HashMap<>();
     private final Map<EntityType, ProtectableConfig> protectableEntities = new HashMap<>();
     private final Map<Material, Tag<Material>> materialTags = new HashMap<>();
+    private final ProtectableResolverRegistry protectableResolverRegistry = new ProtectableResolverRegistry();
     private final Set<Mode> defaultModes = new HashSet<>();
     private String defaultProtectionType = "private";
     private String defaultAccessType = "normal";
@@ -577,6 +584,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return this.eventBus;
     }
 
+    public ProtectableResolverRegistry getProtectableResolverRegistry() {
+        return protectableResolverRegistry;
+    }
+
     @Override
     public <T extends Event> void registerListener(final Class<T> clazz, final Consumer<? super T> listener) {
         this.eventBus.register(clazz, listener::accept);
@@ -598,11 +609,28 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     }
 
     public ProtectableConfig getProtectableConfig(final Block block) {
-        return protectableBlocks.get(block.getType());
+        return resolveProtectable(block).map(ResolvedProtectable::config).orElse(null);
     }
 
     public ProtectableConfig getProtectableConfig(final Entity entity) {
         return protectableEntities.get(entity.getType());
+    }
+
+    public Optional<ResolvedProtectable> resolveProtectable(final Block block) {
+        final ProtectableResult result = protectableResolverRegistry.resolve(block);
+        if (result.isDeny()) {
+            return Optional.empty();
+        }
+        if (!result.isPass()) {
+            final ProtectableTarget target = result.getTarget();
+            final Access defaultAccess = target.autoProtect() == null ? null : bolt.getAccessRegistry().getProtectionByType(target.autoProtect()).orElse(null);
+            return Optional.of(new ResolvedProtectable(target.key(), new ProtectableConfig(defaultAccess, target.lockPermission(), target.autoProtectPermission())));
+        }
+        final ProtectableConfig config = protectableBlocks.get(block.getType());
+        if (config == null && !DEBUG) {
+            return Optional.empty();
+        }
+        return Optional.of(new ResolvedProtectable(block.getType().name().toLowerCase(), config));
     }
 
     public String getDefaultProtectionType() {
@@ -623,7 +651,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     @Override
     public boolean isProtectable(final Block block) {
-        return DEBUG || protectableBlocks.containsKey(block.getType());
+        return resolveProtectable(block).isPresent();
     }
 
     public boolean isProtectable(final Material material) {
@@ -865,6 +893,16 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     @Override
     public void registerPlayerSourceResolver(PlayerSourceResolver playerSourceResolver) {
         bolt.getRegisteredPlayerResolvers().add(playerSourceResolver);
+    }
+
+    @Override
+    public void registerProtectableTargetResolver(final ProtectableTargetResolver resolver) {
+        protectableResolverRegistry.registerTargetResolver(resolver);
+    }
+
+    @Override
+    public void registerProtectionNameResolver(final ProtectionNameResolver resolver) {
+        protectableResolverRegistry.registerNameResolver(resolver);
     }
 
     private Protection matchProtection(final Block block) {

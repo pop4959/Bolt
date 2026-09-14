@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.popcraft.bolt.lang.Translator.isTranslatable;
 import static org.popcraft.bolt.util.BoltComponents.getLocaleOf;
@@ -67,6 +68,10 @@ public final class Protections {
 
     public static Component displayType(final Protection protection, final CommandSender sender) {
         if (protection instanceof final BlockProtection blockProtection) {
+            final Optional<Component> resolved = JavaPlugin.getPlugin(BoltPlugin.class).getProtectableResolverRegistry().resolveName(blockProtection, sender);
+            if (resolved.isPresent()) {
+                return resolved.get();
+            }
             final World world = Bukkit.getWorld(blockProtection.getWorld());
             final int x = blockProtection.getX();
             final int y = blockProtection.getY();
@@ -94,8 +99,8 @@ public final class Protections {
     }
 
     public static Component displayType(final Block block, final CommandSender sender) {
-        final Material material = block.getType();
-        return displayType(material, sender);
+        return JavaPlugin.getPlugin(BoltPlugin.class).getProtectableResolverRegistry().resolveName(block, sender)
+                .orElseGet(() -> displayType(block.getType(), sender));
     }
 
     private static Component displayType(final Material material, final CommandSender sender) {
