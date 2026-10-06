@@ -137,6 +137,8 @@ entities:
     autoProtect: private
   pale_oak_chest_boat:
     autoProtect: private
+  poplar_chest_boat:
+    autoProtect: private
   spruce_chest_boat:
     autoProtect: private
   chest_minecart:

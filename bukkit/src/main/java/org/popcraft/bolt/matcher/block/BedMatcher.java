@@ -1,7 +1,6 @@
 package org.popcraft.bolt.matcher.block;
 
 import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.EntityType;
@@ -15,7 +14,7 @@ public class BedMatcher implements BlockMatcher {
 
     @Override
     public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
-        enabled = protectableBlocks.stream().anyMatch(Tag.BEDS::isTagged);
+        enabled = protectableBlocks.stream().anyMatch(material -> material.createBlockData() instanceof Bed);
     }
 
     @Override
@@ -25,7 +24,7 @@ public class BedMatcher implements BlockMatcher {
 
     @Override
     public boolean canMatch(Block block) {
-        return enabled && Tag.BEDS.isTagged(block.getType());
+        return enabled && block.getBlockData() instanceof Bed;
     }
 
     @Override
@@ -33,12 +32,12 @@ public class BedMatcher implements BlockMatcher {
         if (block.getBlockData() instanceof final Bed bed) {
             if (Bed.Part.FOOT.equals(bed.getPart())) {
                 final Block head = block.getRelative(bed.getFacing());
-                if (Tag.BEDS.isTagged(head.getType())) {
+                if (head.getBlockData() instanceof Bed) {
                     return Match.ofBlocks(Collections.singleton(head));
                 }
             } else {
                 final Block foot = block.getRelative(bed.getFacing().getOppositeFace());
-                if (Tag.BEDS.isTagged(foot.getType())) {
+                if (foot.getBlockData() instanceof Bed) {
                     return Match.ofBlocks(Collections.singleton(foot));
                 }
             }

@@ -18,6 +18,7 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -292,6 +293,37 @@ public final class EntityListener extends InteractionListener implements Listene
                 }
             }
         } else if (plugin.isProtected(entity)) {
+            e.setCancelled(true);
+        }
+    }
+
+    public void onEntityBreakByEntity(final Entity entity, final Entity remover, Cancellable e) {
+        if (getDamagerSource(remover) instanceof final Player player) {
+            if (handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) {
+                e.setCancelled(true);
+            } else {
+                final Protection protection = plugin.findProtection(entity);
+                if (protection == null) {
+                    return;
+                }
+                plugin.removeProtection(protection);
+                if (plugin.canAccess(protection, player, Permission.DESTROY)) {
+                    BoltComponents.sendMessage(
+                            player,
+                            Translation.CLICK_UNLOCKED,
+                            plugin.isUseActionBar(),
+                            Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
+                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
+                    );
+                }
+            }
+        } else if (plugin.isProtected(entity)) {
+            e.setCancelled(true);
+        }
+    }
+
+    public void onEntityBreak(final Entity entity, Cancellable e) {
+        if (plugin.isProtected(entity)) {
             e.setCancelled(true);
         }
     }

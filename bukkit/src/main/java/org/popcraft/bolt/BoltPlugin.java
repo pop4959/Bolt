@@ -59,6 +59,7 @@ import org.popcraft.bolt.listeners.BlockListener;
 import org.popcraft.bolt.listeners.EntityListener;
 import org.popcraft.bolt.listeners.InventoryListener;
 import org.popcraft.bolt.listeners.PlayerListener;
+import org.popcraft.bolt.listeners.adapter.EntityBreakEventListener;
 import org.popcraft.bolt.listeners.adapter.ItemTransportingEntityValidateTargetEventListener;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.matcher.block.AmethystClusterMatcher;
@@ -74,6 +75,7 @@ import org.popcraft.bolt.matcher.block.ChorusMatcher;
 import org.popcraft.bolt.matcher.block.CocoaMatcher;
 import org.popcraft.bolt.matcher.block.CoralMatcher;
 import org.popcraft.bolt.matcher.block.CropsMatcher;
+import org.popcraft.bolt.matcher.block.CushionMatcher;
 import org.popcraft.bolt.matcher.block.DeadBushMatcher;
 import org.popcraft.bolt.matcher.block.DoorMatcher;
 import org.popcraft.bolt.matcher.block.FarmlandMatcher;
@@ -104,6 +106,7 @@ import org.popcraft.bolt.matcher.block.RepeaterMatcher;
 import org.popcraft.bolt.matcher.block.SaplingMatcher;
 import org.popcraft.bolt.matcher.block.ScaffoldingMatcher;
 import org.popcraft.bolt.matcher.block.SeaPickleMatcher;
+import org.popcraft.bolt.matcher.block.ShelfMushroomMatcher;
 import org.popcraft.bolt.matcher.block.SignMatcher;
 import org.popcraft.bolt.matcher.block.SmallDripleafMatcher;
 import org.popcraft.bolt.matcher.block.SmallFlowerMatcher;
@@ -176,7 +179,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             new DeadBushMatcher(), new HangingRootsMatcher(), new PointedDripstoneMatcher(), new FireMatcher(),
             new LilyPadMatcher(), new RepeaterMatcher(), new SpeleothemMatcher(), new SporeBlossomMatcher(),
             new SoulFireMatcher(), new FrogspawnMatcher(), new MangrovePropaguleMatcher(), new MultipleFacingMatcher(),
-            new HangingSignMatcher(), new PinkPetalsMatcher());
+            new HangingSignMatcher(), new PinkPetalsMatcher(), new ShelfMushroomMatcher(), new CushionMatcher());
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private static final Source ADMIN_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.admin");
     private static final Source MOD_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.mod");
@@ -465,6 +468,9 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         pluginManager.registerEvents(entityListener, this);
         if (ItemTransportingEntityValidateTargetEventListener.canUse()) {
             pluginManager.registerEvents(new ItemTransportingEntityValidateTargetEventListener(entityListener::onItemTransportingEntityValidateTarget), this);
+        }
+        if (EntityBreakEventListener.canUse()) {
+            pluginManager.registerEvents(new EntityBreakEventListener(entityListener::onEntityBreak, entityListener::onEntityBreakByEntity), this);
         }
         pluginManager.registerEvents(new InventoryListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
