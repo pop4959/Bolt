@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CushionMatcher implements BlockMatcher {
+    // Future: Replace with EntityType.CUSHION
     private static final EntityType CUSHION = EnumUtil.valueOf(EntityType.class, "CUSHION").orElse(null);
     private boolean enabled;
 

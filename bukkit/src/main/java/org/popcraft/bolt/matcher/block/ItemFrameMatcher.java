@@ -2,16 +2,11 @@ package org.popcraft.bolt.matcher.block;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.ItemFrame;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.matcher.Match;
-import org.popcraft.bolt.util.FoliaUtil;
-import org.popcraft.bolt.util.HangingCache;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class ItemFrameMatcher implements BlockMatcher {
