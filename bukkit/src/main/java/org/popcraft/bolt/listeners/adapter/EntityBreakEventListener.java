@@ -26,7 +26,7 @@ public record EntityBreakEventListener(Handler handler, ByEntityHandler byEntity
   }
 
   @EventHandler
-  public void onHangingBreakByEntity(final EntityBreakByEntityEvent e) {
+  public void onEntityBreakByEntity(final EntityBreakByEntityEvent e) {
     byEntityHandler.accept(e.getEntity(), e.getRemover(), e);
   }
 
