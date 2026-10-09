@@ -7,14 +7,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Painting;
+import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class HangingCache {
+  // Future: Replace with EntityType.CUSHION
+  private static final EntityType CUSHION = EnumUtil.valueOf(EntityType.class, "CUSHION").orElse(null);
+
   private final SetMultimap<BlockLocation, Entity> blockSupporting = HashMultimap.create();
   private final SetMultimap<Entity, BlockLocation> entitySupportedBy = HashMultimap.create();
 
@@ -43,6 +48,12 @@ public class HangingCache {
           entitySupportedBy.put(painting, support);
         }
       }
+    } else if (entity.getType().equals(CUSHION)) {
+      Location location = entity.getLocation();
+      // Cushions may be "in" blocks (i.e. on a slab)
+      BlockLocation support = new BlockLocation(location.getWorld().getName(), location.getBlockX(), NumberConversions.ceil(location.getY()) - 1, location.getBlockZ());
+      blockSupporting.put(support, entity);
+      entitySupportedBy.put(entity, support);
     }
   }
 
