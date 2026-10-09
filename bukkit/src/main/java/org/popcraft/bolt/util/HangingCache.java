@@ -65,6 +65,10 @@ public class HangingCache {
     entitySupportedBy.removeAll(entity);
   }
 
+  public boolean entityInCache(Entity entity) {
+    return entitySupportedBy.containsKey(entity);
+  }
+
   public Collection<Entity> entitiesSupportedByBlock(Block block) {
     BlockLocation support = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
     return blockSupporting.get(support);
