@@ -38,6 +38,7 @@ import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
@@ -823,6 +824,18 @@ public final class EntityListener extends InteractionListener implements Listene
         Entity entity = e.getEntity();
         if (plugin.isProtectedExact(entity)) {
             plugin.getHangingCache().removeFromCache(entity);
+        }
+    }
+
+    @EventHandler
+    public void onEntityTeleport(EntityTeleportEvent e) {
+        Entity entity = e.getEntity();
+        if (plugin.isProtectedExact(entity) && plugin.getHangingCache().entityInCache(entity)) {
+            // Most hanging entities "snap" into place after being teleported, so we need to wait a tick for that to happen
+            SchedulerUtil.schedule(plugin, entity, () -> {
+                plugin.getHangingCache().removeFromCache(entity);
+                plugin.getHangingCache().addToCache(entity);
+            });
         }
     }
 
