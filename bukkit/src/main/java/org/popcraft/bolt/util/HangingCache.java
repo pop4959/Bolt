@@ -4,9 +4,12 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Painting;
+import org.bukkit.util.Vector;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -21,6 +24,25 @@ public class HangingCache {
       BlockLocation support = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
       blockSupporting.put(support, itemFrame);
       entitySupportedBy.put(itemFrame, support);
+    } else if (entity instanceof Painting painting) {
+      int width = painting.getArt().getBlockWidth();
+      int height = painting.getArt().getBlockHeight();
+      double halfWidth = (double) width / 2 - 0.5;
+      double halfHeight = (double) height / 2 - 0.5;
+      Vector forward = painting.getAttachedFace().getDirection();
+      // Rotate 90° clockwise
+      int rightX = (int) -forward.getZ();
+      int rightZ = (int) forward.getX();
+      Location bottomLeft = painting.getLocation().add(forward).add(halfWidth * -rightX, -halfHeight, halfWidth * -rightZ);
+      String world = bottomLeft.getWorld().getName();
+
+      for (int h = 0; h < width; h++) {
+        for (int v = 0; v < height; v++) {
+          BlockLocation support = new BlockLocation(world, bottomLeft.getBlockX() + h * rightX, bottomLeft.getBlockY() + v, bottomLeft.getBlockZ() + h * rightZ);
+          blockSupporting.put(support, painting);
+          entitySupportedBy.put(painting, support);
+        }
+      }
     }
   }
 
