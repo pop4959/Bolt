@@ -142,6 +142,7 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Group;
+import org.popcraft.bolt.util.HangingCache;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.ProtectableConfig;
 
@@ -204,6 +205,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private Bolt bolt;
     private CallbackManager callbackManager;
     private EventBus<Event> eventBus;
+    private HangingCache hangingCache;
 
     @Override
     public void onEnable() {
@@ -228,6 +230,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         registerCommands();
         this.callbackManager = new CallbackManager(this);
         this.eventBus = new SimpleEventBus<>(Event.class);
+        this.hangingCache = new HangingCache();
         profileCache.load();
         final Metrics metrics = new Metrics(this, 17711);
         registerCustomCharts(metrics, databaseConfiguration);
@@ -932,5 +935,9 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public SourceTransformer getSourceTransformer(String type) {
         return this.sourceTransformers.getOrDefault(type, SourceTransformer.DEFAULT);
+    }
+
+    public HangingCache getHangingCache() {
+        return this.hangingCache;
     }
 }

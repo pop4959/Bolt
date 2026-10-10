@@ -1,6 +1,7 @@
 package org.popcraft.bolt.listeners;
 
 import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import io.papermc.paper.event.entity.EntityKnockbackEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -37,6 +38,7 @@ import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
@@ -57,6 +59,7 @@ import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
@@ -75,6 +78,7 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
+import org.popcraft.bolt.util.HangingCache;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
@@ -193,6 +197,7 @@ public final class EntityListener extends InteractionListener implements Listene
         }
         final EntityProtection newProtection = plugin.createProtection(entity, player.getUniqueId(), access.type());
         plugin.saveProtection(newProtection);
+        plugin.getHangingCache().addToCache(entity);
         if (!plugin.player(player.getUniqueId()).hasMode(Mode.NOSPAM)) {
             BoltComponents.sendMessage(
                     player,
@@ -290,6 +295,7 @@ public final class EntityListener extends InteractionListener implements Listene
                 if (protection == null) {
                     return;
                 }
+                plugin.getHangingCache().removeFromCache(entity);
                 plugin.removeProtection(protection);
                 if (plugin.canAccess(protection, player, Permission.DESTROY)) {
                     BoltComponents.sendMessage(
@@ -801,6 +807,35 @@ public final class EntityListener extends InteractionListener implements Listene
             if (!plugin.canAccess(blockProtection, resolver, Permission.WITHDRAW, Permission.DEPOSIT)) {
                 setAllowed.accept(false);
             }
+        }
+    }
+
+    @EventHandler
+    public void onEntitiesLoad(EntitiesLoadEvent e) {
+        for (Entity entity : e.getEntities()) {
+            if (plugin.isProtectedExact(entity)) {
+                plugin.getHangingCache().addToCache(entity);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityRemoveFromWorld(EntityRemoveFromWorldEvent e) {
+        Entity entity = e.getEntity();
+        if (plugin.isProtectedExact(entity)) {
+            plugin.getHangingCache().removeFromCache(entity);
+        }
+    }
+
+    @EventHandler
+    public void onEntityTeleport(EntityTeleportEvent e) {
+        Entity entity = e.getEntity();
+        if (plugin.isProtectedExact(entity) && plugin.getHangingCache().entityInCache(entity)) {
+            // Most hanging entities "snap" into place after being teleported, so we need to wait a tick for that to happen
+            SchedulerUtil.schedule(plugin, entity, () -> {
+                plugin.getHangingCache().removeFromCache(entity);
+                plugin.getHangingCache().addToCache(entity);
+            });
         }
     }
 

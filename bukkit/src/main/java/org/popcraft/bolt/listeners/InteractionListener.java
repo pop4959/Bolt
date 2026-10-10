@@ -112,6 +112,7 @@ abstract class InteractionListener {
                         newProtection = plugin.createProtection(block, protectionUUID, protectionType);
                     } else if (object instanceof final Entity entity) {
                         newProtection = plugin.createProtection(entity, protectionUUID, protectionType);
+                        plugin.getHangingCache().addToCache(entity);
                     } else {
                         throw new IllegalStateException("Protection is not a block or entity");
                     }
@@ -136,6 +137,9 @@ abstract class InteractionListener {
             case UNLOCK -> {
                 if (protection != null) {
                     if (plugin.canAccess(protection, player, Permission.DESTROY)) {
+                        if (object instanceof Entity entity) {
+                            plugin.getHangingCache().removeFromCache(entity);
+                        }
                         plugin.removeProtection(protection);
                         BoltComponents.sendMessage(
                                 player,
