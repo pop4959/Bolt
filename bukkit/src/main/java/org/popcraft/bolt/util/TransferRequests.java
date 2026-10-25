@@ -78,6 +78,9 @@ public class TransferRequests {
             final Protection protection = protections.get(transfer.protection());
             if (isValid(transfer, protection)) {
                 protection.setOwner(recipient);
+                if (plugin.isTransferClearsAccess()) {
+                    protection.getAccess().clear();
+                }
                 plugin.saveProtection(protection);
                 ++accepted;
             }
