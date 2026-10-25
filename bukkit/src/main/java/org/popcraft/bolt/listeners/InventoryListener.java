@@ -30,7 +30,6 @@ import org.popcraft.bolt.util.Permission;
 
 public final class InventoryListener implements Listener {
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
-    private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
 
     // These exist only in newer versions of 1.21.4 and only in Paper.
     private static final InventoryAction PICKUP_FROM_BUNDLE = EnumUtil.valueOf(InventoryAction.class, "PICKUP_FROM_BUNDLE").orElse(null);
@@ -145,7 +144,7 @@ public final class InventoryListener implements Listener {
         }
         // Droppers can move items to another container, but they need to be activated by redstone to do so
         if (sourceProtection != null && InventoryType.DROPPER.equals(e.getSource().getType())) {
-            if (!plugin.canAccess(sourceProtection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
+            if (!plugin.isAllowedRedstoneAccess(sourceProtection, e.getSource().getLocation().getBlock())) {
                 e.setCancelled(true);
                 return;
             }

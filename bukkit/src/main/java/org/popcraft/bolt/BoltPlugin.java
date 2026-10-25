@@ -136,6 +136,7 @@ import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceTransformer;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypeRegistry;
+import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.source.SourceTypes;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BoltComponents;
@@ -145,7 +146,9 @@ import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.HangingCache;
 import org.popcraft.bolt.util.Mode;
+import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.ProtectableConfig;
+import org.popcraft.bolt.util.RedstoneTracker;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -186,6 +189,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private static final Source ADMIN_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.admin");
     private static final Source MOD_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.mod");
     private static final Set<String> UNIQUE_SOURCE_TYPES = Set.of(SourceTypes.REDSTONE, SourceTypes.BLOCK, SourceTypes.DOOR, SourceTypes.ENTITY);
+    private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private final List<BlockMatcher> enabledBlockMatchers = new ArrayList<>();
     private final List<EntityMatcher> enabledEntityMatchers = new ArrayList<>();
     private final Map<String, BoltCommand> commands = new HashMap<>();
@@ -206,6 +210,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private boolean doorsFixPlugins;
     private boolean blocksDispensersLockBlocks;
     private boolean enableHangingCache;
+    private boolean redstoneTracking;
     private Bolt bolt;
     private CallbackManager callbackManager;
     private EventBus<Event> eventBus;
@@ -265,6 +270,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         this.doorsFixPlugins = getConfig().getBoolean("doors.fix-plugins", false);
         this.blocksDispensersLockBlocks = getConfig().getBoolean("settings.blocks.dispensers-lock-blocks", true);
         this.enableHangingCache = getConfig().getBoolean("settings.entities.experimental-matcher-optimization", false);
+        this.redstoneTracking = getConfig().getBoolean("settings.blocks.experimental-redstone-tracking", false);
         registerAccessTypes();
         registerProtectableAccess();
         nagInvalidHopperConfig();
@@ -591,6 +597,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return enableHangingCache;
     }
 
+    public boolean isRedstoneTracking() {
+        return redstoneTracking;
+    }
+
     public ProfileCache getProfileCache() {
         return profileCache;
     }
@@ -789,6 +799,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             return true;
         }
         return permissions.length == 1 ? canAccessSingle(protection, sourceResolver, permissions[0]) : canAccessMulti(protection, sourceResolver, permissions);
+    }
+
+    public boolean isAllowedRedstoneAccess(final Protection protection, final Block block) {
+        return canAccess(protection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE) || (redstoneTracking && RedstoneTracker.allows(this, protection, block));
     }
 
     private boolean canAccessMulti(final Protection protection, final SourceResolver sourceResolver, final String... permissions) {
