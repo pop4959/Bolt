@@ -36,10 +36,10 @@ access:
   normal:
     default: true
     require-permission: false
-    allows: [ "redstone", "interact", "open", "deposit", "withdraw", "mount" ]
+    allows: [ "redstone", "interact", "open", "deposit", "withdraw", "mount", "push", "pull" ]
   admin:
     require-permission: true
-    allows: [ "redstone", "interact", "open", "deposit", "withdraw", "mount", "edit" ]
+    allows: [ "redstone", "interact", "open", "deposit", "withdraw", "mount", "push", "pull", "edit" ]
 sources:
   player:
     require-permission: false

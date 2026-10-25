@@ -17,6 +17,10 @@ public interface Store {
 
     void saveBlockProtection(BlockProtection protection);
 
+    default void saveBlockProtections(Collection<BlockProtection> protections) {
+        protections.forEach(this::saveBlockProtection);
+    }
+
     void removeBlockProtection(BlockProtection protection);
 
     CompletableFuture<EntityProtection> loadEntityProtection(UUID id);
