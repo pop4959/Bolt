@@ -23,6 +23,8 @@ public class Translation {
     public static final String CLICK_TRANSFER = "click_transfer";
     public static final String CLICK_TRANSFER_ALL = "click_transfer_all";
     public static final String CLICK_TRANSFER_CONFIRM = "click_transfer_confirm";
+    public static final String CLICK_TRANSFER_PENDING = "click_transfer_pending";
+    public static final String CLICK_TRANSFER_SELF = "click_transfer_self";
     public static final String CLICK_UNLOCKED = "click_unlocked";
     public static final String CLICK_UNLOCKED_NO_PERMISSION = "click_unlocked_no_permission";
     public static final String COMMAND_INVALID = "command_invalid";
@@ -87,6 +89,14 @@ public class Translation {
     public static final String PROTECTION_NOTIFY_GENERIC = "protection_notify_generic";
     public static final String PURGE = "purge";
     public static final String RELOAD = "reload";
+    public static final String REQUESTS_ACCEPTED = "requests_accepted";
+    public static final String REQUESTS_CANCELLED = "requests_cancelled";
+    public static final String REQUESTS_DENIED = "requests_denied";
+    public static final String REQUESTS_NONE = "requests_none";
+    public static final String REQUESTS_RESULT_INCOMING = "requests_result_incoming";
+    public static final String REQUESTS_RESULT_INCOMING_UNKNOWN = "requests_result_incoming_unknown";
+    public static final String REQUESTS_RESULT_OUTGOING = "requests_result_outgoing";
+    public static final String REQUESTS_RESULT_OUTGOING_UNKNOWN = "requests_result_outgoing_unknown";
     public static final String STATUS = "status";
     public static final String STORAGE_EXPORT_EXISTS = "storage_export_exists";
     public static final String STORAGE_EXPORT_STARTED = "storage_export_started";
@@ -95,6 +105,8 @@ public class Translation {
     public static final String STORAGE_IMPORT_STARTED = "storage_import_started";
     public static final String STORAGE_IMPORT_COMPLETED = "storage_import_completed";
     public static final String STORAGE_IN_PROGRESS = "storage_in_progress";
+    public static final String TRANSFER_REQUEST_JOIN = "transfer_request_join";
+    public static final String TRANSFER_REQUEST_RECEIVED = "transfer_request_received";
     public static final String TRUST = "trust";
     public static final String TRUST_ADD = "trust_add";
     public static final String TRUST_REMOVE = "trust_remove";
@@ -126,6 +138,7 @@ public class Translation {
     public static final String HELP_COMMAND_SHORT_LOCK = "help_command_short_lock";
     public static final String HELP_COMMAND_SHORT_MODE = "help_command_short_mode";
     public static final String HELP_COMMAND_SHORT_PASSWORD = "help_command_short_password";
+    public static final String HELP_COMMAND_SHORT_REQUESTS = "help_command_short_requests";
     public static final String HELP_COMMAND_SHORT_TRANSFER = "help_command_short_transfer";
     public static final String HELP_COMMAND_SHORT_TRUST = "help_command_short_trust";
     public static final String HELP_COMMAND_SHORT_UNLOCK = "help_command_short_unlock";
@@ -151,6 +164,7 @@ public class Translation {
     public static final String HELP_COMMAND_LONG_LOCK = "help_command_long_lock";
     public static final String HELP_COMMAND_LONG_MODE = "help_command_long_mode";
     public static final String HELP_COMMAND_LONG_PASSWORD = "help_command_long_password";
+    public static final String HELP_COMMAND_LONG_REQUESTS = "help_command_long_requests";
     public static final String HELP_COMMAND_LONG_TRANSFER = "help_command_long_transfer";
     public static final String HELP_COMMAND_LONG_TRUST = "help_command_long_trust";
     public static final String HELP_COMMAND_LONG_UNLOCK = "help_command_long_unlock";

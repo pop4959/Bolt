@@ -16,12 +16,15 @@ import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.lang.Translator;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.PendingTransfer;
 import org.popcraft.bolt.protection.Protection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntFunction;
 
@@ -53,13 +56,7 @@ public class Pagination {
         }
         final AtomicInteger displayed = new AtomicInteger();
         protections.stream().skip(skip).limit(RESULTS_PER_PAGE).forEach(protection -> {
-            final Location location = switch (protection) {
-                case BlockProtection block -> new Location(plugin.getServer().getWorld(block.getWorld()), block.getX() + 0.5, block.getY(), block.getZ() + 0.5);
-                case EntityProtection entityProtection -> {
-                    final Entity entity = plugin.getServer().getEntity(entityProtection.getId());
-                    yield entity == null ? null : entity.getLocation();
-                }
-            };
+            final Location location = locationOf(plugin, protection);
 
             final Profile profile = Profiles.findProfileByUniqueId(protection.getOwner());
             final Component name = Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, sender));
@@ -110,34 +107,7 @@ public class Pagination {
         if (numberDisplayed == 0) {
             BoltComponents.sendMessage(sender, Translation.FIND_NONE);
         } else if (newFindFormat) {
-            Component pages = Component.empty();
-            final int firstPage = Math.max(0, page - PAGES_BEFORE_AND_AFTER);
-            final int lastPage = Math.min(page + PAGES_BEFORE_AND_AFTER, totalPages);
-            pages = pages.append(resolveTranslation(
-                    firstPage == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
-                    sender,
-                    Placeholder.component(Translation.Placeholder.PAGE, Component.text(firstPage + 1)
-                            .clickEvent(pageCallback.apply(firstPage)))
-            ));
-            for (int p = firstPage + 1; p <= lastPage; ++p) {
-                pages = pages.append(resolveTranslation(Translation.FIND_NEXT_NEW_PAGE_SEPARATOR, sender));
-                pages = pages.append(resolveTranslation(
-                        p == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
-                        sender,
-                        Placeholder.component(Translation.Placeholder.PAGE, Component.text(p + 1)
-                                .clickEvent(pageCallback.apply(p)))
-                ));
-            }
-            BoltComponents.sendMessage(
-                    sender,
-                    Translation.FIND_NEXT_NEW,
-                    Placeholder.component(Translation.Placeholder.PAGES, pages),
-                    Placeholder.component(Translation.Placeholder.PAGE, resolveTranslation(
-                            totalPages == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
-                            sender,
-                            Placeholder.component(Translation.Placeholder.PAGE, Component.text(totalPages + 1)
-                                    .clickEvent(pageCallback.apply(totalPages)))))
-            );
+            sendPageFooter(sender, page, totalPages, pageCallback);
         } else if (numberDisplayed == RESULTS_PER_PAGE) {
             BoltComponents.sendClickableMessage(
                     sender,
@@ -145,5 +115,100 @@ public class Pagination {
                     pageCallback.apply(page + 1)
             );
         }
+    }
+
+    public static void runPage(final BoltPlugin plugin, final CommandSender sender, final List<PendingTransfer> incoming, final List<PendingTransfer> outgoing, final int requestedPage) {
+        final List<PendingTransfer> requests = new ArrayList<>(incoming);
+        requests.addAll(outgoing);
+        final int total = requests.size();
+        if (total == 0) {
+            BoltComponents.sendMessage(sender, Translation.REQUESTS_NONE);
+            return;
+        }
+        final int totalPages = Math.max(0, (int) Math.ceil((double) total / RESULTS_PER_PAGE) - 1);
+        final int page = Math.min(requestedPage, totalPages);
+        final int skip = RESULTS_PER_PAGE * page;
+        BoltComponents.sendMessage(
+                sender,
+                Translation.FIND_HEADER_NEW,
+                Placeholder.component(Translation.Placeholder.FIRST, Component.text(skip + 1)),
+                Placeholder.component(Translation.Placeholder.LAST, Component.text(Math.min(skip + RESULTS_PER_PAGE, total))),
+                Placeholder.component(Translation.Placeholder.COUNT, Component.text(total))
+        );
+        final Map<UUID, Protection> protections = plugin.getTransferRequests().protectionsById();
+        for (int i = skip; i < Math.min(skip + RESULTS_PER_PAGE, total); ++i) {
+            final PendingTransfer request = requests.get(i);
+            final boolean isIncoming = i < incoming.size();
+            final Protection protection = protections.get(request.protection());
+            final Location location = locationOf(plugin, protection);
+            final Profile profile = Profiles.findProfileByUniqueId(isIncoming ? request.giver() : request.recipient());
+            final Component name = Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, sender));
+            if (location == null) {
+                BoltComponents.sendMessage(
+                        sender,
+                        isIncoming ? Translation.REQUESTS_RESULT_INCOMING_UNKNOWN : Translation.REQUESTS_RESULT_OUTGOING_UNKNOWN,
+                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, sender)),
+                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, sender)),
+                        Placeholder.component(Translation.Placeholder.PLAYER, name),
+                        Placeholder.component(Translation.Placeholder.TIME, Time.relativeTimestamp(request.created(), sender, 1))
+                );
+            } else {
+                BoltComponents.sendMessage(
+                        sender,
+                        isIncoming ? Translation.REQUESTS_RESULT_INCOMING : Translation.REQUESTS_RESULT_OUTGOING,
+                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, sender)),
+                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, sender)),
+                        Placeholder.component(Translation.Placeholder.PLAYER, name),
+                        Placeholder.component(Translation.Placeholder.TIME, Time.relativeTimestamp(request.created(), sender, 1)),
+                        Placeholder.component(Translation.Placeholder.WORLD, Component.text(Objects.requireNonNull(location.getWorld()).getName())),
+                        Placeholder.component(Translation.Placeholder.X, Component.text(location.getBlockX())),
+                        Placeholder.component(Translation.Placeholder.Y, Component.text(location.getBlockY())),
+                        Placeholder.component(Translation.Placeholder.Z, Component.text(location.getBlockZ()))
+                );
+            }
+        }
+        final IntFunction<ClickEvent> pageCallback = newPage -> plugin.getCallbackManager().registerPlayerOnly(player -> runPage(plugin, player, plugin.getTransferRequests().incoming(player.getUniqueId()), plugin.getTransferRequests().outgoing(player.getUniqueId()), newPage));
+        sendPageFooter(sender, page, totalPages, pageCallback);
+    }
+
+    private static void sendPageFooter(final CommandSender sender, final int page, final int totalPages, final IntFunction<ClickEvent> pageCallback) {
+        Component pages = Component.empty();
+        final int firstPage = Math.max(0, page - PAGES_BEFORE_AND_AFTER);
+        final int lastPage = Math.min(page + PAGES_BEFORE_AND_AFTER, totalPages);
+        pages = pages.append(resolveTranslation(
+                firstPage == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
+                sender,
+                Placeholder.component(Translation.Placeholder.PAGE, Component.text(firstPage + 1)
+                        .clickEvent(pageCallback.apply(firstPage)))
+        ));
+        for (int p = firstPage + 1; p <= lastPage; ++p) {
+            pages = pages.append(resolveTranslation(Translation.FIND_NEXT_NEW_PAGE_SEPARATOR, sender));
+            pages = pages.append(resolveTranslation(
+                    p == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
+                    sender,
+                    Placeholder.component(Translation.Placeholder.PAGE, Component.text(p + 1)
+                            .clickEvent(pageCallback.apply(p)))
+            ));
+        }
+        BoltComponents.sendMessage(
+                sender,
+                Translation.FIND_NEXT_NEW,
+                Placeholder.component(Translation.Placeholder.PAGES, pages),
+                Placeholder.component(Translation.Placeholder.PAGE, resolveTranslation(
+                        totalPages == page ? Translation.FIND_NEXT_NEW_PAGE_CURRENT : Translation.FIND_NEXT_NEW_PAGE_OTHER,
+                        sender,
+                        Placeholder.component(Translation.Placeholder.PAGE, Component.text(totalPages + 1)
+                                .clickEvent(pageCallback.apply(totalPages)))))
+        );
+    }
+
+    private static Location locationOf(final BoltPlugin plugin, final Protection protection) {
+        return switch (protection) {
+            case BlockProtection block -> new Location(plugin.getServer().getWorld(block.getWorld()), block.getX() + 0.5, block.getY(), block.getZ() + 0.5);
+            case EntityProtection entityProtection -> {
+                final Entity entity = plugin.getServer().getEntity(entityProtection.getId());
+                yield entity == null ? null : entity.getLocation();
+            }
+        };
     }
 }

@@ -6,6 +6,7 @@ import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.data.sql.Statements;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.PendingTransfer;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Metrics;
@@ -51,6 +52,8 @@ public class SQLStore implements Store {
     private final Map<String, Group> removeGroups = new HashMap<>();
     private final Map<UUID, AccessList> saveAccessLists = new HashMap<>();
     private final Map<UUID, AccessList> removeAccessLists = new HashMap<>();
+    private final Map<UUID, PendingTransfer> saveTransfers = new HashMap<>();
+    private final Map<UUID, PendingTransfer> removeTransfers = new HashMap<>();
     private final Configuration configuration;
     private final String connectionUrl;
     private Connection connection;
@@ -72,11 +75,13 @@ public class SQLStore implements Store {
         try (final PreparedStatement createBlocksTable = connection.prepareStatement(Statements.CREATE_TABLE_BLOCKS.get(configuration.type()).formatted(configuration.prefix()));
              final PreparedStatement createEntitiesTable = connection.prepareStatement(Statements.CREATE_TABLE_ENTITIES.get(configuration.type()).formatted(configuration.prefix()));
              final PreparedStatement createGroupsTable = connection.prepareStatement(Statements.CREATE_TABLE_GROUPS.get(configuration.type()).formatted(configuration.prefix()));
-             final PreparedStatement createAccessTable = connection.prepareStatement(Statements.CREATE_TABLE_ACCESS.get(configuration.type()).formatted(configuration.prefix()))) {
+             final PreparedStatement createAccessTable = connection.prepareStatement(Statements.CREATE_TABLE_ACCESS.get(configuration.type()).formatted(configuration.prefix()));
+             final PreparedStatement createTransfersTable = connection.prepareStatement(Statements.CREATE_TABLE_TRANSFERS.get(configuration.type()).formatted(configuration.prefix()))) {
             createBlocksTable.execute();
             createEntitiesTable.execute();
             createGroupsTable.execute();
             createAccessTable.execute();
+            createTransfersTable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -472,6 +477,70 @@ public class SQLStore implements Store {
     }
 
     @Override
+    public CompletableFuture<Collection<PendingTransfer>> loadPendingTransfers() {
+        final CompletableFuture<Collection<PendingTransfer>> future = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            try (final PreparedStatement selectTransfers = connection.prepareStatement(Statements.SELECT_ALL_TRANSFERS.get(configuration.type()).formatted(configuration.prefix()))) {
+                final ResultSet transfersResultSet = selectTransfers.executeQuery();
+                final List<PendingTransfer> transfers = new ArrayList<>();
+                while (transfersResultSet.next()) {
+                    transfers.add(transferFromResultSet(transfersResultSet));
+                }
+                future.complete(transfers);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            future.complete(Collections.emptyList());
+        }, executor);
+        return future;
+    }
+
+    private PendingTransfer transferFromResultSet(final ResultSet resultSet) throws SQLException {
+        final String protection = resultSet.getString(1);
+        final String giver = resultSet.getString(2);
+        final String recipient = resultSet.getString(3);
+        final long created = resultSet.getLong(4);
+        return new PendingTransfer(UUID.fromString(protection), UUID.fromString(giver), UUID.fromString(recipient), created);
+    }
+
+    @Override
+    public void savePendingTransfer(PendingTransfer transfer) {
+        CompletableFuture.runAsync(() -> {
+            saveTransfers.put(transfer.protection(), transfer);
+            removeTransfers.remove(transfer.protection());
+        }, executor);
+    }
+
+    private void saveTransferNow(PendingTransfer transfer) {
+        try (final PreparedStatement replaceTransfer = connection.prepareStatement(Statements.REPLACE_TRANSFER.get(configuration.type()).formatted(configuration.prefix()))) {
+            replaceTransfer.setString(1, transfer.protection().toString());
+            replaceTransfer.setString(2, transfer.giver().toString());
+            replaceTransfer.setString(3, transfer.recipient().toString());
+            replaceTransfer.setLong(4, transfer.created());
+            replaceTransfer.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void removePendingTransfer(PendingTransfer transfer) {
+        CompletableFuture.runAsync(() -> {
+            removeTransfers.put(transfer.protection(), transfer);
+            saveTransfers.remove(transfer.protection());
+        }, executor);
+    }
+
+    private void removeTransferNow(PendingTransfer transfer) {
+        try (final PreparedStatement deleteTransfer = connection.prepareStatement(Statements.DELETE_TRANSFER.get(configuration.type()).formatted(configuration.prefix()))) {
+            deleteTransfer.setString(1, transfer.protection().toString());
+            deleteTransfer.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public long pendingSave() {
         return CompletableFuture.supplyAsync(() -> saveBlocks.size() + removeBlocks.size() + saveEntities.size() + removeEntities.size(), executor).join();
     }
@@ -550,6 +619,24 @@ public class SQLStore implements Store {
                     while (removeAccessListsIterator.hasNext()) {
                         removeAccessListNow(removeAccessListsIterator.next());
                         removeAccessListsIterator.remove();
+                    }
+                    connection.setAutoCommit(true);
+                }
+                if (!saveTransfers.isEmpty()) {
+                    connection.setAutoCommit(false);
+                    final Iterator<PendingTransfer> saveTransfersIterator = saveTransfers.values().iterator();
+                    while (saveTransfersIterator.hasNext()) {
+                        saveTransferNow(saveTransfersIterator.next());
+                        saveTransfersIterator.remove();
+                    }
+                    connection.setAutoCommit(true);
+                }
+                if (!removeTransfers.isEmpty()) {
+                    connection.setAutoCommit(false);
+                    final Iterator<PendingTransfer> removeTransfersIterator = removeTransfers.values().iterator();
+                    while (removeTransfersIterator.hasNext()) {
+                        removeTransferNow(removeTransfersIterator.next());
+                        removeTransfersIterator.remove();
                     }
                     connection.setAutoCommit(true);
                 }

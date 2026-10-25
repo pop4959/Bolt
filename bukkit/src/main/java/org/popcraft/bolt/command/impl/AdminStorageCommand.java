@@ -86,6 +86,7 @@ public class AdminStorageCommand extends BoltCommand {
             from.loadEntityProtections().join().forEach(to::saveEntityProtection);
             from.loadGroups().join().forEach(to::saveGroup);
             from.loadAccessLists().join().forEach(to::saveAccessList);
+            from.loadPendingTransfers().join().forEach(to::savePendingTransfer);
             to.flush().join();
         });
     }

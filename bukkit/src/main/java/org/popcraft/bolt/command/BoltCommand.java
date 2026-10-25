@@ -23,4 +23,8 @@ public abstract class BoltCommand {
     public boolean hidden() {
         return false;
     }
+
+    public boolean hidden(CommandSender sender) {
+        return hidden();
+    }
 }

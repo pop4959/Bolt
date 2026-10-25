@@ -3,6 +3,7 @@ package org.popcraft.bolt.data;
 import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.PendingTransfer;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.Group;
 
@@ -42,6 +43,12 @@ public interface Store {
     void saveAccessList(AccessList accessList);
 
     void removeAccessList(AccessList accessList);
+
+    CompletableFuture<Collection<PendingTransfer>> loadPendingTransfers();
+
+    void savePendingTransfer(PendingTransfer transfer);
+
+    void removePendingTransfer(PendingTransfer transfer);
 
     long pendingSave();
 

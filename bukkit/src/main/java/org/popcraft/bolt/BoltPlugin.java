@@ -43,6 +43,7 @@ import org.popcraft.bolt.command.impl.LockCommand;
 import org.popcraft.bolt.command.impl.ModeCommand;
 import org.popcraft.bolt.command.impl.ModifyCommand;
 import org.popcraft.bolt.command.impl.PasswordCommand;
+import org.popcraft.bolt.command.impl.RequestsCommand;
 import org.popcraft.bolt.command.impl.TransferCommand;
 import org.popcraft.bolt.command.impl.TrustCommand;
 import org.popcraft.bolt.command.impl.UnlockCommand;
@@ -146,6 +147,7 @@ import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.HangingCache;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.ProtectableConfig;
+import org.popcraft.bolt.util.TransferRequests;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -207,6 +209,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private boolean blocksDispensersLockBlocks;
     private boolean enableHangingCache;
     private Bolt bolt;
+    private TransferRequests transferRequests;
     private CallbackManager callbackManager;
     private EventBus<Event> eventBus;
     private HangingCache hangingCache;
@@ -228,6 +231,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
                         .collect(Collectors.toMap(String::valueOf, key -> getConfig().getString("database.properties." + key, "")))
         );
         this.bolt = new Bolt(new SimpleProtectionCache(new SQLStore(databaseConfiguration)));
+        this.transferRequests = new TransferRequests(this);
         reload();
         BoltComponents.enable();
         registerEvents();
@@ -498,6 +502,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         commands.put("mode", new ModeCommand(this));
         commands.put("modify", new ModifyCommand(this));
         commands.put("password", new PasswordCommand(this));
+        commands.put("requests", new RequestsCommand(this));
         commands.put("transfer", new TransferCommand(this));
         commands.put("trust", new TrustCommand(this));
         commands.put("unlock", new UnlockCommand(this));
@@ -537,7 +542,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         final List<String> suggestions = new ArrayList<>();
         if (args.length == commandStart) {
             commands.entrySet().stream()
-                .filter(i -> sender.hasPermission(COMMAND_PERMISSION_KEY + i.getKey()) && !i.getValue().hidden())
+                .filter(i -> sender.hasPermission(COMMAND_PERMISSION_KEY + i.getKey()) && !i.getValue().hidden(sender))
                 .forEach(i -> suggestions.add(i.getKey()));
         } else if (commands.containsKey(commandKey) && sender.hasPermission(COMMAND_PERMISSION_KEY + commandKey)) {
             suggestions.addAll(commands.get(commandKey).suggestions(sender, new Arguments(Arrays.copyOfRange(args, commandStart, args.length))));
@@ -549,6 +554,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public Bolt getBolt() {
         return bolt;
+    }
+
+    public TransferRequests getTransferRequests() {
+        return transferRequests;
     }
 
     public Path getDataPath() {
@@ -724,11 +733,15 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     @Override
     public void removeProtection(final Protection protection) {
+        if (protection == null) {
+            return;
+        }
         if (protection instanceof final BlockProtection blockProtection) {
             bolt.getStore().removeBlockProtection(blockProtection);
         } else if (protection instanceof final EntityProtection entityProtection) {
             bolt.getStore().removeEntityProtection(entityProtection);
         }
+        transferRequests.clear(protection.getId());
     }
 
     @Override
