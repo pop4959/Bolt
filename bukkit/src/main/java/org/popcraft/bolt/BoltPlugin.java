@@ -183,6 +183,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private static final List<EntityMatcher> ENTITY_MATCHERS = List.of();
     private static final Source ADMIN_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.admin");
     private static final Source MOD_PERMISSION_SOURCE = Source.of(SourceTypes.PERMISSION, "bolt.mod");
+    private static final Set<String> UNIQUE_SOURCE_TYPES = Set.of(SourceTypes.REDSTONE, SourceTypes.BLOCK, SourceTypes.DOOR, SourceTypes.ENTITY);
     private final List<BlockMatcher> enabledBlockMatchers = new ArrayList<>();
     private final List<EntityMatcher> enabledEntityMatchers = new ArrayList<>();
     private final Map<String, BoltCommand> commands = new HashMap<>();
@@ -408,7 +409,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         }
         for (final String source : sources.getKeys(false)) {
             final boolean requirePermission = sources.getBoolean("%s.require-permission".formatted(source), false);
-            final boolean unique = sources.getBoolean("%s.unique".formatted(source), false);
+            final boolean unique = UNIQUE_SOURCE_TYPES.contains(source) || sources.getBoolean("%s.unique".formatted(source), false);
             sourceTypeRegistry.registerSourceType(source, requirePermission, unique);
         }
         if (sourceTypeRegistry.sourceTypes().isEmpty()) {
