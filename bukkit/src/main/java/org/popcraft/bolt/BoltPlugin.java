@@ -251,7 +251,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     public void reload() {
         reloadConfig();
         Translator.loadAllTranslations(getDataPath(), getConfig().getString("language", "en"), getConfig().getBoolean("settings.per-player-locale", true));
-        this.useActionBar = getConfig().getBoolean("settings.use-action-bar", false);
+        this.useActionBar = getConfig().getBoolean("settings.use-action-bar", true);
         this.doors = getConfig().getConfigurationSection("doors") != null;
         this.doorsOpenIron = getConfig().getBoolean("doors.open-iron", false);
         this.doorsOpenDouble = getConfig().getBoolean("doors.open-double", false);

@@ -1,7 +1,7 @@
 version: 0
 language: en
 settings:
-  use-action-bar: false
+  use-action-bar: true
   per-player-locale: true
 database:
   type: sqlite
