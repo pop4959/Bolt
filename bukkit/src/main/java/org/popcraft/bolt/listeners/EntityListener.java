@@ -32,6 +32,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
@@ -63,6 +64,7 @@ import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.event.LockEntityEvent;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.listeners.adapter.EntityBreakEventListener;
+import org.popcraft.bolt.listeners.adapter.WindChargeExplosionListener;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
 import org.popcraft.bolt.protection.Protection;
@@ -804,11 +806,43 @@ public final class EntityListener extends InteractionListener implements Listene
         }
     }
 
+    @EventHandler
+    public void onEntityExplode(final EntityExplodeEvent e) {
+        if (WindChargeExplosionListener.canUse()) {
+            return; // Already handled below
+        }
+        e.blockList().removeIf(plugin::isProtected);
+    }
+
+    public void onEntityExplodeNew(final EntityExplodeEvent e, final boolean trigger) {
+        if (trigger) {
+            e.blockList().removeIf(block -> {
+                final Protection protection = plugin.findProtection(block);
+                if (protection == null) {
+                    return false;
+                }
+                return !plugin.canAccess(protection, getDamagerSourceResolver(e.getEntity()), Permission.INTERACT);
+            });
+        } else {
+            // Destructive explosion
+            e.blockList().removeIf(plugin::isProtected);
+        }
+    }
+
     private Entity getDamagerSource(final Entity damager) {
         if (damager instanceof final Projectile projectile && projectile.getShooter() instanceof final Entity source) {
             return source;
         } else {
             return damager;
+        }
+    }
+
+    private SourceResolver getDamagerSourceResolver(final Entity damager) {
+        final Entity source = getDamagerSource(damager);
+        if (source instanceof Player player) {
+            return new BukkitPlayerResolver(this.plugin.getBolt(), player.getUniqueId());
+        } else {
+            return ENTITY_SOURCE_RESOLVER;
         }
     }
 }
