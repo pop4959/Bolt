@@ -37,8 +37,7 @@ public class AdminCommand extends BoltCommand {
                 Map.entry("report", new AdminReportCommand(plugin)),
                 Map.entry("storage", new AdminStorageCommand(plugin)),
                 Map.entry("transfer", new AdminTransferCommand(plugin)),
-                Map.entry("trust", new AdminTrustCommand(plugin)),
-                Map.entry("hdebug", new AdminHDebugCommand(plugin))
+                Map.entry("trust", new AdminTrustCommand(plugin))
         ));
     }
 
