@@ -45,7 +45,7 @@ public class CushionMatcher implements BlockMatcher {
         FoliaUtil.getNearbyEntities(block, block.getBoundingBox().expand(0, 0, 0, 0, 0.5, 0), (entity -> entity.getType().equals(CUSHION))).forEach(entity -> {
             // Cushions may be "in" blocks (i.e. on a slab)
             if (entity.getType().equals(CUSHION) && (
-                entity.getLocation().toBlockLocation().equals(block.getLocation()) ||
+                    entity.getLocation().toBlockLocation().equals(block.getLocation()) ||
                     entity.getLocation().getBlock().getRelative(BlockFace.DOWN).getLocation().equals(block.getLocation())
             )) {
                 entities.add(entity);
