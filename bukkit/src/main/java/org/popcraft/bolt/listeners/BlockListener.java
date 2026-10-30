@@ -447,11 +447,6 @@ public final class BlockListener extends InteractionListener implements Listener
     }
 
     @EventHandler
-    public void onEntityExplode(final EntityExplodeEvent e) {
-        e.blockList().removeIf(plugin::isProtected);
-    }
-
-    @EventHandler
     public void onSpongeAbsorb(final SpongeAbsorbEvent e) {
         if (plugin.isProtected(e.getBlock())) {
             e.setCancelled(true);
