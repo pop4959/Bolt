@@ -579,6 +579,9 @@ public final class BlockListener extends InteractionListener implements Listener
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockDispenseMonitor(final BlockDispenseEvent e) {
+        if (!plugin.getBlocksDispensersLockBlocks()) {
+            return;
+        }
         final Block block = e.getBlock();
         final Protection existingProtection = plugin.findProtection(block);
         if (existingProtection == null) {

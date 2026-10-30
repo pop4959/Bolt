@@ -3,6 +3,8 @@ language: en
 settings:
   use-action-bar: true
   per-player-locale: true
+  blocks:
+    dispensers-lock-blocks: true
 database:
   type: sqlite
   hostname: ""
