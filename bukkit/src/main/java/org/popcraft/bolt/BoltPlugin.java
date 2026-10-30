@@ -801,10 +801,6 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return permissions.length == 1 ? canAccessSingle(protection, sourceResolver, permissions[0]) : canAccessMulti(protection, sourceResolver, permissions);
     }
 
-    public boolean isAllowedRedstoneAccess(final Protection protection, final Block block) {
-        return canAccess(protection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE) || (redstoneTracking && RedstoneTracker.allows(this, protection, block));
-    }
-
     private boolean canAccessMulti(final Protection protection, final SourceResolver sourceResolver, final String... permissions) {
         final Set<String> unresolved = new HashSet<>(Arrays.asList(permissions));
         final Source ownerSource = Source.player(protection.getOwner());
@@ -900,6 +896,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
             }
         }
         return sourceResolver.resolve(Source.of(SourceTypes.PERMISSION, "bolt.permission." + permission));
+    }
+
+    public boolean isAllowedRedstoneAccess(final Protection protection, final Block block) {
+        return canAccess(protection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE) || (redstoneTracking && RedstoneTracker.allows(this, protection, block));
     }
 
     @Override
