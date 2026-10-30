@@ -813,35 +813,6 @@ public final class EntityListener extends InteractionListener implements Listene
     }
 
     @EventHandler
-    public void onEntitiesLoad(EntitiesLoadEvent e) {
-        for (Entity entity : e.getEntities()) {
-            if (plugin.isProtectedExact(entity)) {
-                plugin.getHangingCache().addToCache(entity);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onEntityRemoveFromWorld(EntityRemoveFromWorldEvent e) {
-        Entity entity = e.getEntity();
-        if (plugin.isProtectedExact(entity)) {
-            plugin.getHangingCache().removeFromCache(entity);
-        }
-    }
-
-    @EventHandler
-    public void onEntityTeleport(EntityTeleportEvent e) {
-        Entity entity = e.getEntity();
-        if (plugin.isProtectedExact(entity) && plugin.getHangingCache().entityInCache(entity)) {
-            // Most hanging entities "snap" into place after being teleported, so we need to wait a tick for that to happen
-            SchedulerUtil.schedule(plugin, entity, () -> {
-                plugin.getHangingCache().removeFromCache(entity);
-                plugin.getHangingCache().addToCache(entity);
-            });
-        }
-    }
-
-    @EventHandler
     public void onEntityExplode(final EntityExplodeEvent e) {
         if (WindChargeExplosionListener.canUse()) {
             return; // Already handled below
@@ -861,6 +832,44 @@ public final class EntityListener extends InteractionListener implements Listene
         } else {
             // Destructive explosion
             e.blockList().removeIf(plugin::isProtected);
+        }
+    }
+
+    @EventHandler
+    public void onEntitiesLoad(EntitiesLoadEvent e) {
+        if (!plugin.getEnableHangingCache()) {
+            return;
+        }
+        for (Entity entity : e.getEntities()) {
+            if (plugin.isProtectedExact(entity)) {
+                plugin.getHangingCache().addToCache(entity);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityRemoveFromWorld(EntityRemoveFromWorldEvent e) {
+        if (!plugin.getEnableHangingCache()) {
+            return;
+        }
+        Entity entity = e.getEntity();
+        if (plugin.isProtectedExact(entity)) {
+            plugin.getHangingCache().removeFromCache(entity);
+        }
+    }
+
+    @EventHandler
+    public void onEntityTeleport(EntityTeleportEvent e) {
+        if (!plugin.getEnableHangingCache()) {
+            return;
+        }
+        Entity entity = e.getEntity();
+        if (plugin.isProtectedExact(entity) && plugin.getHangingCache().entityInCache(entity)) {
+            // Most hanging entities "snap" into place after being teleported, so we need to wait a tick for that to happen
+            SchedulerUtil.schedule(plugin, entity, () -> {
+                plugin.getHangingCache().removeFromCache(entity);
+                plugin.getHangingCache().addToCache(entity);
+            });
         }
     }
 
