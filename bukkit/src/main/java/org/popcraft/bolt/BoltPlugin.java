@@ -205,6 +205,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private int doorsCloseAfter;
     private boolean doorsFixPlugins;
     private boolean blocksDispensersLockBlocks;
+    private boolean enableHangingCache;
     private Bolt bolt;
     private CallbackManager callbackManager;
     private EventBus<Event> eventBus;
@@ -263,6 +264,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         this.doorsCloseAfter = getConfig().getInt("doors.close-after", 0);
         this.doorsFixPlugins = getConfig().getBoolean("doors.fix-plugins", false);
         this.blocksDispensersLockBlocks = getConfig().getBoolean("settings.blocks.dispensers-lock-blocks", true);
+        this.enableHangingCache = getConfig().getBoolean("settings.entities.experimental-matcher-optimization", false);
         registerAccessTypes();
         registerProtectableAccess();
         nagInvalidHopperConfig();
@@ -583,6 +585,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public boolean getBlocksDispensersLockBlocks() {
         return blocksDispensersLockBlocks;
+    }
+
+    public boolean getEnableHangingCache() {
+        return enableHangingCache;
     }
 
     public ProfileCache getProfileCache() {
