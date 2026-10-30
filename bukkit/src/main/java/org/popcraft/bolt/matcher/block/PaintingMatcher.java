@@ -7,7 +7,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Painting;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.BoundingBox;
+import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.util.FoliaUtil;
 
@@ -16,10 +18,12 @@ import java.util.Set;
 
 public class PaintingMatcher implements BlockMatcher {
     private boolean enabled;
+    private BoltPlugin plugin;
 
     @Override
     public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
         enabled = protectableEntities.contains(EntityType.PAINTING);
+        this.plugin = JavaPlugin.getPlugin(BoltPlugin.class);
     }
 
     @Override
@@ -34,6 +38,9 @@ public class PaintingMatcher implements BlockMatcher {
 
     @Override
     public Match findMatch(Block block) {
+        if (plugin.getEnableHangingCache()) {
+            return Match.ofEntities(this.plugin.getHangingCache().entitiesSupportedByBlock(block));
+        }
         final Set<Entity> entities = new HashSet<>();
         FoliaUtil.getNearbyEntities(block, block.getBoundingBox().expand(0.5, 0, 0.5, 0.5, 0, 0.5), Painting.class::isInstance).forEach(entity -> {
             if (entity instanceof final Painting painting) {

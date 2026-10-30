@@ -5,6 +5,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.util.FoliaUtil;
 
@@ -13,10 +15,12 @@ import java.util.Set;
 
 public class ItemFrameMatcher implements BlockMatcher {
     private boolean enabled;
+    private BoltPlugin plugin;
 
     @Override
     public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
         enabled = protectableEntities.stream().anyMatch(entityType -> EntityType.ITEM_FRAME.equals(entityType) || EntityType.GLOW_ITEM_FRAME.equals(entityType));
+        this.plugin = JavaPlugin.getPlugin(BoltPlugin.class);
     }
 
     @Override
@@ -31,6 +35,9 @@ public class ItemFrameMatcher implements BlockMatcher {
 
     @Override
     public Match findMatch(Block block) {
+        if (plugin.getEnableHangingCache()) {
+            return Match.ofEntities(this.plugin.getHangingCache().entitiesSupportedByBlock(block));
+        }
         final Set<Entity> entities = new HashSet<>();
         FoliaUtil.getNearbyEntities(block, block.getBoundingBox().expand(0.5, 0.5, 0.5, 0.5, 0.5, 0.5), ItemFrame.class::isInstance).forEach(entity -> {
             if (entity instanceof final ItemFrame itemFrame && itemFrame.getLocation().getBlock().getRelative(itemFrame.getAttachedFace()).getLocation().equals(block.getLocation())) {

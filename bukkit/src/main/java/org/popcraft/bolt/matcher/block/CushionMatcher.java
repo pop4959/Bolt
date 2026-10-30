@@ -5,6 +5,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.util.EnumUtil;
 import org.popcraft.bolt.util.FoliaUtil;
@@ -13,12 +15,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CushionMatcher implements BlockMatcher {
+    // Future: Replace with EntityType.CUSHION
     private static final EntityType CUSHION = EnumUtil.valueOf(EntityType.class, "CUSHION").orElse(null);
     private boolean enabled;
+    private BoltPlugin plugin;
 
     @Override
     public void initialize(Set<Material> protectableBlocks, Set<EntityType> protectableEntities) {
         enabled = protectableEntities.stream().anyMatch(entityType -> entityType.equals(CUSHION));
+        this.plugin = JavaPlugin.getPlugin(BoltPlugin.class);
     }
 
     @Override
@@ -33,6 +38,9 @@ public class CushionMatcher implements BlockMatcher {
 
     @Override
     public Match findMatch(Block block) {
+        if (plugin.getEnableHangingCache()) {
+            return Match.ofEntities(this.plugin.getHangingCache().entitiesSupportedByBlock(block));
+        }
         final Set<Entity> entities = new HashSet<>();
         FoliaUtil.getNearbyEntities(block, block.getBoundingBox().expand(0, 0, 0, 0, 0.5, 0), (entity -> entity.getType().equals(CUSHION))).forEach(entity -> {
             // Cushions may be "in" blocks (i.e. on a slab)

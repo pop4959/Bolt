@@ -5,6 +5,8 @@ settings:
   per-player-locale: true
   blocks:
     dispensers-lock-blocks: true
+  entities:
+    experimental-matcher-optimization: false
 database:
   type: sqlite
   hostname: ""
