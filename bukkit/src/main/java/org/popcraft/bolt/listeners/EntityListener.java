@@ -37,6 +37,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
+import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
@@ -870,6 +871,18 @@ public final class EntityListener extends InteractionListener implements Listene
                 plugin.getHangingCache().removeFromCache(entity);
                 plugin.getHangingCache().addToCache(entity);
             });
+        }
+    }
+
+    @EventHandler
+    public void onEntityRemove(EntityRemoveEvent e) {
+        EntityProtection protection = plugin.loadProtection(e.getEntity());
+        if (protection == null) {
+            return;
+        }
+        // Last resort event. We can't cancel it, all we can do is clean up stale DB entries.
+        if (e.getCause() == EntityRemoveEvent.Cause.DEATH || e.getCause() == EntityRemoveEvent.Cause.OUT_OF_WORLD) {
+            plugin.removeProtection(protection);
         }
     }
 
