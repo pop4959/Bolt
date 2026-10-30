@@ -10,8 +10,10 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Painting;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+import org.popcraft.bolt.BoltPlugin;
 
 import java.util.Collection;
+import java.util.Set;
 
 public class HangingCache {
   // Future: Replace with EntityType.CUSHION
@@ -19,8 +21,16 @@ public class HangingCache {
 
   private final SetMultimap<BlockLocation, Entity> blockSupporting = HashMultimap.create();
   private final SetMultimap<Entity, BlockLocation> entitySupportedBy = HashMultimap.create();
+  private final boolean enabled;
+
+  public HangingCache(BoltPlugin plugin) {
+    this.enabled = plugin.getEnableHangingCache();
+  }
 
   public void addToCache(Entity entity) {
+    if (!this.enabled) {
+      return;
+    }
     if (entity instanceof ItemFrame itemFrame) {
       Block block = itemFrame.getLocation().getBlock().getRelative(itemFrame.getAttachedFace());
       BlockLocation support = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
@@ -55,6 +65,9 @@ public class HangingCache {
   }
 
   public void removeFromCache(Entity entity) {
+    if (!this.enabled) {
+      return;
+    }
     Collection<BlockLocation> supportedBy = entitySupportedBy.get(entity);
     for (BlockLocation block : supportedBy) {
       blockSupporting.remove(block, entity);
@@ -63,10 +76,16 @@ public class HangingCache {
   }
 
   public boolean entityInCache(Entity entity) {
+    if (!this.enabled) {
+      return false;
+    }
     return entitySupportedBy.containsKey(entity);
   }
 
   public Collection<Entity> entitiesSupportedByBlock(Block block) {
+    if (!this.enabled) {
+      return Set.of();
+    }
     BlockLocation support = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
     return blockSupporting.get(support);
   }

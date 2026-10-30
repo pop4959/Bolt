@@ -234,7 +234,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         registerCommands();
         this.callbackManager = new CallbackManager(this);
         this.eventBus = new SimpleEventBus<>(Event.class);
-        this.hangingCache = new HangingCache();
+        this.hangingCache = new HangingCache(this);
         profileCache.load();
         final Metrics metrics = new Metrics(this, 17711);
         registerCustomCharts(metrics, databaseConfiguration);
