@@ -19,6 +19,7 @@ import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
+import org.popcraft.bolt.util.ResolvedProtectable;
 import org.popcraft.bolt.util.SchedulerUtil;
 import org.popcraft.bolt.util.Time;
 
@@ -36,10 +37,12 @@ abstract class InteractionListener {
     }
 
     protected boolean triggerAction(final Player player, final Protection protection, final Block block) {
-        final boolean protectable = plugin.isProtectable(block);
-        final ProtectableConfig config = plugin.getProtectableConfig(block);
+        final Optional<ResolvedProtectable> resolved = plugin.resolveProtectable(block);
+        final boolean protectable = resolved.isPresent();
+        final ProtectableConfig config = resolved.map(ResolvedProtectable::config).orElse(null);
         final Component displayName = Protections.displayType(block, player);
-        final String lockPermission = "bolt.protection.lock.%s".formatted(block.getType().name().toLowerCase());
+        final String key = resolved.map(ResolvedProtectable::key).orElseGet(() -> block.getType().name().toLowerCase());
+        final String lockPermission = "bolt.protection.lock.%s".formatted(key);
         return triggerAction(player, protection, block, protectable, config, displayName, lockPermission);
     }
 

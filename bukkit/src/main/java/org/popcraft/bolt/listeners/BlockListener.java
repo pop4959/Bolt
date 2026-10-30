@@ -70,9 +70,11 @@ import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
+import org.popcraft.bolt.util.ResolvedProtectable;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.popcraft.bolt.util.BoltComponents.translateRaw;
@@ -253,7 +255,8 @@ public final class BlockListener extends InteractionListener implements Listener
             return;
         }
         final Block block = e.getBlock();
-        if (!plugin.isProtectable(block)) {
+        final Optional<ResolvedProtectable> resolved = plugin.resolveProtectable(block);
+        if (resolved.isEmpty()) {
             return;
         }
         final BlockState replaced = e.getBlockReplacedState();
@@ -262,11 +265,11 @@ public final class BlockListener extends InteractionListener implements Listener
         if (!plugin.isProtected(block) && !replaced.getType().isAir() && !Tag.REPLACEABLE.isTagged(replaced.getType())) {
             return;
         }
-        final ProtectableConfig protectableConfig = plugin.getProtectableConfig(block);
+        final ProtectableConfig protectableConfig = resolved.get().config();
         if (protectableConfig == null) {
             return;
         }
-        if (protectableConfig.autoProtectPermission() && !player.hasPermission("bolt.protection.autoprotect.%s".formatted(block.getType().name().toLowerCase()))) {
+        if (protectableConfig.autoProtectPermission() && !player.hasPermission("bolt.protection.autoprotect.%s".formatted(resolved.get().key()))) {
             return;
         }
         final Access access = protectableConfig.defaultAccess();

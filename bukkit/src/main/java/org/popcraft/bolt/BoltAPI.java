@@ -8,7 +8,9 @@ import org.bukkit.util.BoundingBox;
 import org.popcraft.bolt.event.Event;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.ProtectableTargetResolver;
 import org.popcraft.bolt.protection.Protection;
+import org.popcraft.bolt.protection.ProtectionNameResolver;
 import org.popcraft.bolt.source.PlayerSourceResolver;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTransformer;
@@ -193,4 +195,25 @@ public interface BoltAPI {
      * @see SourceTransformer
      */
     void registerSourceTransformer(final String sourceType, final SourceTransformer sourceTransformer);
+
+    /**
+     * Registers a resolver that decides whether blocks can be protected, and with which settings. This allows custom
+     * blocks from other plugins to be locked through the normal Bolt commands and autoprotection.
+     * <p>
+     * Resolvers are consulted in registration order and the first result that is not
+     * {@link org.popcraft.bolt.protection.ProtectableResult#pass() pass} is used. If every resolver passes, the
+     * {@code blocks} section of the config is used.
+     *
+     * @see ProtectableTargetResolver
+     */
+    void registerProtectableTargetResolver(final ProtectableTargetResolver resolver);
+
+    /**
+     * Registers a resolver that supplies display names for blocks and block protections in Bolt messages.
+     * Resolvers are consulted in registration order and the first present name is used, falling back to the vanilla
+     * name.
+     *
+     * @see ProtectionNameResolver
+     */
+    void registerProtectionNameResolver(final ProtectionNameResolver resolver);
 }
