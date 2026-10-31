@@ -201,6 +201,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private String defaultAccessType = "normal";
     private Map<String, SourceTransformer> sourceTransformers = new HashMap<>();
     private boolean useActionBar;
+    private boolean transferRequestsEnabled;
     private boolean doors;
     private boolean doorsOpenIron;
     private boolean doorsOpenDouble;
@@ -262,6 +263,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         reloadConfig();
         Translator.loadAllTranslations(getDataPath(), getConfig().getString("language", "en"), getConfig().getBoolean("settings.per-player-locale", true));
         this.useActionBar = getConfig().getBoolean("settings.use-action-bar", true);
+        this.transferRequestsEnabled = getConfig().getBoolean("settings.transfer-requests", true);
         this.doors = getConfig().getConfigurationSection("doors") != null;
         this.doorsOpenIron = getConfig().getBoolean("doors.open-iron", false);
         this.doorsOpenDouble = getConfig().getBoolean("doors.open-double", false);
@@ -570,6 +572,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public boolean isUseActionBar() {
         return useActionBar;
+    }
+
+    public boolean isTransferRequestsEnabled() {
+        return transferRequestsEnabled;
     }
 
     public boolean isDoors() {

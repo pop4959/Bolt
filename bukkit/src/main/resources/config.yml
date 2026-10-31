@@ -3,6 +3,7 @@ language: en
 settings:
   use-action-bar: true
   per-player-locale: true
+  transfer-requests: true
   blocks:
     dispensers-lock-blocks: true
   entities:

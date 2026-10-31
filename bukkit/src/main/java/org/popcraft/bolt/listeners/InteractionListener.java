@@ -231,7 +231,7 @@ abstract class InteractionListener {
                 if (protection != null) {
                     if (player.getUniqueId().equals(protection.getOwner()) || action.isAdmin()) {
                         final UUID uuid = UUID.fromString(action.getData());
-                        final boolean instant = action.isAdmin() || !player.hasPermission("bolt.command.requests");
+                        final boolean instant = action.isAdmin() || !plugin.isTransferRequestsEnabled() || !player.hasPermission("bolt.command.requests");
                         if (!instant && uuid.equals(protection.getOwner())) {
                             BoltComponents.sendMessage(
                                     player,
