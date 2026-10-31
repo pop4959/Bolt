@@ -47,7 +47,7 @@ public class AdminExpireCommand extends BoltCommand {
         for (final BlockProtection blockProtection : protections) {
             final long lastAccessed = blockProtection.getAccessed();
             if (lastAccessed > 0 && lastAccessed < expireTime) {
-                store.removeBlockProtection(blockProtection);
+                plugin.removeProtection(blockProtection);
                 ++removed;
             }
         }

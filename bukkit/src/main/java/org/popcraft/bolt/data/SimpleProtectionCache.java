@@ -3,6 +3,7 @@ package org.popcraft.bolt.data;
 import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.PendingTransfer;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.Group;
 import org.popcraft.bolt.util.Metrics;
@@ -20,6 +21,7 @@ public class SimpleProtectionCache implements Store {
     private final Map<UUID, EntityProtection> cachedEntities = new ConcurrentHashMap<>();
     private final Map<String, Group> cachedGroups = new ConcurrentHashMap<>();
     private final Map<UUID, AccessList> cachedAccessLists = new ConcurrentHashMap<>();
+    private final Map<UUID, PendingTransfer> cachedTransfers = new ConcurrentHashMap<>();
     private final Store backingStore;
 
     public SimpleProtectionCache(final Store backingStore) {
@@ -34,6 +36,7 @@ public class SimpleProtectionCache implements Store {
         backingStore.loadEntityProtections().join().forEach(entityProtection -> cachedEntities.putIfAbsent(entityProtection.getId(), entityProtection));
         backingStore.loadGroups().join().forEach(group -> cachedGroups.putIfAbsent(group.getName(), group));
         backingStore.loadAccessLists().join().forEach(accessList -> cachedAccessLists.putIfAbsent(accessList.getOwner(), accessList));
+        backingStore.loadPendingTransfers().join().forEach(transfer -> cachedTransfers.putIfAbsent(transfer.protection(), transfer));
     }
 
     @Override
@@ -139,6 +142,23 @@ public class SimpleProtectionCache implements Store {
     public void removeAccessList(AccessList accessList) {
         cachedAccessLists.remove(accessList.getOwner());
         backingStore.removeAccessList(accessList);
+    }
+
+    @Override
+    public CompletableFuture<Collection<PendingTransfer>> loadPendingTransfers() {
+        return CompletableFuture.completedFuture(cachedTransfers.values());
+    }
+
+    @Override
+    public void savePendingTransfer(PendingTransfer transfer) {
+        cachedTransfers.put(transfer.protection(), transfer);
+        backingStore.savePendingTransfer(transfer);
+    }
+
+    @Override
+    public void removePendingTransfer(PendingTransfer transfer) {
+        cachedTransfers.remove(transfer.protection());
+        backingStore.removePendingTransfer(transfer);
     }
 
     @Override

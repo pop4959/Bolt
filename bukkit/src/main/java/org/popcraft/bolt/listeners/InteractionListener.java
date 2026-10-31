@@ -231,17 +231,32 @@ abstract class InteractionListener {
                 if (protection != null) {
                     if (player.getUniqueId().equals(protection.getOwner()) || action.isAdmin()) {
                         final UUID uuid = UUID.fromString(action.getData());
-                        protection.setOwner(uuid);
-                        plugin.saveProtection(protection);
-                        Profiles.findOrLookupProfileByUniqueId(uuid)
-                                .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
-                                        player,
-                                        Translation.CLICK_TRANSFER_CONFIRM,
-                                        plugin.isUseActionBar(),
-                                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player)),
-                                        Placeholder.component(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, player)))
-                                )));
+                        final boolean instant = action.isAdmin() || !plugin.isTransferRequestsEnabled() || !player.hasPermission("bolt.command.requests");
+                        if (!instant && uuid.equals(protection.getOwner())) {
+                            BoltComponents.sendMessage(
+                                    player,
+                                    Translation.CLICK_TRANSFER_SELF,
+                                    plugin.isUseActionBar(),
+                                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
+                            );
+                        } else {
+                            if (instant) {
+                                protection.setOwner(uuid);
+                                plugin.saveProtection(protection);
+                                plugin.getTransferRequests().clear(protection.getId());
+                            } else {
+                                plugin.getTransferRequests().request(protection, uuid);
+                            }
+                            Profiles.findOrLookupProfileByUniqueId(uuid)
+                                    .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
+                                            player,
+                                            instant ? Translation.CLICK_TRANSFER_CONFIRM : Translation.CLICK_TRANSFER_PENDING,
+                                            plugin.isUseActionBar(),
+                                            Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
+                                            Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player)),
+                                            Placeholder.component(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(resolveTranslation(Translation.UNKNOWN, player)))
+                                    )));
+                        }
                     } else {
                         BoltComponents.sendMessage(player, Translation.CLICK_EDITED_NO_OWNER, plugin.isUseActionBar());
                     }

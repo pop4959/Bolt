@@ -11,11 +11,16 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.lang.Translation;
+import org.popcraft.bolt.protection.PendingTransfer;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Mode;
+import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.SchedulerUtil;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -57,7 +62,17 @@ public final class PlayerListener implements Listener {
                 ), 20);
             }
         });
-
+        final Map<UUID, Long> incomingRequests = new LinkedHashMap<>();
+        for (final PendingTransfer pending : plugin.getTransferRequests().incoming(uuid)) {
+            incomingRequests.merge(pending.giver(), 1L, Long::sum);
+        }
+        incomingRequests.forEach((giver, count) -> Profiles.findOrLookupProfileByUniqueId(giver)
+                .thenAccept(profile -> SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
+                        player,
+                        Translation.TRANSFER_REQUEST_JOIN,
+                        Placeholder.component(Translation.Placeholder.PLAYER, Optional.ofNullable(profile.name()).<Component>map(Component::text).orElse(BoltComponents.resolveTranslation(Translation.UNKNOWN, player))),
+                        Placeholder.component(Translation.Placeholder.COUNT, Component.text(count))
+                ))));
     }
 
     @EventHandler

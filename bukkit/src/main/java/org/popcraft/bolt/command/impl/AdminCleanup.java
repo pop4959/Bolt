@@ -78,7 +78,7 @@ public class AdminCleanup extends BoltCommand {
                             for (BlockProtection blockProtection : blockProtections) {
                                 final Block block = world.getBlockAt(blockProtection.getX(), blockProtection.getY(), blockProtection.getZ());
                                 if (!blockProtection.getBlock().equals(block.getType().name())) {
-                                    store.removeBlockProtection(blockProtection);
+                                    plugin.removeProtection(blockProtection);
                                     removed.incrementAndGet();
                                     SchedulerUtil.schedule(plugin, sender, () -> BoltComponents.sendMessage(
                                             sender,
