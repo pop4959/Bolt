@@ -5,6 +5,7 @@ settings:
   per-player-locale: true
   blocks:
     dispensers-lock-blocks: true
+    experimental-piston-movement: false
   entities:
     experimental-matcher-optimization: false
 database:
