@@ -13,6 +13,7 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.EndPortalFrame;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
@@ -37,6 +38,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
+import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
@@ -62,6 +64,8 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.popcraft.bolt.BoltPlugin;
 import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.event.LockEntityEvent;
@@ -80,7 +84,6 @@ import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.BukkitPlayerResolver;
 import org.popcraft.bolt.util.EnumUtil;
-import org.popcraft.bolt.util.HangingCache;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
 import org.popcraft.bolt.util.Profiles;
@@ -248,7 +251,16 @@ public final class EntityListener extends InteractionListener implements Listene
             }
             return;
         }
-        if ((damager instanceof final Player player && handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) || (!(damager instanceof Player) && plugin.isProtected(entity))) {
+
+        if (damager instanceof final Player player) {
+            if (!handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) {
+                return;
+            }
+        } else if (!plugin.isProtected(entity)) {
+            return;
+        }
+
+        if (forbidDamagingEntity(damager, entity)) {
             e.setCancelled(true);
         }
     }
@@ -258,10 +270,10 @@ public final class EntityListener extends InteractionListener implements Listene
         // We reach here after attacks with piercing_weapon or kinetic_weapon, present by default on spears, even when cancelled.
         // Working around a Paper bug.
         final Entity damager = getDamagerSource(e.getHitBy());
-        if (!(damager instanceof final Player player) || e.getCause() != EntityKnockbackEvent.Cause.ENTITY_ATTACK) {
+        final LivingEntity entity = e.getEntity();
+        if (!(damager instanceof final Player player) || e.getCause() != EntityKnockbackEvent.Cause.ENTITY_ATTACK || !forbidDamagingEntity(damager, entity)) {
             return;
         }
-        final LivingEntity entity = e.getEntity();
         final Protection protection = plugin.findProtection(entity);
         // The player couldn't have attacked the entity, so they also shouldn't be able to knockback it.
         if (!plugin.canAccess(protection, player, Permission.DESTROY)) {
@@ -273,7 +285,11 @@ public final class EntityListener extends InteractionListener implements Listene
     public void onVehicleDamage(final VehicleDamageEvent e) {
         final Entity attacker = getDamagerSource(e.getAttacker());
         final Entity vehicle = e.getVehicle();
-        if (attacker instanceof final Player player && handlePlayerEntityInteraction(player, vehicle, Permission.INTERACT, true)) {
+        if (!(attacker instanceof final Player player) || !handlePlayerEntityInteraction(player, vehicle, Permission.INTERACT, true)) {
+            return;
+        }
+
+        if (forbidDamagingEntity(attacker, vehicle)) {
             e.setCancelled(true);
         }
     }
@@ -289,11 +305,10 @@ public final class EntityListener extends InteractionListener implements Listene
     }
 
     public void onEntityBreakByEntity(final Entity entity, final Entity remover, Cancellable e) {
-        if (getDamagerSource(remover) instanceof final Player player) {
-            if (handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) {
-                e.setCancelled(true);
-            } else {
-                final Protection protection = plugin.findProtection(entity);
+        final Entity removerSource = getDamagerSource(remover);
+        final Protection protection = plugin.findProtection(entity);
+        if (removerSource instanceof final Player player) {
+            if (!handlePlayerEntityInteraction(player, entity, Permission.DESTROY, true)) {
                 if (protection == null) {
                     return;
                 }
@@ -309,17 +324,34 @@ public final class EntityListener extends InteractionListener implements Listene
                     );
                 }
             }
-        } else if (plugin.isProtected(entity)) {
+        } else if (protection == null) {
+            return;
+        }
+
+        if (forbidDamagingEntity(removerSource, entity)) {
             e.setCancelled(true);
+        } else if (protection != null) {
+            plugin.getHangingCache().removeFromCache(entity);
+            plugin.removeProtection(protection);
         }
     }
 
     public void onEntityBreak(final Entity entity, Cancellable e) {
-        if (plugin.isProtected(entity)) {
+        final Protection protection = plugin.findProtection(entity);
+        if (protection == null) {
+            return;
+        }
+        if (forbidDamagingEntity(null, entity)) {
             e.setCancelled(true);
+        } else {
+            plugin.getHangingCache().removeFromCache(entity);
+            plugin.removeProtection(protection);
         }
     }
 
+    /**
+     * @return true if the interaction should be cancelled (ignoring entity damage configs)
+     */
     private boolean handlePlayerEntityInteraction(final Player player, final Entity entity, final String permission, final boolean shouldSendMessage) {
         if (entity == null) {
             return false;
@@ -403,17 +435,25 @@ public final class EntityListener extends InteractionListener implements Listene
         if (protection == null) {
             return;
         }
-        if (!(getDamagerSource(e.getAttacker()) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY)) {
+        final Entity remover = getDamagerSource(e.getAttacker());
+        if (remover instanceof final Player player) {
+            if (plugin.canAccess(protection, player, Permission.DESTROY)) {
+                plugin.removeProtection(protection);
+                BoltComponents.sendMessage(
+                        player,
+                        Translation.CLICK_UNLOCKED,
+                        plugin.isUseActionBar(),
+                        Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
+                        Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
+                );
+                return;
+            }
+        }
+
+        if (forbidDamagingEntity(remover, vehicle)) {
             e.setCancelled(true);
         } else {
             plugin.removeProtection(protection);
-            BoltComponents.sendMessage(
-                    player,
-                    Translation.CLICK_UNLOCKED,
-                    plugin.isUseActionBar(),
-                    Placeholder.component(Translation.Placeholder.PROTECTION_TYPE, Protections.protectionType(protection, player)),
-                    Placeholder.component(Translation.Placeholder.PROTECTION, Protections.displayType(protection, player))
-            );
         }
     }
 
@@ -476,7 +516,7 @@ public final class EntityListener extends InteractionListener implements Listene
         if (HangingBreakEvent.RemoveCause.ENTITY.equals(e.getCause())) {
             return;
         }
-        if (plugin.isProtected(e.getEntity())) {
+        if (plugin.isProtected(e.getEntity()) && !plugin.getEntitiesAllowNonlivingEnvironmentDamage()) {
             e.setCancelled(true);
         }
     }
@@ -490,7 +530,16 @@ public final class EntityListener extends InteractionListener implements Listene
         if (EntityDamageEvent.DamageCause.ENTITY_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK.equals(e.getCause()) || EntityDamageEvent.DamageCause.PROJECTILE.equals(e.getCause()) || EntityDamageEvent.DamageCause.ENTITY_EXPLOSION.equals(e.getCause())) {
             return;
         }
-        if (plugin.isProtected(e.getEntity())) {
+        final Entity entity = e.getEntity();
+        if (!plugin.isProtected(entity)) {
+            return;
+        }
+        if (EntityDamageEvent.DamageCause.VOID.equals(e.getCause()) || EntityDamageEvent.DamageCause.KILL.equals(e.getCause())) {
+            // Non-living entities seemingly don't take void or kill damage, they are instantly removed from the world.
+            if (!plugin.getEntitiesAllowVoidDamage()) {
+                e.setCancelled(true);
+            }
+        } else if (forbidDamagingEntity(null, entity)) {
             e.setCancelled(true);
         }
     }
@@ -619,7 +668,11 @@ public final class EntityListener extends InteractionListener implements Listene
         if (protection == null) {
             return;
         }
-        if (!(getDamagerSource(e.getEntity()) instanceof final Player player) || !plugin.canAccess(protection, player, Permission.DESTROY)) {
+        final Entity damager = getDamagerSource(e.getEntity());
+        if (damager instanceof final Player player && plugin.canAccess(protection, player, Permission.DESTROY)) {
+            return;
+        }
+        if (forbidDamagingEntity(damager, hitEntity)) {
             e.setCancelled(true);
         }
     }
@@ -873,6 +926,18 @@ public final class EntityListener extends InteractionListener implements Listene
         }
     }
 
+    @EventHandler
+    public void onEntityRemove(EntityRemoveEvent e) {
+        EntityProtection protection = plugin.loadProtection(e.getEntity());
+        if (protection == null) {
+            return;
+        }
+        // Last resort event. We can't cancel it, all we can do is clean up stale DB entries.
+        if (e.getCause() == EntityRemoveEvent.Cause.DEATH || e.getCause() == EntityRemoveEvent.Cause.OUT_OF_WORLD) {
+            plugin.removeProtection(protection);
+        }
+    }
+
     private Entity getDamagerSource(final Entity damager) {
         if (damager instanceof final Projectile projectile && projectile.getShooter() instanceof final Entity source) {
             return source;
@@ -887,6 +952,38 @@ public final class EntityListener extends InteractionListener implements Listene
             return new BukkitPlayerResolver(this.plugin.getBolt(), player.getUniqueId());
         } else {
             return ENTITY_SOURCE_RESOLVER;
+        }
+    }
+
+    // An ArmorStand is an instanceof a LivingEntity, but it doesn't "feel" living, and it would break the old default
+    // config to classify it as such.
+    private boolean isLivingEntity(@NotNull Entity victim) {
+        return victim instanceof LivingEntity && !(victim instanceof ArmorStand);
+    }
+
+    /**
+     * The locked entity {@code victim} has just been damaged by {@code damager}; check if that damage is allowed.
+     * {@code damager} may be null for environmental damage.
+     * @return true if the damage shouldn't be allowed
+     */
+    private boolean forbidDamagingEntity(@Nullable Entity damager, @NotNull Entity victim) {
+        if (damager instanceof Player player) {
+            final BoltPlayer boltPlayer = plugin.player(player);
+            // Hitting an entity to interact with it using an action should not damage it
+            if (boltPlayer.triggeredAction()) {
+                return true;
+            }
+            if (isLivingEntity(victim)) {
+                return !plugin.getEntitiesAllowLivingPlayerDamage();
+            } else {
+                return !plugin.getEntitiesAllowNonlivingPlayerDamage();
+            }
+        } else {
+            if (isLivingEntity(victim)) {
+                return !plugin.getEntitiesAllowLivingEnvironmentDamage();
+            } else {
+                return !plugin.getEntitiesAllowNonlivingEnvironmentDamage();
+            }
         }
     }
 }
