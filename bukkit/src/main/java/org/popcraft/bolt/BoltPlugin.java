@@ -205,6 +205,11 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private int doorsCloseAfter;
     private boolean doorsFixPlugins;
     private boolean blocksDispensersLockBlocks;
+    private boolean entitiesAllowVoidDamage;
+    private boolean entitiesAllowLivingEnvironmentDamage;
+    private boolean entitiesAllowLivingPlayerDamage;
+    private boolean entitiesAllowNonlivingEnvironmentDamage;
+    private boolean entitiesAllowNonlivingPlayerDamage;
     private boolean enableHangingCache;
     private Bolt bolt;
     private CallbackManager callbackManager;
@@ -265,6 +270,11 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         this.doorsFixPlugins = getConfig().getBoolean("doors.fix-plugins", false);
         this.blocksDispensersLockBlocks = getConfig().getBoolean("settings.blocks.dispensers-lock-blocks", true);
         this.enableHangingCache = getConfig().getBoolean("settings.entities.experimental-matcher-optimization", false);
+        this.entitiesAllowVoidDamage =  getConfig().getBoolean("settings.entities.allow-void-damage", true);
+        this.entitiesAllowLivingEnvironmentDamage =  getConfig().getBoolean("settings.entities.allow-living-entity-environment-damage", true);
+        this.entitiesAllowLivingPlayerDamage =  getConfig().getBoolean("settings.entities.allow-living-entity-player-damage", true);
+        this.entitiesAllowNonlivingEnvironmentDamage =  getConfig().getBoolean("settings.entities.allow-nonliving-entity-environment-damage", false);
+        this.entitiesAllowNonlivingPlayerDamage =  getConfig().getBoolean("settings.entities.allow-nonliving-entity-player-damage", false);
         registerAccessTypes();
         registerProtectableAccess();
         nagInvalidHopperConfig();
@@ -585,6 +595,26 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public boolean getBlocksDispensersLockBlocks() {
         return blocksDispensersLockBlocks;
+    }
+
+    public boolean getEntitiesAllowVoidDamage() {
+        return entitiesAllowVoidDamage;
+    }
+
+    public boolean getEntitiesAllowLivingEnvironmentDamage() {
+        return entitiesAllowLivingEnvironmentDamage;
+    }
+
+    public boolean getEntitiesAllowLivingPlayerDamage() {
+        return entitiesAllowLivingPlayerDamage;
+    }
+
+    public boolean getEntitiesAllowNonlivingEnvironmentDamage() {
+        return entitiesAllowNonlivingEnvironmentDamage;
+    }
+
+    public boolean getEntitiesAllowNonlivingPlayerDamage() {
+        return entitiesAllowNonlivingPlayerDamage;
     }
 
     public boolean getEnableHangingCache() {
