@@ -271,8 +271,8 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         this.blocksDispensersLockBlocks = getConfig().getBoolean("settings.blocks.dispensers-lock-blocks", true);
         this.enableHangingCache = getConfig().getBoolean("settings.entities.experimental-matcher-optimization", false);
         this.entitiesAllowVoidDamage =  getConfig().getBoolean("settings.entities.allow-void-damage", true);
-        this.entitiesAllowLivingEnvironmentDamage =  getConfig().getBoolean("settings.entities.allow-living-entity-environment-damage", true);
-        this.entitiesAllowLivingPlayerDamage =  getConfig().getBoolean("settings.entities.allow-living-entity-player-damage", true);
+        this.entitiesAllowLivingEnvironmentDamage =  getConfig().getBoolean("settings.entities.allow-living-entity-environment-damage", false);
+        this.entitiesAllowLivingPlayerDamage =  getConfig().getBoolean("settings.entities.allow-living-entity-player-damage", false);
         this.entitiesAllowNonlivingEnvironmentDamage =  getConfig().getBoolean("settings.entities.allow-nonliving-entity-environment-damage", false);
         this.entitiesAllowNonlivingPlayerDamage =  getConfig().getBoolean("settings.entities.allow-nonliving-entity-player-damage", false);
         registerAccessTypes();
