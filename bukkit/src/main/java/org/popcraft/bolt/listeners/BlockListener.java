@@ -67,6 +67,7 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Doors;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
+import org.popcraft.bolt.util.PistonMovement;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
@@ -411,6 +412,12 @@ public final class BlockListener extends InteractionListener implements Listener
 
     @EventHandler
     public void onBlockPistonRetract(final BlockPistonRetractEvent e) {
+        if (plugin.isPistonMovement()) {
+            if (!PistonMovement.allowed(plugin, e.getBlock(), e.getBlocks(), e.getDirection(), Permission.PULL)) {
+                e.setCancelled(true);
+            }
+            return;
+        }
         for (final Block block : e.getBlocks()) {
             if (plugin.isProtected(block)) {
                 e.setCancelled(true);
@@ -419,8 +426,21 @@ public final class BlockListener extends InteractionListener implements Listener
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockPistonRetractMonitor(final BlockPistonRetractEvent e) {
+        if (plugin.isPistonMovement()) {
+            PistonMovement.relocate(plugin, e.getBlocks(), e.getDirection());
+        }
+    }
+
     @EventHandler
     public void onBlockPistonExtend(final BlockPistonExtendEvent e) {
+        if (plugin.isPistonMovement()) {
+            if (!PistonMovement.allowed(plugin, e.getBlock(), e.getBlocks(), e.getDirection(), Permission.PUSH)) {
+                e.setCancelled(true);
+            }
+            return;
+        }
         final Protection pistonProtection = plugin.loadProtection(e.getBlock());
         final List<Block> blocks = e.getBlocks();
         for (final Block block : blocks) {
@@ -438,6 +458,13 @@ public final class BlockListener extends InteractionListener implements Listener
                     return;
                 }
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockPistonExtendMonitor(final BlockPistonExtendEvent e) {
+        if (plugin.isPistonMovement()) {
+            PistonMovement.relocate(plugin, e.getBlocks(), e.getDirection());
         }
     }
 
@@ -636,6 +663,9 @@ public final class BlockListener extends InteractionListener implements Listener
     // interaction to happen, so all we need to do here is clean up.
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreakBlock(final BlockBreakBlockEvent e) {
+        if (plugin.isPistonMovement()) {
+            return;
+        }
         final Block target = e.getBlock();
         final Protection targetProtection = plugin.findProtection(target);
         if (e.getSource().getBlockData() instanceof Piston && targetProtection != null) {
