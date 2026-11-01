@@ -64,6 +64,24 @@ public class SimpleProtectionCache implements Store {
     }
 
     @Override
+    public void saveBlockProtections(Collection<BlockProtection> protections) {
+        for (final BlockProtection protection : protections) {
+            final BlockLocation oldBlockLocation = cachedBlockIdLocation.remove(protection.getId());
+            if (oldBlockLocation != null) {
+                cachedBlockLocationId.remove(oldBlockLocation);
+            }
+        }
+        for (final BlockProtection protection : protections) {
+            final UUID id = protection.getId();
+            final BlockLocation blockLocation = BlockLocation.fromProtection(protection);
+            cachedBlockLocationId.put(blockLocation, id);
+            cachedBlockIdLocation.put(id, blockLocation);
+            cachedBlocks.put(id, protection);
+        }
+        backingStore.saveBlockProtections(protections);
+    }
+
+    @Override
     public void removeBlockProtection(BlockProtection protection) {
         final UUID id = protection.getId();
         final BlockLocation blockLocation = BlockLocation.fromProtection(protection);

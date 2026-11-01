@@ -211,6 +211,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private boolean blocksDispensersLockBlocks;
     private boolean enableHangingCache;
     private boolean redstoneTracking;
+    private boolean pistonMovement;
     private Bolt bolt;
     private CallbackManager callbackManager;
     private EventBus<Event> eventBus;
@@ -271,6 +272,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         this.blocksDispensersLockBlocks = getConfig().getBoolean("settings.blocks.dispensers-lock-blocks", true);
         this.enableHangingCache = getConfig().getBoolean("settings.entities.experimental-matcher-optimization", false);
         this.redstoneTracking = getConfig().getBoolean("settings.blocks.experimental-redstone-tracking", false);
+        this.pistonMovement = getConfig().getBoolean("settings.blocks.experimental-piston-movement", false);
         registerAccessTypes();
         registerProtectableAccess();
         nagInvalidHopperConfig();
@@ -601,6 +603,10 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         return redstoneTracking;
     }
 
+    public boolean isPistonMovement() {
+        return pistonMovement;
+    }
+
     public ProfileCache getProfileCache() {
         return profileCache;
     }
@@ -907,7 +913,7 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         bolt.getRegisteredPlayerResolvers().add(playerSourceResolver);
     }
 
-    private Protection matchProtection(final Block block) {
+    public Protection matchProtection(final Block block) {
         for (final BlockMatcher blockMatcher : enabledBlockMatchers) {
             if (blockMatcher.canMatch(block)) {
                 final Match match = blockMatcher.findMatch(block);

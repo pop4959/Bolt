@@ -108,3 +108,7 @@ permissions:
     default: false
   bolt.permission.auto_close:
     default: false
+  bolt.permission.push:
+    default: false
+  bolt.permission.pull:
+    default: false

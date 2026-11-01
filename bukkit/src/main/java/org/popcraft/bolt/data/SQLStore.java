@@ -211,6 +211,15 @@ public class SQLStore implements Store {
     }
 
     @Override
+    public void saveBlockProtections(Collection<BlockProtection> protections) {
+        final List<BlockProtection> copies = new ArrayList<>(protections.size());
+        for (final BlockProtection protection : protections) {
+            copies.add(new BlockProtection(protection.getId(), protection.getOwner(), protection.getType(), protection.getCreated(), protection.getAccessed(), new HashMap<>(protection.getAccess()), protection.getWorld(), protection.getX(), protection.getY(), protection.getZ(), protection.getBlock()));
+        }
+        CompletableFuture.runAsync(() -> copies.forEach(copy -> saveBlocks.put(copy.getId(), copy)), executor);
+    }
+
+    @Override
     public void removeBlockProtection(BlockProtection protection) {
         CompletableFuture.runAsync(() -> {
             final UUID id = protection.getId();
