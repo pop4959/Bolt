@@ -131,6 +131,8 @@ entities:
     autoProtect: private
   leash_knot:
     autoProtect: private
+  copper_golem:
+    autoProtect: private
   acacia_chest_boat:
     autoProtect: private
   bamboo_chest_raft:
