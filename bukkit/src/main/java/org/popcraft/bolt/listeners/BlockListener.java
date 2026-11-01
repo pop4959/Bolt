@@ -67,9 +67,11 @@ import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Doors;
 import org.popcraft.bolt.util.Mode;
 import org.popcraft.bolt.util.Permission;
+import org.popcraft.bolt.util.PistonMovement;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
+import org.popcraft.bolt.util.RedstoneTracker;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.List;
@@ -79,7 +81,6 @@ import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 
 public final class BlockListener extends InteractionListener implements Listener {
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
-    private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private static final Set<Material> DYES = Set.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     private static final Tag<Material> WOODEN_SHELVES = Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("wooden_shelves"), Material.class);
 
@@ -215,6 +216,13 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         if (shouldCancel) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerInteractMonitor(final PlayerInteractEvent e) {
+        if (plugin.isRedstoneTracking()) {
+            RedstoneTracker.handlePlayerInteract(e);
         }
     }
 
@@ -411,6 +419,12 @@ public final class BlockListener extends InteractionListener implements Listener
 
     @EventHandler
     public void onBlockPistonRetract(final BlockPistonRetractEvent e) {
+        if (plugin.isPistonMovement()) {
+            if (!PistonMovement.allowed(plugin, e.getBlock(), e.getBlocks(), e.getDirection(), Permission.PULL)) {
+                e.setCancelled(true);
+            }
+            return;
+        }
         for (final Block block : e.getBlocks()) {
             if (plugin.isProtected(block)) {
                 e.setCancelled(true);
@@ -419,8 +433,21 @@ public final class BlockListener extends InteractionListener implements Listener
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockPistonRetractMonitor(final BlockPistonRetractEvent e) {
+        if (plugin.isPistonMovement()) {
+            PistonMovement.relocate(plugin, e.getBlocks(), e.getDirection());
+        }
+    }
+
     @EventHandler
     public void onBlockPistonExtend(final BlockPistonExtendEvent e) {
+        if (plugin.isPistonMovement()) {
+            if (!PistonMovement.allowed(plugin, e.getBlock(), e.getBlocks(), e.getDirection(), Permission.PUSH)) {
+                e.setCancelled(true);
+            }
+            return;
+        }
         final Protection pistonProtection = plugin.loadProtection(e.getBlock());
         final List<Block> blocks = e.getBlocks();
         for (final Block block : blocks) {
@@ -438,6 +465,13 @@ public final class BlockListener extends InteractionListener implements Listener
                     return;
                 }
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockPistonExtendMonitor(final BlockPistonExtendEvent e) {
+        if (plugin.isPistonMovement()) {
+            PistonMovement.relocate(plugin, e.getBlocks(), e.getDirection());
         }
     }
 
@@ -539,8 +573,15 @@ public final class BlockListener extends InteractionListener implements Listener
         if (protection == null) {
             return;
         }
-        if (!plugin.canAccess(protection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
+        if (!(plugin.isRedstoneTracking() && e.getNewCurrent() == 0) && !plugin.isAllowedRedstoneAccess(protection, e.getBlock())) {
             e.setNewCurrent(e.getOldCurrent());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onBlockRedstoneMonitor(final BlockRedstoneEvent e) {
+        if (plugin.isRedstoneTracking()) {
+            RedstoneTracker.handleBlockRedstone(e);
         }
     }
 
@@ -567,7 +608,7 @@ public final class BlockListener extends InteractionListener implements Listener
         if (existingProtection == null) {
             return;
         }
-        if (!plugin.canAccess(existingProtection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
+        if (!plugin.isAllowedRedstoneAccess(existingProtection, block)) {
             e.setCancelled(true);
         }
     }
@@ -617,7 +658,7 @@ public final class BlockListener extends InteractionListener implements Listener
         if (existingProtection == null) {
             return;
         }
-        if (!plugin.canAccess(existingProtection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
+        if (!plugin.isAllowedRedstoneAccess(existingProtection, block)) {
             e.setCancelled(true);
         }
     }
@@ -636,6 +677,9 @@ public final class BlockListener extends InteractionListener implements Listener
     // interaction to happen, so all we need to do here is clean up.
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreakBlock(final BlockBreakBlockEvent e) {
+        if (plugin.isPistonMovement()) {
+            return;
+        }
         final Block target = e.getBlock();
         final Protection targetProtection = plugin.findProtection(target);
         if (e.getSource().getBlockData() instanceof Piston && targetProtection != null) {
