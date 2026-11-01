@@ -3,6 +3,7 @@ package org.popcraft.bolt.data;
 import org.popcraft.bolt.access.AccessList;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
+import org.popcraft.bolt.protection.PendingTransfer;
 import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.Group;
 
@@ -18,6 +19,7 @@ public class MemoryStore implements Store {
     private final Map<UUID, EntityProtection> entityProtectionMap = new ConcurrentHashMap<>();
     private final Map<String, Group> groupMap = new ConcurrentHashMap<>();
     private final Map<UUID, AccessList> accessListMap = new ConcurrentHashMap<>();
+    private final Map<UUID, PendingTransfer> pendingTransferMap = new ConcurrentHashMap<>();
 
     @Override
     public CompletableFuture<BlockProtection> loadBlockProtection(final BlockLocation location) {
@@ -99,6 +101,21 @@ public class MemoryStore implements Store {
     @Override
     public void removeAccessList(AccessList accessList) {
         accessListMap.remove(accessList.getOwner());
+    }
+
+    @Override
+    public CompletableFuture<Collection<PendingTransfer>> loadPendingTransfers() {
+        return CompletableFuture.completedFuture(pendingTransferMap.values());
+    }
+
+    @Override
+    public void savePendingTransfer(PendingTransfer transfer) {
+        pendingTransferMap.put(transfer.protection(), transfer);
+    }
+
+    @Override
+    public void removePendingTransfer(PendingTransfer transfer) {
+        pendingTransferMap.remove(transfer.protection());
     }
 
     @Override

@@ -70,6 +70,8 @@ permissions:
     default: true
   bolt.command.password:
     default: true
+  bolt.command.requests:
+    default: true
   bolt.command.transfer:
     default: true
   bolt.command.trust:
@@ -107,4 +109,8 @@ permissions:
   bolt.permission.entity_break_door:
     default: false
   bolt.permission.auto_close:
+    default: false
+  bolt.permission.push:
+    default: false
+  bolt.permission.pull:
     default: false

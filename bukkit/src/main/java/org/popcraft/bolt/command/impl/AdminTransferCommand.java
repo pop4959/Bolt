@@ -59,6 +59,7 @@ public class AdminTransferCommand extends BoltCommand {
                             .forEach(protection -> {
                                 protection.setOwner(newOwnerProfile.uuid());
                                 plugin.saveProtection(protection);
+                                plugin.getTransferRequests().clear(protection.getId());
                             });
                     SchedulerUtil.schedule(plugin, player, () -> BoltComponents.sendMessage(
                             player,

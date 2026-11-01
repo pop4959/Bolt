@@ -16,6 +16,10 @@ public enum Statements {
     CREATE_TABLE_ACCESS(
             "CREATE TABLE IF NOT EXISTS %saccess (owner varchar(36) PRIMARY KEY, access text);"
     ),
+    CREATE_TABLE_TRANSFERS(
+            "CREATE TABLE IF NOT EXISTS %stransfers (protection varchar(36) PRIMARY KEY, giver varchar(36), recipient varchar(36), created integer);",
+            "CREATE TABLE IF NOT EXISTS %stransfers (protection varchar(36) PRIMARY KEY, giver varchar(36), recipient varchar(36), created bigint);"
+    ),
     CREATE_INDEX_BLOCK_OWNER(
             "CREATE INDEX IF NOT EXISTS block_owner ON %sblocks(owner);"
     ),
@@ -75,6 +79,15 @@ public enum Statements {
     ),
     DELETE_ACCESS_LIST(
             "DELETE FROM %saccess WHERE owner = ?;"
+    ),
+    SELECT_ALL_TRANSFERS(
+            "SELECT * FROM %stransfers;"
+    ),
+    REPLACE_TRANSFER(
+            "REPLACE INTO %stransfers VALUES (?, ?, ?, ?);"
+    ),
+    DELETE_TRANSFER(
+            "DELETE FROM %stransfers WHERE protection = ?;"
     ),
     LWC_SELECT_ALL_BLOCK_IDS(
             "SELECT * FROM %sblocks;"

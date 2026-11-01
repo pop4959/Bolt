@@ -13,6 +13,8 @@ public final class Permission {
     public static final String ENTITY_INTERACT = "entity_interact";
     public static final String ENTITY_BREAK_DOOR = "entity_break_door";
     public static final String AUTO_CLOSE = "auto_close";
+    public static final String PUSH = "push";
+    public static final String PULL = "pull";
 
     private Permission() {
     }
