@@ -4,6 +4,7 @@ settings:
   use-action-bar: true
   per-player-locale: true
   transfer-requests: true
+  transfer-resets-access: true
   blocks:
     dispensers-lock-blocks: true
     experimental-redstone-tracking: false
