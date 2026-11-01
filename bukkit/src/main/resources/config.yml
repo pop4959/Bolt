@@ -5,6 +5,7 @@ settings:
   per-player-locale: true
   blocks:
     dispensers-lock-blocks: true
+    experimental-redstone-tracking: false
   entities:
     experimental-matcher-optimization: false
 database:
