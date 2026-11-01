@@ -71,6 +71,7 @@ import org.popcraft.bolt.util.PistonMovement;
 import org.popcraft.bolt.util.Profiles;
 import org.popcraft.bolt.util.ProtectableConfig;
 import org.popcraft.bolt.util.Protections;
+import org.popcraft.bolt.util.RedstoneTracker;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.List;
@@ -80,7 +81,6 @@ import static org.popcraft.bolt.util.BoltComponents.translateRaw;
 
 public final class BlockListener extends InteractionListener implements Listener {
     private static final SourceResolver BLOCK_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.BLOCK));
-    private static final SourceResolver REDSTONE_SOURCE_RESOLVER = new SourceTypeResolver(Source.of(SourceTypes.REDSTONE));
     private static final Set<Material> DYES = Set.of(Material.WHITE_DYE, Material.ORANGE_DYE, Material.MAGENTA_DYE, Material.LIGHT_BLUE_DYE, Material.YELLOW_DYE, Material.LIME_DYE, Material.PINK_DYE, Material.GRAY_DYE, Material.LIGHT_GRAY_DYE, Material.CYAN_DYE, Material.PURPLE_DYE, Material.BLUE_DYE, Material.BROWN_DYE, Material.GREEN_DYE, Material.RED_DYE, Material.BLACK_DYE);
     private static final Tag<Material> WOODEN_SHELVES = Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("wooden_shelves"), Material.class);
 
@@ -216,6 +216,13 @@ public final class BlockListener extends InteractionListener implements Listener
         }
         if (shouldCancel) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerInteractMonitor(final PlayerInteractEvent e) {
+        if (plugin.isRedstoneTracking()) {
+            RedstoneTracker.handlePlayerInteract(e);
         }
     }
 
@@ -566,8 +573,15 @@ public final class BlockListener extends InteractionListener implements Listener
         if (protection == null) {
             return;
         }
-        if (!plugin.canAccess(protection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
+        if (!(plugin.isRedstoneTracking() && e.getNewCurrent() == 0) && !plugin.isAllowedRedstoneAccess(protection, e.getBlock())) {
             e.setNewCurrent(e.getOldCurrent());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onBlockRedstoneMonitor(final BlockRedstoneEvent e) {
+        if (plugin.isRedstoneTracking()) {
+            RedstoneTracker.handleBlockRedstone(e);
         }
     }
 
@@ -594,7 +608,7 @@ public final class BlockListener extends InteractionListener implements Listener
         if (existingProtection == null) {
             return;
         }
-        if (!plugin.canAccess(existingProtection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
+        if (!plugin.isAllowedRedstoneAccess(existingProtection, block)) {
             e.setCancelled(true);
         }
     }
@@ -644,7 +658,7 @@ public final class BlockListener extends InteractionListener implements Listener
         if (existingProtection == null) {
             return;
         }
-        if (!plugin.canAccess(existingProtection, REDSTONE_SOURCE_RESOLVER, Permission.REDSTONE)) {
+        if (!plugin.isAllowedRedstoneAccess(existingProtection, block)) {
             e.setCancelled(true);
         }
     }
