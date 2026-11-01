@@ -42,7 +42,6 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -55,6 +54,7 @@ import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.event.LockBlockEvent;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.listeners.adapter.ConnectedShelves;
+import org.popcraft.bolt.listeners.adapter.EntityConstructListener;
 import org.popcraft.bolt.matcher.Match;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.Protection;
@@ -62,6 +62,7 @@ import org.popcraft.bolt.source.Source;
 import org.popcraft.bolt.source.SourceResolver;
 import org.popcraft.bolt.source.SourceTypeResolver;
 import org.popcraft.bolt.source.SourceTypes;
+import org.popcraft.bolt.util.BlockLocation;
 import org.popcraft.bolt.util.BoltComponents;
 import org.popcraft.bolt.util.BoltPlayer;
 import org.popcraft.bolt.util.Doors;
@@ -257,17 +258,27 @@ public final class BlockListener extends InteractionListener implements Listener
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBlockPlaceMonitor(final BlockPlaceEvent e) {
         final Player player = e.getPlayer();
+        final Block block = e.getBlock();
+
+        final BlockState replaced = e.getBlockReplacedState();
+        // Future: use BlockData.isReplaceable, which is only available from Paper 1.21.10 onwards.
+        final boolean modification = !replaced.getType().isAir() && !Tag.REPLACEABLE.isTagged(replaced.getType());
+
+        if (!modification && (block.getType().equals(Material.JACK_O_LANTERN) || block.getType().equals(Material.CARVED_PUMPKIN))) {
+            final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+            EntityConstructListener.placedPumpkins.put(location, player.getUniqueId());
+            SchedulerUtil.schedule(plugin, block.getLocation(), () -> EntityConstructListener.placedPumpkins.remove(location));
+        }
+
+        // This is actually a block modification, not a replacement, and the block wasn't protected, so don't autoprotect it.
+        if (!plugin.isProtected(block) && modification) {
+            return;
+        }
+
         if (plugin.player(player.getUniqueId()).hasMode(Mode.NOLOCK)) {
             return;
         }
-        final Block block = e.getBlock();
         if (!plugin.isProtectable(block)) {
-            return;
-        }
-        final BlockState replaced = e.getBlockReplacedState();
-        // This is actually a block modification, not a replacement, and the block wasn't protected, so don't autoprotect it.
-        // Future: use BlockData.isReplaceable, which is only available from Paper 1.21.10 onwards.
-        if (!plugin.isProtected(block) && !replaced.getType().isAir() && !Tag.REPLACEABLE.isTagged(replaced.getType())) {
             return;
         }
         final ProtectableConfig protectableConfig = plugin.getProtectableConfig(block);
