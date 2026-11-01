@@ -242,7 +242,8 @@ abstract class InteractionListener {
                         } else {
                             if (instant) {
                                 protection.setOwner(uuid);
-                                if (!action.isAdmin() && plugin.isTransferClearsAccess()) {
+                                if (!action.isAdmin() && plugin.isTransferResetsAccess()) {
+                                    protection.setType(plugin.getDefaultProtectionType());
                                     protection.getAccess().clear();
                                 }
                                 plugin.saveProtection(protection);
