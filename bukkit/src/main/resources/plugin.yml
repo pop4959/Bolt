@@ -70,6 +70,8 @@ permissions:
     default: true
   bolt.command.password:
     default: true
+  bolt.command.requests:
+    default: true
   bolt.command.transfer:
     default: true
   bolt.command.trust:
