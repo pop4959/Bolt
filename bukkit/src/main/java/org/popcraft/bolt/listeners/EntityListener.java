@@ -34,6 +34,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityMountEvent;
@@ -71,6 +72,7 @@ import org.popcraft.bolt.access.Access;
 import org.popcraft.bolt.event.LockEntityEvent;
 import org.popcraft.bolt.lang.Translation;
 import org.popcraft.bolt.listeners.adapter.EntityBreakEventListener;
+import org.popcraft.bolt.listeners.adapter.EntityConstructListener;
 import org.popcraft.bolt.listeners.adapter.WindChargeExplosionListener;
 import org.popcraft.bolt.protection.BlockProtection;
 import org.popcraft.bolt.protection.EntityProtection;
@@ -92,13 +94,13 @@ import org.popcraft.bolt.util.Protections;
 import org.popcraft.bolt.util.SchedulerUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static org.popcraft.bolt.util.BoltComponents.translateRaw;
@@ -108,8 +110,9 @@ public final class EntityListener extends InteractionListener implements Listene
     private static final EntityType COPPER_GOLEM = EnumUtil.valueOf(EntityType.class, "COPPER_GOLEM").orElse(null);
     private static final Tag<Material> COPPER_GOLEM_STATUES = Bukkit.getTag(Tag.REGISTRY_BLOCKS, NamespacedKey.minecraft("copper_golem_statues"), Material.class);
     private static final CreatureSpawnEvent.SpawnReason REANIMATE = EnumUtil.valueOf(CreatureSpawnEvent.SpawnReason.class, "REANIMATE").orElse(null);
-    private final Map<NamespacedKey, UUID> spawnEggPlayers = new HashMap<>();
-    private final Map<BlockLocation, BlockProtection> reanimatedCopperGolems = new HashMap<>();
+    private static final CreatureSpawnEvent.SpawnReason BUILD_COPPERGOLEM = EnumUtil.valueOf(CreatureSpawnEvent.SpawnReason.class, "BUILD_COPPERGOLEM").orElse(null);
+    private final Map<NamespacedKey, UUID> spawnEntityPlayers = new ConcurrentHashMap<>();
+    private final Map<BlockLocation, BlockProtection> reanimatedCopperGolems = new ConcurrentHashMap<>();
 
     public EntityListener(final BoltPlugin plugin) {
         super(plugin);
@@ -127,15 +130,16 @@ public final class EntityListener extends InteractionListener implements Listene
         final NamespacedKey entityKey = NamespacedKey.minecraft(spawnEggKey.getKey().replace("_spawn_egg", ""));
         final Player player = e.getPlayer();
         final UUID uuid = player.getUniqueId();
-        spawnEggPlayers.put(entityKey, uuid);
-        SchedulerUtil.schedule(plugin, player, () -> spawnEggPlayers.remove(entityKey));
+        spawnEntityPlayers.put(entityKey, uuid);
+        SchedulerUtil.schedule(plugin, player, () -> spawnEntityPlayers.remove(entityKey));
     }
 
     @EventHandler
     public void onCreatureSpawn(final CreatureSpawnEvent e) {
         final Entity entity = e.getEntity();
-        if (CreatureSpawnEvent.SpawnReason.SPAWNER_EGG.equals(e.getSpawnReason())) {
-            final UUID uuid = spawnEggPlayers.remove(entity.getType().getKey());
+        if (CreatureSpawnEvent.SpawnReason.SPAWNER_EGG.equals(e.getSpawnReason()) || e.getSpawnReason().equals(BUILD_COPPERGOLEM)) {
+            // Future: Use CreatureSpawnEvent.SpawnReason.BUILD_COPPERGOLEM
+            final UUID uuid = spawnEntityPlayers.remove(entity.getType().getKey());
             if (uuid == null) {
                 return;
             }
@@ -935,6 +939,28 @@ public final class EntityListener extends InteractionListener implements Listene
         // Last resort event. We can't cancel it, all we can do is clean up stale DB entries.
         if (e.getCause() == EntityRemoveEvent.Cause.DEATH || e.getCause() == EntityRemoveEvent.Cause.OUT_OF_WORLD) {
             plugin.removeProtection(protection);
+        }
+    }
+
+    public <E extends EntityEvent & Cancellable> void onEntityConstruct(E e, List<Block> blocks) {
+        UUID player = null;
+        for (final Block block : blocks) {
+            if (plugin.isProtected(block)) {
+                e.setCancelled(true);
+                return;
+            }
+            final BlockLocation location = new BlockLocation(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+            final UUID tracked = EntityConstructListener.placedPumpkins.remove(location);
+            if (tracked != null) {
+                player = tracked;
+            }
+        }
+
+        if (player != null) {
+            // According to Javadocs, this event doesn't guarantee the entity will spawn, so we keep track of it again
+            // until the spawn event.
+            spawnEntityPlayers.put(e.getEntityType().getKey(), player);
+            SchedulerUtil.schedule(plugin, e.getEntity(), () -> spawnEntityPlayers.remove(e.getEntityType().getKey()));
         }
     }
 
