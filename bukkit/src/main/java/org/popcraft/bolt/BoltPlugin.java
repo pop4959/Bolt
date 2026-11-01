@@ -213,6 +213,11 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
     private int doorsCloseAfter;
     private boolean doorsFixPlugins;
     private boolean blocksDispensersLockBlocks;
+    private boolean entitiesAllowVoidDamage;
+    private boolean entitiesAllowLivingEnvironmentDamage;
+    private boolean entitiesAllowLivingPlayerDamage;
+    private boolean entitiesAllowNonlivingEnvironmentDamage;
+    private boolean entitiesAllowNonlivingPlayerDamage;
     private boolean enableHangingCache;
     private boolean redstoneTracking;
     private boolean pistonMovement;
@@ -279,6 +284,11 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
         this.doorsFixPlugins = getConfig().getBoolean("doors.fix-plugins", false);
         this.blocksDispensersLockBlocks = getConfig().getBoolean("settings.blocks.dispensers-lock-blocks", true);
         this.enableHangingCache = getConfig().getBoolean("settings.entities.experimental-matcher-optimization", false);
+        this.entitiesAllowVoidDamage =  getConfig().getBoolean("settings.entities.allow-void-damage", true);
+        this.entitiesAllowLivingEnvironmentDamage =  getConfig().getBoolean("settings.entities.allow-living-entity-environment-damage", false);
+        this.entitiesAllowLivingPlayerDamage =  getConfig().getBoolean("settings.entities.allow-living-entity-player-damage", false);
+        this.entitiesAllowNonlivingEnvironmentDamage =  getConfig().getBoolean("settings.entities.allow-nonliving-entity-environment-damage", false);
+        this.entitiesAllowNonlivingPlayerDamage =  getConfig().getBoolean("settings.entities.allow-nonliving-entity-player-damage", false);
         this.redstoneTracking = getConfig().getBoolean("settings.blocks.experimental-redstone-tracking", false);
         this.pistonMovement = getConfig().getBoolean("settings.blocks.experimental-piston-movement", false);
         registerAccessTypes();
@@ -614,6 +624,26 @@ public class BoltPlugin extends JavaPlugin implements BoltAPI {
 
     public boolean getBlocksDispensersLockBlocks() {
         return blocksDispensersLockBlocks;
+    }
+
+    public boolean getEntitiesAllowVoidDamage() {
+        return entitiesAllowVoidDamage;
+    }
+
+    public boolean getEntitiesAllowLivingEnvironmentDamage() {
+        return entitiesAllowLivingEnvironmentDamage;
+    }
+
+    public boolean getEntitiesAllowLivingPlayerDamage() {
+        return entitiesAllowLivingPlayerDamage;
+    }
+
+    public boolean getEntitiesAllowNonlivingEnvironmentDamage() {
+        return entitiesAllowNonlivingEnvironmentDamage;
+    }
+
+    public boolean getEntitiesAllowNonlivingPlayerDamage() {
+        return entitiesAllowNonlivingPlayerDamage;
     }
 
     public boolean getEnableHangingCache() {

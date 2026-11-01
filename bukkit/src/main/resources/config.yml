@@ -10,6 +10,11 @@ settings:
     experimental-redstone-tracking: false
     experimental-piston-movement: false
   entities:
+    allow-void-damage: true
+    allow-living-entity-environment-damage: true
+    allow-living-entity-player-damage: true
+    allow-nonliving-entity-environment-damage: false
+    allow-nonliving-entity-player-damage: false
     experimental-matcher-optimization: false
 database:
   type: sqlite
